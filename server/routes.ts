@@ -9,17 +9,14 @@ import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { insertUserSchema, loginSchema, type User, type SubscriptionTier } from "@shared/schema";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
-}
-
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing required OpenAI API key: OPENAI_API_KEY');
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-10-16",
-});
+// Stripe is optional for now
+const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2025-06-30.basil",
+}) : null;
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -170,6 +167,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Subscription routes
   app.post("/api/create-subscription", requireAuth, async (req: any, res) => {
+    if (!stripe) {
+      return res.status(503).json({ message: "Payment processing not available. Stripe not configured." });
+    }
+
     try {
       const { tier } = req.body;
       const user = req.user;
@@ -182,7 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Create customer if doesn't exist
       if (!customerId) {
-        const customer = await stripe.customers.create({
+        const customer = await stripe!.customers.create({
           email: user.email,
           name: user.username,
         });
@@ -191,7 +192,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create subscription
-      const subscription = await stripe.subscriptions.create({
+      const subscription = await stripe!.subscriptions.create({
         customer: customerId,
         items: [{
           price: PRICE_IDS[tier as keyof typeof PRICE_IDS],
@@ -220,8 +221,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Chat routes
-  app.post("/api/chat", requireAuth, requireSubscription, async (req: any, res) => {
+  // Chat routes (subscription requirement temporarily disabled)
+  app.post("/api/chat", requireAuth, async (req: any, res) => {
     try {
       const { message, conversationHistory = [] } = req.body;
       const user = req.user;

@@ -9,11 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
-}
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) : null;
 
 const TIER_INFO = {
   basic: {
@@ -157,7 +153,10 @@ export default function SubscribePage() {
       return;
     }
 
-    createSubscriptionMutation.mutate();
+    // Only create subscription if Stripe is available
+    if (stripePromise) {
+      createSubscriptionMutation.mutate();
+    }
   }, [user, tier, setLocation, toast]);
 
   if (!user || !tier || !TIER_INFO[tier as keyof typeof TIER_INFO]) {
@@ -173,6 +172,54 @@ export default function SubscribePage() {
           <div className="animate-spin w-8 h-8 border-4 border-sky-blue border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600">Setting up your subscription...</p>
         </div>
+      </div>
+    );
+  }
+
+  // If Stripe is not configured, show a coming soon message
+  if (!stripePromise) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-12 h-12 gradient-bg rounded-xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-white font-bold">BH</span>
+            </div>
+            <CardTitle className="text-2xl font-bold text-gray-900">
+              {tierInfo.name} Plan
+            </CardTitle>
+            <p className="text-gray-600 mt-2">{tierInfo.price}/month</p>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              {tierInfo.features.map((feature, index) => (
+                <div key={index} className="flex items-center text-sm text-gray-600">
+                  <div className="w-2 h-2 bg-sky-blue rounded-full mr-3"></div>
+                  {feature}
+                </div>
+              ))}
+            </div>
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
+              <p className="text-yellow-800 font-medium">Payment System Coming Soon</p>
+              <p className="text-yellow-600 text-sm mt-1">
+                We're setting up secure payments. For now, enjoy the free chat experience!
+              </p>
+            </div>
+            <Button 
+              onClick={() => setLocation("/chat")} 
+              className="w-full bg-sky-blue hover:bg-sky-blue/90"
+            >
+              Try Free Chat Instead
+            </Button>
+            <Button 
+              onClick={() => setLocation("/")} 
+              variant="outline"
+              className="w-full"
+            >
+              Back to Home
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     );
   }

@@ -21,21 +21,22 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState("");
 
-  // Redirect if not authenticated or no subscription
+  // Redirect if not authenticated (subscription check disabled for now)
   useEffect(() => {
     if (!user) {
       setLocation("/");
       return;
     }
-    if (!user.isSubscriptionActive) {
-      toast({
-        title: "Subscription Required",
-        description: "Please subscribe to access the chat feature.",
-        variant: "destructive",
-      });
-      setLocation("/");
-      return;
-    }
+    // Temporarily disabled subscription requirement
+    // if (!user.isSubscriptionActive) {
+    //   toast({
+    //     title: "Subscription Required",
+    //     description: "Please subscribe to access the chat feature.",
+    //     variant: "destructive",
+    //   });
+    //   setLocation("/");
+    //   return;
+    // }
   }, [user, setLocation, toast]);
 
   const chatMutation = useMutation({
