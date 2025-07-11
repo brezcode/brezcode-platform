@@ -158,7 +158,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white p-8 rounded-3xl shadow-lg">
               <div className="flex mb-4">
                 {[...Array(5)].map((_, i) => (
@@ -168,9 +168,9 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "I have family history and not knowing what to do with my current symptoms, thanks to this APP, now I gain control of my life"
+                "As a young woman, I ignored breast health. This app's fun, quick lessons taught me to listen to my body and act early!"
               </p>
-              <p className="font-semibold">Abby, 35 years old</p>
+              <p className="font-semibold">– Mia, 28</p>
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-lg">
@@ -182,9 +182,9 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "I am a current breast cancer patient, not knowing how to live my life, this APP is a game changer, I am so encouraged and able to face this challenge every day."
+                "I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast."
               </p>
-              <p className="font-semibold">Monica, 44 years old</p>
+              <p className="font-semibold">– Emily, 37</p>
             </div>
 
             <div className="bg-white p-8 rounded-3xl shadow-lg">
@@ -196,9 +196,23 @@ export default function LandingPage() {
                 ))}
               </div>
               <p className="text-gray-600 mb-6 italic">
-                "After chemo treatment, my doctor said I am free of cancer, but I am scared of recurrence. This APP provide me with daily guidance and tips to rebuild myself, and not solely on medication."
+                "My sister had breast cancer, so I'm high-risk. The app's risk scoring and check-in reminders help me feel in control of my health!"
               </p>
-              <p className="font-semibold">Tracy, 52 years old</p>
+              <p className="font-semibold">– Aisha, 34</p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl shadow-lg">
+              <div className="flex mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
+              </div>
+              <p className="text-gray-600 mb-6 italic">
+                "I'm a survivor, but recurrence scares me. This app keeps me proactive with diet, exercise, and peace of mind."
+              </p>
+              <p className="font-semibold">– Vanessa, 47</p>
             </div>
           </div>
         </div>
