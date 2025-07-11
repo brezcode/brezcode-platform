@@ -80,8 +80,7 @@ export default function Features() {
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {activities.map((activity, index) => (
-            <div key={index} className={`${activity.bgColor} border ${activity.borderColor} p-6 rounded-2xl hover-lift`}>
-              <div className="text-3xl mb-4">{activity.icon}</div>
+            <div key={index} className="bg-yellow-50 border border-yellow-200 p-6 rounded-2xl hover-lift">
               <h3 className="text-lg font-bold mb-2">{activity.title}</h3>
               <p className="text-gray-600 text-sm mb-3">{activity.description}</p>
               <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1 rounded-full text-sm font-semibold inline-block">
