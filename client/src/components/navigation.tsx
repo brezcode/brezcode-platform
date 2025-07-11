@@ -61,42 +61,52 @@ export default function Navigation() {
 
   return (
     <>
-      <nav className="fixed top-0 w-full bg-white/80 backdrop-blur-lg z-50 border-b border-gray-100">
+      <nav className="fixed top-0 w-full bg-transparent z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setLocation("/")}>
-              <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">BC</span>
               </div>
-              <span className="font-semibold text-lg">BrezCode</span>
+              <span className="font-bold text-xl text-white">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-charcoal hover:text-sky-blue transition-colors">Features</a>
-              <a href="#pricing" className="text-charcoal hover:text-sky-blue transition-colors">Pricing</a>
-              <a href="#about" className="text-charcoal hover:text-sky-blue transition-colors">About</a>
+              <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">About</a>
+              <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">Features</a>
+              <a href="#pricing" className="text-white hover:text-yellow-200 transition-colors font-medium">Reviews</a>
+              <a href="#" className="text-white hover:text-yellow-200 transition-colors font-medium">For Organizations</a>
               
               {user ? (
                 <div className="flex items-center space-x-4">
+                  <span className="text-sm text-white">Welcome, {user.username}!</span>
                   {user.isSubscriptionActive && (
                     <Button 
                       onClick={() => setLocation("/chat")}
-                      variant="outline"
-                      className="border-sky-blue text-sky-blue hover:bg-sky-blue hover:text-white"
+                      className="bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors font-semibold"
                     >
-                      Chat
+                      Open Chat
                     </Button>
                   )}
-                  <Button onClick={handleLogout} variant="outline">
+                  <Button variant="outline" onClick={handleLogout} className="border-white text-white hover:bg-white hover:text-blue-600">
                     Sign Out
                   </Button>
                 </div>
               ) : (
-                <Button 
-                  onClick={() => setShowAuthModal(true)}
-                  className="bg-sky-blue text-white hover:bg-blue-600"
-                >
-                  Sign In
-                </Button>
+                <div className="flex items-center space-x-6">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => setShowAuthModal(true)}
+                    className="text-white hover:text-yellow-200 font-medium"
+                  >
+                    Log In
+                  </Button>
+                  <Button 
+                    onClick={() => setShowAuthModal(true)}
+                    className="bg-white text-blue-600 px-6 py-2 rounded-full hover:bg-gray-100 transition-colors font-semibold"
+                  >
+                    SIGN UP
+                  </Button>
+                </div>
               )}
             </div>
           </div>
