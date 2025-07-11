@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import RiskReductionChart from "./risk-reduction-chart";
+import yogaImage from "@assets/yoga_1752241133489.png";
 
 export default function Features() {
   const activities = [
@@ -164,7 +165,7 @@ export default function Features() {
               <div className="bg-white rounded-3xl p-8 shadow-lg">
                 <div className="w-full h-96 rounded-2xl overflow-hidden flex items-center justify-center">
                   <img 
-                    src="/meditation-woman.png" 
+                    src={yogaImage} 
                     alt="Woman meditating in peaceful pose"
                     className="w-full h-full object-cover rounded-2xl"
                   />
