@@ -103,23 +103,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Free Trial Section */}
-      <section id="trial" className="py-20 bg-gradient-to-r from-sky-50 to-blue-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            "Get your free <span className="sunny-yellow">15-day trial</span>"
-          </h2>
-          <p className="text-2xl text-gray-600 mb-8">
-            Every feature is included
-          </p>
-          <Button 
-            onClick={() => setLocation("/chat")}
-            className="gradient-bg text-white px-12 py-6 rounded-full text-xl font-semibold hover:shadow-lg transition-all hover:scale-105"
-          >
-            Start Free Trial
-          </Button>
-        </div>
-      </section>
 
       {/* Promise Section */}
       <section className="py-20">
