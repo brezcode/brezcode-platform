@@ -79,7 +79,7 @@ export default function Hero() {
         </div>
 
         {/* Hero Image Section */}
-        <div className="grid lg:grid-cols-2 gap-16 items-end pb-0">
+        <div className="grid lg:grid-cols-2 gap-16 items-start pb-0">
           <div className="relative flex justify-center items-end" style={{ height: '500px' }}>
             {/* Yellow Circle Background */}
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
