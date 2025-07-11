@@ -148,112 +148,121 @@ export default function LandingPage() {
 
       {/* Testimonials Section */}
       <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Results from <span className="sky-blue">real people like you</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              Results from real people like you
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-lg text-gray-500 italic">
               These are real customer reviews, and we have hundreds more
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white p-8 rounded-3xl shadow-lg">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
+          <div className="grid md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-pink-400 to-purple-500">
+                <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                  M
+                </div>
               </div>
-              <p className="text-gray-600 mb-6 italic">
+              <p className="text-gray-600 font-medium mb-6">Mia</p>
+              <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
                 "As a young woman, I ignored breast health. This app's fun, quick lessons taught me to listen to my body and act early!"
-              </p>
-              <p className="font-semibold">– Mia, 28</p>
+              </blockquote>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
+              </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl shadow-lg">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-yellow-400 to-orange-500">
+                <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                  E
+                </div>
               </div>
-              <p className="text-gray-600 mb-6 italic">
+              <p className="text-gray-600 font-medium mb-6">Emily</p>
+              <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
                 "I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast."
-              </p>
-              <p className="font-semibold">– Emily, 37</p>
+              </blockquote>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
+              </div>
             </div>
 
-            <div className="bg-white p-8 rounded-3xl shadow-lg">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
+            <div className="text-center">
+              <div className="w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden bg-gradient-to-br from-green-400 to-teal-500">
+                <div className="w-full h-full flex items-center justify-center text-white text-2xl font-bold">
+                  A
+                </div>
               </div>
-              <p className="text-gray-600 mb-6 italic">
+              <p className="text-gray-600 font-medium mb-6">Aisha</p>
+              <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
                 "My sister had breast cancer, so I'm high-risk. The app's risk scoring and check-in reminders help me feel in control of my health!"
-              </p>
-              <p className="font-semibold">– Aisha, 34</p>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-lg">
-              <div className="flex mb-4">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+              </blockquote>
+              <div className="flex items-center justify-center space-x-2">
+                <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
-                ))}
+                </div>
+                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
               </div>
-              <p className="text-gray-600 mb-6 italic">
-                "I'm a survivor, but recurrence scares me. This app keeps me proactive with diet, exercise, and peace of mind."
-              </p>
-              <p className="font-semibold">– Vanessa, 47</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Results Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              With <span className="sky-blue">measurable impact</span>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              With measurable impact
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-lg text-gray-500 italic">
               Results reported from a recent customer survey
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">96%</div>
-              <p className="text-gray-600">feel less anxiety</p>
+          <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+            <div className="space-y-4">
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">96% feel less anxiety</span>
+              </div>
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">90% improve diet quality</span>
+              </div>
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">87% have better sleep</span>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">73%</div>
-              <p className="text-gray-600">sleep better</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">80%</div>
-              <p className="text-gray-600">eat better</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">75%</div>
-              <p className="text-gray-600">exercise more</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">80%</div>
-              <p className="text-gray-600">feel accomplished</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-bold sky-blue mb-2">100%</div>
-              <p className="text-gray-600">improve breast health</p>
+            
+            <div className="space-y-4">
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">80% feel accomplished</span>
+              </div>
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">75% improve mental health</span>
+              </div>
+              <div className="flex items-center text-lg text-gray-800">
+                <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
+                <span className="font-medium">100% improve breast health</span>
+              </div>
             </div>
           </div>
         </div>
