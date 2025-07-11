@@ -84,7 +84,7 @@ export default function Hero() {
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute"></div>
             {/* Woman Image */}
             <img 
-              src="https://images.unsplash.com/photo-1594824226394-17fb78a5f2aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=387&h=580"
+              src="/happy-woman-phone.png"
               alt="Happy woman using phone"
               className="relative z-10 w-64 h-80 object-cover object-center"
             />
