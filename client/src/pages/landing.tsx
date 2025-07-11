@@ -5,6 +5,7 @@ import Pricing from "@/components/pricing";
 import ChatInterface from "@/components/chat-interface";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import promiseImage from "@assets/Sunnyside p5_1752243629786.png";
 
 export default function LandingPage() {
   const [, setLocation] = useLocation();
@@ -105,54 +106,13 @@ export default function LandingPage() {
 
 
       {/* Promise Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Our <span className="sky-blue">promise to you</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              We know this is a deeply personal journey for you, as it was for us. We follow a strict code of conduct and promise to always put your health and wellness above all else.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-red-400 to-pink-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">No shame or guilt ever</h3>
-              <p className="text-gray-600">
-                Mindful lifestyle is about celebrating our wins, not making you feel bad.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-blue-400 to-indigo-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Always private and secure</h3>
-              <p className="text-gray-600">
-                This is a personal, private journey for you. We make privacy a top priority.
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-20 h-20 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold mb-4">Money back guarantee</h3>
-              <p className="text-gray-600">
-                If you give it a fair shot and aren't happy after 30 days, just let us know!
-              </p>
-            </div>
-          </div>
+      <section className="py-0">
+        <div className="w-full">
+          <img 
+            src={promiseImage}
+            alt="Our promise to you"
+            className="w-full h-auto"
+          />
         </div>
       </section>
 
