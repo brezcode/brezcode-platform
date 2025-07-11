@@ -80,19 +80,18 @@ export default function Hero() {
 
         {/* Hero Image Section */}
         <div className="grid lg:grid-cols-2 gap-16 items-center pb-20">
-          <div className="relative flex justify-center items-end h-96 overflow-hidden">
+          <div className="relative flex justify-center items-end min-h-96">
             {/* Yellow Circle Background */}
-            <div className="w-80 h-80 bg-yellow-400 rounded-full absolute bottom-0"></div>
+            <div className="w-80 h-80 bg-yellow-400 rounded-full absolute bottom-16"></div>
             {/* Woman Image */}
             <img 
               src={happyWomanImage}
               alt="Happy woman using phone"
-              className="relative z-10 object-contain"
+              className="relative z-10 object-contain object-bottom"
               style={{
                 width: '32rem',
                 height: '40rem',
-                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))',
-                transform: 'translateY(8rem)'
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
               }}
             />
 
