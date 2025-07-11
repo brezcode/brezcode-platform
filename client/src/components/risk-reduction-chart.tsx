@@ -47,16 +47,6 @@ export default function RiskReductionChart() {
 
   return (
     <div className="flex flex-col items-center mb-16">
-      {/* Celebration Header */}
-      <div className="text-center mb-8">
-        <h3 className="text-3xl font-bold text-green-600 mb-2">
-          🎉 Reach Risk Reduction of 100% 🎊
-        </h3>
-        <p className="text-lg text-gray-600">
-          Combine all activities for maximum protection! 🌟
-        </p>
-      </div>
-
       {/* Phone Mockup */}
       <div className="relative">
         {/* Phone Frame */}
@@ -67,35 +57,42 @@ export default function RiskReductionChart() {
             <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-32 h-6 bg-gray-900 rounded-b-2xl z-10"></div>
             
             {/* Chart Content */}
-            <div className="pt-8 px-4 h-full">
+            <div className="pt-8 px-3 h-full">
+              {/* Celebration Header inside phone */}
               <div className="text-center mb-4">
-                <h4 className="text-lg font-bold text-gray-800">Risk Reduction by Activity</h4>
+                <h3 className="text-lg font-bold text-green-600 mb-1">
+                  🎉 Reach Risk Reduction of 100% 🎊
+                </h3>
+                <p className="text-xs text-gray-600 mb-2">
+                  Combine all activities for maximum protection! 🌟
+                </p>
+                <h4 className="text-md font-bold text-gray-800">Risk Reduction by Activity</h4>
               </div>
               
-              <ResponsiveContainer width="100%" height="85%">
+              <ResponsiveContainer width="100%" height="75%">
                 <BarChart
                   data={data}
                   layout="horizontal"
                   margin={{
-                    top: 20,
-                    right: 30,
-                    left: 60,
-                    bottom: 20,
+                    top: 10,
+                    right: 5,
+                    left: 50,
+                    bottom: 10,
                   }}
                 >
-                  <CartesianGrid strokeDasharray="3 3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis 
                     type="number"
                     domain={[0, 60]}
-                    tickFormatter={(value) => `${value}%`}
-                    fontSize={10}
+                    hide
                   />
                   <YAxis 
                     type="category"
                     dataKey="name"
-                    width={50}
-                    fontSize={9}
+                    width={45}
+                    fontSize={8}
                     interval={0}
+                    tick={{ fill: '#374151' }}
                   />
                   <Tooltip 
                     formatter={(value, name, props) => [`${value}%`, 'Risk Reduction']}
@@ -104,17 +101,25 @@ export default function RiskReductionChart() {
                       return item ? item.fullName : label;
                     }}
                     contentStyle={{
-                      fontSize: '12px',
-                      borderRadius: '8px',
-                      border: '1px solid #e5e7eb'
+                      fontSize: '10px',
+                      borderRadius: '6px',
+                      border: '1px solid #e5e7eb',
+                      padding: '6px'
                     }}
                   />
                   <Bar 
                     dataKey="reduction" 
-                    fill="#fbbf24"
-                    stroke="#f59e0b"
+                    fill="#3b82f6"
+                    stroke="#2563eb"
                     strokeWidth={1}
-                    radius={[0, 4, 4, 0]}
+                    radius={[0, 6, 6, 0]}
+                    label={{
+                      position: 'inside',
+                      fill: 'white',
+                      fontSize: 9,
+                      fontWeight: 'bold',
+                      formatter: (value) => `${value}%`
+                    }}
                   />
                 </BarChart>
               </ResponsiveContainer>
