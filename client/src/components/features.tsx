@@ -106,7 +106,7 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-xl font-bold mb-2">Reduce Risk Level</h4>
-              <p className="text-gray-600">Improve your breast health</p>
+              <p className="text-xl font-bold text-gray-700">💖 Improve your breast health</p>
             </div>
             <div>
               <div className="w-16 h-16 bg-sunny-yellow rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -115,7 +115,7 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-xl font-bold mb-2">Increase awareness</h4>
-              <p className="text-gray-600">Gain control over estrogen</p>
+              <p className="text-xl font-bold text-gray-700">⚖️ Gain control over estrogen</p>
             </div>
             <div>
               <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -124,7 +124,7 @@ export default function Features() {
                 </svg>
               </div>
               <h4 className="text-xl font-bold mb-2">Improve your well-being</h4>
-              <p className="text-gray-600">No more guessing</p>
+              <p className="text-xl font-bold text-gray-700">🎯 No more guessing</p>
             </div>
           </div>
         </div>
