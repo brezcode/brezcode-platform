@@ -66,9 +66,9 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setLocation("/")}>
               <div className="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">BH</span>
+                <span className="text-white font-bold text-sm">BC</span>
               </div>
-              <span className="font-semibold text-lg">Breast Health Coach AI</span>
+              <span className="font-semibold text-lg">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-charcoal hover:text-sky-blue transition-colors">Features</a>

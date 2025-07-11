@@ -10,36 +10,56 @@ export default function Hero() {
     if (user?.isSubscriptionActive) {
       setLocation("/chat");
     } else {
-      // Scroll to pricing section
-      const pricingSection = document.getElementById("pricing");
-      pricingSection?.scrollIntoView({ behavior: "smooth" });
+      // Scroll to quiz section
+      const quizSection = document.getElementById("quiz");
+      quizSection?.scrollIntoView({ behavior: "smooth" });
     }
+  };
+
+  const handleTakeQuiz = () => {
+    setLocation("/chat"); // For now, redirect to chat for the quiz experience
   };
 
   return (
     <section className="pt-24 pb-20 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">
         <div className="animate-fade-in-up">
+          {/* Statistics Header */}
+          <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl p-4 mb-8 max-w-md mx-auto">
+            <p className="text-red-700 font-semibold text-lg">
+              "1 in 8 will have breast cancer in their lifetime"
+            </p>
+          </div>
+
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Your Personal
-            <span className="gradient-text"> Breast Health</span>
-            <br />Coach
+            Say no to <span className="text-red-600">anxiety</span> 
+            <br />and <span className="text-red-600">guessing</span>
           </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            AI-powered guidance for proactive breast health management. Get personalized insights, risk assessments, and daily coaching tailored to your unique health profile.
+          
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 gradient-text">
+            Join now to lower your risk over 100% in 15 days
+          </h2>
+          
+          <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
+            The #1 evidence-based AI coaching program with practical daily guidance, nurturing tips and risk scoring to uplift your lifestyle
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Button 
-              onClick={handleGetStarted}
+              onClick={handleTakeQuiz}
               className="gradient-bg text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg transition-all hover:scale-105"
             >
-              {user?.isSubscriptionActive ? "Open Chat" : "Start Your Health Journey"}
+              Take a quiz now to assess your risk
             </Button>
             <Button 
               variant="outline"
               className="border-2 border-sky-blue text-sky-blue px-8 py-4 rounded-full text-lg font-semibold hover:bg-sky-blue hover:text-white transition-all"
+              onClick={() => {
+                const trialSection = document.getElementById("trial");
+                trialSection?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
-              Watch Demo
+              Get your free 15-day trial
             </Button>
           </div>
         </div>

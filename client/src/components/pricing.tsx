@@ -69,69 +69,100 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-20 bg-gray-50">
+    <section id="pricing" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Choose Your <span className="sky-blue">Health Plan</span>
+            Free 15-day trial, then <span className="sky-blue">simple pricing</span>
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Select the perfect plan for your breast health journey. All plans include AI chat support and personalized recommendations.
+            Easy Risk scoring and tracking • Weekly Planning • Analytics & dashboard • Personalized recommendations • AI chatbot messaging interface • Supportive community • Focus on moderation • Affordable cost
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          {plans.map((plan) => (
-            <div 
-              key={plan.id}
-              className={`bg-white rounded-3xl shadow-lg hover-lift p-8 relative ${
-                plan.popular ? "border-2 border-sky-blue" : ""
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-sky-blue text-white px-6 py-2 rounded-full text-sm font-semibold">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-              
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <div className={`text-4xl font-bold mb-6 ${
-                  plan.popular ? "sky-blue" : "text-charcoal"
-                }`}>
-                  {plan.price}<span className="text-lg font-normal text-gray-500">/month</span>
-                </div>
-                
-                <ul className="space-y-3 mb-8 text-left">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="flex items-center space-x-3">
-                      <svg 
-                        className={`w-5 h-5 ${
-                          plan.id === "premium" ? "sunny-yellow" : "sky-blue"
-                        }`} 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                
-                <Button
-                  onClick={() => handleSubscribe(plan.id)}
-                  className={`w-full py-3 rounded-full font-semibold transition-all ${plan.buttonClass}`}
-                >
-                  {plan.id === "basic" ? "Get Started" : 
-                   plan.id === "pro" ? "Start Pro Plan" : "Go Premium"}
-                </Button>
-              </div>
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-3xl shadow-xl p-12 border-2 border-sky-blue relative">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <span className="bg-gradient-to-r from-sky-blue to-blue-500 text-white px-8 py-3 rounded-full text-lg font-bold">
+                ⭐ BEST VALUE
+              </span>
             </div>
-          ))}
+            
+            <div className="text-center">
+              <h3 className="text-3xl font-bold mb-4">BrezCode Premium</h3>
+              <div className="text-6xl font-bold mb-2 sky-blue">
+                Free
+              </div>
+              <p className="text-xl text-gray-600 mb-2">15 days, then $19.99/month</p>
+              <p className="text-gray-500 mb-8">Cancel anytime • No hidden fees</p>
+              
+              <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Easy Risk scoring and tracking</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Weekly Planning</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Analytics & dashboard</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Personalized recommendations</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>AI chatbot messaging interface</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Supportive community</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Focus on moderation</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Affordable cost</span>
+                  </div>
+                </div>
+              </div>
+              
+              <Button
+                onClick={() => setLocation("/chat")}
+                className="w-full py-4 rounded-full font-bold text-xl gradient-bg text-white hover:shadow-lg transition-all hover:scale-105"
+              >
+                Start Your Free 15-Day Trial
+              </Button>
+              
+              <p className="text-sm text-gray-500 mt-4">
+                Start immediately • No credit card required • Cancel anytime
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Money Back Guarantee */}

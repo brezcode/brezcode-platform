@@ -1,8 +1,8 @@
-# Breast Health Coach AI
+# BrezCode - Breast Health Coach AI
 
 ## Overview
 
-This is a subscription-based web application that provides AI-powered breast health coaching through a conversational interface. The application features a modern landing page with Stripe-integrated subscription tiers and a chat interface powered by OpenAI's GPT-4o model. It's built as a full-stack React application with an Express.js backend, designed to run on Replit with session-based authentication and in-memory storage for the MVP.
+This is a subscription-based web application that provides AI-powered breast health coaching through a conversational interface. The application features a modern landing page inspired by the BrezCode design document with evidence-based risk reduction activities, AI chat functionality, and subscription tiers. It's built as a full-stack React application with an Express.js backend, designed to run on Replit with session-based authentication and in-memory storage for the MVP.
 
 ## System Architecture
 
@@ -99,6 +99,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 11, 2025. Landing page redesigned with BrezCode content - updated hero section with risk statistics, evidence-based activities, app features, testimonials, and simplified pricing structure
 - July 02, 2025. Initial setup
 ```
 
