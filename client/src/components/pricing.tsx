@@ -69,111 +69,107 @@ export default function Pricing() {
   };
 
   return (
-    <section id="pricing" className="py-20" style={{ backgroundColor: '#F4F1E8' }}>
+    <section id="pricing" className="py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid lg:grid-cols-3 gap-12 items-start">
-          {/* Left side - Features list */}
-          <div className="lg:col-span-1">
-            <h2 className="text-4xl md:text-5xl font-bold mb-8 text-black leading-tight">
-              Free 15-day trial,<br />
-              then simple pricing.
-            </h2>
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Free 15-day trial, then <span className="sky-blue">simple pricing</span>
+          </h2>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            Easy Risk scoring and tracking • Weekly Planning • Analytics & dashboard • Personalized recommendations • AI chatbot messaging interface • Supportive community • Focus on moderation • Affordable cost
+          </p>
+        </div>
 
-            <div className="space-y-4">
-              {[
-                "Easy drink tracking",
-                "Weekly planning", 
-                "Analytics & dashboard",
-                "Personalized recommendations",
-                "Real human coaching",
-                "Supportive community",
-                "Focus on moderation",
-                "Judgement-free",
-                "Affordable cost",
-                "Text message interface",
-                "Only 3 minutes per day"
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="3">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-3xl shadow-xl p-12 border-2 border-sky-blue relative">
+            <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+              <span className="bg-gradient-to-r from-sky-blue to-blue-500 text-white px-8 py-3 rounded-full text-lg font-bold">
+                ⭐ BEST VALUE
+              </span>
+            </div>
+            
+            <div className="text-center">
+              <h3 className="text-3xl font-bold mb-4">BrezCode Premium</h3>
+              <div className="text-6xl font-bold mb-2 sky-blue">
+                Free
+              </div>
+              <p className="text-xl text-gray-600 mb-2">15 days, then $19.99/month</p>
+              <p className="text-gray-500 mb-8">Cancel anytime • No hidden fees</p>
+              
+              <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
+                    <span>Easy Risk scoring and tracking</span>
                   </div>
-                  <span className="text-gray-800 text-sm">{feature}</span>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Weekly Planning</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Analytics & dashboard</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Personalized recommendations</span>
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right side - Pricing cards */}
-          <div className="lg:col-span-2 grid md:grid-cols-2 gap-6">
-            {/* Basic Plan */}
-            <div className="bg-white rounded-3xl border-2 border-yellow-300 p-8 relative shadow-sm">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-green-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center space-x-1">
-                  <span>✓</span>
-                  <span>MOST POPULAR</span>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>AI chatbot messaging interface</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Supportive community</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Focus on moderation</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span>Affordable cost</span>
+                  </div>
                 </div>
               </div>
-
-              <h3 className="text-2xl font-bold mb-4 text-black mt-4">Basic plan</h3>
-              <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-                Ready to drink a bit less, but don't want to quit? This is where most new members start.
-              </p>
-
-              <div className="mb-8">
-                <div className="text-4xl font-bold text-black">$8.25</div>
-                <div className="text-gray-500 text-sm">per month, billed at $99/year</div>
-              </div>
-
-              <Button 
+              
+              <Button
                 onClick={() => setLocation("/chat")}
-                className="w-full py-4 rounded-full font-bold text-black border-0 transition-all"
-                style={{ backgroundColor: '#F5D748' }}
+                className="w-full py-4 rounded-full font-bold text-xl gradient-bg text-white hover:shadow-lg transition-all hover:scale-105"
               >
-                Start my free 15-day trial
+                Start Your Free 15-Day Trial
               </Button>
-            </div>
-
-            {/* Cutback Coach */}
-            <div className="bg-white rounded-3xl border border-gray-200 p-8 relative shadow-sm">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <div className="bg-gray-400 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center space-x-1">
-                  <span>♡</span>
-                  <span>IF YOU NEED MORE SUPPORT</span>
-                </div>
-              </div>
-
-              <h3 className="text-2xl font-bold mb-4 text-black mt-4">Cutback Coach</h3>
-              <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-                Need a more hands-on approach? Get a more personalized experience & hands-on coaching.
+              
+              <p className="text-sm text-gray-500 mt-4">
+                Start immediately • No credit card required • Cancel anytime
               </p>
-
-              <div className="mb-8">
-                <div className="text-4xl font-bold text-black">$24.83</div>
-                <div className="text-gray-500 text-sm">per month, billed at $298/year</div>
-              </div>
-
-              <Button 
-                onClick={() => setLocation("/chat")}
-                className="w-full py-4 rounded-full font-bold bg-gray-200 text-gray-700 hover:bg-gray-300 transition-all border-0"
-              >
-                Start my free 15-day trial
-              </Button>
             </div>
           </div>
         </div>
 
         {/* Money Back Guarantee */}
         <div className="text-center mt-12">
-          <div className="flex items-center justify-center space-x-2">
-            <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <span className="text-gray-700 font-medium text-sm">MONEY-BACK GUARANTEE. DON'T LOVE IT? JUST LET US KNOW</span>
-          </div>
+          <p className="text-gray-600">
+            <span className="font-semibold">30-day money-back guarantee</span> • Cancel anytime • No hidden fees
+          </p>
         </div>
       </div>
     </section>
