@@ -162,14 +162,18 @@ export default function Features() {
             {/* Right side - Image */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
-                <img 
-                  src="/yoga-woman.png" 
-                  alt="Woman meditating in yoga pose"
-                  className="w-full h-auto object-contain rounded-2xl max-h-96"
-                  onError={(e) => {
-                    console.error('Image failed to load:', e);
-                  }}
-                />
+                <div className="w-full h-96 flex items-center justify-center">
+                  <img 
+                    src="/yoga-woman.png" 
+                    alt="Woman meditating in yoga pose"
+                    className="max-w-full max-h-full object-contain rounded-2xl"
+                    onLoad={() => console.log('Image loaded successfully')}
+                    onError={(e) => {
+                      console.error('Image failed to load:', e);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
               </div>
             </div>
           </div>
