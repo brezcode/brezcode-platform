@@ -81,7 +81,7 @@ export default function Features() {
           </p>
         </div>
 
-        <RiskReductionChart activities={activities} />
+        <RiskReductionChart />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {activities.map((activity, index) => (
