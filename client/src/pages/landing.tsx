@@ -106,13 +106,28 @@ export default function LandingPage() {
 
 
       {/* Promise Section */}
-      <section className="py-0">
-        <div className="w-full">
-          <img 
-            src={promiseImage}
-            alt="Our promise to you"
-            className="w-full h-auto"
-          />
+      <section className="py-20 bg-gradient-to-br from-purple-600 to-indigo-700">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
+              Our Promise to You
+            </h2>
+            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-12 max-w-4xl mx-auto">
+              <p className="text-xl md:text-2xl text-white leading-relaxed font-medium">
+                We are committed to providing you with evidence-based, personalized guidance 
+                that empowers you to take control of your breast health. Our platform combines 
+                cutting-edge AI technology with compassionate support to help you reduce your 
+                risk and live with confidence.
+              </p>
+              <div className="mt-8 flex justify-center">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
+                  <p className="text-lg font-semibold">
+                    Your health journey is unique, and so is our approach to supporting you.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
