@@ -162,20 +162,12 @@ export default function Features() {
             {/* Right side - Image */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
-                <div className="w-full h-96 bg-gray-100 rounded-2xl overflow-hidden flex items-center justify-center">
-                  <img 
-                    src="/yoga-woman.png" 
-                    alt="Woman meditating in yoga pose"
-                    className="w-full h-full object-cover"
-                    style={{ display: 'block' }}
-                    onLoad={() => console.log('Image loaded successfully')}
-                    onError={(e) => {
-                      console.error('Image failed to load:', e);
-                      const target = e.currentTarget as HTMLImageElement;
-                      target.style.display = 'none';
-                      target.parentElement!.innerHTML = '<div class="text-gray-500 text-center">Image not available</div>';
-                    }}
-                  />
+                <div className="w-full h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl overflow-hidden flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <div className="text-6xl mb-4">🧘‍♀️</div>
+                    <h4 className="text-xl font-bold text-purple-700 mb-2">Mindfulness & Wellness</h4>
+                    <p className="text-purple-600">Your journey to better health starts with daily mindfulness practice</p>
+                  </div>
                 </div>
               </div>
             </div>
