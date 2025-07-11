@@ -15,6 +15,97 @@ export default function LandingPage() {
       <Hero />
       <Features />
       
+      {/* Evidence-Based Risk Reduction Section */}
+      <section className="py-20 bg-gradient-to-br from-sky-400 to-blue-500 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left Content */}
+            <div className="text-white">
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+                Control your habits,<br />
+                <span className="text-yellow-300">transform your life.</span>
+              </h2>
+              <p className="text-xl mb-8 text-blue-100">
+                The #1 evidence-based habit moderation platform to help you gain control of your lifestyle.
+              </p>
+              
+              <Button 
+                onClick={() => setLocation("/chat")}
+                className="bg-yellow-400 text-gray-900 hover:bg-yellow-300 px-8 py-4 rounded-full text-lg font-semibold mb-8"
+              >
+                Take the quiz to start
+              </Button>
+              
+              <p className="text-blue-100 mb-12">Start for free. Cancel any time.</p>
+
+              {/* Statistics */}
+              <div className="grid grid-cols-3 gap-8 text-center">
+                <div>
+                  <div className="text-2xl font-bold mb-2">250,000</div>
+                  <div className="text-blue-200 text-sm">LIVES CHANGED</div>
+                </div>
+                <div>
+                  <div className="flex justify-center mb-2">
+                    <div className="flex text-yellow-300">
+                      ★★★★★
+                    </div>
+                  </div>
+                  <div className="text-blue-200 text-sm">4.8 RATING</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold mb-2">13 MILLION</div>
+                  <div className="text-blue-200 text-sm">DRINKS CUT SINCE 2020</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Content - Person with Phone */}
+            <div className="relative">
+              {/* Yellow circle background */}
+              <div className="absolute inset-0 bg-yellow-400 rounded-full w-80 h-80 mx-auto"></div>
+              
+              {/* Person illustration placeholder - you can replace with actual image */}
+              <div className="relative z-10 flex justify-center">
+                <div className="w-64 h-80 bg-gradient-to-b from-yellow-200 to-yellow-300 rounded-t-full flex items-end justify-center relative">
+                  <div className="text-6xl mb-8">👤</div>
+                  
+                  {/* Chat bubbles */}
+                  <div className="absolute -right-8 top-16">
+                    <div className="bg-white rounded-2xl p-3 shadow-lg mb-2 max-w-xs">
+                      <p className="text-gray-800 text-sm">Hey Sue, how'd it go yesterday?</p>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute -right-12 top-32">
+                    <div className="bg-purple-500 text-white rounded-2xl p-3 shadow-lg mb-2 max-w-xs">
+                      <p className="text-sm">Keep it mindful and feeling great today!</p>
+                    </div>
+                  </div>
+                  
+                  <div className="absolute -right-8 top-48">
+                    <div className="bg-green-500 text-white rounded-2xl p-3 shadow-lg max-w-xs">
+                      <p className="text-sm">Great work sticking to your plan!</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Large percentage stat */}
+              <div className="absolute right-0 bottom-20 bg-white rounded-2xl p-6 shadow-xl">
+                <div className="text-5xl font-bold text-blue-600 mb-2">96%</div>
+                <div className="text-gray-700 font-semibold">
+                  of members report<br />
+                  drinking less after 90 days
+                </div>
+                <p className="text-gray-500 text-sm mt-2">
+                  In addition, Sunnyside members reduce their weekly consumption by an average of 30% after 90 days, as verified in a third-party study.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* App Features Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
