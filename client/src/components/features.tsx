@@ -165,7 +165,10 @@ export default function Features() {
                 <img 
                   src="/yoga-woman.png" 
                   alt="Woman meditating in yoga pose"
-                  className="w-full h-auto object-cover rounded-2xl"
+                  className="w-full h-auto object-contain rounded-2xl max-h-96"
+                  onError={(e) => {
+                    console.error('Image failed to load:', e);
+                  }}
                 />
               </div>
             </div>
