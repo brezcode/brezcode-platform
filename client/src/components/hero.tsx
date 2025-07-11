@@ -113,7 +113,7 @@ export default function Hero() {
             <div className="text-6xl font-bold text-white mb-4">96%</div>
             <div className="text-2xl font-bold text-white mb-4">
               of members report<br />
-              better health after 90 days
+              reduced anxiety after 90 days
             </div>
             <p className="text-blue-100 mb-8">
               In addition, BrezCode members reduce their weekly risk consumption by an average of 31% after 90 days, as verified in a third-party study.
