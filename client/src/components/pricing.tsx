@@ -93,7 +93,7 @@ export default function Pricing() {
               <div className="text-6xl font-bold mb-2 sky-blue">
                 Free
               </div>
-              <p className="text-xl text-gray-600 mb-2">15 days, then $19.99/month</p>
+              <p className="text-xl text-gray-600 mb-2">15 days, then $4.99/month</p>
               <p className="text-gray-500 mb-8">Cancel anytime • No hidden fees</p>
               
               <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
@@ -153,9 +153,9 @@ export default function Pricing() {
               
               <Button
                 onClick={() => setLocation("/chat")}
-                className="w-full py-4 rounded-full font-bold text-xl gradient-bg text-white hover:shadow-lg transition-all hover:scale-105"
+                className="w-full py-4 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
               >
-                Start Your Free 15-Day Trial
+                Take the quiz to start
               </Button>
               
               <p className="text-sm text-gray-500 mt-4">
