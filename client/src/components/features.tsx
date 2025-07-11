@@ -96,35 +96,102 @@ export default function Features() {
         </div>
 
         {/* Benefits Summary */}
-        <div className="mt-20 bg-gradient-to-r from-sky-50 to-blue-50 rounded-3xl p-12 text-center">
-          <h3 className="text-3xl font-bold mb-6">Brezcode can help you</h3>
-          <div className="grid md:grid-cols-3 gap-8">
+        <div className="mt-20 bg-gradient-to-r from-sky-50 to-blue-50 rounded-3xl p-12">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Left side - Content */}
             <div>
-              <div className="w-16 h-16 bg-sky-blue rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+              <h3 className="text-3xl font-bold mb-8 text-sky-600">Brezcode can help you</h3>
+              
+              <div className="space-y-6">
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-2">Reduce breast cancer risk</h4>
+                    <p className="text-gray-600">No matter where you are on your journey, Brezcode can help you reduce risk, with no pressure to be perfect.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-2">Gain control over your wellness</h4>
+                    <p className="text-gray-600">We'll teach you the science-backed habits and techniques to gain control over your breast health.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-2">Reduce anxiety and stress</h4>
+                    <p className="text-gray-600">The days of anxiety ruining your day or week are over. Learn to enjoy peace of mind with fewer negative effects.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start space-x-4">
+                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold mb-2">Improve your well-being</h4>
+                    <p className="text-gray-600">Taking care of your health can have a big positive impact on your sleep, mental health, relationships, and more.</p>
+                  </div>
+                </div>
               </div>
-              <h4 className="text-xl font-bold mb-2">Reduce Risk Level</h4>
-              <p className="text-xl font-bold text-gray-700">💖 Improve your breast health</p>
+
+              <div className="mt-8">
+                <Button className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
+                  Take the quiz to start
+                </Button>
+              </div>
             </div>
-            <div>
-              <div className="w-16 h-16 bg-sunny-yellow rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-charcoal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
+
+            {/* Right side - Image with stats */}
+            <div className="relative">
+              <div className="bg-white rounded-3xl p-8 shadow-lg">
+                <img 
+                  src="/happy-woman-phone.png" 
+                  alt="Woman using phone with health tracking"
+                  className="w-full h-64 object-cover rounded-2xl mb-6"
+                />
+                
+                {/* Stats overlay */}
+                <div className="space-y-3">
+                  <div className="bg-purple-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
+                    <span className="text-2xl font-bold">19</span>
+                    <span className="text-sm">Nights of great sleep</span>
+                  </div>
+                  <div className="bg-yellow-400 text-black px-4 py-2 rounded-lg flex items-center justify-between">
+                    <span className="text-2xl font-bold">1.3k</span>
+                    <span className="text-sm">Calories cut</span>
+                  </div>
+                  <div className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-between">
+                    <span className="text-2xl font-bold">27</span>
+                    <span className="text-sm">Risk activities tracked</span>
+                  </div>
+                  <div className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
+                    <span className="text-2xl font-bold">20</span>
+                    <span className="text-sm">Healthy days added</span>
+                  </div>
+                  <div className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
+                    <span className="text-2xl font-bold">$58</span>
+                    <span className="text-sm">In healthcare saved</span>
+                  </div>
+                </div>
               </div>
-              <h4 className="text-xl font-bold mb-2">Increase awareness</h4>
-              <p className="text-xl font-bold text-gray-700">⚖️ Gain control over estrogen</p>
-            </div>
-            <div>
-              <div className="w-16 h-16 gradient-bg rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                </svg>
-              </div>
-              <h4 className="text-xl font-bold mb-2">Improve your well-being</h4>
-              <p className="text-xl font-bold text-gray-700">🎯 No more guessing</p>
             </div>
           </div>
         </div>
