@@ -84,13 +84,9 @@ export default function Hero() {
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute"></div>
             {/* Woman Image */}
             <img 
-              src="./happy-woman-phone.png"
+              src="/happy-woman-phone.png"
               alt="Happy woman using phone"
               className="relative z-10 w-64 h-80 object-cover object-center"
-              onError={(e) => {
-                console.error('Image failed to load:', e);
-                e.currentTarget.style.display = 'none';
-              }}
             />
 
             {/* Chat Bubbles */}
