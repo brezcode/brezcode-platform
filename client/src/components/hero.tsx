@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
-import happyWomanImage from "@assets/happy women using phone_1752231595491.png";
+import happyWomanImage from "@assets/happy_women_using_phone-removebg-preview_1752232002425.png";
 
 export default function Hero() {
   const [, setLocation] = useLocation();
@@ -87,10 +87,11 @@ export default function Hero() {
             <img 
               src={happyWomanImage}
               alt="Happy woman using phone"
-              className="relative z-10 w-80 h-96 object-contain object-center"
+              className="relative z-10 object-contain object-center"
               style={{
-                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))',
-                mixBlendMode: 'multiply'
+                width: '32rem',
+                height: '40rem',
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
               }}
             />
 
