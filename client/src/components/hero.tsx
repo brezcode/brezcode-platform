@@ -1,6 +1,7 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import happyWomanImage from "@assets/happy women using phone_1752231595491.png";
 
 export default function Hero() {
   const [, setLocation] = useLocation();
@@ -84,9 +85,9 @@ export default function Hero() {
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute"></div>
             {/* Woman Image */}
             <img 
-              src="/happy-woman-phone.png"
+              src={happyWomanImage}
               alt="Happy woman using phone"
-              className="relative z-10 w-64 h-80 object-cover object-center"
+              className="relative z-10 w-64 h-80 object-contain object-center"
             />
 
             {/* Chat Bubbles */}
