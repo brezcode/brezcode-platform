@@ -20,7 +20,7 @@ export default function Hero() {
           </div>
 
           <p className="text-xl text-white/90 mb-6 max-w-4xl mx-auto leading-relaxed">
-            "1 in 8 women in US will <strong>develop</strong> breast cancer in their lifetime"... According to WHO
+            "1 in 8 women in US will <strong className="text-yellow-400">develop</strong> breast cancer in their lifetime"... According to WHO
           </p>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
