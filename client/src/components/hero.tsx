@@ -52,30 +52,6 @@ export default function Hero() {
           <p className="text-white/80 text-lg mb-16">
             Start for free. Cancel any time.
           </p>
-
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center items-center gap-12 md:gap-20 text-white">
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold mb-2">250,000</div>
-              <p className="text-white/80 text-sm uppercase tracking-wider">Lives changed</p>
-            </div>
-
-            <div className="flex items-center">
-              <div className="flex mr-3">
-                {[...Array(5)].map((_, i) => (
-                  <svg key={i} className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
-              </div>
-              <span className="text-sm">4.8 RATING</span>
-            </div>
-
-            <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold mb-2">13 MILLION</div>
-              <p className="text-white/80 text-sm uppercase tracking-wider">Women helped since 2020</p>
-            </div>
-          </div>
         </div>
 
         {/* Hero Image Section */}
