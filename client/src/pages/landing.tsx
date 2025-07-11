@@ -113,16 +113,31 @@ export default function LandingPage() {
               Our Promise to You
             </h2>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-12 max-w-4xl mx-auto">
-              <p className="text-xl md:text-2xl text-white leading-relaxed font-medium">
-                We are committed to providing you with evidence-based, personalized guidance 
-                that empowers you to take control of your breast health. Our platform combines 
-                cutting-edge AI technology with compassionate support to help you reduce your 
-                risk and live with confidence.
+              <p className="text-xl md:text-2xl text-white leading-relaxed font-medium mb-12">
+                We know this is a deeply personal journey for you, as it was for us. We follow a strict code of conduct and promise to always put your health and wellness above all else.
               </p>
+              
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
+                  <h3 className="text-xl font-bold mb-3">No shame or guilt ever</h3>
+                  <p className="text-white/90">
+                    Mindful lifestyle is about celebrating our wins, not making you feel bad.
+                  </p>
+                </div>
+                
+                <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
+                  <h3 className="text-xl font-bold mb-3">Always private and secure</h3>
+                  <p className="text-white/90">
+                    This is a personal, private journey for you. We make privacy a top priority.
+                  </p>
+                </div>
+              </div>
+              
               <div className="mt-8 flex justify-center">
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
-                  <p className="text-lg font-semibold">
-                    Your health journey is unique, and so is our approach to supporting you.
+                  <h3 className="text-xl font-bold mb-3">Money back guarantee</h3>
+                  <p className="text-white/90">
+                    If you give it a fair shot and aren't happy after 30 days, just let us know!
                   </p>
                 </div>
               </div>
