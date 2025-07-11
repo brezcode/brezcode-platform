@@ -101,7 +101,7 @@ export default function Hero() {
             </div>
 
             <div className="absolute top-20 right-8 bg-purple-500 rounded-2xl p-3 shadow-lg max-w-48 z-20">
-              <p className="text-sm text-white">Kept it mindful, and feeling great today!</p>
+              <p className="text-sm text-white">I am following the plan, and feeling great today!</p>
             </div>
 
             <div className="absolute bottom-20 left-4 bg-green-500 rounded-2xl p-3 shadow-lg max-w-40 z-20">
