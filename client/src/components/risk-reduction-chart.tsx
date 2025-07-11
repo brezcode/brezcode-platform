@@ -45,21 +45,21 @@ export default function RiskReductionChart() {
               <div className="space-y-3">
                 {data.map((item, index) => (
                   <div key={index} className="flex items-center">
-                    {/* Activity Label */}
-                    <div className="w-16 text-xs font-medium text-gray-700 text-right mr-2">
-                      {item.name}
-                    </div>
-
                     {/* Bar Container */}
-                    <div className="flex-1 relative">
+                    <div className="flex-1 relative flex items-center">
                       <div 
-                        className="bg-blue-600 h-8 rounded-r-md flex items-center justify-start pl-2 transition-all duration-500 ease-out"
+                        className="bg-blue-600 h-10 rounded-md flex items-center justify-between px-3 transition-all duration-500 ease-out min-w-[120px]"
                         style={{ width: `${getBarWidth(item.reduction)}%` }}
                       >
-                        <span className="text-white font-bold text-sm">
-                          {item.reduction}%
+                        <span className="text-white font-bold text-sm truncate">
+                          {item.name}
                         </span>
                       </div>
+
+                      {/* Percentage on the right */}
+                      <span className="text-gray-800 font-bold text-sm ml-3 min-w-[35px]">
+                        {item.reduction}%
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -82,3 +82,4 @@ export default function RiskReductionChart() {
     </div>
   );
 }
+`
