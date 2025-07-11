@@ -1,3 +1,6 @@
+import { Button } from "@/components/ui/button";
+import RiskReductionChart from "./risk-reduction-chart";
+
 export default function Features() {
   const activities = [
     {
@@ -77,6 +80,8 @@ export default function Features() {
             Proven daily activities that work together to significantly reduce your breast cancer risk through lifestyle optimization.
           </p>
         </div>
+
+        <RiskReductionChart activities={activities} />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {activities.map((activity, index) => (
