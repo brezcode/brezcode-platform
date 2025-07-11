@@ -159,38 +159,14 @@ export default function Features() {
               </div>
             </div>
 
-            {/* Right side - Image with stats */}
+            {/* Right side - Image */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
                 <img 
-                  src="/happy-woman-phone.png" 
-                  alt="Woman using phone with health tracking"
-                  className="w-full h-64 object-cover rounded-2xl mb-6"
+                  src="/yoga-woman.png" 
+                  alt="Woman meditating in yoga pose"
+                  className="w-full h-auto object-cover rounded-2xl"
                 />
-                
-                {/* Stats overlay */}
-                <div className="space-y-3">
-                  <div className="bg-purple-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
-                    <span className="text-2xl font-bold">19</span>
-                    <span className="text-sm">Nights of great sleep</span>
-                  </div>
-                  <div className="bg-yellow-400 text-black px-4 py-2 rounded-lg flex items-center justify-between">
-                    <span className="text-2xl font-bold">1.3k</span>
-                    <span className="text-sm">Calories cut</span>
-                  </div>
-                  <div className="bg-gray-600 text-white px-4 py-2 rounded-lg flex items-center justify-between">
-                    <span className="text-2xl font-bold">27</span>
-                    <span className="text-sm">Risk activities tracked</span>
-                  </div>
-                  <div className="bg-blue-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
-                    <span className="text-2xl font-bold">20</span>
-                    <span className="text-sm">Healthy days added</span>
-                  </div>
-                  <div className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center justify-between">
-                    <span className="text-2xl font-bold">$58</span>
-                    <span className="text-sm">In healthcare saved</span>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
