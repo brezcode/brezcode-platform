@@ -87,7 +87,11 @@ export default function Hero() {
             <img 
               src={happyWomanImage}
               alt="Happy woman using phone"
-              className="relative z-10 w-64 h-80 object-contain object-center"
+              className="relative z-10 w-80 h-96 object-contain object-center"
+              style={{
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))',
+                mixBlendMode: 'multiply'
+              }}
             />
 
             {/* Chat Bubbles */}
