@@ -162,12 +162,12 @@ export default function Features() {
             {/* Right side - Image */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
-                <div className="w-full h-96 bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl overflow-hidden flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <div className="text-6xl mb-4">🧘‍♀️</div>
-                    <h4 className="text-xl font-bold text-purple-700 mb-2">Mindfulness & Wellness</h4>
-                    <p className="text-purple-600">Your journey to better health starts with daily mindfulness practice</p>
-                  </div>
+                <div className="w-full h-96 rounded-2xl overflow-hidden flex items-center justify-center">
+                  <img 
+                    src="/meditation-woman.png" 
+                    alt="Woman meditating in peaceful pose"
+                    className="w-full h-full object-cover rounded-2xl"
+                  />
                 </div>
               </div>
             </div>
