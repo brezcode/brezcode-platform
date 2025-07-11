@@ -69,30 +69,37 @@ export default function RiskReductionChart() {
                 <h4 className="text-md font-bold text-gray-800">Risk Reduction by Activity</h4>
               </div>
               
-              <ResponsiveContainer width="100%" height="75%">
+              <ResponsiveContainer width="100%" height="70%">
                 <BarChart
                   data={data}
                   layout="horizontal"
                   margin={{
-                    top: 10,
-                    right: 5,
-                    left: 50,
-                    bottom: 10,
+                    top: 5,
+                    right: 10,
+                    left: 55,
+                    bottom: 5,
                   }}
+                  barCategoryGap="10%"
+                  barGap={2}
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <CartesianGrid strokeDasharray="2 2" stroke="#d1d5db" opacity={0.3} />
                   <XAxis 
                     type="number"
-                    domain={[0, 60]}
-                    hide
+                    domain={[0, 50]}
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 8, fill: '#6b7280' }}
+                    tickFormatter={(value) => `${value}%`}
                   />
                   <YAxis 
                     type="category"
                     dataKey="name"
-                    width={45}
-                    fontSize={8}
+                    width={50}
+                    fontSize={7}
                     interval={0}
-                    tick={{ fill: '#374151' }}
+                    tick={{ fill: '#374151', fontWeight: '500' }}
+                    axisLine={false}
+                    tickLine={false}
                   />
                   <Tooltip 
                     formatter={(value, name, props) => [`${value}%`, 'Risk Reduction']}
@@ -102,21 +109,24 @@ export default function RiskReductionChart() {
                     }}
                     contentStyle={{
                       fontSize: '10px',
-                      borderRadius: '6px',
+                      borderRadius: '8px',
                       border: '1px solid #e5e7eb',
-                      padding: '6px'
+                      padding: '8px',
+                      backgroundColor: 'white',
+                      boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                     }}
                   />
                   <Bar 
                     dataKey="reduction" 
-                    fill="#3b82f6"
-                    stroke="#2563eb"
-                    strokeWidth={1}
-                    radius={[0, 6, 6, 0]}
+                    fill="#2563eb"
+                    stroke="#1d4ed8"
+                    strokeWidth={0}
+                    radius={[0, 4, 4, 0]}
+                    minPointSize={8}
                     label={{
                       position: 'inside',
                       fill: 'white',
-                      fontSize: 9,
+                      fontSize: 8,
                       fontWeight: 'bold',
                       formatter: (value) => `${value}%`
                     }}
