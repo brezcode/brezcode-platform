@@ -148,14 +148,12 @@ export default function Pricing() {
                 </div>
               </div>
               
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => setLocation("/chat")}
-                  className="py-4 px-8 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
-                >
-                  Take the quiz to start
-                </Button>
-              </div>
+              <Button
+                onClick={() => setLocation("/chat")}
+                className="w-full py-4 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
+              >
+                Take the quiz to start
+              </Button>
               
               <p className="text-sm text-gray-500 mt-4">
                 Start immediately • No credit card required • Cancel anytime
@@ -163,9 +161,6 @@ export default function Pricing() {
             </div>
           </div>
         </div>
-
-        {/* Blue spacing before next section */}
-        <div className="h-16"></div>
 
         {/* Money Back Guarantee */}
         <div className="text-center mt-12">
