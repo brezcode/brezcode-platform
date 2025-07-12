@@ -15,40 +15,194 @@ interface QuizQuestion {
   min?: number;
   max?: number;
   required: boolean;
+  condition?: {
+    questionId: string;
+    answer: string;
+  };
 }
 
-// Sample quiz structure - you can update this with the actual Excel data
+// BC Assessment Quiz Questions from Excel file
 const quizQuestions: QuizQuestion[] = [
   {
     id: "age",
-    question: "What is your age?",
+    question: "What is your current age?",
     type: "number_range",
     min: 20,
     max: 80,
     required: true
   },
   {
-    id: "family_history",
-    question: "Do you have a family history of breast cancer?",
-    type: "yes_no",
+    id: "country",
+    question: "Which country are you residing now?",
+    type: "text",
     required: true
   },
   {
-    id: "exercise_frequency",
-    question: "How many days per week do you exercise?",
+    id: "ethnicity",
+    question: "What is your racial/ethnic background?",
     type: "multiple_choice",
-    options: ["0 days", "1-2 days", "3-4 days", "5-6 days", "7 days"],
+    options: ["White (non-Hispanic)", "Black", "Asian", "Hispanic/Latino", "American Indian"],
     required: true
   },
   {
-    id: "stress_level",
-    question: "On a scale of 1-10, how would you rate your stress level?",
-    type: "slider",
-    min: 1,
-    max: 10,
+    id: "family_history",
+    question: "Do you have a first-degree relative (mother, sister, daughter) or second-degree relative with breast cancer (BC)?",
+    type: "multiple_choice",
+    options: ["Yes, I have first-degree relative with BC", "Yes, I have second-degree relative with BC", "No, I don't have any relatives with BC"],
     required: true
+  },
+  {
+    id: "brca_test",
+    question: "Have you ever been told you have one of the following genetic or family cancer syndromes after having genetic testing?",
+    type: "multiple_choice",
+    options: ["BRCA1/2", "No condition", "Not tested"],
+    required: true
+  },
+  {
+    id: "dense_breast",
+    question: "Have you been told that you have dense breast tissue based on a mammogram?",
+    type: "multiple_choice",
+    options: ["Yes", "No", "I don't know (I've never had a mammogram)"],
+    required: true
+  },
+  {
+    id: "menstrual_age",
+    question: "At what age did you have your first menstrual period?",
+    type: "multiple_choice",
+    options: ["Before 12 years old", "12 years old or later", "Not Yet"],
+    required: true
+  },
+  {
+    id: "pregnancy_age",
+    question: "Have you ever been pregnant? If yes, At what age did you have your first full-term pregnancy?",
+    type: "multiple_choice",
+    options: ["Never been pregnant", "First pregnancy before 25", "First pregnancy between 25-29", "First pregnancy after 30"],
+    required: true
+  },
+  {
+    id: "oral_contraceptives",
+    question: "Have you ever used hormonal birth control (e.g., pills, patches, injections)?",
+    type: "multiple_choice",
+    options: ["Yes, currently using", "Yes, used in the past", "No, never used"],
+    required: true
+  },
+  {
+    id: "menopause",
+    question: "Have you gone without a menstrual period for 12 or more consecutive months (excluding pregnancy or medical conditions)?",
+    type: "multiple_choice",
+    options: ["Yes, at age 55 or later", "Yes, at age 50-54", "Yes, before age 50", "No, I am still menstruating"],
+    required: true
+  },
+  {
+    id: "weight",
+    question: "What is your weight in kg?",
+    type: "number_range",
+    min: 40,
+    max: 150,
+    required: true
+  },
+  {
+    id: "height",
+    question: "What is your height in meters?",
+    type: "number_range",
+    min: 1.4,
+    max: 2.1,
+    required: true
+  },
+  {
+    id: "hrt",
+    question: "Have you ever used Combined Hormone Replacement Therapy (HRT) for more than 5 years?",
+    type: "multiple_choice",
+    options: ["Yes", "No"],
+    required: true
+  },
+  {
+    id: "western_diet",
+    question: "Do you regularly follow a Western diet (e.g., high in processed foods, red meats, saturated fats, and low in fruits, vegetables, and fiber)?",
+    type: "multiple_choice",
+    options: ["Yes, regularly", "Sometimes", "No, I follow a healthy diet"],
+    required: true
+  },
+  {
+    id: "smoke",
+    question: "Do you currently smoke tobacco products?",
+    type: "multiple_choice",
+    options: ["Yes", "No"],
+    required: true
+  },
+  {
+    id: "alcohol",
+    question: "How many alcoholic drinks do you consume per day, on average?",
+    type: "multiple_choice",
+    options: ["2 or more drinks", "1 drink", "None"],
+    required: true
+  },
+  {
+    id: "night_shift",
+    question: "Do you regularly work night shifts (e.g., shifts including midnight to 5:00 AM)?",
+    type: "multiple_choice",
+    options: ["Yes", "No"],
+    required: true
+  },
+  {
+    id: "stressful_events",
+    question: "Have you experienced striking stressful life events (e.g., death of a close family member, divorce, or major financial crisis)?",
+    type: "multiple_choice",
+    options: ["Yes, striking life events", "Yes, moderate life events", "No significant stressful events"],
+    required: true
+  },
+  {
+    id: "benign_condition",
+    question: "Have you been diagnosed with a benign breast condition, such as atypical hyperplasia, lobular carcinoma in situ (LCIS), or complex/complicated cysts?",
+    type: "multiple_choice",
+    options: ["Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
+    required: true
+  },
+  {
+    id: "precancerous_condition",
+    question: "Have you been diagnosed with a precancerous or cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), Ductal Carcinoma (DSIC) or Atypical Hyperplasia (ADH/ALH)?",
+    type: "multiple_choice",
+    options: ["Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma (ILC)", "Yes, Atypical Hyperplasia (ADH/ALH)", "No precancerous or cancerous breast conditions"],
+    required: true
+  },
+  {
+    id: "mammogram_frequency",
+    question: "How often do you undergo mammogram or other screening for breast cancer?",
+    type: "multiple_choice",
+    options: ["Annual (every year)", "Biennial (every 2 years)", "Irregular (sometimes)", "Never"],
+    required: true
+  },
+  {
+    id: "breast_symptoms",
+    question: "Do you have any breast symptoms such as lumps, pain, or nipple discharge?",
+    type: "multiple_choice",
+    options: ["I have breast pain", "I have a lump in my breast", "I have swollen breast or changed in size or shape", "Yes, I have other symptoms", "No symptoms"],
+    required: true
+  },
+  {
+    id: "pain_level",
+    question: "How painful is it? (Feeling of heaviness, tenderness, a burning, prickling or stabbing pain, or a feeling of tightness.)",
+    type: "multiple_choice",
+    options: ["Severe pain (7-10/10)", "Moderate pain (4-6/10)", "Mild pain (1-3/10)", "No pain"],
+    required: true,
+    condition: { questionId: "breast_symptoms", answer: "I have breast pain" }
+  },
+  {
+    id: "lump_characteristics",
+    question: "Is it larger than 2 cm or growing rapidly?",
+    type: "multiple_choice",
+    options: ["Growing Lump with size over 5cm", "Growing Lump size over 2cm", "Stable Lump size over 2cm", "Stable Lump size under 2cm"],
+    required: true,
+    condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
+  },
+  {
+    id: "breast_size_changes",
+    question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape?",
+    type: "multiple_choice",
+    options: ["Yes, I have persistent changes in breast size or shape", "Yes, I have temporary/cyclical changes", "No persistent changes"],
+    required: true,
+    condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
   }
-  // Add more questions here based on your Excel file
 ];
 
 interface QuizProps {
@@ -60,10 +214,22 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [currentAnswer, setCurrentAnswer] = useState<any>("");
+  
+  // Filter questions based on conditions
+  const getVisibleQuestions = () => {
+    return quizQuestions.filter(question => {
+      if (!question.condition) return true;
+      
+      const conditionAnswer = answers[question.condition.questionId];
+      return conditionAnswer === question.condition.answer;
+    });
+  };
+  
+  const visibleQuestions = getVisibleQuestions();
 
-  const currentQuestion = quizQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
-  const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
+  const currentQuestion = visibleQuestions[currentQuestionIndex];
+  const progress = ((currentQuestionIndex + 1) / visibleQuestions.length) * 100;
+  const isLastQuestion = currentQuestionIndex === visibleQuestions.length - 1;
 
   const handleNext = () => {
     // Save current answer
@@ -71,6 +237,12 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
+      // Calculate BMI if both weight and height are provided
+      if (updatedAnswers.weight && updatedAnswers.height) {
+        const bmi = Number(updatedAnswers.weight) / (Number(updatedAnswers.height) ** 2);
+        updatedAnswers.bmi = Math.round(bmi * 10) / 10;
+        updatedAnswers.obesity = bmi >= 30 ? "Yes" : "No";
+      }
       onComplete(updatedAnswers);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
@@ -81,7 +253,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(prev => prev - 1);
-      const previousQuestion = quizQuestions[currentQuestionIndex - 1];
+      const previousQuestion = visibleQuestions[currentQuestionIndex - 1];
       setCurrentAnswer(answers[previousQuestion.id] || "");
     }
   };
@@ -94,7 +266,8 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
         const num = Number(currentAnswer);
         return !isNaN(num) && 
                num >= (currentQuestion.min || 0) && 
-               num <= (currentQuestion.max || 100);
+               num <= (currentQuestion.max || 100) &&
+               currentAnswer !== "";
       case "multiple_choice":
       case "yes_no":
         return currentAnswer !== "";
@@ -124,6 +297,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
               onChange={(e) => setCurrentAnswer(e.target.value)}
               className="text-xl p-4 text-center"
               placeholder={`Enter a number between ${currentQuestion.min} and ${currentQuestion.max}`}
+              step={currentQuestion.id === "height" ? "0.1" : "1"}
             />
           </div>
         );
@@ -205,7 +379,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm text-gray-600">
-              <span>Question {currentQuestionIndex + 1} of {quizQuestions.length}</span>
+              <span>Question {currentQuestionIndex + 1} of {visibleQuestions.length}</span>
               <span>{Math.round(progress)}% complete</span>
             </div>
             <Progress value={progress} className="w-full" />
@@ -217,6 +391,15 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             <h3 className="text-2xl font-semibold leading-relaxed">
               {currentQuestion.question}
             </h3>
+            
+            {/* Show BMI calculation for height question */}
+            {currentQuestion.id === "height" && answers.weight && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <p className="text-sm text-blue-700">
+                  With your weight of {answers.weight}kg, your BMI will be calculated automatically.
+                </p>
+              </div>
+            )}
             
             {renderQuestionInput()}
           </div>
