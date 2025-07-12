@@ -312,6 +312,21 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
   const isLastQuestion = currentQuestionIndex === visibleQuestions.length - 1;
 
   const handleNext = () => {
+    // Validate menopause age against current age for question 9
+    if (currentQuestion.id === "menopause" && answers.age && currentAnswer) {
+      const userAge = Number(answers.age);
+      
+      if (currentAnswer === "Yes, at age 55 or later" && userAge < 55) {
+        alert("Your menopause age cannot be 55 or later if you are currently under 55. Please select a different option.");
+        return;
+      }
+      
+      if (currentAnswer === "Yes, before age 55" && userAge < 40) {
+        alert("Please verify your menopause status. If you went through menopause before age 55 but are currently under 40, this seems unusual. Please double-check your selection.");
+        return;
+      }
+    }
+
     // Save current answer
     const updatedAnswers = { ...answers, [currentQuestion.id]: currentAnswer };
     setAnswers(updatedAnswers);
