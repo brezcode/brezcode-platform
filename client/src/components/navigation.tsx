@@ -66,9 +66,7 @@ export default function Navigation() {
           <div className="flex justify-between items-center h-20">
             <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setLocation("/")}>
               <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M4 3h8c3.314 0 6 2.686 6 6s-2.686 6-6 6h-2v2h2c3.314 0 6 2.686 6 6s-2.686 6-6 6H4V3zm2 2v6h6c2.209 0 4-1.791 4-4s-1.791-4-4-4H6zm0 8v8h6c2.209 0 4-1.791 4-4s-1.791-4-4-4H6zm2-6h4c1.105 0 2 .895 2 2s-.895 2-2 2H8V7zm0 8h4c1.105 0 2 .895 2 2s-.895 2-2 2H8v-4z"/>
-                </svg>
+                <span className="text-white font-bold text-sm">BC</span>
               </div>
               <span className="font-bold text-xl text-white">BrezCode</span>
             </div>
