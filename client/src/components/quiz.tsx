@@ -252,6 +252,49 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
   
   const visibleQuestions = getVisibleQuestions();
 
+  // Format reason text to be more friendly and readable
+  const formatReasonText = (reason: string) => {
+    // Clean up the text to be more user-friendly
+    let formatted = reason
+      .replace(/According to a \d+ study by.*?, /, "Research shows that ")
+      .replace(/According to.*? study.*?, /, "Research shows that ")
+      .replace(/According to.*?, /, "Research shows that ")
+      .replace(/Studies show.*?, /, "Research shows that ")
+      .replace(/relative risk.*?\)/g, "")
+      .replace(/\(RR.*?\)/g, "")
+      .replace(/approximately /g, "about ")
+      .replace(/\(relative risk, RR ≈.*?\)/g, "")
+      .replace(/Compare to.*?, /g, "")
+      .replace(/Women who /g, "Women who ")
+      .replace(/women who /g, "women who ");
+    
+    // Split into sentences and create bullet points
+    const sentences = formatted.split(/\. (?=[A-Z])/);
+    const bulletPoints: string[] = [];
+    
+    sentences.forEach(sentence => {
+      if (sentence.trim().length > 10) {
+        let cleanSentence = sentence.trim();
+        if (!cleanSentence.endsWith('.')) {
+          cleanSentence += '.';
+        }
+        bulletPoints.push(cleanSentence);
+      }
+    });
+    
+    // Return formatted JSX
+    return (
+      <div className="space-y-2">
+        {bulletPoints.map((point, index) => (
+          <div key={index} className="flex items-start">
+            <span className="text-blue-600 mr-2 mt-1">•</span>
+            <span>{point}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
   const currentQuestion = visibleQuestions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / visibleQuestions.length) * 100;
   const isLastQuestion = currentQuestionIndex === visibleQuestions.length - 1;
@@ -417,20 +460,6 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
               {currentQuestion.question}
             </h3>
             
-            {/* Show educational reason */}
-            {currentQuestion.reason && (
-              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg">
-                <div className="flex">
-                  <div className="ml-3">
-                    <p className="text-sm text-blue-700 leading-relaxed">
-                      <span className="font-medium">Why we ask: </span>
-                      {currentQuestion.reason}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
             {/* Show BMI calculation for height question */}
             {currentQuestion.id === "height" && answers.weight && (
               <div className="bg-green-50 p-4 rounded-lg">
@@ -441,6 +470,20 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             )}
             
             {renderQuestionInput()}
+
+            {/* Show educational reason below the answer box */}
+            {currentQuestion.reason && (
+              <div className="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg mt-6">
+                <div className="flex">
+                  <div className="ml-3">
+                    <p className="text-sm font-medium text-blue-800 mb-2">Why we ask this question:</p>
+                    <div className="text-sm text-blue-700 leading-relaxed">
+                      {formatReasonText(currentQuestion.reason)}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-between pt-6 border-t">
