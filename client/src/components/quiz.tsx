@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -31,12 +31,6 @@ const quizQuestions: QuizQuestion[] = [
     type: "number_range",
     min: 20,
     max: 80,
-    required: true
-  },
-  {
-    id: "country",
-    question: "Which country are you residing now?",
-    type: "text",
     required: true
   },
   {
@@ -238,18 +232,36 @@ interface QuizProps {
 export default function Quiz({ onComplete, onClose }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
+  const [showReasons, setShowReasons] = useState<Record<string, boolean>>({});
   const [currentAnswer, setCurrentAnswer] = useState<any>("");
-  
+  const [userCountry, setUserCountry] = useState<string>("");
+
+  // Get user's country from IP address
+  useEffect(() => {
+    const getUserCountry = async () => {
+      try {
+        const response = await fetch('https://ipapi.co/json/');
+        const data = await response.json();
+        setUserCountry(data.country_name || 'Unknown');
+      } catch (error) {
+        console.error('Failed to get user location:', error);
+        setUserCountry('Unknown');
+      }
+    };
+
+    getUserCountry();
+  }, []);
+
   // Filter questions based on conditions
   const getVisibleQuestions = () => {
     return quizQuestions.filter(question => {
       if (!question.condition) return true;
-      
+
       const conditionAnswer = answers[question.condition.questionId];
       return conditionAnswer === question.condition.answer;
     });
   };
-  
+
   const visibleQuestions = getVisibleQuestions();
 
   // Format reason text to be more friendly and readable
@@ -267,11 +279,11 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       .replace(/Compare to.*?, /g, "")
       .replace(/Women who /g, "Women who ")
       .replace(/women who /g, "women who ");
-    
+
     // Split into sentences and create bullet points
     const sentences = formatted.split(/\. (?=[A-Z])/);
     const bulletPoints: string[] = [];
-    
+
     sentences.forEach(sentence => {
       if (sentence.trim().length > 10) {
         let cleanSentence = sentence.trim();
@@ -281,7 +293,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
         bulletPoints.push(cleanSentence);
       }
     });
-    
+
     // Return formatted JSX
     return (
       <div className="space-y-2">
@@ -305,13 +317,18 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     setAnswers(updatedAnswers);
 
     if (isLastQuestion) {
+      const finalAnswers = { 
+        ...updatedAnswers,
+        country: userCountry // Automatically include detected country
+      };
+
       // Calculate BMI if both weight and height are provided
-      if (updatedAnswers.weight && updatedAnswers.height) {
-        const bmi = Number(updatedAnswers.weight) / (Number(updatedAnswers.height) ** 2);
-        updatedAnswers.bmi = Math.round(bmi * 10) / 10;
-        updatedAnswers.obesity = bmi >= 30 ? "Yes" : "No";
+      if (finalAnswers.weight && finalAnswers.height) {
+        const bmi = Number(finalAnswers.weight) / (Number(finalAnswers.height) ** 2);
+        finalAnswers.bmi = Math.round(bmi * 10) / 10;
+        finalAnswers.obesity = bmi >= 30 ? "Yes" : "No";
       }
-      onComplete(updatedAnswers);
+      onComplete(finalAnswers);
     } else {
       setCurrentQuestionIndex(prev => prev + 1);
       setCurrentAnswer("");
@@ -328,7 +345,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
 
   const isAnswerValid = () => {
     if (!currentQuestion.required) return true;
-    
+
     switch (currentQuestion.type) {
       case "number_range":
         const num = Number(currentAnswer);
@@ -459,7 +476,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             <h3 className="text-2xl font-semibold leading-relaxed">
               {currentQuestion.question}
             </h3>
-            
+
             {/* Show BMI calculation for height question */}
             {currentQuestion.id === "height" && answers.weight && (
               <div className="bg-green-50 p-4 rounded-lg">
@@ -468,7 +485,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
                 </p>
               </div>
             )}
-            
+
             {renderQuestionInput()}
 
             {/* Show educational reason below the answer box */}
@@ -495,7 +512,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             >
               Previous
             </Button>
-            
+
             <Button
               onClick={handleNext}
               disabled={!isAnswerValid()}
