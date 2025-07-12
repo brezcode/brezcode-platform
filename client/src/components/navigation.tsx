@@ -74,7 +74,7 @@ export default function Navigation() {
               <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">About</a>
               <a href="#app-features" className="text-white hover:text-yellow-200 transition-colors font-medium">Features</a>
               <a href="#reviews" className="text-white hover:text-yellow-200 transition-colors font-medium">Reviews</a>
-              <a href="#" className="text-white hover:text-yellow-200 transition-colors font-medium">For Organizations</a>
+              <a href="#pricing" className="text-white hover:text-yellow-200 transition-colors font-medium">Pricing</a>
               
               {user ? (
                 <div className="flex items-center space-x-4">
