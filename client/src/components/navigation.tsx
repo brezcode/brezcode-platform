@@ -71,14 +71,14 @@ export default function Navigation() {
               <span className="font-bold text-xl text-white">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">About</a>
-              <a href="#app-features" className="text-white hover:text-yellow-200 transition-colors font-medium">Features</a>
-              <a href="#reviews" className="text-white hover:text-yellow-200 transition-colors font-medium">Reviews</a>
-              <a href="#pricing" className="text-white hover:text-yellow-200 transition-colors font-medium">Pricing</a>
+              <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">About</a>
+              <a href="#app-features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Features</a>
+              <a href="#reviews" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Reviews</a>
+              <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Pricing</a>
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-white">Welcome, {user.username}!</span>
+                  <span className="text-sm text-yellow-400">Welcome, {user.username}!</span>
                   {user.isSubscriptionActive && (
                     <Button 
                       onClick={() => setLocation("/chat")}
@@ -96,7 +96,7 @@ export default function Navigation() {
                   <Button 
                     variant="ghost" 
                     onClick={() => setShowAuthModal(true)}
-                    className="text-white hover:text-yellow-200 font-medium"
+                    className="text-yellow-400 hover:text-yellow-300 font-medium"
                   >
                     Log In
                   </Button>
