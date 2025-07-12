@@ -72,8 +72,8 @@ export default function Navigation() {
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">About</a>
-              <a href="#features" className="text-white hover:text-yellow-200 transition-colors font-medium">Features</a>
-              <a href="#pricing" className="text-white hover:text-yellow-200 transition-colors font-medium">Reviews</a>
+              <a href="#app-features" className="text-white hover:text-yellow-200 transition-colors font-medium">Features</a>
+              <a href="#reviews" className="text-white hover:text-yellow-200 transition-colors font-medium">Reviews</a>
               <a href="#" className="text-white hover:text-yellow-200 transition-colors font-medium">For Organizations</a>
               
               {user ? (
