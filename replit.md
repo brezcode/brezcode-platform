@@ -99,6 +99,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 12, 2025. Implemented comprehensive BC Assessment quiz with all 26 questions from Excel file - added educational explanations from column D for every question, fixed ethnicity question to include all 4 options, implemented conditional questions for symptom follow-ups (pain, lump characteristics, breast changes), and integrated BMI auto-calculation
 - January 11, 2025. Landing page redesigned with BrezCode content - updated hero section with risk statistics, evidence-based activities, app features, testimonials, and simplified pricing structure
 - July 02, 2025. Initial setup
 ```
