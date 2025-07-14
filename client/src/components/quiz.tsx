@@ -541,6 +541,34 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
               </div>
             )}
 
+            {/* Show BMI and warning for HRT question */}
+            {currentQuestion.id === "hrt" && answers.weight && answers.height && (
+              <div className="bg-blue-50 p-4 rounded-lg">
+                {(() => {
+                  const bmi = Number(answers.weight) / (Number(answers.height) ** 2);
+                  const roundedBmi = Math.round(bmi * 10) / 10;
+                  const isPostmenopausal = answers.menopause === "Yes, at age 55 or later" || answers.menopause === "Yes, before age 55";
+                  
+                  return (
+                    <div>
+                      <p className="text-sm text-blue-700 mb-2">
+                        <strong>Your calculated BMI: {roundedBmi}</strong>
+                      </p>
+                      {roundedBmi >= 30 && isPostmenopausal && (
+                        <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                          <p className="text-sm text-orange-700">
+                            <strong>⚠️ Important Health Notice:</strong> Your BMI is {roundedBmi}, which is in the obese range (≥30). 
+                            As a postmenopausal woman, this is associated with increased breast cancer risk. 
+                            Consider speaking with your healthcare provider about strategies to lower your BMI through diet and exercise.
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
             {renderQuestionInput()}
 
             {/* Show educational reason below the answer box */}
