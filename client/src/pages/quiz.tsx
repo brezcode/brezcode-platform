@@ -29,16 +29,26 @@ export default function QuizPage() {
             <CardTitle className="text-2xl text-center">Assessment Complete!</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6 text-center">
-            <p className="text-lg text-gray-600">
-              Thank you for completing the breast health assessment. Your personalized health plan is being prepared.
-            </p>
+            <div className="space-y-4">
+              <div className="text-6xl">🎉</div>
+              <h2 className="text-2xl font-bold text-gray-800">Welcome to BrezCode, {quizResults.first_name}!</h2>
+              <p className="text-lg text-gray-600">
+                Thank you for completing your breast health assessment. We're preparing your personalized report and will send it to <strong>{quizResults.email}</strong> shortly.
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-700">
+                  <strong>What's Next?</strong> Your comprehensive assessment report will include personalized recommendations, risk factors analysis, and an action plan tailored specifically for you.
+                </p>
+              </div>
+            </div>
             
             <div className="space-y-4">
               <Button
                 onClick={() => setLocation("/chat")}
                 className="w-full bg-sky-blue hover:bg-blue-600 text-white py-3"
               >
-                Start Your Personalized Coaching
+                Start Your Personalized AI Coaching
               </Button>
               
               <Button

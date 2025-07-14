@@ -258,6 +258,29 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "swelling_characteristics", answer: "Other changes" }
   },
+  
+  // Signup Questions (for new users after completing the quiz)
+  {
+    id: "first_name",
+    question: "What's your first name?",
+    reason: "We'll use your name to personalize your breast health assessment report and coaching experience.",
+    type: "text",
+    required: true
+  },
+  {
+    id: "email",
+    question: "What's your email address?",
+    reason: "We'll send your personalized assessment report and important health insights to this email address.",
+    type: "text",
+    required: true
+  },
+  {
+    id: "phone_number",
+    question: "What's your phone number?",
+    reason: "We may send you important health reminders and updates. We're committed to your privacy. We'll never share your number with any third parties.",
+    type: "text",
+    required: true
+  },
 
 ];
 
@@ -449,7 +472,22 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       case "yes_no":
         return currentAnswer !== "";
       case "text":
-        return currentAnswer.trim() !== "";
+        const trimmedAnswer = currentAnswer.trim();
+        if (trimmedAnswer === "") return false;
+        
+        // Email validation
+        if (currentQuestion.id === "email") {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(trimmedAnswer);
+        }
+        
+        // Phone number validation (basic - just check if it contains digits)
+        if (currentQuestion.id === "phone_number") {
+          const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+          return phoneRegex.test(trimmedAnswer);
+        }
+        
+        return true;
       case "slider":
         return currentAnswer !== null && currentAnswer !== undefined;
       default:
@@ -550,12 +588,46 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             <Label htmlFor="text-input" className="text-lg">Your answer:</Label>
             <Input
               id="text-input"
-              type="text"
+              type={currentQuestion.id === "email" ? "email" : currentQuestion.id === "phone_number" ? "tel" : "text"}
               value={currentAnswer}
-              onChange={(e) => setCurrentAnswer(e.target.value)}
+              onChange={(e) => {
+                setCurrentAnswer(e.target.value);
+                setValidationError("");
+              }}
               className="text-xl p-4"
-              placeholder="Type your answer here"
+              placeholder={
+                currentQuestion.id === "email" ? "Enter your email address" :
+                currentQuestion.id === "phone_number" ? "Enter your phone number" :
+                currentQuestion.id === "first_name" ? "Enter your first name" :
+                "Type your answer here"
+              }
             />
+            
+            {/* Show validation errors for email and phone */}
+            {currentAnswer && !isAnswerValid() && (
+              <div className="text-red-600 text-sm mt-2">
+                {currentQuestion.id === "email" && "Please enter a valid email address"}
+                {currentQuestion.id === "phone_number" && "Please enter a valid phone number (at least 10 digits)"}
+              </div>
+            )}
+            
+            {/* Privacy statement for phone number */}
+            {currentQuestion.id === "phone_number" && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-green-700">
+                      <strong>Privacy Promise:</strong> We're committed to your privacy. We'll never share your number with any third parties.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         );
 
