@@ -75,7 +75,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "pregnancy_age",
-    question: "Have you ever been pregnant? If yes, At what age did you have your first full-term pregnancy?",
+    question: "Have you ever been pregnant? If yes, at what age did you have your first full-term pregnancy?",
     reason: "According to a 2012 meta-analysis by the Collaborative Group in Breast Cancer, Women who have never had a full-term pregnancy have approximately a 27% increased risk (RR ≈ 1.27). Also, according to a 2018 study by Nichols et al., women who have their first full-term pregnancy after age 30 or between ages 25-29 have a 20-40% (relative risk, RR ≈ 1.20-1.40) or 10-20% (relative risk, RR ≈ 1.10-1.20) increased lifetime risk of breast cancer respectively.",
     type: "multiple_choice",
     options: ["Never had a full-term pregnancy", "Age 30 or older", "Age 25-29", "Before age 25"],
@@ -141,7 +141,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "alcohol",
-    question: "How many alcoholic drinks do you consume per day, on average?",
+    question: "On average, how many alcoholic drinks do you consume per day?",
     reason: "According to a 2021 study by Sun et al., consuming one alcoholic drink per day increases breast cancer risk by 7-10% (RR ≈ 1.07-1.10), and two or more drinks further elevates risk by 15-20% per additional drink.",
     type: "multiple_choice",
     options: ["2 or more drinks", "1 drink", "None"],
@@ -149,7 +149,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "night_shift",
-    question: "Do you regularly work night shifts (e.g., shifts including midnight to 5:00 AM)?",
+    question: "Do you regularly work night shifts (including shifts from midnight to 5:00 AM)?",
     reason: "According to a 2021 meta-analysis by Manouchehri et al., women who regularly work night shifts have a 8-13% increased risk of breast cancer (relative risk, RR ≈ 1.08-1.13). This may be due to circadian disruption and melatonin suppression from light exposure at night.",
     type: "multiple_choice",
     options: ["Yes", "No"],
@@ -157,7 +157,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "stressful_events",
-    question: "Have you experienced striking stressful life events (e.g., death of a close family member, divorce, or major financial crisis)?",
+    question: "Have you experienced significant stressful life events (e.g., death of a close family member, divorce, or major financial crisis)?",
     reason: "According to a 2013 meta-analysis by Lin et al., women who have experienced stressful to striking life events have a 10-107% increased risk of breast cancer (relative risk, RR ≈ 1.1-2.07). This may be due to stress-related hormonal and immune dysregulation, though the evidence is not conclusive.",
     type: "multiple_choice",
     options: ["Yes, striking life events", "Yes, stressful life events", "No, no significant stressful events"],
@@ -173,7 +173,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "precancerous_condition",
-    question: "Have you been diagnosed with a cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), Ductal Carcinoma (DSIC)?",
+    question: "Have you been diagnosed with a cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), or Ductal Carcinoma In Situ (DCIS)?",
     reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
     type: "multiple_choice",
     options: ["Yes, I am a Breast Cancer Patient currently undergoing treatment", "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", "No diagnosed breast conditions"],
@@ -181,7 +181,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "cancer_stage",
-    question: "What Stage is/was your breast cancer?",
+    question: "What stage is/was your breast cancer?",
     reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
     type: "multiple_choice",
     options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
@@ -190,7 +190,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "cancer_stage_survivor",
-    question: "What Stage is/was your breast cancer?",
+    question: "What stage is/was your breast cancer?",
     reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
     type: "multiple_choice",
     options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
@@ -199,7 +199,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "mammogram_frequency",
-    question: "How often do you undergo mammogram or other screening for breast cancer?",
+    question: "How often do you undergo mammograms or other breast cancer screenings?",
     reason: "According to a 2020 study by Hofvind et al., women who undergo annual mammography screening have a 40-50% reduced risk of interval breast cancer (relative risk, RR ≈ 0.50-0.60) compared to those who never screen. Biennial screening (every 2 years) reduces the risk by 20-30% (RR ≈ 0.70-0.80), but interval cancers, which are often more aggressive, are more likely than with annual screening.",
     type: "multiple_choice",
     options: ["Annually (once a year)", "Biennially (every 2 years)", "Never or irregularly"],
@@ -214,8 +214,17 @@ const quizQuestions: QuizQuestion[] = [
     required: true
   },
   {
+    id: "other_symptoms_detail",
+    question: "Please specify what other breast symptoms you are experiencing:",
+    reason: "Understanding the specific nature of breast symptoms helps healthcare providers assess the urgency and determine appropriate next steps for evaluation and care.",
+    type: "multiple_choice",
+    options: ["Nipple discharge", "Skin changes (dimpling, puckering, or orange-peel texture)", "Both nipple discharge and skin changes"],
+    required: true,
+    condition: { questionId: "breast_symptoms", answer: "Yes, I have other symptoms" }
+  },
+  {
     id: "pain_level",
-    question: "How painful is it? (Feeling of heaviness, tenderness, a burning, prickling or stabbing pain, or a feeling of tightness.)",
+    question: "How painful is it? (Do you experience feelings of heaviness, tenderness, a burning, prickling, or stabbing pain, or a feeling of tightness?)",
     reason: "According to a 2019 study by Stachs et al., breast pain (mastalgia) alone is rarely associated with breast cancer, with a minimal 0-10% increased likelihood of cancer detection (relative risk, RR ≈ 1.0-1.10) compared to women without pain, as most cases are benign and hormonal.",
     type: "multiple_choice",
     options: ["Severe Cyclical Pain in Breast or Armpit", "Severe and Continuous Non-Cyclical Breast Pain in one part of the breast or armpit", "Mild Pain"],
@@ -224,7 +233,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "lump_characteristics",
-    question: "Is it larger than 2 cm or growing rapidly?",
+    question: "Regarding the lump, is it larger than 2 cm or growing rapidly?",
     reason: "According to a 2017 study by Kerlikowske et al., women with breast lumps larger than 2 cm and showing rapid growth have a 2-3 times higher risk of breast cancer (relative risk, RR ≈ 2.0-3.0) compared to women with smaller, stable lumps or no lumps.",
     type: "multiple_choice",
     options: ["Growing Lump with size over 5cm", "Growing Lump size over 2cm", "Stable Lump size over 2cm", "Stable Lump size below 2cm"],
@@ -233,7 +242,7 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "swelling_characteristics",
-    question: "How would you describe the swelling or size/shape changes?",
+    question: "How would you describe the swelling or changes in size/shape?",
     reason: "Understanding the nature of breast swelling or changes helps assess urgency and potential causes. Sudden or significant changes may require more immediate medical attention.",
     type: "multiple_choice",
     options: ["Sudden swelling or rapid size/shape changes", "Gradual swelling or size/shape changes", "Other changes"],
@@ -249,7 +258,7 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "swelling_characteristics", answer: "Other changes" }
   },
-  
+
 ];
 
 interface QuizProps {
@@ -345,12 +354,12 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     // Validate menopause age against current age for question 9
     if (currentQuestion.id === "menopause" && answers.age && currentAnswer) {
       const userAge = Number(answers.age);
-      
+
       if (currentAnswer === "Yes, at age 55 or later" && userAge < 55) {
         setValidationError("Your menopause age cannot be 55 or later if you are currently under 55. Please select a different option.");
         return;
       }
-      
+
       if (currentAnswer === "Yes, before age 55" && userAge < 40) {
         setValidationError("Please verify your menopause status. If you went through menopause before age 55 but are currently under 40, this seems unusual. Please double-check your selection.");
         return;
@@ -360,12 +369,12 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     // Validate pregnancy age against current age for question 7
     if (currentQuestion.id === "pregnancy_age" && answers.age && currentAnswer) {
       const userAge = Number(answers.age);
-      
+
       if (currentAnswer === "Age 30 or older" && userAge < 30) {
         setValidationError("You cannot have had your first pregnancy at age 30 or older if you are currently under 30. Please select a different option.");
         return;
       }
-      
+
       if (currentAnswer === "Age 25-29" && userAge < 25) {
         setValidationError("You cannot have had your first pregnancy at age 25-29 if you are currently under 25. Please select a different option.");
         return;
@@ -388,7 +397,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
 
     // Find next question index in the new visible questions list
     let nextQuestionIndex = currentQuestionIndex + 1;
-    
+
     // If we're at the last question in current visible list, check if we have new conditional questions
     if (nextQuestionIndex >= visibleQuestions.length) {
       // Check if there are new conditional questions that should be shown
@@ -486,7 +495,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
                 </div>
               ))}
             </RadioGroup>
-            
+
             {validationError && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
                 <div className="flex">
@@ -587,7 +596,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
                   const bmi = Number(answers.weight) / (Number(currentAnswer) ** 2);
                   const roundedBmi = Math.round(bmi * 10) / 10;
                   const isPostmenopausal = answers.menopause === "Yes, at age 55 or later" || answers.menopause === "Yes, before age 55";
-                  
+
                   return (
                     <div>
                       <p className="text-sm text-blue-700 mb-2">
