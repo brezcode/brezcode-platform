@@ -235,6 +235,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
   const [showReasons, setShowReasons] = useState<Record<string, boolean>>({});
   const [currentAnswer, setCurrentAnswer] = useState<any>("");
   const [userCountry, setUserCountry] = useState<string>("");
+  const [validationError, setValidationError] = useState<string>("");
 
   // Get user's country from IP address
   useEffect(() => {
@@ -317,15 +318,18 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       const userAge = Number(answers.age);
       
       if (currentAnswer === "Yes, at age 55 or later" && userAge < 55) {
-        alert("Your menopause age cannot be 55 or later if you are currently under 55. Please select a different option.");
+        setValidationError("Your menopause age cannot be 55 or later if you are currently under 55. Please select a different option.");
         return;
       }
       
       if (currentAnswer === "Yes, before age 55" && userAge < 40) {
-        alert("Please verify your menopause status. If you went through menopause before age 55 but are currently under 40, this seems unusual. Please double-check your selection.");
+        setValidationError("Please verify your menopause status. If you went through menopause before age 55 but are currently under 40, this seems unusual. Please double-check your selection.");
         return;
       }
     }
+
+    // Clear any validation errors
+    setValidationError("");
 
     // Save current answer
     const updatedAnswers = { ...answers, [currentQuestion.id]: currentAnswer };
@@ -352,6 +356,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
 
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
+      setValidationError("");
       setCurrentQuestionIndex(prev => prev - 1);
       const previousQuestion = visibleQuestions[currentQuestionIndex - 1];
       setCurrentAnswer(answers[previousQuestion.id] || "");
@@ -404,16 +409,36 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
 
       case "multiple_choice":
         return (
-          <RadioGroup value={currentAnswer} onValueChange={setCurrentAnswer}>
-            {currentQuestion.options?.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`} className="text-lg cursor-pointer flex-1">
-                  {option}
-                </Label>
+          <div className="space-y-4">
+            <RadioGroup value={currentAnswer} onValueChange={(value) => {
+              setCurrentAnswer(value);
+              setValidationError("");
+            }}>
+              {currentQuestion.options?.map((option, index) => (
+                <div key={index} className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50">
+                  <RadioGroupItem value={option} id={`option-${index}`} />
+                  <Label htmlFor={`option-${index}`} className="text-lg cursor-pointer flex-1">
+                    {option}
+                  </Label>
+                </div>
+              ))}
+            </RadioGroup>
+            
+            {validationError && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mt-4">
+                <div className="flex">
+                  <div className="flex-shrink-0">
+                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div className="ml-3">
+                    <p className="text-sm text-red-700">{validationError}</p>
+                  </div>
+                </div>
               </div>
-            ))}
-          </RadioGroup>
+            )}
+          </div>
         );
 
       case "yes_no":
