@@ -532,20 +532,11 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
               {currentQuestion.question}
             </h3>
 
-            {/* Show BMI calculation for height question */}
-            {currentQuestion.id === "height" && answers.weight && (
-              <div className="bg-green-50 p-4 rounded-lg">
-                <p className="text-sm text-green-700">
-                  With your weight of {answers.weight}kg, your BMI will be calculated automatically.
-                </p>
-              </div>
-            )}
-
-            {/* Show BMI and warning for HRT question */}
-            {currentQuestion.id === "hrt" && answers.weight && answers.height && (
+            {/* Show BMI calculation and warning for height question */}
+            {currentQuestion.id === "height" && answers.weight && currentAnswer && (
               <div className="bg-blue-50 p-4 rounded-lg">
                 {(() => {
-                  const bmi = Number(answers.weight) / (Number(answers.height) ** 2);
+                  const bmi = Number(answers.weight) / (Number(currentAnswer) ** 2);
                   const roundedBmi = Math.round(bmi * 10) / 10;
                   const isPostmenopausal = answers.menopause === "Yes, at age 55 or later" || answers.menopause === "Yes, before age 55";
                   
