@@ -356,6 +356,9 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
                 <p className="text-sm text-gray-600">
                   We sent a 6-digit code to {email}
                 </p>
+                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+                  <strong>Testing Mode:</strong> Check the server console for your verification code
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -414,6 +417,9 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
                 <p className="text-sm text-gray-600">
                   We sent a 6-digit code to {countryCodes.find(c => c.code === selectedCountry)?.dialCode}{phoneNumber}
                 </p>
+                <div className="mt-2 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-700">
+                  <strong>Testing Mode:</strong> Check the server console for your SMS verification code
+                </div>
               </div>
 
               <div className="space-y-2">
