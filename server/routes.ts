@@ -27,7 +27,12 @@ const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_
 
 // Initialize SendGrid for email (optional)
 if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+  const apiKey = process.env.SENDGRID_API_KEY;
+  if (!apiKey.startsWith('SG.')) {
+    console.log('API key does not start with "SG.".');
+  }
+  sgMail.setApiKey(apiKey);
+  console.log(`SendGrid initialized with FROM_EMAIL: ${process.env.FROM_EMAIL}`);
 }
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
