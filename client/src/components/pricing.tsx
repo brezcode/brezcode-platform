@@ -84,7 +84,7 @@ export default function Pricing() {
                 ⭐ BEST VALUE
               </span>
             </div>
-            
+
             <div className="text-center">
               <h3 className="text-3xl font-bold mb-4">BrezCode Premium</h3>
               <div className="text-6xl font-bold mb-2 sky-blue">
@@ -92,7 +92,7 @@ export default function Pricing() {
               </div>
               <p className="text-xl text-gray-600 mb-2">15 days, then $4.99/month</p>
               <p className="text-gray-500 mb-8">Cancel anytime • No hidden fees</p>
-              
+
               <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
                 <div className="space-y-3">
                   <div className="flex items-center space-x-3">
@@ -147,14 +147,14 @@ export default function Pricing() {
                   </div>
                 </div>
               </div>
-              
+
               <Button
-                onClick={() => setLocation("/chat")}
+                onClick={() => setLocation("/quiz")}
                 className="w-full py-4 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
               >
                 Take the quiz to start
               </Button>
-              
+
               <p className="text-sm text-gray-500 mt-4">
                 Start immediately • No credit card required • Cancel anytime
               </p>

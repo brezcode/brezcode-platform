@@ -1,8 +1,16 @@
+The code has been modified to import the `useLocation` hook from the `wouter` library and use it within the `Features` component to enable navigation when the "Take the quiz to start" button is clicked.
+```
+
+```replit_final_file
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useLocation } from "wouter";
 import RiskReductionChart from "./risk-reduction-chart";
 import yogaImage from "@assets/yoga_1752241133489.png";
 
 export default function Features() {
+  const [, setLocation] = useLocation();
+
   const activities = [
     {
       title: "Daily 5mins breathing exercise",
@@ -102,7 +110,7 @@ export default function Features() {
             {/* Left side - Content */}
             <div>
               <h3 className="text-3xl font-bold mb-8 text-sky-600">Brezcode can help you</h3>
-              
+
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
                   <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-1">
@@ -154,7 +162,7 @@ export default function Features() {
               </div>
 
               <div className="mt-8">
-                <Button className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
+                <Button onClick={() => setLocation('/quiz')} className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
                   Take the quiz to start
                 </Button>
               </div>
