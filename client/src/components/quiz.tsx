@@ -213,15 +213,7 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
   },
-  {
-    id: "breast_size_changes",
-    question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape?",
-    reason: "According to a 2020 study by Gewefel et al., women with persistent changes in breast size or shape have a 50-100% increased risk of breast cancer (relative risk, RR ≈ 1.50-2.00) compared to women without these symptoms.",
-    type: "multiple_choice",
-    options: ["Yes, I have persistent changes in breast size or shape", "No, I don't have persistent changes in breast size or shape"],
-    required: true,
-    condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
-  }
+  
 ];
 
 interface QuizProps {
