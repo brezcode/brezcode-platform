@@ -95,6 +95,13 @@ This is a subscription-based web application that provides AI-powered breast hea
 - `VITE_STRIPE_PUBLIC_KEY`: Stripe client-side key
 - `DATABASE_URL`: PostgreSQL connection (for production upgrade)
 
+### Twilio Integration (Optional - fallback to console logging)
+- `TWILIO_ACCOUNT_SID`: Twilio account identifier for SMS
+- `TWILIO_AUTH_TOKEN`: Twilio authentication token for SMS
+- `TWILIO_PHONE_NUMBER`: Twilio phone number for sending SMS
+- `SENDGRID_API_KEY`: SendGrid API key for email verification
+- `FROM_EMAIL`: Verified sender email address for verification emails
+
 ## Changelog
 
 ```

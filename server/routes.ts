@@ -8,6 +8,8 @@ import path from "path";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
 import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, phoneVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
+import twilio from "twilio";
+import sgMail from "@sendgrid/mail";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing required OpenAI API key: OPENAI_API_KEY');
@@ -17,6 +19,16 @@ if (!process.env.OPENAI_API_KEY) {
 const stripe = process.env.STRIPE_SECRET_KEY ? new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2025-06-30.basil",
 }) : null;
+
+// Initialize Twilio client for SMS (optional)
+const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) 
+  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN) 
+  : null;
+
+// Initialize SendGrid for email (optional)
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -34,6 +46,62 @@ declare module "express-session" {
   interface SessionData {
     userId?: number;
     isAuthenticated?: boolean;
+  }
+}
+
+// Helper functions for sending notifications
+async function sendEmailVerification(email: string, code: string): Promise<void> {
+  if (process.env.SENDGRID_API_KEY && process.env.FROM_EMAIL) {
+    try {
+      const msg = {
+        to: email,
+        from: process.env.FROM_EMAIL,
+        subject: 'BrezCode - Email Verification Code',
+        text: `Your BrezCode verification code is: ${code}`,
+        html: `
+          <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #2563eb;">BrezCode Email Verification</h2>
+            <p>Thank you for joining BrezCode! Please use the following 6-digit code to verify your email address:</p>
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+              <h1 style="color: #1f2937; letter-spacing: 0.1em; font-size: 32px; margin: 0;">${code}</h1>
+            </div>
+            <p>This code will expire in 10 minutes for security purposes.</p>
+            <p>If you didn't request this code, please ignore this email.</p>
+            <hr>
+            <p style="color: #6b7280; font-size: 12px;">BrezCode - Your AI-Powered Breast Health Coach</p>
+          </div>
+        `,
+      };
+      await sgMail.send(msg);
+      console.log(`Email verification sent to ${email}`);
+    } catch (error) {
+      console.error('SendGrid email error:', error);
+      // Fall back to console logging
+      console.log(`Email verification code for ${email}: ${code}`);
+    }
+  } else {
+    // Development mode - log to console
+    console.log(`Email verification code for ${email}: ${code}`);
+  }
+}
+
+async function sendSMSVerification(phone: string, code: string): Promise<void> {
+  if (twilioClient && process.env.TWILIO_PHONE_NUMBER) {
+    try {
+      await twilioClient.messages.create({
+        body: `Your BrezCode verification code is: ${code}. This code expires in 10 minutes.`,
+        from: process.env.TWILIO_PHONE_NUMBER,
+        to: phone,
+      });
+      console.log(`SMS verification sent to ${phone}`);
+    } catch (error) {
+      console.error('Twilio SMS error:', error);
+      // Fall back to console logging
+      console.log(`SMS verification code for ${phone}: ${code}`);
+    }
+  } else {
+    // Development mode - log to console
+    console.log(`SMS verification code for ${phone}: ${code}`);
   }
 }
 
@@ -179,9 +247,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store verification code
       await storage.createEmailVerification(email, code);
       
-      // In a real application, you would send this via email service
-      // For now, we'll just log it (in production, use SendGrid, AWS SES, etc.)
-      console.log(`Email verification code for ${email}: ${code}`);
+      // Send email verification via SendGrid or fallback to console
+      await sendEmailVerification(email, code);
       
       res.json({ message: "Verification code sent" });
     } catch (error: any) {
@@ -215,9 +282,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Store verification code
       await storage.createPhoneVerification(phone, code);
       
-      // In a real application, you would send this via SMS service
-      // For now, we'll just log it (in production, use Twilio, AWS SNS, etc.)
-      console.log(`SMS verification code for ${phone}: ${code}`);
+      // Send SMS verification via Twilio or fallback to console
+      await sendSMSVerification(phone, code);
       
       res.json({ message: "Verification code sent" });
     } catch (error: any) {
