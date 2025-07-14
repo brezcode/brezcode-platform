@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import { insertUserSchema, loginSchema, type User, type SubscriptionTier } from "@shared/schema";
+import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, phoneVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing required OpenAI API key: OPENAI_API_KEY');
@@ -82,7 +82,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   };
 
-  // Auth routes
+  // Legacy auth routes (keeping for backward compatibility)
   app.post("/api/register", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
@@ -106,7 +106,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         id: user.id, 
-        username: user.username, 
         email: user.email,
         subscriptionTier: user.subscriptionTier,
         isSubscriptionActive: user.isSubscriptionActive,
@@ -135,7 +134,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({ 
         id: user.id, 
-        username: user.username, 
         email: user.email,
         subscriptionTier: user.subscriptionTier,
         isSubscriptionActive: user.isSubscriptionActive,
@@ -158,11 +156,134 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const user = req.user;
     res.json({ 
       id: user.id, 
-      username: user.username, 
       email: user.email,
       subscriptionTier: user.subscriptionTier,
       isSubscriptionActive: user.isSubscriptionActive,
     });
+  });
+
+  // Email verification routes
+  app.post("/api/auth/send-email-verification", async (req, res) => {
+    try {
+      const { email } = req.body;
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists with this email" });
+      }
+
+      // Generate 6-digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Store verification code
+      await storage.createEmailVerification(email, code);
+      
+      // In a real application, you would send this via email service
+      // For now, we'll just log it (in production, use SendGrid, AWS SES, etc.)
+      console.log(`Email verification code for ${email}: ${code}`);
+      
+      res.json({ message: "Verification code sent" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/verify-email", async (req, res) => {
+    try {
+      const { email, code } = emailVerificationSchema.parse(req.body);
+      
+      const verification = await storage.getEmailVerification(email, code);
+      if (!verification) {
+        return res.status(400).json({ message: "Invalid or expired verification code" });
+      }
+      
+      res.json({ message: "Email verified successfully" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // Phone verification routes
+  app.post("/api/auth/send-phone-verification", async (req, res) => {
+    try {
+      const { phone } = req.body;
+      
+      // Generate 6-digit code
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      
+      // Store verification code
+      await storage.createPhoneVerification(phone, code);
+      
+      // In a real application, you would send this via SMS service
+      // For now, we'll just log it (in production, use Twilio, AWS SNS, etc.)
+      console.log(`SMS verification code for ${phone}: ${code}`);
+      
+      res.json({ message: "Verification code sent" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  app.post("/api/auth/verify-phone", async (req, res) => {
+    try {
+      const { phone, code } = phoneVerificationSchema.parse(req.body);
+      
+      const verification = await storage.getPhoneVerification(phone, code);
+      if (!verification) {
+        return res.status(400).json({ message: "Invalid or expired verification code" });
+      }
+      
+      res.json({ message: "Phone verified successfully" });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
+  });
+
+  // New signup route with verification
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      const userData = signupSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        return res.status(400).json({ message: "User already exists" });
+      }
+
+      // Verify email was verified
+      const emailVerification = await storage.getEmailVerification(userData.email, "verified");
+      
+      // Verify phone was verified
+      const phoneVerification = await storage.getPhoneVerification(userData.phone, "verified");
+
+      // Hash password
+      const hashedPassword = await bcrypt.hash(userData.password, 10);
+      
+      const user = await storage.createUser({
+        email: userData.email,
+        password: hashedPassword,
+        phone: userData.phone,
+        phoneCountryCode: userData.phoneCountryCode,
+        quizAnswers: userData.quizAnswers,
+      });
+
+      // Mark email and phone as verified
+      await storage.verifyEmail(userData.email);
+      await storage.verifyPhone(userData.phone);
+
+      req.session.userId = user.id;
+      req.session.isAuthenticated = true;
+
+      res.json({ 
+        id: user.id, 
+        email: user.email,
+        subscriptionTier: user.subscriptionTier,
+        isSubscriptionActive: user.isSubscriptionActive,
+      });
+    } catch (error: any) {
+      res.status(400).json({ message: error.message });
+    }
   });
 
   // Subscription routes
