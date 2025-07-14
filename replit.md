@@ -99,6 +99,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 14, 2025. Fixed runtime error plugin issues and added quiz transition page - removed redundant signup questions (24-26) from quiz, fixed apiRequest function signatures causing unhandled promise rejections, added transitional page between quiz completion and signup explaining assessment report and coaching journey
 - January 14, 2025. Implemented complete signup flow with email and phone verification - quiz now transitions to 4-step signup (email/password, phone selection with country codes, email verification, phone verification), added database schemas for verification storage, created comprehensive signup API routes with proper validation, updated authentication system to support verified users
 - January 12, 2025. Implemented comprehensive BC Assessment quiz with all 26 questions from Excel file - added educational explanations from column D for every question, fixed ethnicity question to include all 4 options, implemented conditional questions for symptom follow-ups (pain, lump characteristics, breast changes), and integrated BMI auto-calculation
 - January 11, 2025. Landing page redesigned with BrezCode content - updated hero section with risk statistics, evidence-based activities, app features, testimonials, and simplified pricing structure

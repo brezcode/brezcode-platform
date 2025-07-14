@@ -257,31 +257,7 @@ const quizQuestions: QuizQuestion[] = [
     options: ["Within the past week", "Within the past month"],
     required: true,
     condition: { questionId: "swelling_characteristics", answer: "Other changes" }
-  },
-  
-  // Signup Questions (for new users after completing the quiz)
-  {
-    id: "first_name",
-    question: "What's your first name?",
-    reason: "We'll use your name to personalize your breast health assessment report and coaching experience.",
-    type: "text",
-    required: true
-  },
-  {
-    id: "email",
-    question: "What's your email address?",
-    reason: "We'll send your personalized assessment report and important health insights to this email address.",
-    type: "text",
-    required: true
-  },
-  {
-    id: "phone_number",
-    question: "What's your phone number?",
-    reason: "We may send you important health reminders and updates. We're committed to your privacy. We'll never share your number with any third parties.",
-    type: "text",
-    required: true
-  },
-
+  }
 ];
 
 interface QuizProps {
