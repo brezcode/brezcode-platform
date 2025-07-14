@@ -26,12 +26,15 @@ FROM_EMAIL=noreply@your-domain.com
 4. Purchase a phone number for SMS sending
 5. Add these to your environment variables
 
-### SendGrid Email Setup  
-1. Sign up at [sendgrid.com](https://sendgrid.com) (owned by Twilio)
-2. Go to Settings > API Keys
-3. Create a new API key with "Mail Send" permissions
-4. Verify a sender email address in SendGrid
-5. Add the API key and FROM_EMAIL to environment variables
+### SendGrid Email Setup (via Twilio Dashboard)
+1. In your Twilio Console, go to **Email API** → **Integration Guide**
+2. Or visit: https://console.twilio.com/us1/develop/email/manage
+3. Click **Create API Key**
+4. Name it "BrezCode Email Verification" 
+5. Select **Full Access** permissions
+6. Copy the API key (starts with "SG.")
+7. In **Sender Authentication**, verify your FROM_EMAIL address
+8. Add both SENDGRID_API_KEY and FROM_EMAIL to environment variables
 
 ## Development vs Production
 
