@@ -231,6 +231,24 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
   },
+  {
+    id: "swelling_characteristics",
+    question: "How would you describe the swelling or size/shape changes?",
+    reason: "Understanding the nature of breast swelling or changes helps assess urgency and potential causes. Sudden or significant changes may require more immediate medical attention.",
+    type: "multiple_choice",
+    options: ["Sudden swelling or rapid size/shape changes", "Gradual swelling or size/shape changes", "Other changes"],
+    required: true,
+    condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
+  },
+  {
+    id: "swelling_timing",
+    question: "When did you first notice these changes?",
+    reason: "The timing of breast changes can help determine the urgency of medical evaluation and potential causes, whether related to hormonal cycles, recent changes, or other factors.",
+    type: "multiple_choice",
+    options: ["Within the past week", "Within the past month"],
+    required: true,
+    condition: { questionId: "swelling_characteristics", answer: "Other changes" }
+  },
   
 ];
 
