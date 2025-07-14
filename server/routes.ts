@@ -74,8 +74,11 @@ async function sendEmailVerification(email: string, code: string): Promise<void>
       };
       await sgMail.send(msg);
       console.log(`Email verification sent to ${email}`);
-    } catch (error) {
-      console.error('SendGrid email error:', error);
+    } catch (error: any) {
+      console.error('SendGrid email error:', error.message || error);
+      if (error.code === 401) {
+        console.error('SendGrid API key is invalid or unauthorized. Please check your SENDGRID_API_KEY.');
+      }
       // Fall back to console logging
       console.log(`Email verification code for ${email}: ${code}`);
     }
