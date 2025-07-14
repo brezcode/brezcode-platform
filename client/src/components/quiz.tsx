@@ -328,6 +328,21 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       }
     }
 
+    // Validate pregnancy age against current age for question 7
+    if (currentQuestion.id === "pregnancy_age" && answers.age && currentAnswer) {
+      const userAge = Number(answers.age);
+      
+      if (currentAnswer === "Age 30 or older" && userAge < 30) {
+        setValidationError("You cannot have had your first pregnancy at age 30 or older if you are currently under 30. Please select a different option.");
+        return;
+      }
+      
+      if (currentAnswer === "Age 25-29" && userAge < 25) {
+        setValidationError("You cannot have had your first pregnancy at age 25-29 if you are currently under 25. Please select a different option.");
+        return;
+      }
+    }
+
     // Clear any validation errors
     setValidationError("");
 
