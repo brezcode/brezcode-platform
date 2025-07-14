@@ -165,37 +165,37 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "benign_condition",
-    question: "Have you been diagnosed with a benign breast condition, such as atypical hyperplasia, lobular carcinoma in situ (LCIS), or complex/complicated cysts?",
+    question: "Have you been diagnosed with a benign (non-cancerous) breast condition?",
     reason: "According to a 2015 study by Hartmann et al., women with a history of atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0), women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0). Complex cysts generally have a minimal risk increase (RR ≈ 1.0-1.5).",
     type: "multiple_choice",
-    options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
+    options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, Lobular Carcinoma In Situ (LCIS)", "Yes, complex or complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No, I have not been diagnosed with any benign breast conditions"],
     required: true
   },
   {
     id: "precancerous_condition",
-    question: "Have you been diagnosed with a cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), or Ductal Carcinoma In Situ (DCIS)?",
+    question: "Have you been diagnosed with breast cancer?",
     reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
     type: "multiple_choice",
-    options: ["Yes, I am a Breast Cancer Patient currently undergoing treatment", "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", "No diagnosed breast conditions"],
+    options: ["Yes, I am currently receiving treatment for breast cancer", "Yes, I am a breast cancer survivor taking medication to prevent recurrence", "No, I have not been diagnosed with breast cancer"],
     required: true
   },
   {
     id: "cancer_stage",
-    question: "What stage is/was your breast cancer?",
+    question: "What stage was your breast cancer at the time of diagnosis?",
     reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
     type: "multiple_choice",
     options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
     required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, I am a Breast Cancer Patient currently undergoing treatment" }
+    condition: { questionId: "precancerous_condition", answer: "Yes, I am currently receiving treatment for breast cancer" }
   },
   {
     id: "cancer_stage_survivor",
-    question: "What stage is/was your breast cancer?",
+    question: "What stage was your breast cancer at the time of diagnosis?",
     reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
     type: "multiple_choice",
     options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
     required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence" }
+    condition: { questionId: "precancerous_condition", answer: "Yes, I am a breast cancer survivor taking medication to prevent recurrence" }
   },
   {
     id: "mammogram_frequency",
@@ -242,10 +242,10 @@ const quizQuestions: QuizQuestion[] = [
   },
   {
     id: "swelling_characteristics",
-    question: "How would you describe the swelling or changes in size/shape?",
+    question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape?",
     reason: "Understanding the nature of breast swelling or changes helps assess urgency and potential causes. Sudden or significant changes may require more immediate medical attention.",
     type: "multiple_choice",
-    options: ["Sudden swelling or rapid size/shape changes", "Gradual swelling or size/shape changes", "Other changes"],
+    options: ["Yes, I have swollen breast or armpit", "Yes, I have persistent changes in breast size or shape"],
     required: true,
     condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
   },
