@@ -57,10 +57,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
 
   const sendEmailCodeMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("/api/auth/send-email-verification", {
-        method: "POST",
-        body: JSON.stringify({ email }),
-      });
+      await apiRequest("POST", "/api/auth/send-email-verification", { email });
     },
     onSuccess: () => {
       toast({
@@ -79,10 +76,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
 
   const verifyEmailMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest("/api/auth/verify-email", {
-        method: "POST",
-        body: JSON.stringify({ email, code: emailCode }),
-      });
+      await apiRequest("POST", "/api/auth/verify-email", { email, code: emailCode });
     },
     onSuccess: () => {
       setIsEmailVerified(true);
@@ -104,10 +98,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
     mutationFn: async () => {
       const selectedCountryCode = countryCodes.find(c => c.code === selectedCountry);
       const fullPhone = `${selectedCountryCode?.dialCode}${phoneNumber}`;
-      await apiRequest("/api/auth/send-phone-verification", {
-        method: "POST",
-        body: JSON.stringify({ phone: fullPhone }),
-      });
+      await apiRequest("POST", "/api/auth/send-phone-verification", { phone: fullPhone });
     },
     onSuccess: () => {
       toast({
@@ -128,10 +119,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
     mutationFn: async () => {
       const selectedCountryCode = countryCodes.find(c => c.code === selectedCountry);
       const fullPhone = `${selectedCountryCode?.dialCode}${phoneNumber}`;
-      await apiRequest("/api/auth/verify-phone", {
-        method: "POST",
-        body: JSON.stringify({ phone: fullPhone, code: phoneCode }),
-      });
+      await apiRequest("POST", "/api/auth/verify-phone", { phone: fullPhone, code: phoneCode });
     },
     onSuccess: () => {
       setIsPhoneVerified(true);
@@ -154,15 +142,12 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
       const selectedCountryCode = countryCodes.find(c => c.code === selectedCountry);
       const fullPhone = `${selectedCountryCode?.dialCode}${phoneNumber}`;
       
-      await apiRequest("/api/auth/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-          phone: fullPhone,
-          phoneCountryCode: selectedCountryCode?.dialCode,
-          quizAnswers,
-        }),
+      await apiRequest("POST", "/api/auth/signup", {
+        email,
+        password,
+        phone: fullPhone,
+        phoneCountryCode: selectedCountryCode?.dialCode,
+        quizAnswers,
       });
     },
     onSuccess: () => {
