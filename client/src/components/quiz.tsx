@@ -166,18 +166,36 @@ const quizQuestions: QuizQuestion[] = [
   {
     id: "benign_condition",
     question: "Have you been diagnosed with a benign breast condition, such as atypical hyperplasia, lobular carcinoma in situ (LCIS), or complex/complicated cysts?",
-    reason: "According to a 2015 study by Hartmann et al., women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0). Complex cysts generally have a minimal risk increase (RR ≈ 1.0-1.5).",
+    reason: "According to a 2015 study by Hartmann et al., women with a history of atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0), women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0). Complex cysts generally have a minimal risk increase (RR ≈ 1.0-1.5).",
     type: "multiple_choice",
-    options: ["Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
+    options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
     required: true
   },
   {
     id: "precancerous_condition",
-    question: "Have you been diagnosed with a precancerous or cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), Ductal Carcinoma (DSIC) or Atypical Hyperplasia (ADH/ALH)?",
-    reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer or atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0)",
+    question: "Have you been diagnosed with a cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), Ductal Carcinoma (DSIC)?",
+    reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
     type: "multiple_choice",
-    options: ["Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma", "Yes, Atypical Hyperplasia (ADH/ALH)", "No diagnosed breast conditions"],
+    options: ["Yes, I am a Breast Cancer Patient currently undergoing treatment", "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", "No diagnosed breast conditions"],
     required: true
+  },
+  {
+    id: "cancer_stage",
+    question: "What Stage is/was your breast cancer?",
+    reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
+    type: "multiple_choice",
+    options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+    required: true,
+    condition: { questionId: "precancerous_condition", answer: "Yes, I am a Breast Cancer Patient currently undergoing treatment" }
+  },
+  {
+    id: "cancer_stage_survivor",
+    question: "What Stage is/was your breast cancer?",
+    reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
+    type: "multiple_choice",
+    options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+    required: true,
+    condition: { questionId: "precancerous_condition", answer: "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence" }
   },
   {
     id: "mammogram_frequency",
@@ -213,36 +231,7 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
   },
-  {
-    id: "cancer_treatment_stage",
-    question: "What is your current cancer treatment status?",
-    reason: "Understanding your treatment stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
-    type: "multiple_choice",
-    options: [
-      "Recently diagnosed, no treatment started yet",
-      "Currently undergoing treatment (surgery, chemotherapy, radiation, etc.)",
-      "Cancer survivor - completed treatment and doing post-treatment care/medication to prevent recurrence"
-    ],
-    required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma" }
-  },
-  {
-    id: "cancer_anxiety_level",
-    question: "How would you rate your current level of anxiety or worry about your breast cancer situation?",
-    reason: "Mental health and anxiety management are crucial parts of cancer care. Understanding your anxiety level helps us provide appropriate emotional support and coping strategies.",
-    type: "multiple_choice",
-    options: [
-      "Extremely worried and feeling helpless (10/10)",
-      "Very worried and anxious (8-9/10)",
-      "Moderately worried (6-7/10)",
-      "Somewhat worried (4-5/10)",
-      "Mildly concerned (2-3/10)",
-      "Very little worry (1/10)",
-      "No worries at all (0/10)"
-    ],
-    required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma" }
-  }
+  
 ];
 
 interface QuizProps {
