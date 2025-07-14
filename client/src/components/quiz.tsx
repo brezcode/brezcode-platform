@@ -308,9 +308,10 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     );
   };
 
-  const currentQuestion = visibleQuestions[currentQuestionIndex];
-  const progress = ((currentQuestionIndex + 1) / visibleQuestions.length) * 100;
-  const isLastQuestion = currentQuestionIndex === visibleQuestions.length - 1;
+  // Ensure we have a valid current question
+  const currentQuestion = visibleQuestions[currentQuestionIndex] || visibleQuestions[visibleQuestions.length - 1];
+  const progress = Math.min(((currentQuestionIndex + 1) / Math.max(visibleQuestions.length, 1)) * 100, 100);
+  const isLastQuestion = currentQuestionIndex >= visibleQuestions.length - 1;
 
   const handleNext = () => {
     // Validate menopause age against current age for question 9
@@ -350,23 +351,42 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     const updatedAnswers = { ...answers, [currentQuestion.id]: currentAnswer };
     setAnswers(updatedAnswers);
 
-    if (isLastQuestion) {
-      const finalAnswers = { 
-        ...updatedAnswers,
-        country: userCountry // Automatically include detected country
-      };
+    // Check if this creates new conditional questions that need to be shown
+    const newVisibleQuestions = quizQuestions.filter(question => {
+      if (!question.condition) return true;
+      const conditionAnswer = updatedAnswers[question.condition.questionId];
+      return conditionAnswer === question.condition.answer;
+    });
 
-      // Calculate BMI if both weight and height are provided
-      if (finalAnswers.weight && finalAnswers.height) {
-        const bmi = Number(finalAnswers.weight) / (Number(finalAnswers.height) ** 2);
-        finalAnswers.bmi = Math.round(bmi * 10) / 10;
-        finalAnswers.obesity = bmi >= 30 ? "Yes" : "No";
+    // Find next question index in the new visible questions list
+    let nextQuestionIndex = currentQuestionIndex + 1;
+    
+    // If we're at the last question in current visible list, check if we have new conditional questions
+    if (nextQuestionIndex >= visibleQuestions.length) {
+      // Check if there are new conditional questions that should be shown
+      if (newVisibleQuestions.length > visibleQuestions.length) {
+        // There are new conditional questions, continue to the first new one
+        nextQuestionIndex = visibleQuestions.length;
+      } else {
+        // No new questions, we're at the end
+        const finalAnswers = { 
+          ...updatedAnswers,
+          country: userCountry // Automatically include detected country
+        };
+
+        // Calculate BMI if both weight and height are provided
+        if (finalAnswers.weight && finalAnswers.height) {
+          const bmi = Number(finalAnswers.weight) / (Number(finalAnswers.height) ** 2);
+          finalAnswers.bmi = Math.round(bmi * 10) / 10;
+          finalAnswers.obesity = bmi >= 30 ? "Yes" : "No";
+        }
+        onComplete(finalAnswers);
+        return;
       }
-      onComplete(finalAnswers);
-    } else {
-      setCurrentQuestionIndex(prev => prev + 1);
-      setCurrentAnswer("");
     }
+
+    setCurrentQuestionIndex(nextQuestionIndex);
+    setCurrentAnswer("");
   };
 
   const handlePrevious = () => {
