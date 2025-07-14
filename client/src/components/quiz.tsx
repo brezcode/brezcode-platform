@@ -243,7 +243,7 @@ const quizQuestions: QuizQuestion[] = [
   {
     id: "swelling_characteristics",
     question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape?",
-    reason: "Understanding the nature of breast swelling or changes helps assess urgency and potential causes. Sudden or significant changes may require more immediate medical attention.",
+    reason: "According to a 2020 study by Gewefel et al., women with persistent changes in breast size or shape have a 50-100% increased risk of breast cancer (relative risk, RR ≈ 1.50-2.00) compared to women without these symptoms. These changes may indicate malignancy or high-risk proliferative lesions requiring medical evaluation.",
     type: "multiple_choice",
     options: ["Yes, I have swollen breast or armpit", "Yes, I have persistent changes in breast size or shape"],
     required: true,
