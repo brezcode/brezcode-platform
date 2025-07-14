@@ -213,7 +213,36 @@ const quizQuestions: QuizQuestion[] = [
     required: true,
     condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
   },
-  
+  {
+    id: "cancer_treatment_stage",
+    question: "What is your current cancer treatment status?",
+    reason: "Understanding your treatment stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
+    type: "multiple_choice",
+    options: [
+      "Recently diagnosed, no treatment started yet",
+      "Currently undergoing treatment (surgery, chemotherapy, radiation, etc.)",
+      "Cancer survivor - completed treatment and doing post-treatment care/medication to prevent recurrence"
+    ],
+    required: true,
+    condition: { questionId: "precancerous_condition", answer: "Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma" }
+  },
+  {
+    id: "cancer_anxiety_level",
+    question: "How would you rate your current level of anxiety or worry about your breast cancer situation?",
+    reason: "Mental health and anxiety management are crucial parts of cancer care. Understanding your anxiety level helps us provide appropriate emotional support and coping strategies.",
+    type: "multiple_choice",
+    options: [
+      "Extremely worried and feeling helpless (10/10)",
+      "Very worried and anxious (8-9/10)",
+      "Moderately worried (6-7/10)",
+      "Somewhat worried (4-5/10)",
+      "Mildly concerned (2-3/10)",
+      "Very little worry (1/10)",
+      "No worries at all (0/10)"
+    ],
+    required: true,
+    condition: { questionId: "precancerous_condition", answer: "Yes, Invasive Breast Cancer, Ductal Carcinoma (DCIS), or Invasive Lobular Carcinoma" }
+  }
 ];
 
 interface QuizProps {
