@@ -8,7 +8,7 @@ export default function Hero() {
   const { user } = useAuth();
 
   const handleTakeQuiz = () => {
-    setLocation("/chat");
+    setLocation("/quiz");
   };
 
   return (
