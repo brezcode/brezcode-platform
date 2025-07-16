@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Vite development console overlay */
+#vite-plugin-checker-container,
+[id*="vite-plugin"],
+.vite-overlay,
+[class*="vite-overlay"],
+[class*="vite-error"],
+div[style*="position: fixed"][style*="z-index"],
+div[style*="inset: 0px"],
+div[data-vite-dev-id] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+}
+
 /* Hide Replit development console */
 iframe[src*="runtime-error"], 
 div[data-runtime-error],
