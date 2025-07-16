@@ -55,17 +55,31 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   // Email signup mutation
   const signupMutation = useMutation({
     mutationFn: async (data: { email: string; password: string; quizAnswers: Record<string, any> }) => {
-      return await apiRequest("/api/auth/signup", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await apiRequest("POST", "/api/auth/signup", data);
+        return response.json();
+      } catch (error) {
+        console.error("Signup error:", error);
+        throw error;
+      }
     },
-    onSuccess: () => {
-      toast({
-        title: "Account Created",
-        description: "Please check your email for a verification code.",
-      });
-      setStep(3);
+    onSuccess: async () => {
+      // Send email verification code after account creation
+      try {
+        await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
+        toast({
+          title: "Account Created",
+          description: "Please check your email for a verification code.",
+        });
+        setStep(3);
+      } catch (error) {
+        console.error("Failed to send verification email:", error);
+        toast({
+          title: "Account Created",
+          description: "Account created but failed to send verification email. Please try again.",
+          variant: "destructive",
+        });
+      }
     },
     onError: (error: any) => {
       toast({
@@ -79,10 +93,13 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   // Email verification mutation
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: { email: string; code: string }) => {
-      return await apiRequest("/api/auth/verify-email", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await apiRequest("POST", "/api/auth/verify-email", data);
+        return response.json();
+      } catch (error) {
+        console.error("Email verification error:", error);
+        throw error;
+      }
     },
     onSuccess: () => {
       toast({
