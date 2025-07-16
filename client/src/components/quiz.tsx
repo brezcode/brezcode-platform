@@ -416,6 +416,11 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
           finalAnswers.bmi = Math.round(bmi * 10) / 10;
           finalAnswers.obesity = bmi >= 30 ? "Yes" : "No";
         }
+        
+        // Save answers to localStorage for demo report generation
+        localStorage.setItem('brezcode_quiz_answers', JSON.stringify(finalAnswers));
+        console.log('Quiz completed with answers:', finalAnswers);
+        
         onComplete(finalAnswers);
         return;
       }

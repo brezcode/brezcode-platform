@@ -14,7 +14,7 @@ export default function QuizPage() {
     console.log("Quiz completed with answers:", answers);
     setQuizAnswers(answers);
     // Store answers in localStorage for report generation
-    localStorage.setItem('completedQuizAnswers', JSON.stringify(answers));
+    localStorage.setItem('brezcode_quiz_answers', JSON.stringify(answers));
     
     // For test mode: Go directly to demo report page
     setLocation('/demo-report');
