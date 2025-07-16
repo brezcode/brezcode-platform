@@ -18,9 +18,11 @@ interface SimpleSignupFlowProps {
 export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSignupFlowProps) {
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
+    confirmPassword: "",
   });
   const [verificationCode, setVerificationCode] = useState("");
   const { toast } = useToast();
@@ -112,6 +114,17 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
       <CardContent className="space-y-6">
         <form onSubmit={(e) => {
           e.preventDefault();
+          
+          // Validate passwords match
+          if (formData.password !== formData.confirmPassword) {
+            toast({
+              title: "Password Mismatch",
+              description: "Passwords do not match. Please try again.",
+              variant: "destructive",
+            });
+            return;
+          }
+          
           signupMutation.mutate({
             email: formData.email,
             password: formData.password,
@@ -154,10 +167,43 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
             </div>
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Input
+                id="confirmPassword"
+                type={showConfirmPassword ? "text" : "password"}
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Confirm your password"
+                required
+                minLength={8}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              >
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+            {formData.confirmPassword && formData.password !== formData.confirmPassword && (
+              <p className="text-sm text-red-600">Passwords do not match</p>
+            )}
+          </div>
+
           <Button 
             type="submit" 
             className="w-full"
-            disabled={signupMutation.isPending}
+            disabled={
+              signupMutation.isPending || 
+              formData.password !== formData.confirmPassword ||
+              !formData.email ||
+              !formData.password ||
+              !formData.confirmPassword
+            }
           >
             {signupMutation.isPending ? "Creating Account..." : "Create Account"}
           </Button>
