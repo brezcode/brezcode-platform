@@ -19,17 +19,8 @@ interface ProfileCharacteristics {
   preventionPriorities: string[];
 }
 
-// UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) - processed first
+// UNCHANGEABLE FACTORS (Q3,4,5,6,7,9,18) - excluding age and ethnicity
 const UNCHANGEABLE_FACTORS: RiskFactor[] = [
-  // Q1: Age - specific risk factors for different age groups (corrected values)
-  { question: "age", answer: "50-59", relativeRisk: 1.14, category: "demographic", explanation: "Age 50-59: RR = 1.14 (14% higher)" },
-  { question: "age", answer: "60-69", relativeRisk: 1.67, category: "demographic", explanation: "Age 60-69: RR = 1.67 (67% higher)" },
-  { question: "age", answer: "70+", relativeRisk: 3.33, category: "demographic", explanation: "Age 70+: RR = 3.33 (233% higher)" },
-  // Q2: Ethnicity
-  { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "genetic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
-  { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "genetic", explanation: "Black: RR = 2.25 vs Asian" },
-  { question: "ethnicity", answer: "American Indian", relativeRisk: 1.74, category: "genetic", explanation: "American Indian: RR = 1.74 vs Asian" },
-  { question: "ethnicity", answer: "Hispanic/Latino", relativeRisk: 1.15, category: "genetic", explanation: "Hispanic/Latino: RR = 1.15 vs Asian" },
   // Q3: Family History
   { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
   { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history: RR = 1.5" },
@@ -46,10 +37,7 @@ const UNCHANGEABLE_FACTORS: RiskFactor[] = [
   { question: "pregnancy_age", answer: "Age 25-29", relativeRisk: 1.15, category: "hormonal", explanation: "First pregnancy 25-29: RR = 1.15 (midpoint 1.1-1.2)" },
   // Q9: Menopause
   { question: "menopause", answer: "Yes, at age 55 or later", relativeRisk: 1.75, category: "hormonal", explanation: "Late menopause: RR = 1.75 (midpoint 1.5-2.0)" },
-  // Q17: Stressful Events
-  { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "environmental", explanation: "Striking life events: RR = 1.585 (midpoint 1.1-2.07)" },
-  { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "environmental", explanation: "Stressful life events: RR = 1.585 (midpoint 1.1-2.07)" },
-  // Q18: Benign Conditions (moved from changeable - these are medical diagnoses)
+  // Q18: Benign Conditions (medical diagnoses)
   { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5 (midpoint 4.0-5.0)" },
 ];
 
@@ -70,6 +58,9 @@ const CHANGEABLE_FACTORS: RiskFactor[] = [
   { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 drink daily: RR = 1.085 (midpoint 1.07-1.1)" },
   // Q16: Night Shift
   { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work: RR = 1.105 (midpoint 1.08-1.13)" },
+  // Q17: Stressful Events (moved from unchangeable)
+  { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Striking life events: RR = 1.585 (midpoint 1.1-2.07)" },
+  { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Stressful life events: RR = 1.585 (midpoint 1.1-2.07)" },
   // Q18: Other Benign Conditions (atypical hyperplasia moved to unchangeable)
   { question: "benign_condition", answer: "Yes, Lobular Carcinoma in Situ (LCIS)", relativeRisk: 2.75, category: "medical", explanation: "LCIS: RR = 2.75 (midpoint 2.5-3.0)" },
   { question: "benign_condition", answer: "Yes, Fibroadenoma or cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts: RR = 1.25 (midpoint 1.0-1.5)" },
@@ -137,33 +128,14 @@ export class BreastHealthReportGenerator {
       return { unchangeableScore: treatmentScore, changeableScore: 0, totalScore: treatmentScore };
     }
 
-    // STEP 1: Calculate UNCHANGEABLE risk score
+    // STEP 1: Calculate UNCHANGEABLE risk score (excluding age and ethnicity)
     let unchangeableMultiplier = 1.0;
-    const age = parseInt(quizAnswers.age || "30");
     
     calculationLog.push(`=== UNCHANGEABLE RISK FACTORS ===`);
-    calculationLog.push(`Starting baseline: 1.0`);
+    calculationLog.push(`Starting baseline: 1.0 (age and ethnicity excluded)`);
     
-    // Apply age-specific risk factor first
-    let ageCategory = "";
-    if (age >= 50 && age < 60) ageCategory = "50-59";
-    else if (age >= 60 && age < 70) ageCategory = "60-69";
-    else if (age >= 70) ageCategory = "70+";
-    
-    if (ageCategory) {
-      const ageFactor = UNCHANGEABLE_FACTORS.find(f => f.question === "age" && f.answer === ageCategory);
-      if (ageFactor) {
-        const oldMultiplier = unchangeableMultiplier;
-        unchangeableMultiplier *= ageFactor.relativeRisk;
-        calculationLog.push(`Age ${age} (${ageCategory}): ${oldMultiplier.toFixed(2)} × ${ageFactor.relativeRisk} = ${unchangeableMultiplier.toFixed(2)}`);
-      }
-    } else {
-      calculationLog.push(`Age ${age}: No additional age risk (baseline)`);
-    }
-    
-    // Apply other UNCHANGEABLE factors
+    // Apply UNCHANGEABLE factors (family history, BRCA, dense breasts, etc.)
     UNCHANGEABLE_FACTORS.forEach(factor => {
-      if (factor.question === "age") return; // Skip age - handled above
       const answer = quizAnswers[factor.question];
       if (answer === factor.answer) {
         const oldMultiplier = unchangeableMultiplier;
@@ -176,11 +148,11 @@ export class BreastHealthReportGenerator {
     const unchangeableFinalScore = Math.sqrt(unchangeableMultiplier);
     calculationLog.push(`Unchangeable final: √${unchangeableMultiplier.toFixed(2)} = ${unchangeableFinalScore.toFixed(2)}`);
     
-    // STEP 2: Calculate CHANGEABLE risk score starting from unchangeable result
-    let changeableMultiplier = unchangeableMultiplier; // Start from unchangeable risk
+    // STEP 2: Calculate CHANGEABLE risk score independently (starting from baseline 1)
+    let changeableMultiplier = 1.0; // Independent calculation starting from baseline
     
     calculationLog.push(`\n=== CHANGEABLE RISK FACTORS ===`);
-    calculationLog.push(`Starting from unchangeable risk: ${unchangeableMultiplier.toFixed(2)}`);
+    calculationLog.push(`Starting from baseline: 1.0 (independent calculation)`);
     
     // Apply CHANGEABLE factors
     CHANGEABLE_FACTORS.forEach(factor => {
@@ -218,23 +190,24 @@ export class BreastHealthReportGenerator {
     };
 
     const unchangeableScore = normalizeScore(unchangeableFinalScore);
-    const totalScore = normalizeScore(changeableFinalScore);
-    const changeableScore = totalScore - unchangeableScore; // The additional risk from changeable factors
+    const changeableScore = normalizeScore(changeableFinalScore);
+    const totalScore = Math.sqrt(unchangeableMultiplier * changeableMultiplier); // Combined effect for total
+    const totalScoreNormalized = normalizeScore(totalScore);
     
     calculationLog.push(`\n=== FINAL SCORES ===`);
     calculationLog.push(`Unchangeable score: ${unchangeableFinalScore.toFixed(2)} → ${unchangeableScore.toFixed(1)}/100`);
-    calculationLog.push(`Total score: ${changeableFinalScore.toFixed(2)} → ${totalScore.toFixed(1)}/100`);
-    calculationLog.push(`Changeable contribution: ${changeableScore.toFixed(1)} points`);
+    calculationLog.push(`Changeable score: ${changeableFinalScore.toFixed(2)} → ${changeableScore.toFixed(1)}/100`);
+    calculationLog.push(`Total combined score: ${totalScore.toFixed(2)} → ${totalScoreNormalized.toFixed(1)}/100`);
     
     // Log the full calculation for debugging
-    console.log('\n=== SEPARATED RISK SCORE CALCULATION ===');
+    console.log('\n=== INDEPENDENT RISK SCORE CALCULATION ===');
     calculationLog.forEach(log => console.log(log));
     console.log('==========================================\n');
     
     return {
       unchangeableScore: Math.round(unchangeableScore * 10) / 10,
-      changeableScore: Math.max(0, Math.round(changeableScore * 10) / 10),
-      totalScore: Math.round(totalScore * 10) / 10
+      changeableScore: Math.round(changeableScore * 10) / 10,
+      totalScore: Math.round(totalScoreNormalized * 10) / 10
     };
   }
   
