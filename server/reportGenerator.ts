@@ -99,6 +99,7 @@ export class BreastHealthReportGenerator {
     let riskMultiplier = 1.0;
     let riskPoints = 0;
     const appliedFactors: string[] = [];
+    const calculationLog: string[] = [];
     
     // Age-based baseline risk
     const age = parseInt(quizAnswers.age || "30");
@@ -109,14 +110,18 @@ export class BreastHealthReportGenerator {
     else if (age < 70) baselineRisk = 6.0;
     else baselineRisk = 8.0;
     
+    calculationLog.push(`Age ${age}: Baseline risk = ${baselineRisk}`);
+    
     // Apply risk factors using evidence-based scoring
     Object.entries(RISK_FACTORS).forEach(([category, factors]) => {
       factors.forEach(factor => {
         const answer = quizAnswers[factor.question];
         if (answer === factor.answer) {
+          const oldMultiplier = riskMultiplier;
           riskMultiplier *= factor.relativeRisk;
           riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
           appliedFactors.push(factor.explanation);
+          calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
         }
       });
     });
@@ -125,23 +130,52 @@ export class BreastHealthReportGenerator {
     if (quizAnswers.precancerous_condition === "Yes, I am currently receiving treatment for breast cancer") {
       // For current patients, provide supportive score focused on treatment success
       const stage = quizAnswers.cancer_stage;
-      if (stage === "Stage 1") return 15;
-      if (stage === "Stage 2") return 25; 
-      if (stage === "Stage 3") return 35;
-      if (stage === "Stage 4") return 45;
+      calculationLog.push(`Current treatment detected: ${stage}`);
+      calculationLog.push(`Treatment-focused scoring applied (not prevention-based)`);
+      
+      if (stage === "Stage 1") {
+        calculationLog.push(`Stage 1: Risk score = 15 (excellent prognosis)`);
+        return 15;
+      }
+      if (stage === "Stage 2") {
+        calculationLog.push(`Stage 2: Risk score = 25 (good prognosis with treatment)`);
+        return 25;
+      }
+      if (stage === "Stage 3") {
+        calculationLog.push(`Stage 3: Risk score = 35 (moderate, treatment-focused)`);
+        return 35;
+      }
+      if (stage === "Stage 4") {
+        calculationLog.push(`Stage 4: Risk score = 45 (advanced, supportive care focus)`);
+        return 45;
+      }
       return 35; // Default for current patients
     }
     
     // Calculate final risk score
     let finalScore = baselineRisk * Math.sqrt(riskMultiplier) + (riskPoints * 0.5);
+    calculationLog.push(`Base calculation: ${baselineRisk} × √${riskMultiplier.toFixed(2)} + (${riskPoints} × 0.5) = ${finalScore.toFixed(2)}`);
     
     // BMI adjustment
     const bmi = parseFloat(quizAnswers.bmi || "25");
-    if (bmi >= 30) finalScore *= 1.2; // Obesity
-    else if (bmi >= 25) finalScore *= 1.1; // Overweight
+    if (bmi >= 30) {
+      finalScore *= 1.2; // Obesity
+      calculationLog.push(`BMI ${bmi} (Obesity): Score × 1.2 = ${finalScore.toFixed(2)}`);
+    } else if (bmi >= 25) {
+      finalScore *= 1.1; // Overweight
+      calculationLog.push(`BMI ${bmi} (Overweight): Score × 1.1 = ${finalScore.toFixed(2)}`);
+    }
     
     // Cap and normalize score (0-100 scale)
-    return Math.min(Math.max(finalScore, 1), 100);
+    const cappedScore = Math.min(Math.max(finalScore, 1), 100);
+    calculationLog.push(`Final score (capped 1-100): ${cappedScore.toFixed(1)}`);
+    
+    // Log the full calculation for debugging
+    console.log('\n=== RISK SCORE CALCULATION BREAKDOWN ===');
+    calculationLog.forEach(log => console.log(log));
+    console.log('==========================================\n');
+    
+    return cappedScore;
   }
   
   categorizeRisk(riskScore: number): 'low' | 'moderate' | 'high' {
