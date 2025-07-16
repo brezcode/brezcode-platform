@@ -283,10 +283,20 @@ export default function LandingPage() {
           
           <div className="flex justify-center">
             <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
-              <FirebaseAuth 
-                mode="signup" 
-                onSuccess={() => setLocation('/chat')}
-              />
+              <div className="space-y-4">
+                <FirebaseAuth 
+                  mode="signup" 
+                  onSuccess={() => setLocation('/chat')}
+                />
+                <div className="text-center">
+                  <button
+                    onClick={() => setLocation('/quiz')}
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    Or continue with the health assessment →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>

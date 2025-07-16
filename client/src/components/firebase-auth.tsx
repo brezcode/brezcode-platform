@@ -11,7 +11,7 @@ interface FirebaseAuthProps {
 }
 
 export default function FirebaseAuth({ mode = 'login', onSuccess }: FirebaseAuthProps) {
-  const { user, loading, isAuthenticated } = useFirebaseAuth();
+  const { user, loading, isAuthenticated, error } = useFirebaseAuth();
   const { toast } = useToast();
 
   const handleGoogleSignIn = async () => {
@@ -64,6 +64,24 @@ export default function FirebaseAuth({ mode = 'login', onSuccess }: FirebaseAuth
       <Card className="w-full max-w-md mx-auto">
         <CardContent className="flex justify-center items-center p-6">
           <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <CardTitle className="text-red-600">Configuration Error</CardTitle>
+          <CardDescription>
+            Firebase authentication is not properly configured. Please check your environment variables.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-gray-600">
+            For now, you can continue using the quiz and other features.
+          </p>
         </CardContent>
       </Card>
     );

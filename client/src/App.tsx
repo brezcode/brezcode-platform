@@ -11,24 +11,12 @@ import SubscribePage from "@/pages/subscribe";
 import NotFound from "@/pages/not-found";
 
 function Router() {
-  const { isAuthenticated, loading } = useFirebaseAuth();
-
   return (
     <Switch>
-      {loading || !isAuthenticated ? (
-        <>
-          <Route path="/" component={LandingPage} />
-          <Route path="/quiz" component={QuizPage} />
-          <Route path="/subscribe/:tier" component={SubscribePage} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={ChatPage} />
-          <Route path="/chat" component={ChatPage} />
-          <Route path="/quiz" component={QuizPage} />
-          <Route path="/subscribe/:tier" component={SubscribePage} />
-        </>
-      )}
+      <Route path="/" component={LandingPage} />
+      <Route path="/quiz" component={QuizPage} />
+      <Route path="/chat" component={ChatPage} />
+      <Route path="/subscribe/:tier" component={SubscribePage} />
       <Route component={NotFound} />
     </Switch>
   );
