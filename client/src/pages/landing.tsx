@@ -6,6 +6,7 @@ import ChatInterface from "@/components/chat-interface";
 import FirebaseAuth from "@/components/firebase-auth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import FirebaseDebug from "@/components/firebase-debug";
 import promiseImage from "@assets/Sunnyside p5_1752243629786.png";
 
 export default function LandingPage() {
@@ -16,6 +17,17 @@ export default function LandingPage() {
       <Navigation />
       <Hero />
       <Features />
+      
+      {/* Firebase Debug Section - Temporary for testing */}
+      <section className="py-10 bg-red-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-6">
+            <h3 className="text-2xl font-bold text-red-600">Firebase Authentication Test</h3>
+            <p className="text-red-700">This is a temporary debug section to test Google sign-in</p>
+          </div>
+          <FirebaseDebug />
+        </div>
+      </section>
       
       {/* App Features Section */}
       <section id="app-features" className="py-20 bg-gray-50">

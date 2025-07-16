@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import FirebaseAuth from "./firebase-auth";
+import FirebaseDebug from "./firebase-debug";
 
 interface SimpleSignupFlowProps {
   quizAnswers: Record<string, any>;

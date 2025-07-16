@@ -18,25 +18,18 @@ export default function FirebaseAuth({ mode = 'login', onSuccess }: FirebaseAuth
     try {
       const result = await signInWithGoogle();
       if (result.user) {
-        if (!result.user.emailVerified) {
-          toast({
-            title: "Email Verification Required",
-            description: "Please check your email and click the verification link to complete signup.",
-            variant: "default",
-          });
-        } else {
-          toast({
-            title: "Welcome to BrezCode!",
-            description: "You've successfully signed in.",
-            variant: "default",
-          });
-          onSuccess?.();
-        }
+        toast({
+          title: "Welcome to BrezCode!",
+          description: `Successfully signed in as ${result.user.email}`,
+          variant: "default",
+        });
+        onSuccess?.();
       }
     } catch (error: any) {
+      console.error("Firebase sign-in error:", error);
       toast({
         title: "Sign In Failed",
-        description: error.message || "Please try again.",
+        description: `Firebase error: ${error.message}`,
         variant: "destructive",
       });
     }

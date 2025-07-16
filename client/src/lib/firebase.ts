@@ -22,7 +22,10 @@ if (hasFirebaseConfig) {
     // Initialize Firebase only once
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
-    console.log("Firebase initialized successfully");
+    console.log("Firebase initialized successfully", {
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      domain: window.location.hostname
+    });
   } catch (error: any) {
     // Handle duplicate app error gracefully
     if (error.code === 'app/duplicate-app') {
@@ -40,13 +43,22 @@ if (hasFirebaseConfig) {
 
 // Google Auth Provider
 const googleProvider = new GoogleAuthProvider();
+googleProvider.addScope('email');
+googleProvider.addScope('profile');
 
 // Auth functions with error handling
 export const signInWithGoogle = async () => {
   if (!auth) {
-    throw new Error("Firebase not configured");
+    throw new Error("Firebase not configured. Please check your Firebase settings.");
   }
-  return signInWithPopup(auth, googleProvider);
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log("Google sign-in successful:", result.user?.email);
+    return result;
+  } catch (error: any) {
+    console.error("Google sign-in error:", error);
+    throw new Error(`Sign in failed: ${error.message}`);
+  }
 };
 
 export const logout = async () => {
