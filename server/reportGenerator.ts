@@ -19,48 +19,60 @@ interface ProfileCharacteristics {
   preventionPriorities: string[];
 }
 
-// Risk scoring system with CORRECT RR values from Column D reference
-const RISK_FACTORS: Record<string, RiskFactor[]> = {
-  genetic: [
-    { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
-    { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history: RR = 1.5" },
-    { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
-    { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 mutation: RR = 1.7" },
-    { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "genetic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
-    { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "genetic", explanation: "Black: RR = 2.25 vs Asian" },
-    { question: "ethnicity", answer: "American Indian", relativeRisk: 1.74, category: "genetic", explanation: "American Indian: RR = 1.74 vs Asian" },
-    { question: "ethnicity", answer: "Hispanic/Latino", relativeRisk: 1.15, category: "genetic", explanation: "Hispanic/Latino: RR = 1.15 vs Asian" },
-  ],
-  hormonal: [
-    { question: "menstrual_age", answer: "Before 12 years old", relativeRisk: 1.15, category: "hormonal", explanation: "Early menarche: RR = 1.15 (midpoint 1.1-1.2)" },
-    { question: "pregnancy_age", answer: "Never had a full-term pregnancy", relativeRisk: 1.27, category: "hormonal", explanation: "Nulliparity: RR = 1.27" },
-    { question: "pregnancy_age", answer: "Age 30 or older", relativeRisk: 1.3, category: "hormonal", explanation: "First pregnancy ≥30: RR = 1.3 (midpoint 1.2-1.4)" },
-    { question: "pregnancy_age", answer: "Age 25-29", relativeRisk: 1.15, category: "hormonal", explanation: "First pregnancy 25-29: RR = 1.15 (midpoint 1.1-1.2)" },
-    { question: "oral_contraceptives", answer: "Yes, currently using", relativeRisk: 1.24, category: "hormonal", explanation: "Current oral contraceptive: RR = 1.24" },
-    { question: "oral_contraceptives", answer: "Yes, used in the past", relativeRisk: 1.07, category: "hormonal", explanation: "Past oral contraceptive: RR = 1.07" },
-    { question: "menopause", answer: "Yes, at age 55 or later", relativeRisk: 1.75, category: "hormonal", explanation: "Late menopause: RR = 1.75 (midpoint 1.5-2.0)" },
-    { question: "hrt", answer: "Yes", relativeRisk: 1.25, category: "hormonal", explanation: "HRT >5 years: RR = 1.25 (midpoint 1.2-1.3)" },
-  ],
-  lifestyle: [
-    { question: "alcohol", answer: "2 or more drinks", relativeRisk: 1.175, category: "lifestyle", explanation: "2+ drinks daily: RR = 1.175 (midpoint 1.15-1.2)" },
-    { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 drink daily: RR = 1.085 (midpoint 1.07-1.1)" },
-    { question: "smoke", answer: "Yes", relativeRisk: 1.125, category: "lifestyle", explanation: "Current smoking: RR = 1.125 (midpoint 1.1-1.15)" },
-    { question: "western_diet", answer: "Yes, Western diet", relativeRisk: 1.33, category: "lifestyle", explanation: "Western diet: RR = 1.33" },
-    { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work: RR = 1.105 (midpoint 1.08-1.13)" },
-  ],
-  medical: [
-    { question: "dense_breast", answer: "Yes", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue: RR = 2.0" },
-    { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5 (midpoint 4.0-5.0)" },
-    { question: "benign_condition", answer: "Yes, Lobular Carcinoma in Situ (LCIS)", relativeRisk: 2.75, category: "medical", explanation: "LCIS: RR = 2.75 (midpoint 2.5-3.0)" },
-    { question: "benign_condition", answer: "Yes, Fibroadenoma or cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts: RR = 1.25 (midpoint 1.0-1.5)" },
-    { question: "precancerous_condition", answer: "Yes, I am currently receiving treatment for breast cancer", relativeRisk: 4.5, category: "medical", explanation: "Current cancer treatment: RR = 4.5 (midpoint 4.0-5.0)" },
-    { question: "precancerous_condition", answer: "Yes, I have been diagnosed with DCIS", relativeRisk: 4.5, category: "medical", explanation: "DCIS history: RR = 4.5 (midpoint 4.0-5.0)" },
-  ],
-  environmental: [
-    { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "environmental", explanation: "Striking life events: RR = 1.585 (midpoint 1.1-2.07)" },
-    { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "environmental", explanation: "Stressful life events: RR = 1.585 (midpoint 1.1-2.07)" },
-  ]
-};
+// UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) - processed first
+const UNCHANGEABLE_FACTORS: RiskFactor[] = [
+  // Q1: Age - handled separately in baselineRisk
+  // Q2: Ethnicity
+  { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "genetic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
+  { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "genetic", explanation: "Black: RR = 2.25 vs Asian" },
+  { question: "ethnicity", answer: "American Indian", relativeRisk: 1.74, category: "genetic", explanation: "American Indian: RR = 1.74 vs Asian" },
+  { question: "ethnicity", answer: "Hispanic/Latino", relativeRisk: 1.15, category: "genetic", explanation: "Hispanic/Latino: RR = 1.15 vs Asian" },
+  // Q3: Family History
+  { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
+  { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history: RR = 1.5" },
+  { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
+  // Q4: BRCA1/2
+  { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 mutation: RR = 1.7" },
+  // Q5: Dense Breast
+  { question: "dense_breast", answer: "Yes", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue: RR = 2.0" },
+  // Q6: Menstrual Age
+  { question: "menstrual_age", answer: "Before 12 years old", relativeRisk: 1.15, category: "hormonal", explanation: "Early menarche: RR = 1.15 (midpoint 1.1-1.2)" },
+  // Q7: Pregnancy Age
+  { question: "pregnancy_age", answer: "Never had a full-term pregnancy", relativeRisk: 1.27, category: "hormonal", explanation: "Nulliparity: RR = 1.27" },
+  { question: "pregnancy_age", answer: "Age 30 or older", relativeRisk: 1.3, category: "hormonal", explanation: "First pregnancy ≥30: RR = 1.3 (midpoint 1.2-1.4)" },
+  { question: "pregnancy_age", answer: "Age 25-29", relativeRisk: 1.15, category: "hormonal", explanation: "First pregnancy 25-29: RR = 1.15 (midpoint 1.1-1.2)" },
+  // Q9: Menopause
+  { question: "menopause", answer: "Yes, at age 55 or later", relativeRisk: 1.75, category: "hormonal", explanation: "Late menopause: RR = 1.75 (midpoint 1.5-2.0)" },
+  // Q17: Stressful Events
+  { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "environmental", explanation: "Striking life events: RR = 1.585 (midpoint 1.1-2.07)" },
+  { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "environmental", explanation: "Stressful life events: RR = 1.585 (midpoint 1.1-2.07)" },
+];
+
+// CHANGEABLE FACTORS - processed second
+const CHANGEABLE_FACTORS: RiskFactor[] = [
+  // Q8: Oral Contraceptives
+  { question: "oral_contraceptives", answer: "Yes, currently using", relativeRisk: 1.24, category: "hormonal", explanation: "Current oral contraceptive: RR = 1.24" },
+  { question: "oral_contraceptives", answer: "Yes, used in the past", relativeRisk: 1.07, category: "hormonal", explanation: "Past oral contraceptive: RR = 1.07" },
+  // Q10: Weight/BMI - handled separately with obesity logic
+  // Q12: HRT
+  { question: "hrt", answer: "Yes", relativeRisk: 1.25, category: "hormonal", explanation: "HRT >5 years: RR = 1.25 (midpoint 1.2-1.3)" },
+  // Q13: Western Diet
+  { question: "western_diet", answer: "Yes, Western diet", relativeRisk: 1.33, category: "lifestyle", explanation: "Western diet: RR = 1.33" },
+  // Q14: Smoking
+  { question: "smoke", answer: "Yes", relativeRisk: 1.125, category: "lifestyle", explanation: "Current smoking: RR = 1.125 (midpoint 1.1-1.15)" },
+  // Q15: Alcohol
+  { question: "alcohol", answer: "2 or more drinks", relativeRisk: 1.175, category: "lifestyle", explanation: "2+ drinks daily: RR = 1.175 (midpoint 1.15-1.2)" },
+  { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 drink daily: RR = 1.085 (midpoint 1.07-1.1)" },
+  // Q16: Night Shift
+  { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work: RR = 1.105 (midpoint 1.08-1.13)" },
+  // Q18: Benign Conditions
+  { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5 (midpoint 4.0-5.0)" },
+  { question: "benign_condition", answer: "Yes, Lobular Carcinoma in Situ (LCIS)", relativeRisk: 2.75, category: "medical", explanation: "LCIS: RR = 2.75 (midpoint 2.5-3.0)" },
+  { question: "benign_condition", answer: "Yes, Fibroadenoma or cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts: RR = 1.25 (midpoint 1.0-1.5)" },
+  // Q19: Cancer History
+  { question: "precancerous_condition", answer: "Yes, I am currently receiving treatment for breast cancer", relativeRisk: 4.5, category: "medical", explanation: "Current cancer treatment: RR = 4.5 (midpoint 4.0-5.0)" },
+  { question: "precancerous_condition", answer: "Yes, I have been diagnosed with DCIS", relativeRisk: 4.5, category: "medical", explanation: "DCIS history: RR = 4.5 (midpoint 4.0-5.0)" },
+];
 
 // Profile characteristics based on life stages
 const USER_PROFILES: Record<UserProfile, ProfileCharacteristics> = {
@@ -116,18 +128,30 @@ export class BreastHealthReportGenerator {
     
     calculationLog.push(`Age ${age}: Baseline risk = ${baselineRisk}`);
     
-    // Apply risk factors using evidence-based scoring
-    Object.entries(RISK_FACTORS).forEach(([category, factors]) => {
-      factors.forEach(factor => {
-        const answer = quizAnswers[factor.question];
-        if (answer === factor.answer) {
-          const oldMultiplier = riskMultiplier;
-          riskMultiplier *= factor.relativeRisk;
-          riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
-          appliedFactors.push(factor.explanation);
-          calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
-        }
-      });
+    // Apply UNCHANGEABLE factors first (Q1,2,3,4,5,6,7,9,17)
+    calculationLog.push('--- UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) ---');
+    UNCHANGEABLE_FACTORS.forEach(factor => {
+      const answer = quizAnswers[factor.question];
+      if (answer === factor.answer) {
+        const oldMultiplier = riskMultiplier;
+        riskMultiplier *= factor.relativeRisk;
+        riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
+        appliedFactors.push(factor.explanation);
+        calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+      }
+    });
+
+    // Apply CHANGEABLE factors second
+    calculationLog.push('--- CHANGEABLE FACTORS ---');
+    CHANGEABLE_FACTORS.forEach(factor => {
+      const answer = quizAnswers[factor.question];
+      if (answer === factor.answer) {
+        const oldMultiplier = riskMultiplier;
+        riskMultiplier *= factor.relativeRisk;
+        riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
+        appliedFactors.push(factor.explanation);
+        calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+      }
     });
     
     // Special handling for current cancer patients
@@ -174,7 +198,7 @@ export class BreastHealthReportGenerator {
     calculationLog.push(`Final score (capped 1-100): ${cappedScore.toFixed(1)}`);
     
     // Log the full calculation for debugging
-    console.log('\n=== CORRECTED RISK SCORE CALCULATION ===');
+    console.log('\n=== REORDERED RISK SCORE CALCULATION ===');
     calculationLog.forEach(log => console.log(log));
     console.log('==========================================\n');
     
