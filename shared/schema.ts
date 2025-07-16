@@ -50,7 +50,10 @@ export const loginSchema = z.object({
 export const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  phone: z.string()
+    .min(6, "Phone number must be at least 6 digits")
+    .max(15, "Phone number cannot exceed 15 digits")
+    .regex(/^\d+$/, "Phone number must contain only digits"),
   phoneCountryCode: z.string(),
   quizAnswers: z.record(z.any()),
 });

@@ -392,7 +392,9 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
   };
 
   const canProceedFromStep3 = () => {
-    return phoneNumber.length >= 10;
+    // Support international formats: 6-15 digits, only numbers
+    const digitsOnly = phoneNumber.replace(/\D/g, '');
+    return digitsOnly.length >= 6 && digitsOnly.length <= 15;
   };
 
   const handleNextStep = () => {
@@ -599,12 +601,17 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
                     id="phone"
                     type="tel"
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                    placeholder="1234567890"
+                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, '').slice(0, 15))}
+                    placeholder={selectedCountry === "HK" ? "12345678" : "1234567890"}
                     className="flex-1"
                     required
                   />
                 </div>
+                <p className="text-xs text-gray-500">
+                  {selectedCountry === "HK" ? "Hong Kong: 8 digits" : 
+                   selectedCountry === "US" || selectedCountry === "CA" ? "10 digits (without area code prefix)" :
+                   "6-15 digits (numbers only)"}
+                </p>
               </div>
 
               <Button 
