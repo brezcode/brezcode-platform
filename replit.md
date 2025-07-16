@@ -101,6 +101,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 - `VITE_FIREBASE_API_KEY`: Firebase web app API key
 - `VITE_FIREBASE_APP_ID`: Firebase app identifier
 - `VITE_FIREBASE_PROJECT_ID`: Firebase project identifier
+- **Domain Authorization Required**: Current Replit domain must be added to Firebase Console → Authentication → Settings → Authorized domains
 
 ### Twilio Integration (Optional - fallback to console logging)
 - `TWILIO_ACCOUNT_SID`: Twilio account identifier for SMS

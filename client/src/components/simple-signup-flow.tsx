@@ -35,32 +35,36 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
-          {/* Firebase Google Auth */}
-          <FirebaseAuth 
-            mode="signup" 
-            onSuccess={() => {
-              // Firebase handles everything automatically
-              onComplete();
-            }}
-          />
+          <Button 
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={() => setStep(2)}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Create Account with Email
+          </Button>
           
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
+              <span className="bg-white px-2 text-muted-foreground">Or with Google (requires setup)</span>
             </div>
           </div>
 
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => setStep(2)}
-          >
-            <Mail className="w-4 h-4 mr-2" />
-            Sign up with Email
-          </Button>
+          {/* Firebase Google Auth - Currently requires domain authorization */}
+          <div className="space-y-2">
+            <FirebaseAuth 
+              mode="signup" 
+              onSuccess={() => {
+                // Firebase handles everything automatically
+                onComplete();
+              }}
+            />
+            <p className="text-xs text-gray-500 text-center">
+              Google sign-in requires domain authorization in Firebase Console
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>

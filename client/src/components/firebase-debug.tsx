@@ -9,11 +9,15 @@ export default function FirebaseDebug() {
   const { toast } = useToast();
 
   const testFirebaseConfig = () => {
+    const currentDomain = window.location.hostname;
     const config = {
       apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? "✓ Set" : "✗ Missing",
       projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? "✓ Set" : "✗ Missing", 
       appId: import.meta.env.VITE_FIREBASE_APP_ID ? "✓ Set" : "✗ Missing",
-      domain: window.location.hostname
+      currentDomain: currentDomain,
+      fullURL: window.location.href,
+      authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
+      domainStatus: "⚠️ Need to add this domain to Firebase Console"
     };
     
     setTestResult(JSON.stringify(config, null, 2));
@@ -53,6 +57,19 @@ export default function FirebaseDebug() {
         <CardDescription>Test Firebase configuration and authentication</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <h4 className="font-semibold text-yellow-800 mb-2">Domain Authorization Issue</h4>
+          <p className="text-sm text-yellow-700 mb-3">
+            The current domain needs to be added to Firebase Console:
+          </p>
+          <ol className="text-sm text-yellow-700 space-y-1 list-decimal list-inside">
+            <li>Go to <a href="https://console.firebase.google.com" target="_blank" className="underline">Firebase Console</a></li>
+            <li>Select project: <code className="bg-yellow-100 px-1 rounded">{import.meta.env.VITE_FIREBASE_PROJECT_ID}</code></li>
+            <li>Go to Authentication → Settings → Authorized domains</li>
+            <li>Add: <code className="bg-yellow-100 px-1 rounded">{window.location.hostname}</code></li>
+          </ol>
+        </div>
+        
         <Button onClick={testFirebaseConfig} variant="outline" className="w-full">
           Test Firebase Config
         </Button>
