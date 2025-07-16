@@ -6,10 +6,7 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
-  phone: text("phone"),
-  phoneCountryCode: text("phone_country_code"),
   isEmailVerified: boolean("is_email_verified").default(false),
-  isPhoneVerified: boolean("is_phone_verified").default(false),
   quizAnswers: jsonb("quiz_answers"),
   subscriptionTier: text("subscription_tier").$type<"basic" | "pro" | "premium" | null>().default(null),
   stripeCustomerId: text("stripe_customer_id"),
@@ -26,19 +23,11 @@ export const emailVerifications = pgTable("email_verifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-export const phoneVerifications = pgTable("phone_verifications", {
-  id: serial("id").primaryKey(),
-  phone: text("phone").notNull(),
-  code: text("code").notNull(),
-  expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow(),
-});
+// Phone verification removed - using Firebase Auth + email verification only
 
 export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
-  phone: true,
-  phoneCountryCode: true,
   quizAnswers: true,
 });
 
@@ -50,11 +39,6 @@ export const loginSchema = z.object({
 export const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
-  phone: z.string()
-    .min(8, "Phone number must be at least 8 characters")
-    .max(20, "Phone number cannot exceed 20 characters")
-    .regex(/^\+\d{6,18}$/, "Phone number must be in international format (+country code + number)"),
-  phoneCountryCode: z.string(),
   quizAnswers: z.record(z.any()),
 });
 
@@ -63,15 +47,11 @@ export const emailVerificationSchema = z.object({
   code: z.string().length(6, "Code must be 6 digits"),
 });
 
-export const phoneVerificationSchema = z.object({
-  phone: z.string(),
-  code: z.string().length(6, "Code must be 6 digits"),
-});
+// Phone verification schema removed
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SignupData = z.infer<typeof signupSchema>;
 export type EmailVerification = typeof emailVerifications.$inferSelect;
-export type PhoneVerification = typeof phoneVerifications.$inferSelect;
 export type SubscriptionTier = "basic" | "pro" | "premium";

@@ -7,7 +7,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, phoneVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
+import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
 import twilio from "twilio";
 import sgMail from "@sendgrid/mail";
 
@@ -283,46 +283,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Invalid or expired verification code" });
       }
       
+      // Actually verify the email in storage
+      await storage.verifyEmail(email);
+      
       res.json({ message: "Email verified successfully" });
     } catch (error: any) {
       res.status(400).json({ message: error.message });
     }
   });
 
-  // Phone verification routes
-  app.post("/api/auth/send-phone-verification", async (req, res) => {
-    try {
-      const { phone } = req.body;
-      
-      // Generate 6-digit code
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      
-      // Store verification code
-      await storage.createPhoneVerification(phone, code);
-      
-      // Send SMS verification via Twilio or fallback to console
-      await sendSMSVerification(phone, code);
-      
-      res.json({ message: "Verification code sent" });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
-
-  app.post("/api/auth/verify-phone", async (req, res) => {
-    try {
-      const { phone, code } = phoneVerificationSchema.parse(req.body);
-      
-      const verification = await storage.getPhoneVerification(phone, code);
-      if (!verification) {
-        return res.status(400).json({ message: "Invalid or expired verification code" });
-      }
-      
-      res.json({ message: "Phone verified successfully" });
-    } catch (error: any) {
-      res.status(400).json({ message: error.message });
-    }
-  });
+  // Phone verification routes removed - using Firebase Auth + email verification only
 
   // New signup route with verification
   app.post("/api/auth/signup", async (req, res) => {
@@ -335,11 +305,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "User already exists" });
       }
 
-      // Verify email was verified
-      const emailVerification = await storage.getEmailVerification(userData.email, "verified");
-      
-      // Verify phone was verified
-      const phoneVerification = await storage.getPhoneVerification(userData.phone, "verified");
+      // For simple signup, we'll verify email during the flow
 
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
@@ -352,9 +318,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         quizAnswers: userData.quizAnswers,
       });
 
-      // Mark email and phone as verified
-      await storage.verifyEmail(userData.email);
-      await storage.verifyPhone(userData.phone);
+      // Email verification will be handled separately during the signup flow
 
       req.session.userId = user.id;
       req.session.isAuthenticated = true;

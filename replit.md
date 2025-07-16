@@ -29,11 +29,12 @@ This is a subscription-based web application that provides AI-powered breast hea
 ## Key Components
 
 ### Authentication System
-- **Firebase Authentication**: Google social login for seamless user experience
-- **Hybrid approach**: Firebase for auth + Twilio for SMS verification (phone numbers)
-- **Session management**: Firebase handles user sessions automatically
-- **Email verification**: Automated via Firebase (no custom codes needed)
-- **Protected routes**: Firebase auth state determines access to chat features
+- **Simplified Authentication**: Firebase Google social login + email verification only
+- **No phone verification**: Eliminated phone number collection and SMS verification
+- **Dual signup options**: Firebase social login OR email/password with verification
+- **Session management**: Express sessions with bcrypt password hashing
+- **Email verification**: SendGrid for verification codes (falls back to console logging)
+- **Protected routes**: Session-based authentication for chat features
 
 ### Subscription Management
 - Three-tier subscription model (Basic $4.99, Pro $9.99, Premium $19.99)
@@ -112,6 +113,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 16, 2025. Eliminated phone verification entirely - simplified authentication to Firebase Google login + email verification only, removed all Twilio SMS dependencies, created clean 2-step signup flow (auth choice → email verification), updated schema and storage to remove phone fields
 - January 16, 2025. Identified Twilio A2P 10DLC requirement - US phone numbers require brand/campaign registration for SMS delivery, current system falls back to console logging for verification codes which works perfectly for development testing
 - January 16, 2025. Fixed phone number validation for international formats - updated validation to support 6-15 digit phone numbers with proper country code formatting, fixed signup schema to accept full international phone format (+country code + number), improved Twilio error handling for regional SMS permissions, added helpful guidance text for different countries including Hong Kong 8-digit format
 - January 16, 2025. Integrated Firebase Authentication with Google Social Login - replaced custom email verification with Firebase's automatic email verification, maintained Twilio SMS for phone verification, added Firebase Auth components with clean UI, created hybrid auth system (Firebase + Twilio), configured Firebase SDK and authentication hooks

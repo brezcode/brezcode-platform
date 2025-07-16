@@ -1,0 +1,262 @@
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle, Mail, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
+import FirebaseAuth from "./firebase-auth";
+
+interface SimpleSignupFlowProps {
+  quizAnswers: Record<string, any>;
+  onComplete: () => void;
+}
+
+export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSignupFlowProps) {
+  const [step, setStep] = useState(1);
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const [verificationCode, setVerificationCode] = useState("");
+  const { toast } = useToast();
+
+  // Step 1: Choose Authentication Method
+  const renderAuthChoice = () => (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
+        <p className="text-gray-600">Choose how you'd like to sign up</p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          {/* Firebase Google Auth */}
+          <FirebaseAuth 
+            mode="signup" 
+            onSuccess={() => {
+              // Firebase handles everything automatically
+              onComplete();
+            }}
+          />
+          
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-muted-foreground">Or continue with email</span>
+            </div>
+          </div>
+
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => setStep(2)}
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            Sign up with Email
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  // Email signup mutation
+  const signupMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string; quizAnswers: Record<string, any> }) => {
+      return await apiRequest("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Account Created",
+        description: "Please check your email for a verification code.",
+      });
+      setStep(3);
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Signup Failed",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Email verification mutation
+  const verifyEmailMutation = useMutation({
+    mutationFn: async (data: { email: string; code: string }) => {
+      return await apiRequest("/api/auth/verify-email", {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Email Verified",
+        description: "Your account is now active!",
+      });
+      onComplete();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid verification code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Step 2: Email & Password
+  const renderEmailSignup = () => (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <div className="flex items-center justify-center mb-4">
+          <Progress value={50} className="w-32" />
+          <span className="ml-3 text-sm text-gray-600">Step 1 of 2</span>
+        </div>
+        <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
+        <p className="text-gray-600">Enter your email and create a password</p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          signupMutation.mutate({
+            email: formData.email,
+            password: formData.password,
+            quizAnswers,
+          });
+        }} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="email">Email Address</Label>
+            <Input
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+              placeholder="Enter your email"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={formData.password}
+                onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+                placeholder="Create a password (min 8 characters)"
+                required
+                minLength={8}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute right-0 top-0 h-full px-3"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </Button>
+            </div>
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={signupMutation.isPending}
+          >
+            {signupMutation.isPending ? "Creating Account..." : "Create Account"}
+          </Button>
+        </form>
+
+        <Button variant="outline" onClick={() => setStep(1)} className="w-full">
+          Back to Sign Up Options
+        </Button>
+      </CardContent>
+    </Card>
+  );
+
+  // Step 3: Email Verification
+  const renderEmailVerification = () => (
+    <Card className="w-full max-w-md mx-auto">
+      <CardHeader className="text-center">
+        <div className="flex items-center justify-center mb-4">
+          <Progress value={100} className="w-32" />
+          <span className="ml-3 text-sm text-gray-600">Step 2 of 2</span>
+        </div>
+        <CardTitle className="text-2xl font-bold">Verify Your Email</CardTitle>
+        <p className="text-gray-600">
+          We've sent a 6-digit code to <strong>{formData.email}</strong>
+        </p>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          verifyEmailMutation.mutate({
+            email: formData.email,
+            code: verificationCode,
+          });
+        }} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="code">Verification Code</Label>
+            <Input
+              id="code"
+              type="text"
+              value={verificationCode}
+              onChange={(e) => setVerificationCode(e.target.value)}
+              placeholder="Enter 6-digit code"
+              maxLength={6}
+              className="text-center text-lg tracking-widest"
+              required
+            />
+          </div>
+
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={verifyEmailMutation.isPending}
+          >
+            {verifyEmailMutation.isPending ? "Verifying..." : "Verify Email"}
+          </Button>
+        </form>
+
+        <div className="text-center">
+          <p className="text-sm text-gray-600">
+            Didn't receive the code?{" "}
+            <Button
+              variant="link"
+              className="p-0 h-auto"
+              onClick={() => {
+                // Resend verification code
+                signupMutation.mutate({
+                  email: formData.email,
+                  password: formData.password,
+                  quizAnswers,
+                });
+              }}
+            >
+              Resend Code
+            </Button>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 flex items-center justify-center p-4">
+      {step === 1 && renderAuthChoice()}
+      {step === 2 && renderEmailSignup()}
+      {step === 3 && renderEmailVerification()}
+    </div>
+  );
+}
