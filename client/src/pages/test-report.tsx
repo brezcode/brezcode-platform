@@ -15,21 +15,32 @@ export default function TestReportPage() {
   // Generate report mutation using test endpoint (no auth required)
   const generateReportMutation = useMutation({
     mutationFn: async (answers: Record<string, any>) => {
+      console.log('Generating report with answers:', answers);
       const response = await fetch('/api/reports/generate-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quizAnswers: answers })
       });
       
+      console.log('Response status:', response.status);
+      
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error:', errorText);
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       
-      return await response.json();
+      const data = await response.json();
+      console.log('API Response:', data);
+      return data;
     },
     onSuccess: (data) => {
       console.log('Report generated successfully:', data);
-      setGeneratedReport(data.report);
+      if (data && data.report) {
+        setGeneratedReport(data.report);
+      } else {
+        console.error('Invalid response structure:', data);
+      }
     },
     onError: (error) => {
       console.error('Error generating report:', error);

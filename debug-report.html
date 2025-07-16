@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Report Test</title>
+</head>
+<body>
+    <h1>Manual Report Test</h1>
+    <button onclick="testReport()">Generate Test Report</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testReport() {
+            console.log('Starting test...');
+            
+            const testAnswers = {
+                "age": "60",
+                "ethnicity": "White (non-Hispanic)",
+                "family_history": "Yes, I have first-degree relative with BC",
+                "brca_test": "BRCA1/2",
+                "dense_breast": "Yes",
+                "menstrual_age": "Before 12 years old",
+                "pregnancy_age": "Never had a full-term pregnancy",
+                "oral_contraceptives": "Yes, currently using",
+                "menopause": "Yes, at age 55 or later",
+                "weight": "80",
+                "height": "1.6",
+                "hrt": "Yes",
+                "western_diet": "Yes, Western diet",
+                "smoke": "Yes",
+                "alcohol": "2 or more drinks",
+                "night_shift": "Yes",
+                "stressful_events": "Yes, striking life events",
+                "benign_condition": "Yes, Atypical Hyperplasia (ADH/ALH)",
+                "precancerous_condition": "Yes, I am currently receiving treatment for breast cancer",
+                "cancer_stage": "Stage 4",
+                "mammogram_frequency": "Annually (once a year)",
+                "breast_symptoms": "I have a lump in my breast",
+                "lump_characteristics": "Growing Lump with size over 5cm",
+                "country": "United States",
+                "bmi": 31.2,
+                "obesity": "Yes"
+            };
+            
+            try {
+                console.log('Making API request...');
+                const response = await fetch('/api/reports/generate-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ quizAnswers: testAnswers })
+                });
+                
+                console.log('Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Report data:', data);
+                
+                document.getElementById('result').innerHTML = `
+                    <h2>Report Generated!</h2>
+                    <p><strong>Risk Score:</strong> ${data.report.riskScore}</p>
+                    <p><strong>Risk Category:</strong> ${data.report.riskCategory}</p>
+                    <p><strong>User Profile:</strong> ${data.report.userProfile}</p>
+                    <p><strong>Risk Factors:</strong> ${data.report.riskFactors.length}</p>
+                    <p><strong>Recommendations:</strong> ${data.report.recommendations.length}</p>
+                `;
+                
+                // Store in localStorage and redirect
+                localStorage.setItem('completedQuizAnswers', JSON.stringify(testAnswers));
+                setTimeout(() => {
+                    window.location.href = '/test-report';
+                }, 2000);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>

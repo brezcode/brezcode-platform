@@ -504,6 +504,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Debug route to test report generation
+  app.get('/debug-report', (req, res) => {
+    res.sendFile(require('path').join(__dirname, '../debug-report.html'));
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
