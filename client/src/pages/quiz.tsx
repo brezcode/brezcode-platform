@@ -16,8 +16,8 @@ export default function QuizPage() {
     // Store answers in localStorage for report generation
     localStorage.setItem('completedQuizAnswers', JSON.stringify(answers));
     
-    // For test mode: Go directly to report page
-    setLocation('/report');
+    // For test mode: Go directly to test report page
+    setLocation('/test-report');
   };
 
   const handleQuizClose = () => {
