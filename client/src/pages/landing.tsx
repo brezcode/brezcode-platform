@@ -3,10 +3,8 @@ import Hero from "@/components/hero";
 import Features from "@/components/features";
 import Pricing from "@/components/pricing";
 import ChatInterface from "@/components/chat-interface";
-import FirebaseAuth from "@/components/firebase-auth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
-import FirebaseDebug from "@/components/firebase-debug";
 import promiseImage from "@assets/Sunnyside p5_1752243629786.png";
 
 export default function LandingPage() {
@@ -18,16 +16,6 @@ export default function LandingPage() {
       <Hero />
       <Features />
       
-      {/* Firebase Debug Section - Temporary for testing */}
-      <section className="py-10 bg-red-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6">
-            <h3 className="text-2xl font-bold text-red-600">Firebase Authentication Test</h3>
-            <p className="text-red-700">This is a temporary debug section to test Google sign-in</p>
-          </div>
-          <FirebaseDebug />
-        </div>
-      </section>
       
       {/* App Features Section */}
       <section id="app-features" className="py-20 bg-gray-50">
@@ -296,18 +284,15 @@ export default function LandingPage() {
           <div className="flex justify-center">
             <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
               <div className="space-y-4">
-                <FirebaseAuth 
-                  mode="signup" 
-                  onSuccess={() => setLocation('/chat')}
-                />
-                <div className="text-center">
-                  <button
-                    onClick={() => setLocation('/quiz')}
-                    className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                  >
-                    Or continue with the health assessment →
-                  </button>
-                </div>
+                <Button 
+                  onClick={() => setLocation('/quiz')}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3"
+                >
+                  Start Your Health Assessment
+                </Button>
+                <p className="text-center text-sm text-gray-500">
+                  Complete our 23-question assessment to get personalized insights
+                </p>
               </div>
             </div>
           </div>

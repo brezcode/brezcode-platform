@@ -29,9 +29,9 @@ This is a subscription-based web application that provides AI-powered breast hea
 ## Key Components
 
 ### Authentication System
-- **Simplified Authentication**: Firebase Google social login + email verification only
+- **Email-only Authentication**: Simple email signup with verification codes
 - **No phone verification**: Eliminated phone number collection and SMS verification
-- **Dual signup options**: Firebase social login OR email/password with verification
+- **Single signup flow**: Email/password with email verification only
 - **Session management**: Express sessions with bcrypt password hashing
 - **Email verification**: SendGrid for verification codes (falls back to console logging)
 - **Protected routes**: Session-based authentication for chat features
@@ -97,11 +97,9 @@ This is a subscription-based web application that provides AI-powered breast hea
 - `VITE_STRIPE_PUBLIC_KEY`: Stripe client-side key
 - `DATABASE_URL`: PostgreSQL connection (for production upgrade)
 
-### Firebase Configuration (New)
-- `VITE_FIREBASE_API_KEY`: Firebase web app API key
-- `VITE_FIREBASE_APP_ID`: Firebase app identifier
-- `VITE_FIREBASE_PROJECT_ID`: Firebase project identifier
-- **Domain Authorization Required**: Current Replit domain must be added to Firebase Console → Authentication → Settings → Authorized domains
+### Email Configuration
+- `SENDGRID_API_KEY`: SendGrid API key for email verification
+- `FROM_EMAIL`: Verified sender email address for verification emails
 
 ### Twilio Integration (Optional - fallback to console logging)
 - `TWILIO_ACCOUNT_SID`: Twilio account identifier for SMS
@@ -114,6 +112,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 16, 2025. Simplified to email-only authentication - removed Firebase Google login due to domain authorization complexity, now using clean email signup with verification codes only, removed all Firebase dependencies and phone verification completely
 - January 16, 2025. Eliminated phone verification entirely - simplified authentication to Firebase Google login + email verification only, removed all Twilio SMS dependencies, created clean 2-step signup flow (auth choice → email verification), updated schema and storage to remove phone fields
 - January 16, 2025. Identified Twilio A2P 10DLC requirement - US phone numbers require brand/campaign registration for SMS delivery, current system falls back to console logging for verification codes which works perfectly for development testing
 - January 16, 2025. Fixed phone number validation for international formats - updated validation to support 6-15 digit phone numbers with proper country code formatting, fixed signup schema to accept full international phone format (+country code + number), improved Twilio error handling for regional SMS permissions, added helpful guidance text for different countries including Hong Kong 8-digit format

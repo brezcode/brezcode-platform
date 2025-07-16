@@ -8,8 +8,7 @@ import { CheckCircle, Mail, Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import FirebaseAuth from "./firebase-auth";
-import FirebaseDebug from "./firebase-debug";
+// Firebase authentication removed - using email-only signup
 
 interface SimpleSignupFlowProps {
   quizAnswers: Record<string, any>;
@@ -31,40 +30,21 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
     <Card className="w-full max-w-md mx-auto">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold">Create Your Account</CardTitle>
-        <p className="text-gray-600">Choose how you'd like to sign up</p>
+        <p className="text-gray-600">Enter your email to create your account</p>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <Button 
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3"
             onClick={() => setStep(2)}
           >
-            <Mail className="w-4 h-4 mr-2" />
-            Create Account with Email
+            <Mail className="w-5 h-5 mr-2" />
+            Create Your Account
           </Button>
           
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-muted-foreground">Or with Google (requires setup)</span>
-            </div>
-          </div>
-
-          {/* Firebase Google Auth - Currently requires domain authorization */}
-          <div className="space-y-2">
-            <FirebaseAuth 
-              mode="signup" 
-              onSuccess={() => {
-                // Firebase handles everything automatically
-                onComplete();
-              }}
-            />
-            <p className="text-xs text-gray-500 text-center">
-              Google sign-in requires domain authorization in Firebase Console
-            </p>
-          </div>
+          <p className="text-center text-sm text-gray-500">
+            Simple email signup with verification code
+          </p>
         </div>
       </CardContent>
     </Card>
