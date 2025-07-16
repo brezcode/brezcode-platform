@@ -313,8 +313,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.createUser({
         email: userData.email,
         password: hashedPassword,
-        phone: userData.phone,
-        phoneCountryCode: userData.phoneCountryCode,
         quizAnswers: userData.quizAnswers,
       });
 
