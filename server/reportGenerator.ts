@@ -19,42 +19,42 @@ interface ProfileCharacteristics {
   preventionPriorities: string[];
 }
 
-// Risk scoring system based on BC Assessment
+// Risk scoring system mapped to actual BC Assessment quiz questions
 const RISK_FACTORS: Record<string, RiskFactor[]> = {
-  age: [
-    { question: "age", answer: "under_20", relativeRisk: 0.1, category: "demographic", explanation: "Very low risk due to young age" },
-    { question: "age", answer: "20-29", relativeRisk: 0.3, category: "demographic", explanation: "Low risk, early reproductive years" },
-    { question: "age", answer: "30-39", relativeRisk: 1.0, category: "demographic", explanation: "Baseline risk reference" },
-    { question: "age", answer: "40-49", relativeRisk: 1.5, category: "demographic", explanation: "Moderately increased risk" },
-    { question: "age", answer: "50-59", relativeRisk: 3.0, category: "demographic", explanation: "Significantly increased risk" },
-    { question: "age", answer: "60-69", relativeRisk: 4.5, category: "demographic", explanation: "High risk group" },
-    { question: "age", answer: "70_plus", relativeRisk: 6.0, category: "demographic", explanation: "Highest risk group" },
+  genetic: [
+    { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.1, category: "genetic", explanation: "First-degree family history significantly increases risk" },
+    { question: "family_history", answer: "Yes, I have multiple relatives with BC", relativeRisk: 3.0, category: "genetic", explanation: "Multiple family members with breast cancer substantially increases risk" },
+    { question: "brca_test", answer: "BRCA1/2", relativeRisk: 12.0, category: "genetic", explanation: "BRCA1/2 mutation dramatically increases lifetime risk (50-85%)" },
+    { question: "brca_test", answer: "Other genetic mutation", relativeRisk: 3.0, category: "genetic", explanation: "Other genetic mutations moderately increase risk" },
+    { question: "ethnicity", answer: "Ashkenazi Jewish", relativeRisk: 1.4, category: "genetic", explanation: "Ashkenazi Jewish heritage increases BRCA mutation likelihood" },
   ],
-  familyHistory: [
-    { question: "family_history_breast", answer: "mother_sister", relativeRisk: 2.0, category: "genetic", explanation: "First-degree relative with breast cancer doubles risk" },
-    { question: "family_history_breast", answer: "aunt_grandmother", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree relative moderately increases risk" },
-    { question: "family_history_ovarian", answer: "yes", relativeRisk: 1.7, category: "genetic", explanation: "Family history of ovarian cancer increases breast cancer risk" },
-    { question: "brca_mutation", answer: "positive", relativeRisk: 10.0, category: "genetic", explanation: "BRCA mutation significantly increases lifetime risk" },
-  ],
-  reproductive: [
-    { question: "age_first_period", answer: "under_12", relativeRisk: 1.3, category: "hormonal", explanation: "Early menarche increases lifetime estrogen exposure" },
-    { question: "age_first_birth", answer: "never", relativeRisk: 1.4, category: "hormonal", explanation: "Nulliparity increases risk" },
-    { question: "age_first_birth", answer: "after_30", relativeRisk: 1.2, category: "hormonal", explanation: "Late first pregnancy slightly increases risk" },
-    { question: "breastfeeding", answer: "never", relativeRisk: 1.1, category: "hormonal", explanation: "Never breastfeeding slightly increases risk" },
-    { question: "menopause_age", answer: "after_55", relativeRisk: 1.3, category: "hormonal", explanation: "Late menopause increases estrogen exposure" },
+  hormonal: [
+    { question: "menstrual_age", answer: "Before 12 years old", relativeRisk: 1.3, category: "hormonal", explanation: "Early menarche increases lifetime estrogen exposure" },
+    { question: "pregnancy_age", answer: "Never had a full-term pregnancy", relativeRisk: 1.4, category: "hormonal", explanation: "Nulliparity increases risk due to continuous estrogen cycles" },
+    { question: "pregnancy_age", answer: "After 30 years old", relativeRisk: 1.2, category: "hormonal", explanation: "Late first pregnancy slightly increases risk" },
+    { question: "menopause", answer: "Yes, at age 55 or later", relativeRisk: 1.3, category: "hormonal", explanation: "Late menopause extends estrogen exposure" },
+    { question: "oral_contraceptives", answer: "Yes, currently using", relativeRisk: 1.2, category: "hormonal", explanation: "Current oral contraceptive use modestly increases risk" },
+    { question: "oral_contraceptives", answer: "Yes, used in the past", relativeRisk: 1.1, category: "hormonal", explanation: "Past oral contraceptive use slightly increases risk" },
+    { question: "hrt", answer: "Yes", relativeRisk: 1.5, category: "hormonal", explanation: "Hormone replacement therapy significantly increases risk" },
   ],
   lifestyle: [
-    { question: "alcohol_consumption", answer: "daily", relativeRisk: 1.5, category: "lifestyle", explanation: "Daily alcohol consumption increases risk" },
-    { question: "alcohol_consumption", answer: "weekly", relativeRisk: 1.2, category: "lifestyle", explanation: "Regular alcohol consumption moderately increases risk" },
-    { question: "exercise_frequency", answer: "never", relativeRisk: 1.2, category: "lifestyle", explanation: "Sedentary lifestyle increases risk" },
-    { question: "bmi", answer: "obese", relativeRisk: 1.3, category: "lifestyle", explanation: "Obesity increases risk, especially post-menopause" },
-    { question: "smoking", answer: "current", relativeRisk: 1.2, category: "lifestyle", explanation: "Current smoking increases risk" },
+    { question: "alcohol", answer: "2 or more drinks", relativeRisk: 1.4, category: "lifestyle", explanation: "Regular alcohol consumption (2+ drinks daily) increases risk" },
+    { question: "alcohol", answer: "1 drink per day", relativeRisk: 1.1, category: "lifestyle", explanation: "Moderate alcohol consumption slightly increases risk" },
+    { question: "obesity", answer: "Yes", relativeRisk: 1.3, category: "lifestyle", explanation: "Obesity increases risk, especially after menopause" },
+    { question: "smoke", answer: "Yes", relativeRisk: 1.2, category: "lifestyle", explanation: "Smoking increases breast cancer risk" },
+    { question: "western_diet", answer: "Yes, Western diet", relativeRisk: 1.2, category: "lifestyle", explanation: "High-fat Western diet pattern increases risk" },
+    { question: "night_shift", answer: "Yes", relativeRisk: 1.2, category: "lifestyle", explanation: "Night shift work disrupts circadian rhythms and increases risk" },
   ],
   medical: [
-    { question: "hormone_therapy", answer: "current", relativeRisk: 1.25, category: "medical", explanation: "Hormone replacement therapy increases risk" },
-    { question: "birth_control", answer: "current", relativeRisk: 1.08, category: "medical", explanation: "Current oral contraceptive use slightly increases risk" },
-    { question: "breast_density", answer: "dense", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue significantly increases risk" },
-    { question: "previous_biopsy", answer: "atypical", relativeRisk: 4.0, category: "medical", explanation: "Atypical hyperplasia substantially increases risk" },
+    { question: "dense_breast", answer: "Yes", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue significantly increases risk and masks tumors" },
+    { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.0, category: "medical", explanation: "Atypical hyperplasia substantially increases risk" },
+    { question: "benign_condition", answer: "Yes, Lobular Carcinoma in Situ (LCIS)", relativeRisk: 3.0, category: "medical", explanation: "LCIS significantly increases risk" },
+    { question: "benign_condition", answer: "Yes, Fibroadenoma or cysts", relativeRisk: 1.1, category: "medical", explanation: "Benign breast conditions slightly increase risk" },
+    { question: "precancerous_condition", answer: "Yes, I am currently receiving treatment for breast cancer", relativeRisk: 1.0, category: "medical", explanation: "Currently in treatment - risk management focused on treatment success" },
+    { question: "precancerous_condition", answer: "Yes, I have been diagnosed with DCIS", relativeRisk: 2.5, category: "medical", explanation: "DCIS significantly increases invasive cancer risk" },
+  ],
+  environmental: [
+    { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.1, category: "environmental", explanation: "Major life stressors may modestly increase risk through immune impact" },
   ]
 };
 
@@ -95,20 +95,53 @@ const USER_PROFILES: Record<UserProfile, ProfileCharacteristics> = {
 export class BreastHealthReportGenerator {
   
   calculateRiskScore(quizAnswers: Record<string, any>): number {
-    let totalRisk = 1.0; // Start with baseline risk
+    let baselineRisk = 1.0;
+    let riskMultiplier = 1.0;
+    let riskPoints = 0;
+    const appliedFactors: string[] = [];
     
-    // Apply multiplicative risk model
+    // Age-based baseline risk
+    const age = parseInt(quizAnswers.age || "30");
+    if (age < 30) baselineRisk = 0.5;
+    else if (age < 40) baselineRisk = 1.0;
+    else if (age < 50) baselineRisk = 2.0;
+    else if (age < 60) baselineRisk = 4.0;
+    else if (age < 70) baselineRisk = 6.0;
+    else baselineRisk = 8.0;
+    
+    // Apply risk factors using evidence-based scoring
     Object.entries(RISK_FACTORS).forEach(([category, factors]) => {
       factors.forEach(factor => {
         const answer = quizAnswers[factor.question];
         if (answer === factor.answer) {
-          totalRisk *= factor.relativeRisk;
+          riskMultiplier *= factor.relativeRisk;
+          riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
+          appliedFactors.push(factor.explanation);
         }
       });
     });
     
-    // Convert to percentage and normalize
-    return Math.min(totalRisk * 10, 100); // Cap at 100%
+    // Special handling for current cancer patients
+    if (quizAnswers.precancerous_condition === "Yes, I am currently receiving treatment for breast cancer") {
+      // For current patients, provide supportive score focused on treatment success
+      const stage = quizAnswers.cancer_stage;
+      if (stage === "Stage 1") return 15;
+      if (stage === "Stage 2") return 25; 
+      if (stage === "Stage 3") return 35;
+      if (stage === "Stage 4") return 45;
+      return 35; // Default for current patients
+    }
+    
+    // Calculate final risk score
+    let finalScore = baselineRisk * Math.sqrt(riskMultiplier) + (riskPoints * 0.5);
+    
+    // BMI adjustment
+    const bmi = parseFloat(quizAnswers.bmi || "25");
+    if (bmi >= 30) finalScore *= 1.2; // Obesity
+    else if (bmi >= 25) finalScore *= 1.1; // Overweight
+    
+    // Cap and normalize score (0-100 scale)
+    return Math.min(Math.max(finalScore, 1), 100);
   }
   
   categorizeRisk(riskScore: number): 'low' | 'moderate' | 'high' {

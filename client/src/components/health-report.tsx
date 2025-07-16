@@ -102,17 +102,20 @@ export default function HealthReport({ report }: HealthReportProps) {
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <div className="text-sm text-gray-600 mb-2">Overall Risk Score</div>
+              <div className="text-sm text-gray-600 mb-2">Calculated Risk Score</div>
               <div className="flex items-center gap-4">
-                <div className="text-3xl font-bold text-indigo-600">
-                  {summary.riskScore}%
+                <div className="text-4xl font-bold text-indigo-600">
+                  {summary.riskScore}/100
                 </div>
                 <div className="flex-1">
                   <Progress 
                     value={riskScore} 
-                    className="h-3"
+                    className="h-4"
                   />
                 </div>
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                Based on age, genetics, lifestyle, and medical factors from your assessment
               </div>
             </div>
             <div>
