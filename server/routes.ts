@@ -83,6 +83,8 @@ async function sendEmailVerification(email: string, code: string): Promise<void>
       console.error('SendGrid email error:', error.message || error);
       if (error.code === 401) {
         console.error('SendGrid API key is invalid or unauthorized. Please check your SENDGRID_API_KEY.');
+      } else if (error.code === 403) {
+        console.error('SendGrid Forbidden: The FROM_EMAIL address needs to be verified in SendGrid. Please verify brezcode2024@gmail.com in your SendGrid dashboard.');
       }
       // Fall back to console logging
       console.log(`Email verification code for ${email}: ${code}`);
@@ -102,8 +104,11 @@ async function sendSMSVerification(phone: string, code: string): Promise<void> {
         to: phone,
       });
       console.log(`SMS verification sent to ${phone}`);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Twilio SMS error:', error);
+      if (error.code === 21266) {
+        console.error('Twilio error: Cannot send SMS to the same number as the FROM number. Please test with a different phone number.');
+      }
       // Fall back to console logging
       console.log(`SMS verification code for ${phone}: ${code}`);
     }
