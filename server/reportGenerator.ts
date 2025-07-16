@@ -21,7 +21,11 @@ interface ProfileCharacteristics {
 
 // UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) - processed first
 const UNCHANGEABLE_FACTORS: RiskFactor[] = [
-  // Q1: Age - handled separately in baselineRisk
+  // Q1: Age - specific risk factors for different age groups
+  { question: "age", answer: "40-49", relativeRisk: 1.5, category: "demographic", explanation: "Age 40-49: RR = 1.5" },
+  { question: "age", answer: "50-59", relativeRisk: 2.0, category: "demographic", explanation: "Age 50-59: RR = 2.0" },
+  { question: "age", answer: "60-69", relativeRisk: 3.0, category: "demographic", explanation: "Age 60-69: RR = 3.0" },
+  { question: "age", answer: "70+", relativeRisk: 4.0, category: "demographic", explanation: "Age 70+: RR = 4.0" },
   // Q2: Ethnicity
   { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "genetic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
   { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "genetic", explanation: "Black: RR = 2.25 vs Asian" },
@@ -117,20 +121,35 @@ export class BreastHealthReportGenerator {
     const appliedFactors: string[] = [];
     const calculationLog: string[] = [];
     
-    // Age-based baseline risk
+    // Baseline risk is 1.0 for all ages - age-specific risk is handled through relative risk factors
     const age = parseInt(quizAnswers.age || "30");
-    if (age < 30) baselineRisk = 0.5;
-    else if (age < 40) baselineRisk = 1.0;
-    else if (age < 50) baselineRisk = 2.0;
-    else if (age < 60) baselineRisk = 4.0;
-    else if (age < 70) baselineRisk = 6.0;
-    else baselineRisk = 8.0;
+    baselineRisk = 1.0;
     
     calculationLog.push(`Age ${age}: Baseline risk = ${baselineRisk}`);
     
-    // Apply UNCHANGEABLE factors first (Q1,2,3,4,5,6,7,9,17)
-    calculationLog.push('--- UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) ---');
+    // Apply age-specific risk factor
+    let ageCategory = "";
+    if (age >= 40 && age < 50) ageCategory = "40-49";
+    else if (age >= 50 && age < 60) ageCategory = "50-59";
+    else if (age >= 60 && age < 70) ageCategory = "60-69";
+    else if (age >= 70) ageCategory = "70+";
+    
+    if (ageCategory) {
+      const ageFactor = UNCHANGEABLE_FACTORS.find(f => f.question === "age" && f.answer === ageCategory);
+      if (ageFactor) {
+        const oldMultiplier = riskMultiplier;
+        riskMultiplier *= ageFactor.relativeRisk;
+        appliedFactors.push(ageFactor.explanation);
+        calculationLog.push(`Age ${age} (${ageCategory}): Risk multiplier: ${oldMultiplier.toFixed(2)} × ${ageFactor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+      }
+    } else {
+      calculationLog.push(`Age ${age}: No additional risk (baseline = 1.0)`);
+    }
+    
+    // Apply UNCHANGEABLE factors first (Q2,3,4,5,6,7,9,17) - excluding age
+    calculationLog.push('--- UNCHANGEABLE FACTORS (Q2,3,4,5,6,7,9,17) ---');
     UNCHANGEABLE_FACTORS.forEach(factor => {
+      if (factor.question === "age") return; // Skip age - handled above
       const answer = quizAnswers[factor.question];
       if (answer === factor.answer) {
         const oldMultiplier = riskMultiplier;
@@ -193,16 +212,16 @@ export class BreastHealthReportGenerator {
     let finalScore = baselineRisk * Math.sqrt(riskMultiplier);
     calculationLog.push(`Final calculation: ${baselineRisk} × √${riskMultiplier.toFixed(2)} = ${finalScore.toFixed(2)}`);
     
-    // Cap and normalize score (0-100 scale)
-    const cappedScore = Math.min(Math.max(finalScore, 1), 100);
-    calculationLog.push(`Final score (capped 1-100): ${cappedScore.toFixed(1)}`);
+    // Convert to 0-100 scale for display (multiply by appropriate factor)
+    const normalizedScore = Math.min(Math.max(finalScore * 10, 1), 100);
+    calculationLog.push(`Normalized score (1-100 scale): ${normalizedScore.toFixed(1)}`);
     
     // Log the full calculation for debugging
-    console.log('\n=== REORDERED RISK SCORE CALCULATION ===');
+    console.log('\n=== CORRECTED RISK SCORE CALCULATION (Baseline=1.0) ===');
     calculationLog.forEach(log => console.log(log));
     console.log('==========================================\n');
     
-    return cappedScore;
+    return normalizedScore;
   }
   
   categorizeRisk(riskScore: number): 'low' | 'moderate' | 'high' {
