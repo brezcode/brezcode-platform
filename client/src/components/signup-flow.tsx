@@ -400,12 +400,12 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
       setStep(2);
       // Auto-send email verification
       sendEmailCodeMutation.mutate();
-    } else if (step === 2 && canProceedFromStep2()) {
+    } else if (step === 2 && isEmailVerified) {
       setStep(3);
+    } else if (step === 3 && canProceedFromStep2()) {
+      setStep(4);
       // Auto-send phone verification
       sendPhoneCodeMutation.mutate();
-    } else if (step === 3 && isEmailVerified) {
-      setStep(4);
     } else if (step === 4 && isPhoneVerified) {
       signupMutation.mutate();
     }
@@ -506,59 +506,6 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
           {step === 2 && (
             <div className="space-y-4">
               <div className="text-center mb-6">
-                <h3 className="text-lg font-semibold mb-2">Phone Number</h3>
-                <p className="text-sm text-gray-600">
-                  We'll send you important health reminders and alerts
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="country">Country</Label>
-                <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select country" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {countryCodes.map((country) => (
-                      <SelectItem key={country.code} value={country.code}>
-                        {country.country} ({country.dialCode})
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
-                <div className="flex space-x-2">
-                  <div className="w-20 bg-gray-100 border rounded-md flex items-center justify-center text-sm">
-                    {countryCodes.find(c => c.code === selectedCountry)?.dialCode}
-                  </div>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
-                    placeholder="1234567890"
-                    className="flex-1"
-                    required
-                  />
-                </div>
-              </div>
-
-              <Button 
-                onClick={handleNextStep} 
-                disabled={!canProceedFromStep2()}
-                className="w-full"
-              >
-                Continue
-              </Button>
-            </div>
-          )}
-
-          {step === 3 && (
-            <div className="space-y-4">
-              <div className="text-center mb-6">
                 <Mail className="h-12 w-12 text-blue-500 mx-auto mb-2" />
                 <h3 className="text-lg font-semibold mb-2">Verify Your Email</h3>
                 <p className="text-sm text-gray-600">
@@ -610,6 +557,59 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
               <Button 
                 onClick={handleNextStep} 
                 disabled={!isEmailVerified}
+                className="w-full"
+              >
+                Continue
+              </Button>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-4">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-semibold mb-2">Phone Number</h3>
+                <p className="text-sm text-gray-600">
+                  We'll send you important health reminders and alerts
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="country">Country</Label>
+                <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countryCodes.map((country) => (
+                      <SelectItem key={country.code} value={country.code}>
+                        {country.country} ({country.dialCode})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <div className="flex space-x-2">
+                  <div className="w-20 bg-gray-100 border rounded-md flex items-center justify-center text-sm">
+                    {countryCodes.find(c => c.code === selectedCountry)?.dialCode}
+                  </div>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                    placeholder="1234567890"
+                    className="flex-1"
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button 
+                onClick={handleNextStep} 
+                disabled={!canProceedFromStep2()}
                 className="w-full"
               >
                 Continue
