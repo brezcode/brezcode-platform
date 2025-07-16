@@ -275,10 +275,10 @@ export default function HealthReport({ report }: HealthReportProps) {
             <div>
               <h4 className="font-semibold text-gray-900 mb-3">Weekly Focus</h4>
               <div className="space-y-2">
-                {(report.dailyPlan.weekly || []).map((item: string, index: number) => (
-                  <div key={index} className="text-sm text-gray-600 flex items-start gap-2">
+                {Object.entries(report.dailyPlan.weekly || {}).map(([key, value]) => (
+                  <div key={key} className="text-sm text-gray-600 flex items-start gap-2">
                     <span className="text-purple-500">•</span>
-                    {item}
+                    <span className="font-medium capitalize">{key.replace('_', ' ')}:</span> {value}
                   </div>
                 ))}
               </div>
