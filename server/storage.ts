@@ -1,4 +1,4 @@
-import { users, emailVerifications, type User, type InsertUser, type SubscriptionTier, type EmailVerification } from "@shared/schema";
+import { users, emailVerifications, healthReports, type User, type InsertUser, type SubscriptionTier, type EmailVerification, type HealthReport, type InsertHealthReport } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -16,19 +16,28 @@ export interface IStorage {
   createEmailVerification(email: string, code: string): Promise<EmailVerification>;
   getEmailVerification(email: string, code: string): Promise<EmailVerification | undefined>;
   verifyEmail(email: string): Promise<User | undefined>;
+  
+  // Health reports
+  createHealthReport(report: InsertHealthReport): Promise<HealthReport>;
+  getHealthReports(userId: number): Promise<HealthReport[]>;
+  getLatestHealthReport(userId: number): Promise<HealthReport | undefined>;
 }
 
 export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private emailVerifications: Map<string, EmailVerification>;
+  private healthReports: Map<number, HealthReport>;
   currentId: number;
   currentEmailVerificationId: number;
+  currentHealthReportId: number;
 
   constructor() {
     this.users = new Map();
     this.emailVerifications = new Map();
+    this.healthReports = new Map();
     this.currentId = 1;
     this.currentEmailVerificationId = 1;
+    this.currentHealthReportId = 1;
   }
 
   async getUser(id: number): Promise<User | undefined> {
@@ -127,7 +136,30 @@ export class MemStorage implements IStorage {
     return updatedUser;
   }
 
-  // Phone verification removed - using Firebase Auth + email verification only
+  // Health Reports
+  async createHealthReport(report: InsertHealthReport): Promise<HealthReport> {
+    const id = this.currentHealthReportId++;
+    const healthReport: HealthReport = {
+      ...report,
+      id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.healthReports.set(id, healthReport);
+    return healthReport;
+  }
+
+  async getHealthReports(userId: number): Promise<HealthReport[]> {
+    return Array.from(this.healthReports.values())
+      .filter(report => report.userId === userId)
+      .sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+  }
+
+  async getLatestHealthReport(userId: number): Promise<HealthReport | undefined> {
+    const reports = await this.getHealthReports(userId);
+    return reports[0]; // Most recent due to sorting
+  }
 }
 
 export const storage = new MemStorage();

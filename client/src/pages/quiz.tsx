@@ -13,6 +13,8 @@ export default function QuizPage() {
   const handleQuizComplete = (answers: Record<string, any>) => {
     console.log("Quiz completed with answers:", answers);
     setQuizAnswers(answers);
+    // Store answers in localStorage for report generation
+    localStorage.setItem('completedQuizAnswers', JSON.stringify(answers));
     setQuizCompleted(true);
     setShowTransition(true);
   };

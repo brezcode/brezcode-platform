@@ -248,6 +248,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
+  // Health Report Generation
+  app.post('/api/reports/generate', requireAuth, async (req: any, res: Response) => {
+    try {
+      const { quizAnswers } = req.body;
+      
+      if (!quizAnswers) {
+        return res.status(400).json({ message: 'Quiz answers are required' });
+      }
+
+      // Import the report generator
+      const { reportGenerator } = await import('./reportGenerator');
+      
+      // Generate comprehensive report
+      const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
+      reportData.userId = req.user.id;
+      
+      // Save to storage
+      const savedReport = await storage.createHealthReport(reportData);
+      
+      res.json({
+        success: true,
+        report: savedReport
+      });
+    } catch (error) {
+      console.error('Error generating health report:', error);
+      res.status(500).json({ message: 'Failed to generate health report' });
+    }
+  });
+
+  // Get user's health reports
+  app.get('/api/reports', requireAuth, async (req: any, res: Response) => {
+    try {
+      const reports = await storage.getHealthReports(req.user.id);
+      res.json(reports);
+    } catch (error) {
+      console.error('Error fetching health reports:', error);
+      res.status(500).json({ message: 'Failed to fetch health reports' });
+    }
+  });
+
+  // Get latest health report
+  app.get('/api/reports/latest', requireAuth, async (req: any, res: Response) => {
+    try {
+      const report = await storage.getLatestHealthReport(req.user.id);
+      if (!report) {
+        return res.status(404).json({ message: 'No health reports found' });
+      }
+      res.json(report);
+    } catch (error) {
+      console.error('Error fetching latest health report:', error);
+      res.status(500).json({ message: 'Failed to fetch latest health report' });
+    }
+  });
+
   // Email verification routes
   app.post("/api/auth/send-email-verification", async (req, res) => {
     try {
