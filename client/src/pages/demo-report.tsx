@@ -11,61 +11,48 @@ export default function DemoReportPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Generate a demo report with the recent quiz answers
-    const generateDemoReport = async () => {
-      setLoading(true);
-      
-      const demoAnswers = {
-        "age": "60",
-        "ethnicity": "White (non-Hispanic)",
-        "family_history": "Yes, I have first-degree relative with BC",
-        "brca_test": "BRCA1/2",
-        "dense_breast": "Yes",
-        "menstrual_age": "Before 12 years old",
-        "pregnancy_age": "Never had a full-term pregnancy",
-        "oral_contraceptives": "Yes, currently using",
-        "menopause": "Yes, at age 55 or later",
-        "weight": "80",
-        "height": "1.6",
-        "hrt": "Yes",
-        "western_diet": "Yes, Western diet",
-        "smoke": "Yes",
-        "alcohol": "2 or more drinks",
-        "night_shift": "Yes",
-        "stressful_events": "Yes, striking life events",
-        "benign_condition": "Yes, Atypical Hyperplasia (ADH/ALH)",
-        "precancerous_condition": "Yes, I am currently receiving treatment for breast cancer",
-        "cancer_stage": "Stage 4",
-        "mammogram_frequency": "Annually (once a year)",
-        "breast_symptoms": "I have a lump in my breast",
-        "lump_characteristics": "Growing Lump with size over 5cm",
-        "country": "United States",
-        "bmi": 31.2,
-        "obesity": "Yes"
-      };
-
+    const generateReport = async () => {
       try {
-        const response = await fetch('/api/reports/generate-test', {
+        const storedAnswers = localStorage.getItem('brezcode_quiz_answers');
+        if (!storedAnswers) {
+          console.error('No quiz answers found in localStorage');
+          setLoading(false);
+          return;
+        }
+
+        const quizAnswers = JSON.parse(storedAnswers);
+        console.log('Generating report with answers:', quizAnswers);
+
+        const response = await fetch('/api/reports/generate-demo', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ quizAnswers: demoAnswers })
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ quizAnswers }),
         });
 
-        if (response.ok) {
-          const data = await response.json();
-          console.log('Demo report generated:', data);
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Report generated successfully:', data);
+
+        if (data.success && data.report) {
           setReport(data.report);
         } else {
-          console.error('Failed to generate demo report');
+          console.error('Invalid response format:', data);
         }
       } catch (error) {
-        console.error('Error generating demo report:', error);
+        console.error('Failed to generate demo report:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    generateDemoReport();
+    generateReport();
   }, []);
 
   if (loading) {

@@ -151,12 +151,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     if (!req.session.isAuthenticated || !req.session.userId) {
       return res.status(401).json({ message: "Authentication required" });
     }
-    
+
     const user = await storage.getUser(req.session.userId);
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
-    
+
     req.user = user;
     next();
   };
@@ -172,7 +172,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/register", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
@@ -181,7 +181,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
-      
+
       const user = await storage.createUser({
         ...userData,
         password: hashedPassword,
@@ -204,7 +204,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/login", async (req, res) => {
     try {
       const loginData = loginSchema.parse(req.body);
-      
+
       const user = await storage.getUserByEmail(loginData.email);
       if (!user) {
         return res.status(401).json({ message: "Invalid credentials" });
@@ -252,18 +252,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/reports/generate-test', async (req: any, res: Response) => {
     try {
       const { quizAnswers } = req.body;
-      
+
       if (!quizAnswers) {
         return res.status(400).json({ message: 'Quiz answers are required' });
       }
 
       // Import the report generator
       const { reportGenerator } = await import('./reportGenerator');
-      
+
       // Generate comprehensive report without requiring authentication
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = 999; // Test user ID
-      
+
       res.json({
         success: true,
         report: reportData
@@ -278,21 +278,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/reports/generate', requireAuth, async (req: any, res: Response) => {
     try {
       const { quizAnswers } = req.body;
-      
+
       if (!quizAnswers) {
         return res.status(400).json({ message: 'Quiz answers are required' });
       }
 
       // Import the report generator
       const { reportGenerator } = await import('./reportGenerator');
-      
+
       // Generate comprehensive report
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = req.user.id;
-      
+
       // Save to storage
       const savedReport = await storage.createHealthReport(reportData);
-      
+
       res.json({
         success: true,
         report: savedReport
@@ -332,16 +332,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/send-email-verification", async (req, res) => {
     try {
       const { email } = req.body;
-      
+
       // Generate 6-digit code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
-      
+
       // Store verification code (allow overwriting existing codes)
       await storage.createEmailVerification(email, code);
-      
+
       // Send email verification via SendGrid or fallback to console
       await sendEmailVerification(email, code);
-      
+
       res.json({ message: "Verification code sent" });
     } catch (error: any) {
       console.error("Email verification error:", error);
@@ -352,15 +352,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/verify-email", async (req, res) => {
     try {
       const { email, code } = emailVerificationSchema.parse(req.body);
-      
+
       const verification = await storage.getEmailVerification(email, code);
       if (!verification) {
         return res.status(400).json({ message: "Invalid or expired verification code" });
       }
-      
+
       // Actually verify the email in storage
       await storage.verifyEmail(email);
-      
+
       res.json({ message: "Email verified successfully" });
     } catch (error: any) {
       res.status(400).json({ message: error.message });
@@ -373,7 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/signup", async (req, res) => {
     try {
       const userData = signupSchema.parse(req.body);
-      
+
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
@@ -384,7 +384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
-      
+
       const user = await storage.createUser({
         email: userData.email,
         password: hashedPassword,
@@ -512,6 +512,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Generate report now route
   app.get('/generate-now', (req, res) => {
     res.sendFile(require('path').join(__dirname, '../generate-report-now.html'));
+  });
+
+  // Health Report Generation (Demo - No Auth Required)
+  app.post('/api/reports/generate-demo', async (req: Request, res: Response) => {
+    try {
+      console.log('Demo report request received:', req.body);
+      const { quizAnswers } = req.body;
+
+      if (!quizAnswers) {
+        console.error('No quiz answers provided in request');
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Quiz answers are required' 
+        });
+      }
+
+      console.log('Quiz answers received:', Object.keys(quizAnswers));
+
+      // Import the report generator
+      const { reportGenerator } = await import('./reportGenerator');
+
+      // Generate comprehensive report without requiring authentication
+      console.log('Generating report...');
+      const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
+      reportData.userId = 999; // Test user ID
+
+      console.log('Report generated successfully');
+      res.json({
+        success: true,
+        report: reportData
+      });
+    } catch (error) {
+      console.error('Error generating demo health report:', error);
+      console.error('Error stack:', error.stack);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Internal server error',
+        error: error.message 
+      });
+    }
   });
 
   const httpServer = createServer(app);
