@@ -246,13 +246,20 @@ export class BreastHealthReportGenerator {
   identifyRiskFactors(quizAnswers: Record<string, any>): string[] {
     const identifiedFactors: string[] = [];
     
-    Object.entries(RISK_FACTORS).forEach(([category, factors]) => {
-      factors.forEach(factor => {
-        const answer = quizAnswers[factor.question];
-        if (answer === factor.answer && factor.relativeRisk > 1.0) {
-          identifiedFactors.push(factor.explanation);
-        }
-      });
+    // Check UNCHANGEABLE_FACTORS
+    UNCHANGEABLE_FACTORS.forEach(factor => {
+      const answer = quizAnswers[factor.question];
+      if (answer === factor.answer && factor.relativeRisk > 1.0) {
+        identifiedFactors.push(factor.explanation);
+      }
+    });
+    
+    // Check CHANGEABLE_FACTORS
+    CHANGEABLE_FACTORS.forEach(factor => {
+      const answer = quizAnswers[factor.question];
+      if (answer === factor.answer && factor.relativeRisk > 1.0) {
+        identifiedFactors.push(factor.explanation);
+      }
     });
     
     return identifiedFactors;
