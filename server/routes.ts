@@ -60,7 +60,10 @@ async function sendEmailVerification(email: string, code: string): Promise<void>
     try {
       const msg = {
         to: email,
-        from: process.env.FROM_EMAIL,
+        from: {
+          email: process.env.FROM_EMAIL,
+          name: 'BrezCode Support'
+        },
         subject: 'BrezCode - Email Verification Code',
         text: `Your BrezCode verification code is: ${code}`,
         html: `
