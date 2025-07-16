@@ -51,9 +51,9 @@ export const signupSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
   phone: z.string()
-    .min(6, "Phone number must be at least 6 digits")
-    .max(15, "Phone number cannot exceed 15 digits")
-    .regex(/^\d+$/, "Phone number must contain only digits"),
+    .min(8, "Phone number must be at least 8 characters")
+    .max(20, "Phone number cannot exceed 20 characters")
+    .regex(/^\+\d{6,18}$/, "Phone number must be in international format (+country code + number)"),
   phoneCountryCode: z.string(),
   quizAnswers: z.record(z.any()),
 });

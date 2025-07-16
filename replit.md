@@ -112,6 +112,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 16, 2025. Fixed phone number validation for international formats - updated validation to support 6-15 digit phone numbers with proper country code formatting, fixed signup schema to accept full international phone format (+country code + number), improved Twilio error handling for regional SMS permissions, added helpful guidance text for different countries including Hong Kong 8-digit format
 - January 16, 2025. Integrated Firebase Authentication with Google Social Login - replaced custom email verification with Firebase's automatic email verification, maintained Twilio SMS for phone verification, added Firebase Auth components with clean UI, created hybrid auth system (Firebase + Twilio), configured Firebase SDK and authentication hooks
 - January 14, 2025. Fixed runtime error plugin issues and added quiz transition page - removed redundant signup questions (24-26) from quiz, fixed apiRequest function signatures causing unhandled promise rejections, added transitional page between quiz completion and signup explaining assessment report and coaching journey
 - January 14, 2025. Implemented complete signup flow with email and phone verification - quiz now transitions to 4-step signup (email/password, phone selection with country codes, email verification, phone verification), added database schemas for verification storage, created comprehensive signup API routes with proper validation, updated authentication system to support verified users

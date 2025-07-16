@@ -111,6 +111,8 @@ async function sendSMSVerification(phone: string, code: string): Promise<void> {
       console.error('Twilio SMS error:', error);
       if (error.code === 21266) {
         console.error('Twilio error: Cannot send SMS to the same number as the FROM number. Please test with a different phone number.');
+      } else if (error.code === 21408) {
+        console.error(`Twilio error: Permission to send SMS has not been enabled for the region indicated by the number: ${phone}. Please enable SMS for this region in your Twilio console.`);
       }
       // Fall back to console logging
       console.log(`SMS verification code for ${phone}: ${code}`);
