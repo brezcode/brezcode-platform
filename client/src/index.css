@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Hide Replit development console */
+iframe[src*="runtime-error"], 
+div[data-runtime-error],
+#runtime-error-modal,
+.runtime-error-overlay,
+[class*="runtime-error"],
+[id*="runtime-error"] {
+  display: none !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
 :root {
   --background: hsl(0, 0%, 100%);
   --foreground: hsl(207, 45%, 25%);
