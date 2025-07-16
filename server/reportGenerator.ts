@@ -21,11 +21,10 @@ interface ProfileCharacteristics {
 
 // UNCHANGEABLE FACTORS (Q1,2,3,4,5,6,7,9,17) - processed first
 const UNCHANGEABLE_FACTORS: RiskFactor[] = [
-  // Q1: Age - specific risk factors for different age groups
-  { question: "age", answer: "40-49", relativeRisk: 1.5, category: "demographic", explanation: "Age 40-49: RR = 1.5" },
-  { question: "age", answer: "50-59", relativeRisk: 2.0, category: "demographic", explanation: "Age 50-59: RR = 2.0" },
-  { question: "age", answer: "60-69", relativeRisk: 3.0, category: "demographic", explanation: "Age 60-69: RR = 3.0" },
-  { question: "age", answer: "70+", relativeRisk: 4.0, category: "demographic", explanation: "Age 70+: RR = 4.0" },
+  // Q1: Age - specific risk factors for different age groups (corrected values)
+  { question: "age", answer: "50-59", relativeRisk: 1.14, category: "demographic", explanation: "Age 50-59: RR = 1.14 (14% higher)" },
+  { question: "age", answer: "60-69", relativeRisk: 1.67, category: "demographic", explanation: "Age 60-69: RR = 1.67 (67% higher)" },
+  { question: "age", answer: "70+", relativeRisk: 3.33, category: "demographic", explanation: "Age 70+: RR = 3.33 (233% higher)" },
   // Q2: Ethnicity
   { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "genetic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
   { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "genetic", explanation: "Black: RR = 2.25 vs Asian" },
@@ -50,6 +49,8 @@ const UNCHANGEABLE_FACTORS: RiskFactor[] = [
   // Q17: Stressful Events
   { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "environmental", explanation: "Striking life events: RR = 1.585 (midpoint 1.1-2.07)" },
   { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "environmental", explanation: "Stressful life events: RR = 1.585 (midpoint 1.1-2.07)" },
+  // Q18: Benign Conditions (moved from changeable - these are medical diagnoses)
+  { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5 (midpoint 4.0-5.0)" },
 ];
 
 // CHANGEABLE FACTORS - processed second
@@ -69,8 +70,7 @@ const CHANGEABLE_FACTORS: RiskFactor[] = [
   { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 drink daily: RR = 1.085 (midpoint 1.07-1.1)" },
   // Q16: Night Shift
   { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work: RR = 1.105 (midpoint 1.08-1.13)" },
-  // Q18: Benign Conditions
-  { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5 (midpoint 4.0-5.0)" },
+  // Q18: Other Benign Conditions (atypical hyperplasia moved to unchangeable)
   { question: "benign_condition", answer: "Yes, Lobular Carcinoma in Situ (LCIS)", relativeRisk: 2.75, category: "medical", explanation: "LCIS: RR = 2.75 (midpoint 2.5-3.0)" },
   { question: "benign_condition", answer: "Yes, Fibroadenoma or cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts: RR = 1.25 (midpoint 1.0-1.5)" },
   // Q19: Cancer History
@@ -114,125 +114,128 @@ const USER_PROFILES: Record<UserProfile, ProfileCharacteristics> = {
 
 export class BreastHealthReportGenerator {
   
-  calculateRiskScore(quizAnswers: Record<string, any>): number {
-    let baselineRisk = 1.0;
-    let riskMultiplier = 1.0;
-    let riskPoints = 0;
-    const appliedFactors: string[] = [];
+  calculateRiskScore(quizAnswers: Record<string, any>): { unchangeableScore: number, changeableScore: number, totalScore: number } {
     const calculationLog: string[] = [];
     
-    // Baseline risk is 1.0 for all ages - age-specific risk is handled through relative risk factors
+    // Special handling for current cancer patients first
+    if (quizAnswers.precancerous_condition === "Yes, I am currently receiving treatment for breast cancer") {
+      const stage = quizAnswers.cancer_stage;
+      calculationLog.push(`Current treatment detected: ${stage}`);
+      calculationLog.push(`Treatment-focused scoring applied (not prevention-based)`);
+      
+      let treatmentScore = 35;
+      if (stage === "Stage 1") treatmentScore = 15;
+      else if (stage === "Stage 2") treatmentScore = 25;
+      else if (stage === "Stage 3") treatmentScore = 35;
+      else if (stage === "Stage 4") treatmentScore = 45;
+      
+      calculationLog.push(`${stage}: Risk score = ${treatmentScore} (treatment-focused)`);
+      console.log('\n=== TREATMENT PATIENT SCORING ===');
+      calculationLog.forEach(log => console.log(log));
+      console.log('==========================================\n');
+      
+      return { unchangeableScore: treatmentScore, changeableScore: 0, totalScore: treatmentScore };
+    }
+
+    // STEP 1: Calculate UNCHANGEABLE risk score
+    let unchangeableMultiplier = 1.0;
     const age = parseInt(quizAnswers.age || "30");
-    baselineRisk = 1.0;
     
-    calculationLog.push(`Age ${age}: Baseline risk = ${baselineRisk}`);
+    calculationLog.push(`=== UNCHANGEABLE RISK FACTORS ===`);
+    calculationLog.push(`Starting baseline: 1.0`);
     
-    // Apply age-specific risk factor
+    // Apply age-specific risk factor first
     let ageCategory = "";
-    if (age >= 40 && age < 50) ageCategory = "40-49";
-    else if (age >= 50 && age < 60) ageCategory = "50-59";
+    if (age >= 50 && age < 60) ageCategory = "50-59";
     else if (age >= 60 && age < 70) ageCategory = "60-69";
     else if (age >= 70) ageCategory = "70+";
     
     if (ageCategory) {
       const ageFactor = UNCHANGEABLE_FACTORS.find(f => f.question === "age" && f.answer === ageCategory);
       if (ageFactor) {
-        const oldMultiplier = riskMultiplier;
-        riskMultiplier *= ageFactor.relativeRisk;
-        appliedFactors.push(ageFactor.explanation);
-        calculationLog.push(`Age ${age} (${ageCategory}): Risk multiplier: ${oldMultiplier.toFixed(2)} × ${ageFactor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+        const oldMultiplier = unchangeableMultiplier;
+        unchangeableMultiplier *= ageFactor.relativeRisk;
+        calculationLog.push(`Age ${age} (${ageCategory}): ${oldMultiplier.toFixed(2)} × ${ageFactor.relativeRisk} = ${unchangeableMultiplier.toFixed(2)}`);
       }
     } else {
-      calculationLog.push(`Age ${age}: No additional risk (baseline = 1.0)`);
+      calculationLog.push(`Age ${age}: No additional age risk (baseline)`);
     }
     
-    // Apply UNCHANGEABLE factors first (Q2,3,4,5,6,7,9,17) - excluding age
-    calculationLog.push('--- UNCHANGEABLE FACTORS (Q2,3,4,5,6,7,9,17) ---');
+    // Apply other UNCHANGEABLE factors
     UNCHANGEABLE_FACTORS.forEach(factor => {
       if (factor.question === "age") return; // Skip age - handled above
       const answer = quizAnswers[factor.question];
       if (answer === factor.answer) {
-        const oldMultiplier = riskMultiplier;
-        riskMultiplier *= factor.relativeRisk;
-        riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
-        appliedFactors.push(factor.explanation);
-        calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+        const oldMultiplier = unchangeableMultiplier;
+        unchangeableMultiplier *= factor.relativeRisk;
+        calculationLog.push(`${factor.question}: "${answer}" → ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${unchangeableMultiplier.toFixed(2)}`);
       }
     });
 
-    // Apply CHANGEABLE factors second
-    calculationLog.push('--- CHANGEABLE FACTORS ---');
+    // Calculate unchangeable score using epidemiological method
+    const unchangeableFinalScore = Math.sqrt(unchangeableMultiplier);
+    calculationLog.push(`Unchangeable final: √${unchangeableMultiplier.toFixed(2)} = ${unchangeableFinalScore.toFixed(2)}`);
+    
+    // STEP 2: Calculate CHANGEABLE risk score starting from unchangeable result
+    let changeableMultiplier = unchangeableMultiplier; // Start from unchangeable risk
+    
+    calculationLog.push(`\n=== CHANGEABLE RISK FACTORS ===`);
+    calculationLog.push(`Starting from unchangeable risk: ${unchangeableMultiplier.toFixed(2)}`);
+    
+    // Apply CHANGEABLE factors
     CHANGEABLE_FACTORS.forEach(factor => {
       const answer = quizAnswers[factor.question];
       if (answer === factor.answer) {
-        const oldMultiplier = riskMultiplier;
-        riskMultiplier *= factor.relativeRisk;
-        riskPoints += (factor.relativeRisk - 1.0) * 10; // Convert to points
-        appliedFactors.push(factor.explanation);
-        calculationLog.push(`${factor.question}: "${answer}" → Risk multiplier: ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${riskMultiplier.toFixed(2)}`);
+        const oldMultiplier = changeableMultiplier;
+        changeableMultiplier *= factor.relativeRisk;
+        calculationLog.push(`${factor.question}: "${answer}" → ${oldMultiplier.toFixed(2)} × ${factor.relativeRisk} = ${changeableMultiplier.toFixed(2)}`);
       }
     });
-    
-    // Special handling for current cancer patients
-    if (quizAnswers.precancerous_condition === "Yes, I am currently receiving treatment for breast cancer") {
-      // For current patients, provide supportive score focused on treatment success
-      const stage = quizAnswers.cancer_stage;
-      calculationLog.push(`Current treatment detected: ${stage}`);
-      calculationLog.push(`Treatment-focused scoring applied (not prevention-based)`);
-      
-      if (stage === "Stage 1") {
-        calculationLog.push(`Stage 1: Risk score = 15 (excellent prognosis)`);
-        return 15;
-      }
-      if (stage === "Stage 2") {
-        calculationLog.push(`Stage 2: Risk score = 25 (good prognosis with treatment)`);
-        return 25;
-      }
-      if (stage === "Stage 3") {
-        calculationLog.push(`Stage 3: Risk score = 35 (moderate, treatment-focused)`);
-        return 35;
-      }
-      if (stage === "Stage 4") {
-        calculationLog.push(`Stage 4: Risk score = 45 (advanced, supportive care focus)`);
-        return 45;
-      }
-      return 35; // Default for current patients
-    }
-    
+
     // BMI-based obesity adjustment (only for postmenopausal women)
     const bmi = parseFloat(quizAnswers.bmi || "25");
     const isPostmenopausal = quizAnswers.menopause === "Yes, at age 55 or older" || quizAnswers.menopause === "Yes, before age 55";
     
     if (bmi >= 30 && isPostmenopausal) {
-      riskMultiplier *= 1.3;
-      calculationLog.push(`BMI ${bmi} (obese) + postmenopausal: Risk multiplier × 1.3 = ${riskMultiplier.toFixed(2)}`);
+      const oldMultiplier = changeableMultiplier;
+      changeableMultiplier *= 1.3;
+      calculationLog.push(`BMI ${bmi} (obese) + postmenopausal: ${oldMultiplier.toFixed(2)} × 1.3 = ${changeableMultiplier.toFixed(2)}`);
     }
+
+    // Calculate final scores
+    const changeableFinalScore = Math.sqrt(changeableMultiplier);
+    calculationLog.push(`Changeable final: √${changeableMultiplier.toFixed(2)} = ${changeableFinalScore.toFixed(2)}`);
     
-    // Calculate final risk score using proper epidemiological method
-    let finalScore = baselineRisk * Math.sqrt(riskMultiplier);
-    calculationLog.push(`Final calculation: ${baselineRisk} × √${riskMultiplier.toFixed(2)} = ${finalScore.toFixed(2)}`);
+    // Normalize scores to 1-100 scale
+    const normalizeScore = (score: number): number => {
+      if (score <= 2) {
+        return Math.max(score * 12.5, 1); // 1-25 range for low risk
+      } else if (score <= 10) {
+        return 25 + ((score - 2) / 8) * 25; // 26-50 range for moderate risk  
+      } else {
+        return Math.min(50 + ((score - 10) / 40) * 50, 100); // 51-100 range for high risk
+      }
+    };
+
+    const unchangeableScore = normalizeScore(unchangeableFinalScore);
+    const totalScore = normalizeScore(changeableFinalScore);
+    const changeableScore = totalScore - unchangeableScore; // The additional risk from changeable factors
     
-    // Convert to 0-100 scale for display with proper scaling
-    // Use logarithmic scaling to handle the wide range of risk multipliers
-    // Score ranges: 1-25 (low), 26-50 (moderate), 51-100 (high)
-    let normalizedScore: number;
-    
-    if (finalScore <= 2) {
-      normalizedScore = Math.max(finalScore * 12.5, 1); // 1-25 range for low risk
-    } else if (finalScore <= 10) {
-      normalizedScore = 25 + ((finalScore - 2) / 8) * 25; // 26-50 range for moderate risk  
-    } else {
-      normalizedScore = Math.min(50 + ((finalScore - 10) / 40) * 50, 100); // 51-100 range for high risk
-    }
-    
-    calculationLog.push(`Scaling to 1-100: Final score ${finalScore.toFixed(2)} → ${normalizedScore.toFixed(1)}`);
+    calculationLog.push(`\n=== FINAL SCORES ===`);
+    calculationLog.push(`Unchangeable score: ${unchangeableFinalScore.toFixed(2)} → ${unchangeableScore.toFixed(1)}/100`);
+    calculationLog.push(`Total score: ${changeableFinalScore.toFixed(2)} → ${totalScore.toFixed(1)}/100`);
+    calculationLog.push(`Changeable contribution: ${changeableScore.toFixed(1)} points`);
     
     // Log the full calculation for debugging
-    console.log('\n=== CORRECTED RISK SCORE CALCULATION (Baseline=1.0) ===');
+    console.log('\n=== SEPARATED RISK SCORE CALCULATION ===');
     calculationLog.forEach(log => console.log(log));
     console.log('==========================================\n');
     
-    return normalizedScore;
+    return {
+      unchangeableScore: Math.round(unchangeableScore * 10) / 10,
+      changeableScore: Math.max(0, Math.round(changeableScore * 10) / 10),
+      totalScore: Math.round(totalScore * 10) / 10
+    };
   }
   
   categorizeRisk(riskScore: number): 'low' | 'moderate' | 'high' {
@@ -374,8 +377,8 @@ export class BreastHealthReportGenerator {
   }
   
   generateComprehensiveReport(quizAnswers: Record<string, any>): InsertHealthReport {
-    const riskScore = this.calculateRiskScore(quizAnswers);
-    const riskCategory = this.categorizeRisk(riskScore);
+    const riskScores = this.calculateRiskScore(quizAnswers);
+    const riskCategory = this.categorizeRisk(riskScores.totalScore);
     const userProfile = this.determineUserProfile(quizAnswers);
     const riskFactors = this.identifyRiskFactors(quizAnswers);
     const recommendations = this.generateRecommendations(userProfile, riskCategory, riskFactors);
@@ -383,7 +386,9 @@ export class BreastHealthReportGenerator {
     
     const reportData = {
       summary: {
-        riskScore: riskScore.toFixed(1),
+        riskScore: riskScores.totalScore.toFixed(1),
+        unchangeableScore: riskScores.unchangeableScore.toFixed(1),
+        changeableScore: riskScores.changeableScore.toFixed(1),
         riskCategory,
         userProfile,
         profileDescription: USER_PROFILES[userProfile].description,
@@ -392,7 +397,11 @@ export class BreastHealthReportGenerator {
       riskAnalysis: {
         identifiedFactors: riskFactors,
         protectiveFactors: this.identifyProtectiveFactors(quizAnswers),
-        riskBreakdown: this.categorizeRiskFactors(riskFactors)
+        riskBreakdown: this.categorizeRiskFactors(riskFactors),
+        riskSeparation: {
+          unchangeableFactors: riskFactors.filter(f => this.isUnchangeableFactor(f)),
+          changeableFactors: riskFactors.filter(f => !this.isUnchangeableFactor(f))
+        }
       },
       actionPlan: {
         immediate: recommendations.slice(0, 3),
@@ -403,7 +412,7 @@ export class BreastHealthReportGenerator {
     
     return {
       quizAnswers,
-      riskScore: riskScore.toString(),
+      riskScore: riskScores.totalScore.toString(),
       riskCategory,
       userProfile,
       riskFactors,
@@ -414,6 +423,11 @@ export class BreastHealthReportGenerator {
     };
   }
   
+  private isUnchangeableFactor(factorExplanation: string): boolean {
+    // Check if this factor is from the unchangeable list
+    return UNCHANGEABLE_FACTORS.some(factor => factor.explanation === factorExplanation);
+  }
+
   private identifyProtectiveFactors(quizAnswers: Record<string, any>): string[] {
     const protective: string[] = [];
     
