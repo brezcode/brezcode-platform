@@ -391,7 +391,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
            password === confirmPassword;
   };
 
-  const canProceedFromStep2 = () => {
+  const canProceedFromStep3 = () => {
     return phoneNumber.length >= 10;
   };
 
@@ -402,7 +402,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
       sendEmailCodeMutation.mutate();
     } else if (step === 2 && isEmailVerified) {
       setStep(3);
-    } else if (step === 3 && canProceedFromStep2()) {
+    } else if (step === 3 && canProceedFromStep3()) {
       setStep(4);
       // Auto-send phone verification
       sendPhoneCodeMutation.mutate();
@@ -609,7 +609,7 @@ export default function SignupFlow({ quizAnswers, onComplete }: SignupFlowProps)
 
               <Button 
                 onClick={handleNextStep} 
-                disabled={!canProceedFromStep2()}
+                disabled={!canProceedFromStep3()}
                 className="w-full"
               >
                 Continue
