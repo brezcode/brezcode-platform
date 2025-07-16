@@ -8,7 +8,10 @@ div[data-runtime-error],
 #runtime-error-modal,
 .runtime-error-overlay,
 [class*="runtime-error"],
-[id*="runtime-error"] {
+[id*="runtime-error"],
+[class*="error-overlay"],
+div[style*="position: fixed"][style*="bottom"],
+div[style*="z-index: 999"] {
   display: none !important;
   visibility: hidden !important;
   position: absolute !important;
@@ -16,6 +19,9 @@ div[data-runtime-error],
   top: -9999px !important;
   opacity: 0 !important;
   pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
 }
 
 :root {
