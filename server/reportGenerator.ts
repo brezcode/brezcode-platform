@@ -212,9 +212,20 @@ export class BreastHealthReportGenerator {
     let finalScore = baselineRisk * Math.sqrt(riskMultiplier);
     calculationLog.push(`Final calculation: ${baselineRisk} × √${riskMultiplier.toFixed(2)} = ${finalScore.toFixed(2)}`);
     
-    // Convert to 0-100 scale for display (multiply by appropriate factor)
-    const normalizedScore = Math.min(Math.max(finalScore * 10, 1), 100);
-    calculationLog.push(`Normalized score (1-100 scale): ${normalizedScore.toFixed(1)}`);
+    // Convert to 0-100 scale for display with proper scaling
+    // Use logarithmic scaling to handle the wide range of risk multipliers
+    // Score ranges: 1-25 (low), 26-50 (moderate), 51-100 (high)
+    let normalizedScore: number;
+    
+    if (finalScore <= 2) {
+      normalizedScore = Math.max(finalScore * 12.5, 1); // 1-25 range for low risk
+    } else if (finalScore <= 10) {
+      normalizedScore = 25 + ((finalScore - 2) / 8) * 25; // 26-50 range for moderate risk  
+    } else {
+      normalizedScore = Math.min(50 + ((finalScore - 10) / 40) * 50, 100); // 51-100 range for high risk
+    }
+    
+    calculationLog.push(`Scaling to 1-100: Final score ${finalScore.toFixed(2)} → ${normalizedScore.toFixed(1)}`);
     
     // Log the full calculation for debugging
     console.log('\n=== CORRECTED RISK SCORE CALCULATION (Baseline=1.0) ===');
