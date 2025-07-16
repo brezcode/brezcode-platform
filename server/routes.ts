@@ -509,6 +509,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.sendFile(require('path').join(__dirname, '../debug-report.html'));
   });
 
+  // Generate report now route
+  app.get('/generate-now', (req, res) => {
+    res.sendFile(require('path').join(__dirname, '../generate-report-now.html'));
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
