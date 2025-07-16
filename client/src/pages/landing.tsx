@@ -3,6 +3,7 @@ import Hero from "@/components/hero";
 import Features from "@/components/features";
 import Pricing from "@/components/pricing";
 import ChatInterface from "@/components/chat-interface";
+import FirebaseAuth from "@/components/firebase-auth";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import promiseImage from "@assets/Sunnyside p5_1752243629786.png";
@@ -263,6 +264,29 @@ export default function LandingPage() {
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
                 <span className="font-medium">100% improve breast health</span>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sign Up Section */}
+      <section className="py-20 bg-gradient-to-br from-sky-400 to-blue-600">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Start Your Journey Today
+            </h2>
+            <p className="text-xl text-white/90 max-w-2xl mx-auto">
+              Join thousands of women taking control of their breast health with personalized AI guidance and support.
+            </p>
+          </div>
+          
+          <div className="flex justify-center">
+            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
+              <FirebaseAuth 
+                mode="signup" 
+                onSuccess={() => setLocation('/chat')}
+              />
             </div>
           </div>
         </div>

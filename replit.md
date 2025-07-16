@@ -29,10 +29,11 @@ This is a subscription-based web application that provides AI-powered breast hea
 ## Key Components
 
 ### Authentication System
-- Session-based authentication using express-session
-- User registration and login with email/password
-- Password hashing with bcrypt
-- Protected routes requiring authentication and active subscription
+- **Firebase Authentication**: Google social login for seamless user experience
+- **Hybrid approach**: Firebase for auth + Twilio for SMS verification (phone numbers)
+- **Session management**: Firebase handles user sessions automatically
+- **Email verification**: Automated via Firebase (no custom codes needed)
+- **Protected routes**: Firebase auth state determines access to chat features
 
 ### Subscription Management
 - Three-tier subscription model (Basic $4.99, Pro $9.99, Premium $19.99)
@@ -95,6 +96,11 @@ This is a subscription-based web application that provides AI-powered breast hea
 - `VITE_STRIPE_PUBLIC_KEY`: Stripe client-side key
 - `DATABASE_URL`: PostgreSQL connection (for production upgrade)
 
+### Firebase Configuration (New)
+- `VITE_FIREBASE_API_KEY`: Firebase web app API key
+- `VITE_FIREBASE_APP_ID`: Firebase app identifier
+- `VITE_FIREBASE_PROJECT_ID`: Firebase project identifier
+
 ### Twilio Integration (Optional - fallback to console logging)
 - `TWILIO_ACCOUNT_SID`: Twilio account identifier for SMS
 - `TWILIO_AUTH_TOKEN`: Twilio authentication token for SMS
@@ -106,6 +112,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 16, 2025. Integrated Firebase Authentication with Google Social Login - replaced custom email verification with Firebase's automatic email verification, maintained Twilio SMS for phone verification, added Firebase Auth components with clean UI, created hybrid auth system (Firebase + Twilio), configured Firebase SDK and authentication hooks
 - January 14, 2025. Fixed runtime error plugin issues and added quiz transition page - removed redundant signup questions (24-26) from quiz, fixed apiRequest function signatures causing unhandled promise rejections, added transitional page between quiz completion and signup explaining assessment report and coaching journey
 - January 14, 2025. Implemented complete signup flow with email and phone verification - quiz now transitions to 4-step signup (email/password, phone selection with country codes, email verification, phone verification), added database schemas for verification storage, created comprehensive signup API routes with proper validation, updated authentication system to support verified users
 - January 12, 2025. Implemented comprehensive BC Assessment quiz with all 26 questions from Excel file - added educational explanations from column D for every question, fixed ethnicity question to include all 4 options, implemented conditional questions for symptom follow-ups (pain, lump characteristics, breast changes), and integrated BMI auto-calculation
