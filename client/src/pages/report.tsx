@@ -12,6 +12,7 @@ export default function ReportPage() {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [location, setLocation] = useLocation();
   const [quizAnswers, setQuizAnswers] = useState<Record<string, any> | null>(null);
+  const [generatedReport, setGeneratedReport] = useState<any>(null);
 
   // Check for quiz answers in localStorage
   useEffect(() => {
@@ -28,17 +29,18 @@ export default function ReportPage() {
     enabled: isAuthenticated,
   });
 
-  // Generate report mutation
+  // Generate report mutation (uses test endpoint for demo mode)
   const generateReportMutation = useMutation({
     mutationFn: async (answers: Record<string, any>) => {
-      return await apiRequest('/api/reports/generate', {
+      return await apiRequest('/api/reports/generate-test', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quizAnswers: answers })
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/reports'] });
+      setGeneratedReport(data.report); // Store the generated report
       setQuizAnswers(null); // Clear quiz answers after successful generation
     },
     onError: (error) => {
@@ -46,21 +48,22 @@ export default function ReportPage() {
     }
   });
 
-  // Auto-generate report if quiz answers are available and user is authenticated
+  // Auto-generate report if quiz answers are available (test mode - no auth required)
   useEffect(() => {
-    if (quizAnswers && isAuthenticated && !generateReportMutation.isPending) {
+    if (quizAnswers && !generateReportMutation.isPending) {
       generateReportMutation.mutate(quizAnswers);
     }
-  }, [quizAnswers, isAuthenticated]);
+  }, [quizAnswers]);
 
-  // Redirect to landing if not authenticated
+  // For test mode: Allow access without authentication when quiz answers are available
+  // Redirect to landing only if no quiz answers and not authenticated
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    if (!authLoading && !isAuthenticated && !quizAnswers && !generatedReport) {
       setLocation('/');
     }
-  }, [authLoading, isAuthenticated, setLocation]);
+  }, [authLoading, isAuthenticated, quizAnswers, generatedReport, setLocation]);
 
-  if (authLoading) {
+  if (authLoading && !generatedReport) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -68,12 +71,8 @@ export default function ReportPage() {
     );
   }
 
-  if (!isAuthenticated) {
-    return null; // Will redirect
-  }
-
   // Show loading state while generating report
-  if (generateReportMutation.isPending || (quizAnswers && !reports)) {
+  if (generateReportMutation.isPending) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
@@ -131,7 +130,42 @@ export default function ReportPage() {
     );
   }
 
-  // Show reports list if available
+  // Display generated report from test mode
+  if (generatedReport) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        {/* Navigation */}
+        <nav className="bg-white shadow-sm border-b">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <div className="flex items-center">
+                <h1 className="text-xl font-semibold text-gray-900">BrezCode Health Report</h1>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Button variant="outline" onClick={() => setLocation('/')}>
+                  Back to Home
+                </Button>
+                <Button onClick={() => setLocation('/quiz')}>
+                  Retake Assessment
+                </Button>
+              </div>
+            </div>
+          </div>
+        </nav>
+
+        {/* Report Content */}
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <HealthReport report={generatedReport} />
+        </div>
+      </div>
+    );
+  }
+
+  // Show reports list if available (authenticated mode)
+  if (!isAuthenticated) {
+    return null; // Will redirect
+  }
+
   if (reportsLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

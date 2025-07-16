@@ -248,7 +248,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Health Report Generation
+  // Health Report Generation (Test Mode - No Auth Required)
+  app.post('/api/reports/generate-test', async (req: any, res: Response) => {
+    try {
+      const { quizAnswers } = req.body;
+      
+      if (!quizAnswers) {
+        return res.status(400).json({ message: 'Quiz answers are required' });
+      }
+
+      // Import the report generator
+      const { reportGenerator } = await import('./reportGenerator');
+      
+      // Generate comprehensive report without requiring authentication
+      const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
+      reportData.userId = 999; // Test user ID
+      
+      res.json({
+        success: true,
+        report: reportData
+      });
+    } catch (error) {
+      console.error('Error generating test health report:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  });
+
+  // Health Report Generation (Authenticated)
   app.post('/api/reports/generate', requireAuth, async (req: any, res: Response) => {
     try {
       const { quizAnswers } = req.body;
