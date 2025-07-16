@@ -450,19 +450,19 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       case "text":
         const trimmedAnswer = currentAnswer.trim();
         if (trimmedAnswer === "") return false;
-        
+
         // Email validation
         if (currentQuestion.id === "email") {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return emailRegex.test(trimmedAnswer);
         }
-        
+
         // Phone number validation (basic - just check if it contains digits)
         if (currentQuestion.id === "phone_number") {
           const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
           return phoneRegex.test(trimmedAnswer);
         }
-        
+
         return true;
       case "slider":
         return currentAnswer !== null && currentAnswer !== undefined;
@@ -578,7 +578,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
                 "Type your answer here"
               }
             />
-            
+
             {/* Show validation errors for email and phone */}
             {currentAnswer && !isAnswerValid() && (
               <div className="text-red-600 text-sm mt-2">
@@ -586,7 +586,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
                 {currentQuestion.id === "phone_number" && "Please enter a valid phone number (at least 10 digits)"}
               </div>
             )}
-            
+
             {/* Privacy statement for phone number */}
             {currentQuestion.id === "phone_number" && (
               <div className="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
