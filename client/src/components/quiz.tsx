@@ -618,9 +618,48 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
         <CardHeader className="space-y-4">
           <div className="flex items-center justify-between">
             <CardTitle className="text-2xl">Breast Health Assessment</CardTitle>
-            <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700">
-              ✕
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  // Skip quiz with default answers for testing
+                  const defaultAnswers = {
+                    age: "35",
+                    ethnicity: "White (non-Hispanic)",
+                    family_history: "No, I do not have any relative with BC",
+                    brca_test: "Not tested",
+                    dense_breast: "No",
+                    menstrual_age: "12 years old or later",
+                    pregnancy_age: "Before age 25",
+                    oral_contraceptives: "No, never used",
+                    menopause: "Not yet",
+                    weight: "65",
+                    height: "1.65",
+                    hrt: "No",
+                    western_diet: "No, mostly non-Western diet (e.g., Mediterranean or plant-based)",
+                    smoke: "No",
+                    alcohol: "None",
+                    night_shift: "No",
+                    stressful_events: "No, no significant stressful events",
+                    benign_condition: "No, I have not been diagnosed with any benign breast conditions",
+                    precancerous_condition: "No, I have not been diagnosed with breast cancer",
+                    mammogram_frequency: "Biennially (every 2 years)",
+                    breast_symptoms: "No, I don't have any symptoms",
+                    country: userCountry,
+                    bmi: 23.9,
+                    obesity: "No"
+                  };
+                  onComplete(defaultAnswers);
+                }}
+                className="text-blue-600 hover:text-blue-700"
+              >
+                Skip Quiz (Test)
+              </Button>
+              <Button variant="ghost" onClick={onClose} className="text-gray-500 hover:text-gray-700">
+                ✕
+              </Button>
+            </div>
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between text-sm text-gray-600">
