@@ -27,6 +27,27 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   const [verificationCode, setVerificationCode] = useState("");
   const { toast } = useToast();
 
+  // Resend verification code mutation
+  const resendCodeMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Code Resent",
+        description: "A new verification code has been sent to your email.",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Failed to Resend",
+        description: error.message || "Failed to resend verification code",
+        variant: "destructive",
+      });
+    },
+  });
+
   // Step 1: Choose Authentication Method
   const renderAuthChoice = () => (
     <Card className="w-full max-w-md mx-auto">
@@ -72,13 +93,14 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
           description: "Please check your email for a verification code.",
         });
         setStep(3);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to send verification email:", error);
         toast({
-          title: "Account Created",
-          description: "Account created but failed to send verification email. Please try again.",
-          variant: "destructive",
+          title: "Account Created, Verification Needed",
+          description: `Account created successfully. ${error.message || "Please try verification again."}`,
+          variant: "default",
         });
+        setStep(3); // Still proceed to verification step
       }
     },
     onError: (error: any) => {
@@ -282,20 +304,18 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
             Didn't receive the code?{" "}
             <Button
               variant="link"
-              className="p-0 h-auto"
-              onClick={() => {
-                // Resend verification code
-                signupMutation.mutate({
-                  email: formData.email,
-                  password: formData.password,
-                  quizAnswers,
-                });
-              }}
+              className="h-auto p-0 text-sm"
+              onClick={() => resendCodeMutation.mutate()}
+              disabled={resendCodeMutation.isPending}
             >
-              Resend Code
+              {resendCodeMutation.isPending ? "Sending..." : "Resend Code"}
             </Button>
           </p>
         </div>
+
+        <Button variant="outline" onClick={() => setStep(2)} className="w-full">
+          Back to Account Details
+        </Button>
       </CardContent>
     </Card>
   );

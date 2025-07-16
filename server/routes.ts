@@ -253,16 +253,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { email } = req.body;
       
-      // Check if user already exists
-      const existingUser = await storage.getUserByEmail(email);
-      if (existingUser) {
-        return res.status(400).json({ message: "User already exists with this email" });
-      }
-
       // Generate 6-digit code
       const code = Math.floor(100000 + Math.random() * 900000).toString();
       
-      // Store verification code
+      // Store verification code (allow overwriting existing codes)
       await storage.createEmailVerification(email, code);
       
       // Send email verification via SendGrid or fallback to console
@@ -270,6 +264,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json({ message: "Verification code sent" });
     } catch (error: any) {
+      console.error("Email verification error:", error);
       res.status(400).json({ message: error.message });
     }
   });
