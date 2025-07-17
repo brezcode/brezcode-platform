@@ -19,6 +19,7 @@ interface QuizQuestion {
   condition?: {
     questionId: string;
     answer: string;
+    exclude?: boolean;
   };
 }
 
@@ -191,7 +192,7 @@ const quizSections = [
         question: "How often do you undergo mammogram or other screening for breast cancer?",
         reason: "According to a 2020 study by Hofvind et al., women who undergo annual mammography screening have a 40-50% reduced risk of interval breast cancer (relative risk, RR ≈ 0.50-0.60) compared to those who never screen.",
         type: "multiple_choice" as const,
-        options: ["Annually (once a year)", "Biennially (every 2 years)", "Never or irregularly"],
+        options: ["Annually (once a year)", "Biennially (every 2 years)", "Irregularly", "Never"],
         required: true
       },
       {
@@ -199,8 +200,9 @@ const quizSections = [
         question: "Have you been told that you have dense breast tissue based on a mammogram?",
         reason: "According to a 2019 meta-analysis by Bodewes et al., women with dense breasts have a 2 times higher risk of breast cancer (relative risk, RR ≈ 2.0) compared to women with non-dense breasts.",
         type: "multiple_choice" as const,
-        options: ["Yes", "No", "I don't know (I've never had a mammogram)"],
-        required: true
+        options: ["Yes", "No", "I don't know"],
+        required: true,
+        condition: { questionId: "mammogram_frequency", answer: "Never", exclude: true }
       },
       {
         id: "benign_condition",
@@ -208,7 +210,8 @@ const quizSections = [
         reason: "According to a 2015 study by Hartmann et al., women with a history of atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0), women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0).",
         type: "multiple_choice" as const,
         options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
-        required: true
+        required: true,
+        condition: { questionId: "mammogram_frequency", answer: "Never", exclude: true }
       },
       {
         id: "cancer_history",
@@ -216,7 +219,8 @@ const quizSections = [
         reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
         type: "multiple_choice" as const,
         options: ["Yes, I am a Breast Cancer Patient currently undergoing treatment", "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", "No diagnosed breast conditions"],
-        required: true
+        required: true,
+        condition: { questionId: "mammogram_frequency", answer: "Never", exclude: true }
       },
       {
         id: "cancer_stage",
@@ -341,6 +345,13 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       if (!question.condition) return true;
 
       const conditionAnswer = answers[question.condition.questionId];
+      
+      // Handle exclude condition (hide question when condition matches)
+      if (question.condition.exclude) {
+        return conditionAnswer !== question.condition.answer;
+      }
+      
+      // Handle include condition (show question when condition matches)
       return conditionAnswer === question.condition.answer;
     });
   };
@@ -462,6 +473,13 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     const newVisibleQuestions = quizQuestions.filter(question => {
       if (!question.condition) return true;
       const conditionAnswer = updatedAnswers[question.condition.questionId];
+      
+      // Handle exclude condition (hide question when condition matches)
+      if (question.condition.exclude) {
+        return conditionAnswer !== question.condition.answer;
+      }
+      
+      // Handle include condition (show question when condition matches)
       return conditionAnswer === question.condition.answer;
     });
 

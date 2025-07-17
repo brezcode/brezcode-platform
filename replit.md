@@ -114,6 +114,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 17, 2025. Updated mammogram screening question logic - separated "Never or irregularly" into "Never" and "Irregularly" options, added conditional logic to skip dense breast tissue, benign condition, and cancer history questions when user selects "Never" for mammogram screening
 - January 17, 2025. Removed "Not Yet" option from menstrual age question - since users are aged 20-80, all participants must have already had their first menstrual period, making "Not Yet" option inappropriate for the target demographic
 - January 17, 2025. Enhanced age validation for pregnancy and menopause questions - added comprehensive boundary case validation for users at age thresholds, prompts verification when current age matches category boundaries (pregnancy: 30/25, menopause: 55), includes logical consistency checks for impossible age combinations to ensure accurate responses
 - January 16, 2025. Finalized independent risk scoring system - removed age and ethnicity from risk calculations entirely, moved stressful events back to changeable factors, implemented completely independent scoring where unchangeable and changeable factors are calculated separately starting from baseline 1.0, total score combines both effects, provides clear separation of controllable vs uncontrollable risks
