@@ -145,6 +145,7 @@ export class BreastHealthReportGenerator {
   calculateSectionHealthScores(quizAnswers: Record<string, any>): { 
     sectionScores: { [key: string]: { score: number, factors: string[] } },
     totalScore: number,
+    uncontrollableScore: number,
     overallHealthCategory: string
   } {
     const calculationLog: string[] = [];
@@ -165,7 +166,8 @@ export class BreastHealthReportGenerator {
           'Treatment-focused': { score: treatmentScore, factors: [`${stage} breast cancer`] }
         },
         totalScore: treatmentScore,
-        overallRiskCategory: this.categorizeRisk(treatmentScore)
+        uncontrollableScore: treatmentScore,
+        overallHealthCategory: this.categorizeHealth(treatmentScore)
       };
     }
 
@@ -219,11 +221,23 @@ export class BreastHealthReportGenerator {
       totalMultiplier *= sectionMultiplier;
     });
     
-    // Calculate controllable health score (only Symptom + Lifestyle sections)
+    // Calculate uncontrollable health score (Demographic + Genetic + Hormonal + Screening)
+    const uncontrollableMultiplier = (sectionScores['Demographic']?.score ? (100 / sectionScores['Demographic'].score) : 1.0) *
+                                     (sectionScores['Genetic']?.score ? (100 / sectionScores['Genetic'].score) : 1.0) *
+                                     (sectionScores['Hormonal']?.score ? (100 / sectionScores['Hormonal'].score) : 1.0) *
+                                     (sectionScores['Screening']?.score ? (100 / sectionScores['Screening'].score) : 1.0);
+    const uncontrollableFinalScore = Math.sqrt(uncontrollableMultiplier);
+    const uncontrollableHealthScore = this.convertToHealthScore(uncontrollableFinalScore);
+
+    // Calculate controllable health score (Symptom + Lifestyle sections)
     const controllableMultiplier = (sectionScores['Symptom']?.score ? (100 / sectionScores['Symptom'].score) : 1.0) * 
                                    (sectionScores['Lifestyle']?.score ? (100 / sectionScores['Lifestyle'].score) : 1.0);
     const controllableFinalScore = Math.sqrt(controllableMultiplier);
     const controllableHealthScore = this.convertToHealthScore(controllableFinalScore);
+    
+    calculationLog.push(`\n=== UNCONTROLLABLE HEALTH SCORE (Demographic + Genetic + Hormonal + Screening) ===`);
+    calculationLog.push(`Uncontrollable multiplier: ${uncontrollableMultiplier.toFixed(2)}`);
+    calculationLog.push(`Uncontrollable final score: √${uncontrollableMultiplier.toFixed(2)} = ${uncontrollableFinalScore.toFixed(2)} → ${uncontrollableHealthScore.toFixed(1)}/100 health score`);
     
     calculationLog.push(`\n=== CONTROLLABLE HEALTH SCORE (Symptom + Lifestyle Only) ===`);
     calculationLog.push(`Controllable multiplier: ${controllableMultiplier.toFixed(2)}`);
@@ -233,12 +247,14 @@ export class BreastHealthReportGenerator {
     console.log('\n=== 6-SECTION HEALTH SCORE CALCULATION ===');
     console.log('Health Score: Higher = Healthier | 100 = Perfect Health | Lower = More Risk Factors Present');
     calculationLog.forEach(log => console.log(log.replace('RISK SCORE', 'HEALTH SCORE')));
+    console.log(`Uncontrollable Health Score: ${Math.round(uncontrollableHealthScore * 10) / 10}/100 (Higher = Healthier)`);
     console.log(`Controllable Health Score: ${Math.round(controllableHealthScore * 10) / 10}/100 (Higher = Healthier)`);
     console.log('==========================================\n');
     
     return {
       sectionScores: sectionScores,
       totalScore: Math.round(controllableHealthScore * 10) / 10,
+      uncontrollableScore: Math.round(uncontrollableHealthScore * 10) / 10,
       overallHealthCategory: this.categorizeHealth(controllableHealthScore)
     };
   }
@@ -499,6 +515,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
     const reportData = {
       summary: {
         totalHealthScore: sectionAnalysis.totalScore.toFixed(1),
+        uncontrollableHealthScore: sectionAnalysis.uncontrollableScore.toFixed(1),
         overallHealthCategory: sectionAnalysis.overallHealthCategory,
         userProfile,
         profileDescription: USER_PROFILES[userProfile].description,

@@ -101,9 +101,9 @@ export default function HealthReport({ report }: HealthReportProps) {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <div className="text-sm text-gray-600 mb-2">Your Health Score</div>
+              <div className="text-sm text-gray-600 mb-2">Controllable Health Score</div>
               <div className="flex items-center gap-4">
                 <div className="text-4xl font-bold text-green-600">
                   {summary.totalHealthScore || summary.totalRiskScore}/100
@@ -116,7 +116,24 @@ export default function HealthReport({ report }: HealthReportProps) {
                 </div>
               </div>
               <div className="text-xs text-gray-500 mt-2">
-                Higher scores mean better health! Based on your quiz responses across 6 key areas.
+                Higher scores mean better health! Based on Symptom and Lifestyle factors you can control.
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-2">Uncontrollable Health Score</div>
+              <div className="flex items-center gap-4">
+                <div className="text-4xl font-bold text-blue-600">
+                  {summary.uncontrollableHealthScore || "N/A"}/100
+                </div>
+                <div className="flex-1">
+                  <Progress 
+                    value={summary.uncontrollableHealthScore || 0} 
+                    className="h-4"
+                  />
+                </div>
+              </div>
+              <div className="text-xs text-gray-500 mt-2">
+                Based on Demographics, Genetics, Hormonal factors and Screening results.
               </div>
             </div>
             <div>
