@@ -420,8 +420,18 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
         return;
       }
 
+      if (currentAnswer === "Age 30 or older" && userAge === 30) {
+        setValidationError("Please verify: You are currently 30 years old and selected 'Age 30 or older' for first pregnancy. This means you had your first pregnancy at exactly age 30, which is technically correct but at the boundary. Please confirm this is accurate or select 'Age 25-29' if your first pregnancy was before age 30.");
+        return;
+      }
+
       if (currentAnswer === "Age 25-29" && userAge < 25) {
         setValidationError("You cannot have had your first pregnancy at age 25-29 if you are currently under 25. Please select a different option.");
+        return;
+      }
+
+      if (currentAnswer === "Age 25-29" && userAge === 25) {
+        setValidationError("Please verify: You are currently 25 years old and selected 'Age 25-29' for first pregnancy. This means you had your first pregnancy at exactly age 25, which is technically correct but at the boundary. Please confirm this is accurate or select 'Before age 25' if your first pregnancy was before age 25.");
         return;
       }
     }
