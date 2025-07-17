@@ -400,13 +400,28 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
     if (currentQuestion.id === "menopause" && answers.age && currentAnswer) {
       const userAge = Number(answers.age);
 
-      if (currentAnswer === "Yes, at age 55 or later" && userAge < 55) {
-        setValidationError("Your menopause age cannot be 55 or later if you are currently under 55. Please select a different option.");
+      if (currentAnswer === "Yes, at age 55 or older" && userAge < 55) {
+        setValidationError("Your menopause age cannot be 55 or older if you are currently under 55. Please select a different option.");
+        return;
+      }
+
+      if (currentAnswer === "Yes, at age 55 or older" && userAge === 55) {
+        setValidationError("Please verify: You are currently 55 years old and selected 'Yes, at age 55 or older' for menopause. This means you went through menopause at exactly age 55, which is technically correct but at the boundary. Please confirm this is accurate or select 'Yes, before age 55' if your menopause was before age 55.");
         return;
       }
 
       if (currentAnswer === "Yes, before age 55" && userAge < 40) {
         setValidationError("Please verify your menopause status. If you went through menopause before age 55 but are currently under 40, this seems unusual. Please double-check your selection.");
+        return;
+      }
+
+      if (currentAnswer === "Yes, before age 55" && userAge >= 55) {
+        setValidationError("Please verify: You are currently " + userAge + " years old and selected 'Yes, before age 55' for menopause. If you are 55 or older and went through menopause before age 55, this is correct. However, if you went through menopause at age 55 or later, please select 'Yes, at age 55 or older'.");
+        return;
+      }
+
+      if (currentAnswer === "Not yet" && userAge >= 60) {
+        setValidationError("Please verify: You are currently " + userAge + " years old and selected 'Not yet' for menopause. Most women go through menopause by age 60. Please double-check if you have truly not gone through menopause yet, or select the appropriate menopause option.");
         return;
       }
     }
