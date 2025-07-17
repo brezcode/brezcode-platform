@@ -142,10 +142,10 @@ const USER_PROFILES: Record<UserProfile, ProfileCharacteristics> = {
 
 export class BreastHealthReportGenerator {
   
-  calculateSectionRiskScores(quizAnswers: Record<string, any>): { 
+  calculateSectionHealthScores(quizAnswers: Record<string, any>): { 
     sectionScores: { [key: string]: { score: number, factors: string[] } },
     totalScore: number,
-    overallRiskCategory: string
+    overallHealthCategory: string
   } {
     const calculationLog: string[] = [];
     const sectionScores: { [key: string]: { score: number, factors: string[] } } = {};
@@ -227,15 +227,30 @@ export class BreastHealthReportGenerator {
     calculationLog.push(`Combined multiplier: ${totalMultiplier.toFixed(2)}`);
     calculationLog.push(`Total final score: √${totalMultiplier.toFixed(2)} = ${totalFinalScore.toFixed(2)} → ${totalScore.toFixed(1)}/100`);
     
+    // Convert to Health Score (100 = perfect health, lower = more risk factors)
+    const healthScores: { [key: string]: { score: number, factors: string[] } } = {};
+    Object.entries(sectionScores).forEach(([sectionName, data]) => {
+      // Convert risk score to health score: Higher risk = Lower health score
+      const healthScore = Math.max(10, 110 - data.score); // Invert scale
+      healthScores[sectionName] = {
+        score: Math.round(healthScore * 10) / 10,
+        factors: data.factors
+      };
+    });
+    
+    const overallHealthScore = Math.max(10, 110 - totalScore);
+    
     // Log the full calculation for debugging
-    console.log('\n=== 6-SECTION RISK SCORE CALCULATION ===');
-    calculationLog.forEach(log => console.log(log));
+    console.log('\n=== 6-SECTION HEALTH SCORE CALCULATION ===');
+    console.log('Health Score: Higher = Healthier | 100 = Perfect Health | Lower = More Risk Factors Present');
+    calculationLog.forEach(log => console.log(log.replace('RISK SCORE', 'HEALTH SCORE')));
+    console.log(`Final Health Score: ${Math.round(overallHealthScore * 10) / 10}/100 (Higher = Healthier)`);
     console.log('==========================================\n');
     
     return {
-      sectionScores,
-      totalScore: Math.round(totalScore * 10) / 10,
-      overallRiskCategory: this.categorizeRisk(totalScore)
+      sectionScores: healthScores,
+      totalScore: Math.round(overallHealthScore * 10) / 10,
+      overallHealthCategory: this.categorizeHealth(overallHealthScore)
     };
   }
 
@@ -249,6 +264,13 @@ export class BreastHealthReportGenerator {
     }
   }
 
+  categorizeHealth(healthScore: number): string {
+    if (healthScore >= 80) return 'excellent';
+    if (healthScore >= 65) return 'good';
+    if (healthScore >= 50) return 'fair';
+    return 'needs_attention';
+  }
+
   generateSectionSummary(sectionName: string, sectionData: { score: number, factors: string[] }, quizAnswers: Record<string, any>): string {
     const age = parseInt(quizAnswers.age || "30");
     const country = quizAnswers.country || "United States";
@@ -256,13 +278,31 @@ export class BreastHealthReportGenerator {
     
     switch (sectionName) {
       case 'Demographic':
-        return `Based on your age ${age} and residence in ${country}, your demographic risk score is ${sectionData.score}/100. ${hasFactors ? `Your identified factors include: ${sectionData.factors.join(', ')}.` : 'No significant demographic risk factors identified.'} In the ${country}, 1 in 8 women will develop breast cancer in their lifetime, making early detection and prevention crucial. Regardless of your demographic profile, monthly breast self-examinations 7 days after your period, annual clinical breast exams, and maintaining a healthy diet rich in fruits, vegetables, and omega-3 fatty acids are essential. Start mammogram screening at age 40, or earlier if you have elevated risk factors. Your demographic background influences baseline risk, but lifestyle choices and regular screening can significantly impact your overall breast health outcomes. Remember that breast cancer can affect women of all ages and backgrounds, so staying vigilant about breast health through self-awareness and professional screening remains your most powerful tool for early detection and successful treatment outcomes.`;
+        const isYoung = age < 40;
+        const isMiddleAge = age >= 40 && age < 60;
+        const isOlder = age >= 60;
+        
+        return `Hi there! As a ${age}-year-old woman living in ${country}, your health score for this section is ${sectionData.score}/100. ${hasFactors ? `The factors we're watching include: ${sectionData.factors.join(', ')}.` : 'Great news - no major demographic concerns here!'} 
+
+${isYoung ? `At your age, breast cancer is less common, but it's still smart to start good habits now. Begin doing monthly breast self-checks to get familiar with how your breasts normally feel. You don't need mammograms yet unless you have a strong family history.` : 
+isMiddleAge ? `You're at an age where regular screening becomes really important. If you haven't started mammograms yet, now's the time to begin (around age 40-50). Keep up with yearly mammograms and clinical breast exams.` :
+`At ${age}, you're in an age group where breast cancer becomes more common, but don't worry - regular screening catches most cancers early when they're very treatable. Keep up with your mammograms every 1-2 years as your doctor recommends.`}
+
+The good news is that no matter your age or background, you have real power to protect your health. Eat colorful fruits and vegetables, stay active, and keep a healthy weight. These simple steps can make a big difference in your overall health and may help reduce your risk.`;
         
       case 'Genetic':
         if (!hasFactors) {
-          return `Your genetic risk assessment shows a score of ${sectionData.score}/100 with no significant hereditary factors identified. This is encouraging news, as 85% of women who develop breast cancer have no family history of the disease. However, this doesn't eliminate your risk entirely. We recommend genetic counseling and BRCA testing if you have concerns about family history or if new family information emerges. Even without genetic predisposition, environmental and lifestyle factors play crucial roles in breast cancer development. Focus on maintaining protective lifestyle habits including regular exercise, limiting alcohol consumption, maintaining a healthy weight, and avoiding environmental toxins. Consider keeping a detailed family health history and update it regularly as new information becomes available. While genetic factors are beyond your control, this knowledge empowers you to make informed decisions about screening frequency and prevention strategies. Stay informed about advances in genetic testing and personalized medicine, as these fields continue to evolve and may offer new insights for your breast health management.`;
+          return `Great news about your family history! Your health score here is ${sectionData.score}/100, which means you don't have major genetic risk factors. This is really encouraging - about 85% of women who get breast cancer don't have a family history of it either.
+
+Even though your genes look good, it's still important to take care of yourself. Keep living a healthy lifestyle with regular exercise, limit alcohol, and maintain a healthy weight. These habits are powerful tools for preventing many types of cancer.
+
+It's worth keeping track of your family's health history and updating it as you learn new information. If anything changes in your family (like a relative being diagnosed), let your doctor know. You might want to talk to a genetic counselor if you ever have questions about your family history. For now though, you can feel confident that your genetics are working in your favor!`
         } else {
-          return `Your genetic assessment reveals a score of ${sectionData.score}/100 with significant hereditary factors: ${sectionData.factors.join(', ')}. These genetic predispositions require enhanced vigilance and may warrant earlier or more frequent screening protocols. We strongly recommend genetic counseling to discuss your specific risks, inheritance patterns, and family planning considerations. BRCA testing, if not already completed, could provide valuable information for risk management decisions. Consider discussing with your healthcare provider about starting mammograms before age 40, potentially adding breast MRI to your screening routine, and exploring chemoprevention options if appropriate. While genetic factors cannot be changed, they provide crucial information for proactive health management. Share this information with close female relatives, as they may also benefit from genetic counseling and enhanced screening. Stay connected with genetic counselors for updates on new research and testing options. Your genetic profile, while indicating elevated risk, empowers you to take targeted preventive actions and make informed decisions about your healthcare, potentially leading to earlier detection and better outcomes.`;
+          return `Your family history shows some important factors we need to watch: ${sectionData.factors.join(', ')}. Your health score for this section is ${sectionData.score}/100. I know this might feel scary, but having this knowledge is actually a gift - it means you can take action to protect yourself.
+
+Because of your family history, you'll likely need to start screening earlier than other women. ${age < 40 ? 'Even though you\'re young, talk to your doctor about starting mammograms 10 years before the age your relative was diagnosed, or at age 30-35, whichever comes first.' : age < 50 ? 'You may need mammograms yearly instead of every other year.' : 'Make sure you\'re getting mammograms yearly, and ask your doctor if you need additional screening like breast MRI.'}
+
+Consider talking to a genetic counselor about BRCA testing if you haven't already. This isn't something to fear - it's information that can help you make the best choices for your health. Share this information with your sisters, daughters, and other female relatives too, so they can also be proactive about their health.`
         }
         
       case 'Hormonal':
@@ -403,7 +443,7 @@ export class BreastHealthReportGenerator {
     return baseRecommendations;
   }
   
-  createDailyPlan(userProfile: UserProfile, riskCategory: 'low' | 'moderate' | 'high'): Record<string, any> {
+  createDailyPlan(userProfile: UserProfile, healthCategory: 'excellent' | 'good' | 'fair' | 'needs_attention'): Record<string, any> {
     const profile = USER_PROFILES[userProfile];
     
     return {
@@ -428,16 +468,16 @@ export class BreastHealthReportGenerator {
         exercise: "Mix cardio, strength training, and flexibility work"
       },
       monthly: profile.keyFocusAreas,
-      supplements: riskCategory === 'high' ? 
+      supplements: healthCategory === 'needs_attention' ? 
         ["Vitamin D3", "Omega-3", "Folate", "Consider curcumin"] :
         ["Vitamin D3", "Omega-3", "Multivitamin"]
     };
   }
   
   generateComprehensiveReport(quizAnswers: Record<string, any>): InsertHealthReport {
-    const sectionAnalysis = this.calculateSectionRiskScores(quizAnswers);
+    const sectionAnalysis = this.calculateSectionHealthScores(quizAnswers);
     const userProfile = this.determineUserProfile(quizAnswers);
-    const dailyPlan = this.createDailyPlan(userProfile, sectionAnalysis.overallRiskCategory as 'low' | 'moderate' | 'high');
+    const dailyPlan = this.createDailyPlan(userProfile, sectionAnalysis.overallHealthCategory as 'excellent' | 'good' | 'fair' | 'needs_attention');
     
     // Generate 300-word summaries for each section
     const sectionSummaries: { [key: string]: string } = {};
@@ -447,8 +487,8 @@ export class BreastHealthReportGenerator {
     
     const reportData = {
       summary: {
-        totalRiskScore: sectionAnalysis.totalScore.toFixed(1),
-        overallRiskCategory: sectionAnalysis.overallRiskCategory,
+        totalHealthScore: sectionAnalysis.totalScore.toFixed(1),
+        overallHealthCategory: sectionAnalysis.overallHealthCategory,
         userProfile,
         profileDescription: USER_PROFILES[userProfile].description,
         totalSections: Object.keys(sectionAnalysis.sectionScores).length
@@ -466,14 +506,14 @@ export class BreastHealthReportGenerator {
       personalizedPlan: {
         dailyPlan,
         coachingFocus: this.generateCoachingFocus(sectionAnalysis.sectionScores),
-        followUpTimeline: this.generateFollowUpPlan(userProfile, sectionAnalysis.overallRiskCategory as 'low' | 'moderate' | 'high')
+        followUpTimeline: this.generateFollowUpPlan(userProfile, sectionAnalysis.overallHealthCategory as 'excellent' | 'good' | 'fair' | 'needs_attention')
       }
     };
     
     return {
       quizAnswers,
       riskScore: sectionAnalysis.totalScore.toString(),
-      riskCategory: sectionAnalysis.overallRiskCategory,
+      riskCategory: sectionAnalysis.overallHealthCategory,
       userProfile,
       riskFactors: [], // Deprecated - now in section analysis
       recommendations: [], // Deprecated - now in section summaries

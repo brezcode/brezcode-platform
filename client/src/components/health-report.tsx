@@ -46,11 +46,12 @@ function getRiskColor(category: string) {
   }
 }
 
-function getRiskBadgeVariant(category: string) {
+function getHealthBadgeVariant(category: string) {
   switch (category) {
-    case 'low': return 'default';
-    case 'moderate': return 'secondary';
-    case 'high': return 'destructive';
+    case 'excellent': return 'default';
+    case 'good': return 'secondary';
+    case 'fair': return 'outline';
+    case 'needs_attention': return 'destructive';
     default: return 'outline';
   }
 }
@@ -67,7 +68,7 @@ function getProfileIcon(profile: string) {
 }
 
 export default function HealthReport({ report }: HealthReportProps) {
-  const riskScore = parseFloat(report.riskScore);
+  const healthScore = parseFloat(report.riskScore);
   const { summary, sectionAnalysis, personalizedPlan } = report.reportData;
 
   return (
@@ -86,36 +87,36 @@ export default function HealthReport({ report }: HealthReportProps) {
         </Button>
       </div>
 
-      {/* Risk Score Overview */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      {/* Health Score Overview */}
+      <Card className="bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <span className="text-2xl">{getProfileIcon(report.userProfile)}</span>
-              <span>Risk Assessment Summary</span>
+              <span>Your Health Score</span>
             </div>
-            <Badge variant={getRiskBadgeVariant(report.riskCategory)} className="ml-auto">
-              {report.riskCategory.toUpperCase()} RISK
+            <Badge variant={getHealthBadgeVariant(report.riskCategory)} className="ml-auto">
+              {report.riskCategory.replace('_', ' ').toUpperCase()}
             </Badge>
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <div className="text-sm text-gray-600 mb-2">Calculated Risk Score</div>
+              <div className="text-sm text-gray-600 mb-2">Your Health Score</div>
               <div className="flex items-center gap-4">
-                <div className="text-4xl font-bold text-indigo-600">
-                  {summary.totalRiskScore}/100
+                <div className="text-4xl font-bold text-green-600">
+                  {summary.totalHealthScore || summary.totalRiskScore}/100
                 </div>
                 <div className="flex-1">
                   <Progress 
-                    value={riskScore} 
+                    value={healthScore} 
                     className="h-4"
                   />
                 </div>
               </div>
               <div className="text-xs text-gray-500 mt-2">
-                Based on age, genetics, lifestyle, and medical factors from your assessment
+                Higher scores mean better health! Based on your quiz responses across 6 key areas.
               </div>
             </div>
             <div>
@@ -131,12 +132,12 @@ export default function HealthReport({ report }: HealthReportProps) {
         </CardContent>
       </Card>
 
-      {/* Section-Based Risk Analysis */}
+      {/* Section-Based Health Analysis */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-orange-500" />
-            Risk Analysis by Section
+            <AlertTriangle className="h-5 w-5 text-blue-500" />
+            Health Analysis by Section
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -145,7 +146,7 @@ export default function HealthReport({ report }: HealthReportProps) {
               <div key={index} className="p-4 border rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold text-sm text-gray-900">{section.name}</h4>
-                  <Badge variant={getRiskBadgeVariant(section.riskLevel)} className="text-xs">
+                  <Badge variant={getHealthBadgeVariant(section.riskLevel)} className="text-xs">
                     {section.riskLevel}
                   </Badge>
                 </div>
