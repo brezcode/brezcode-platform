@@ -16,7 +16,7 @@ export default function TestReportPage() {
   const generateReportMutation = useMutation({
     mutationFn: async (answers: Record<string, any>) => {
       console.log('Generating report with answers:', answers);
-      const response = await fetch('/api/reports/generate-test', {
+      const response = await fetch('/api/reports/generate-demo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ quizAnswers: answers })
@@ -49,14 +49,14 @@ export default function TestReportPage() {
 
   // Check for quiz answers and generate report immediately
   useEffect(() => {
-    const storedAnswers = localStorage.getItem('completedQuizAnswers');
+    const storedAnswers = localStorage.getItem('brezcode_quiz_answers');
     if (storedAnswers) {
       try {
         const answers = JSON.parse(storedAnswers);
         console.log('Found quiz answers, generating report...', answers);
         setHasAnswers(true);
         generateReportMutation.mutate(answers);
-        localStorage.removeItem('completedQuizAnswers'); // Clean up after use
+        localStorage.removeItem('brezcode_quiz_answers'); // Clean up after use
       } catch (error) {
         console.error('Error parsing quiz answers:', error);
       }
