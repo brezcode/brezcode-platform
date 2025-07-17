@@ -580,7 +580,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
             focus.push('Enhanced screening schedule coordination and health monitoring support');
             break;
           case 'Genetic':
-            focus.push('Genetic counseling coordination and family history management');
+            focus.push('Enhanced prevention strategies for individuals with genetic risk factors');
             break;
           case 'Demographic':
             focus.push('Age-appropriate prevention strategies and screening optimization');
