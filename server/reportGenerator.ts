@@ -204,41 +204,28 @@ export class BreastHealthReportGenerator {
         }
       }
       
-      // Calculate section score
+      // Calculate section health score directly (higher = healthier)
       const sectionFinalScore = Math.sqrt(sectionMultiplier);
-      const normalizedSectionScore = this.normalizeToHundred(sectionFinalScore);
+      const normalizedHealthScore = this.convertToHealthScore(sectionFinalScore);
       
       sectionScores[sectionName] = {
-        score: Math.round(normalizedSectionScore * 10) / 10,
+        score: Math.round(normalizedHealthScore * 10) / 10,
         factors: appliedFactors
       };
       
-      calculationLog.push(`Section ${index + 1} final: √${sectionMultiplier.toFixed(2)} = ${sectionFinalScore.toFixed(2)} → ${normalizedSectionScore.toFixed(1)}/100`);
+      calculationLog.push(`Section ${index + 1} final: √${sectionMultiplier.toFixed(2)} = ${sectionFinalScore.toFixed(2)} → ${normalizedHealthScore.toFixed(1)}/100 health score`);
       
       // Contribute to total score
       totalMultiplier *= sectionMultiplier;
     });
     
-    // Calculate overall total score
+    // Calculate overall total health score
     const totalFinalScore = Math.sqrt(totalMultiplier);
-    const totalScore = this.normalizeToHundred(totalFinalScore);
+    const overallHealthScore = this.convertToHealthScore(totalFinalScore);
     
     calculationLog.push(`\n=== OVERALL TOTAL ===`);
     calculationLog.push(`Combined multiplier: ${totalMultiplier.toFixed(2)}`);
-    calculationLog.push(`Total final score: √${totalMultiplier.toFixed(2)} = ${totalFinalScore.toFixed(2)} → ${totalScore.toFixed(1)}/100`);
-    
-    // Convert to Health Score (100 = perfect health, lower = more risk factors)
-    const healthScores: { [key: string]: { score: number, factors: string[] } } = {};
-    Object.entries(sectionScores).forEach(([sectionName, data]) => {
-      // Convert risk score to health score: Higher risk = Lower health score
-      const healthScore = Math.max(10, 110 - data.score); // Invert scale
-      healthScores[sectionName] = {
-        score: Math.round(healthScore * 10) / 10,
-        factors: data.factors
-      };
-    });
-    
-    const overallHealthScore = Math.max(10, 110 - totalScore);
+    calculationLog.push(`Total final score: √${totalMultiplier.toFixed(2)} = ${totalFinalScore.toFixed(2)} → ${overallHealthScore.toFixed(1)}/100 health score`);
     
     // Log the full calculation for debugging
     console.log('\n=== 6-SECTION HEALTH SCORE CALCULATION ===');
@@ -248,20 +235,21 @@ export class BreastHealthReportGenerator {
     console.log('==========================================\n');
     
     return {
-      sectionScores: healthScores,
+      sectionScores: sectionScores,
       totalScore: Math.round(overallHealthScore * 10) / 10,
       overallHealthCategory: this.categorizeHealth(overallHealthScore)
     };
   }
 
-  private normalizeToHundred(score: number): number {
-    if (score <= 2) {
-      return Math.max(score * 12.5, 1); // 1-25 range for low risk
-    } else if (score <= 10) {
-      return 25 + ((score - 2) / 8) * 25; // 26-50 range for moderate risk  
-    } else {
-      return Math.min(50 + ((score - 10) / 40) * 50, 100); // 51-100 range for high risk
-    }
+  private convertToHealthScore(riskMultiplierSqrt: number): number {
+    // Convert risk multiplier square root to health score
+    // Risk Multiplier 1.0 (no risk factors) → sqrt = 1.0 → Health Score = 100
+    // Risk Multiplier 4.0 (high risk) → sqrt = 2.0 → Health Score = 50
+    // Risk Multiplier 16.0 (very high risk) → sqrt = 4.0 → Health Score = 25
+    
+    // Simple inverse relationship: Health Score = 100 / riskMultiplierSqrt
+    const healthScore = Math.min(100, Math.max(5, 100 / riskMultiplierSqrt));
+    return healthScore;
   }
 
   categorizeHealth(healthScore: number): string {
