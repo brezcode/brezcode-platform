@@ -22,243 +22,289 @@ interface QuizQuestion {
   };
 }
 
-// BC Assessment Quiz Questions from Excel file
-const quizQuestions: QuizQuestion[] = [
+// 6-Section BC Assessment Quiz based on updated CSV format
+const quizSections = [
   {
-    id: "age",
-    question: "What is your current age?",
-    reason: "According to a 2024 study by American Cancer Society, breast cancer risk increases with age: Compare to women below 40, women aged 40-49 have a 150-200% higher risk (RR ≈ 2.5-3.0), 50-59 a 250-300% higher risk (RR ≈ 3.5-4.0), 60-69 a 350-400% higher risk (RR ≈ 4.5-5.0), and ≥70 a 300-350% higher risk (RR ≈ 4.0-4.5).",
-    type: "number_range",
-    min: 20,
-    max: 80,
-    required: true
+    title: "Section 1: Demographic Factors",
+    description: "Basic demographic information that influences baseline risk",
+    questions: [
+      {
+        id: "age",
+        question: "What is your current age?",
+        reason: "According to a 2024 study by American Cancer Society, breast cancer risk increases with age: Compare to women below 50, women aged 50-59 have a 14% higher risk (RR ≈ 1.14), 60-69 a 67% higher risk (RR ≈ 1.67), and ≥70 a 233% higher risk (RR ≈ 3.33).",
+        type: "number_range" as const,
+        min: 20,
+        max: 80,
+        required: true
+      },
+      {
+        id: "country",
+        question: "Which country are you residing now?",
+        reason: "According to a 2024 study by American Cancer Society, 1 in 8 women in US will develop cancer in their lifetime",
+        type: "multiple_choice" as const,
+        options: ["United States", "Canada", "United Kingdom", "Australia", "Other"],
+        required: true
+      },
+      {
+        id: "ethnicity",
+        question: "What is your racial/ethnic background?",
+        reason: "According to a 2024 study by American Cancer Society, breast cancer risk varies by ethnicity: Compare to Asian women, Black women is 2.25 times higher, American Indian is 1.74 times higher, White (non-Hispanic) women is 1.64 times higher, Hispanic women is 1.15 times higher due to differences in genetic predispositions.",
+        type: "multiple_choice" as const,
+        options: ["White (non-Hispanic)", "Black", "Asian", "Hispanic/Latino", "American Indian"],
+        required: true
+      }
+    ]
   },
   {
-    id: "ethnicity",
-    question: "What is your racial/ethnic background?",
-    reason: "According to a 2024 study by American Cancer Society, breast cancer risk varies by ethnicity: Compare to Asian women, Black women is 2.25 times higher, American Indian is 1.74 times higher, White (non-Hispanic) women is 1.64 times higher, Hispanic/Latino women have varied risk depending on specific heritage.",
-    type: "multiple_choice",
-    options: ["White (non-Hispanic)", "Black", "Asian", "Hispanic/Latino", "American Indian"],
-    required: true
+    title: "Section 2: Family History and Genetics Factors",
+    description: "Hereditary and genetic risk factors",
+    questions: [
+      {
+        id: "family_history",
+        question: "Do you have a first-degree relative (mother, sister, daughter) or second-degree relative with breast cancer (BC)?",
+        reason: "According to a 1997 study by Cambridge Institute of Public Health, having a first-degree relative or second-degree relative with breast cancer (BC) increases your lifetime breast cancer risk by approximately 100% (relative risk, RR ≈ 2.0), and 50% (RR≈ 1.5) respectively.",
+        type: "multiple_choice" as const,
+        options: ["Yes, I have first-degree relative with BC", "Yes, I have second-degree relative with BC", "Yes, I have both first-degree relative and second-degree relative with BC", "No, I do not have any relative with BC"],
+        required: true
+      },
+      {
+        id: "brca_test",
+        question: "Have you ever been told you have one of the following genetic or family cancer syndromes after having genetic testing?",
+        reason: "According to a 2017 study by Kuchenbaecker et al., specific genetic mutations can significantly increase breast cancer risk. Women with a BRCA1/2 mutation have a 70% risk (RR ≈ 1.7)",
+        type: "multiple_choice" as const,
+        options: ["BRCA1/2", "No condition", "Not tested"],
+        required: true
+      }
+    ]
   },
   {
-    id: "family_history",
-    question: "Do you have a first-degree relative (mother, sister, daughter) or second-degree relative with breast cancer (BC)?",
-    reason: "According to a 1997 study by Cambridge Institute of Public Health, having a first-degree relative or second-degree relative with breast cancer (BC) increases your lifetime breast cancer risk by approximately 100% (relative risk, RR ≈ 2.0), and 50% (RR≈ 1.5) respectively.",
-    type: "multiple_choice",
-    options: ["Yes, I have first-degree relative with BC", "Yes, I have second-degree relative with BC", "Yes, I have both first-degree relative and second-degree relative with BC", "No, I do not have any relative with BC"],
-    required: true
+    title: "Section 3: Reproductive and Hormonal Factors",
+    description: "Hormonal exposure and reproductive history",
+    questions: [
+      {
+        id: "menstrual_age",
+        question: "At what age did you have your first menstrual period?",
+        reason: "According to a 2021 study by Geunwon et al., early menarche (before age 12) increases breast cancer risk by 10-20% (RR ≈ 1.10-1.20) due to prolonged estrogen exposure.",
+        type: "multiple_choice" as const,
+        options: ["Before 12 years old", "12 years old or later", "Not Yet"],
+        required: true
+      },
+      {
+        id: "pregnancy_age",
+        question: "Have you ever been pregnant? If yes, at what age did you have your first full-term pregnancy?",
+        reason: "According to a 2012 meta-analysis by the Collaborative Group in Breast Cancer, Women who have never had a full-term pregnancy have approximately a 27% increased risk (RR ≈ 1.27). Also, according to a 2018 study by Nichols et al., women who have their first full-term pregnancy after age 30 or between ages 25-29 have a 20-40% (relative risk, RR ≈ 1.20-1.40) or 10-20% (relative risk, RR ≈ 1.10-1.20) increased lifetime risk of breast cancer respectively.",
+        type: "multiple_choice" as const,
+        options: ["Never had a full-term pregnancy", "Age 30 or older", "Age 25-29", "Before age 25"],
+        required: true
+      },
+      {
+        id: "oral_contraceptives",
+        question: "Have you ever used hormonal birth control (e.g., pills, patches, injections)?",
+        reason: "According to the National Cancer Institute, women who have ever used oral contraceptives have a slight 7% (RR ≈ 1.07) increase in the risk of breast cancer compared to those who have never used them. Current users have a 24% (RR ≈ 1.24) increase in risk, which declines after stopping use.",
+        type: "multiple_choice" as const,
+        options: ["Yes, currently using", "Yes, used in the past", "No, never used"],
+        required: true
+      },
+      {
+        id: "menopause",
+        question: "Have you gone without a menstrual period for 12 or more consecutive months (excluding pregnancy or medical conditions)?",
+        reason: "According to the American Cancer Society, women who have gone through menopause have a higher risk of breast cancer compared to pre-menopausal women of the same age. Studies show a relative risk (RR) of approximately 1.5–2.0 for post-menopausal women, largely due to changes in hormone levels, especially estrogen, after menopause.",
+        type: "multiple_choice" as const,
+        options: ["Yes, at age 55 or older", "Yes, before age 55", "Not yet"],
+        required: true
+      },
+      {
+        id: "weight",
+        question: "What is your weight in kg?",
+        reason: "According to a 2018 meta-analysis by Liu et al., obesity (BMI ≥ 30) in postmenopausal women increases breast cancer risk by approximately 31% (RR ≈ 1.31), due to elevated estrogen levels from fat tissue.",
+        type: "number_range" as const,
+        min: 40,
+        max: 150,
+        required: true
+      },
+      {
+        id: "height",
+        question: "What is your height in meters?",
+        reason: "Height and weight are used to calculate your Body Mass Index (BMI). Obesity (BMI ≥ 30) is associated with increased breast cancer risk in postmenopausal women.",
+        type: "number_range" as const,
+        min: 1.4,
+        max: 2.1,
+        required: true
+      },
+      {
+        id: "hrt",
+        question: "Have you ever used Combined Hormone Replacement Therapy (HRT) for more than 5 years?",
+        reason: "According to a 2020 study by Vinogradova et al., women who use combined estrogen-progestin HRT for more than 5 years have a 20-30% increased risk of breast cancer (relative risk, RR ≈ 1.20-1.30)",
+        type: "multiple_choice" as const,
+        options: ["Yes", "No"],
+        required: true
+      }
+    ]
   },
   {
-    id: "brca_test",
-    question: "Have you ever been told you have one of the following genetic or family cancer syndromes after having genetic testing?",
-    reason: "According to a 2017 study by Kuchenbaecker et al., specific genetic mutations can significantly increase breast cancer risk. Women with a BRCA1/2 mutation have a 70% risk (RR ≈ 1.7)",
-    type: "multiple_choice",
-    options: ["BRCA1/2", "No condition", "Not tested"],
-    required: true
+    title: "Section 4: Symptom Risk Factors",
+    description: "Current breast symptoms and related factors",
+    questions: [
+      {
+        id: "breast_symptoms",
+        question: "Do you have any breast symptoms such as lumps, pain, or nipple discharge?",
+        reason: "According to a 2017 study by Kosters et al., women who regularly perform BSE have a 15-20% reduced risk of interval breast cancer detection (relative risk, RR ≈ 0.80-0.85). BSE may facilitate earlier detection of palpable tumors between mammogram screenings.",
+        type: "multiple_choice" as const,
+        options: ["I have breast pain", "I have a lump in my breast", "I have swollen breast or changed in size or shape", "Yes, I have other symptoms", "No, I don't have any symptoms"],
+        required: true
+      },
+      {
+        id: "pain_severity",
+        question: "How painful is it? (Feeling of heaviness, tenderness, a burning, prickling or stabbing pain, or a feeling of tightness.)?",
+        reason: "According to a 2019 study by Stachs et al., breast pain (mastalgia) alone is rarely associated with breast cancer, with a minimal 0-10% increased likelihood of cancer detection (relative risk, RR ≈ 1.0-1.10) compared to women without pain, as most cases are benign and hormonal.",
+        type: "multiple_choice" as const,
+        options: ["Severe Cyclical Pain in Breast or Armpit", "Severe and Continuous Non-Cyclical Breast Pain in one part of the breast or armpit", "Mild Pain"],
+        required: false,
+        condition: { questionId: "breast_symptoms", answer: "I have breast pain" }
+      },
+      {
+        id: "lump_characteristics",
+        question: "Is it larger than 2 cm or growing rapidly?",
+        reason: "According to a 2017 study by Kerlikowske et al., women with breast lumps larger than 2 cm and showing rapid growth have a 2-3 times higher risk of breast cancer (relative risk, RR ≈ 2.0-3.0) compared to women with smaller, stable lumps or no lumps.",
+        type: "multiple_choice" as const,
+        options: ["Growing Lump with size over 5cm", "Growing Lump size over 2cm", "Stable Lump size over 2cm", "Stable Lump size below 2cm"],
+        required: false,
+        condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
+      },
+      {
+        id: "breast_changes",
+        question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape",
+        reason: "According to a 2020 study by Gewefel et al., women with persistent changes in breast size or shape have a 50-100% increased risk of breast cancer (relative risk, RR ≈ 1.50-2.00) compared to women without these symptoms.",
+        type: "multiple_choice" as const,
+        options: ["Yes, I have swollen breast or armpit", "Yes, I have persistent changes in breast size or shape"],
+        required: false,
+        condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
+      }
+    ]
   },
   {
-    id: "dense_breast",
-    question: "Have you been told that you have dense breast tissue based on a mammogram?",
-    reason: "According to a 2019 meta-analysis by Bodewes et al., women with dense breasts have a 2 times higher risk of breast cancer (relative risk, RR ≈ 2.0) compared to women with non-dense breasts. This is due to the increased glandular tissue, which can mask tumors on mammograms and is associated with higher cell proliferation.",
-    type: "multiple_choice",
-    options: ["Yes", "No", "I don't know (I've never had a mammogram)"],
-    required: true
+    title: "Section 5: Screening and Precancerous Risk Factors",
+    description: "Screening history and precancerous conditions",
+    questions: [
+      {
+        id: "mammogram_frequency",
+        question: "How often do you undergo mammogram or other screening for breast cancer?",
+        reason: "According to a 2020 study by Hofvind et al., women who undergo annual mammography screening have a 40-50% reduced risk of interval breast cancer (relative risk, RR ≈ 0.50-0.60) compared to those who never screen.",
+        type: "multiple_choice" as const,
+        options: ["Annually (once a year)", "Biennially (every 2 years)", "Never or irregularly"],
+        required: true
+      },
+      {
+        id: "dense_breast",
+        question: "Have you been told that you have dense breast tissue based on a mammogram?",
+        reason: "According to a 2019 meta-analysis by Bodewes et al., women with dense breasts have a 2 times higher risk of breast cancer (relative risk, RR ≈ 2.0) compared to women with non-dense breasts.",
+        type: "multiple_choice" as const,
+        options: ["Yes", "No", "I don't know (I've never had a mammogram)"],
+        required: true
+      },
+      {
+        id: "benign_condition",
+        question: "Have you been diagnosed with a benign breast condition, such as atypical hyperplasia, lobular carcinoma in situ (LCIS), or complex/complicated cysts?",
+        reason: "According to a 2015 study by Hartmann et al., women with a history of atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0), women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0).",
+        type: "multiple_choice" as const,
+        options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, LCIS", "Yes, complex/complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No benign breast conditions"],
+        required: true
+      },
+      {
+        id: "cancer_history",
+        question: "Have you been diagnosed with a cancerous breast condition, such as Invasive Breast Cancer (IBC), Invasive Lobular Carcinoma (ILC), Ductal Carcinoma (DSIC)?",
+        reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
+        type: "multiple_choice" as const,
+        options: ["Yes, I am a Breast Cancer Patient currently undergoing treatment", "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", "No diagnosed breast conditions"],
+        required: true
+      },
+      {
+        id: "cancer_stage",
+        question: "What Stage is/was your breast cancer",
+        reason: "Cancer stage helps determine appropriate follow-up care and risk management strategies.",
+        type: "multiple_choice" as const,
+        options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
+        required: false,
+        condition: { questionId: "cancer_history", answer: "Yes, I am a Breast Cancer Patient currently undergoing treatment" }
+      }
+    ]
   },
   {
-    id: "menstrual_age",
-    question: "At what age did you have your first menstrual period?",
-    reason: "According to a 2021 study by Geunwon et al., early menarche (before age 12) increases breast cancer risk by 10-20% (RR ≈ 1.10-1.20) due to prolonged estrogen exposure.",
-    type: "multiple_choice",
-    options: ["Before 12 years old", "12 years old or later"],
-    required: true
-  },
-  {
-    id: "pregnancy_age",
-    question: "Have you ever been pregnant? If yes, at what age did you have your first full-term pregnancy?",
-    reason: "According to a 2012 meta-analysis by the Collaborative Group in Breast Cancer, Women who have never had a full-term pregnancy have approximately a 27% increased risk (RR ≈ 1.27). Also, according to a 2018 study by Nichols et al., women who have their first full-term pregnancy after age 30 or between ages 25-29 have a 20-40% (relative risk, RR ≈ 1.20-1.40) or 10-20% (relative risk, RR ≈ 1.10-1.20) increased lifetime risk of breast cancer respectively.",
-    type: "multiple_choice",
-    options: ["Never had a full-term pregnancy", "Age 30 or older", "Age 25-29", "Before age 25"],
-    required: true
-  },
-  {
-    id: "oral_contraceptives",
-    question: "Have you ever used hormonal birth control (e.g., pills, patches, injections)?",
-    reason: "According to the National Cancer Institute, women who have ever used oral contraceptives have a slight 7% (RR ≈ 1.07) increase in the risk of breast cancer compared to those who have never used them. Current users have a 24% (RR ≈ 1.24) increase in risk, which declines after stopping use.",
-    type: "multiple_choice",
-    options: ["Yes, currently using", "Yes, used in the past", "No, never used"],
-    required: true
-  },
-  {
-    id: "menopause",
-    question: "Have you gone without a menstrual period for 12 or more consecutive months (excluding pregnancy or medical conditions)?",
-    reason: "According to the American Cancer Society, women who have gone through menopause have a higher risk of breast cancer compared to pre-menopausal women of the same age. Studies show a relative risk (RR) of approximately 1.5–2.0 for post-menopausal women, largely due to changes in hormone levels, especially estrogen, after menopause.",
-    type: "multiple_choice",
-    options: ["Yes, at age 55 or later", "Yes, before age 55", "Not yet"],
-    required: true
-  },
-  {
-    id: "weight",
-    question: "What is your weight in kg?",
-    reason: "According to a 2018 meta-analysis by Liu et al., obesity (BMI ≥ 30) in postmenopausal women increases breast cancer risk by approximately 31% (RR ≈ 1.31), due to elevated estrogen levels from fat tissue.",
-    type: "number_range",
-    min: 40,
-    max: 150,
-    required: true
-  },
-  {
-    id: "height",
-    question: "What is your height in meters?",
-    reason: "Height and weight are used to calculate your Body Mass Index (BMI). Obesity (BMI ≥ 30) is associated with increased breast cancer risk in postmenopausal women.",
-    type: "number_range",
-    min: 1.4,
-    max: 2.1,
-    required: true
-  },
-  {
-    id: "hrt",
-    question: "Have you ever used Combined Hormone Replacement Therapy (HRT) for more than 5 years?",
-    reason: "According to a 2020 study by Vinogradova et al., women who use combined estrogen-progestin HRT for more than 5 years have a 20-30% increased risk of breast cancer (relative risk, RR ≈ 1.20-1.30)",
-    type: "multiple_choice",
-    options: ["Yes", "No"],
-    required: true
-  },
-  {
-    id: "western_diet",
-    question: "Do you regularly follow a Western diet (e.g., high in processed foods, red meats, saturated fats, and low in fruits, vegetables, and fiber)?",
-    reason: "According to a 2018 study by Castello et al., women adhering to a Western dietary pattern have a 33% increased risk of breast cancer (relative risk, RR ≈ 1.33) compared to those following a Mediterranean diet. This is likely due to inflammation, insulin resistance, and hormonal changes driven by high processed food and fat intake.",
-    type: "multiple_choice",
-    options: ["Yes, Western diet", "Yes, mixed diet with some Western elements", "No, mostly non-Western diet (e.g., Mediterranean or plant-based)"],
-    required: true
-  },
-  {
-    id: "smoke",
-    question: "Do you currently smoke tobacco products?",
-    reason: "According to a 2024 study by Hussain et al., current smoking increases breast cancer risk by 10-15% (relative risk, RR ≈ 1.10-1.15) compared to never-smokers, and diminishes over time after quitting.",
-    type: "multiple_choice",
-    options: ["Yes", "No"],
-    required: true
-  },
-  {
-    id: "alcohol",
-    question: "On average, how many alcoholic drinks do you consume per day?",
-    reason: "According to a 2021 study by Sun et al., consuming one alcoholic drink per day increases breast cancer risk by 7-10% (RR ≈ 1.07-1.10), and two or more drinks further elevates risk by 15-20% per additional drink.",
-    type: "multiple_choice",
-    options: ["2 or more drinks", "1 drink", "None"],
-    required: true
-  },
-  {
-    id: "night_shift",
-    question: "Do you regularly work night shifts (including shifts from midnight to 5:00 AM)?",
-    reason: "According to a 2021 meta-analysis by Manouchehri et al., women who regularly work night shifts have a 8-13% increased risk of breast cancer (relative risk, RR ≈ 1.08-1.13). This may be due to circadian disruption and melatonin suppression from light exposure at night.",
-    type: "multiple_choice",
-    options: ["Yes", "No"],
-    required: true
-  },
-  {
-    id: "stressful_events",
-    question: "Have you experienced significant stressful life events (e.g., death of a close family member, divorce, or major financial crisis)?",
-    reason: "According to a 2013 meta-analysis by Lin et al., women who have experienced stressful to striking life events have a 10-107% increased risk of breast cancer (relative risk, RR ≈ 1.1-2.07). This may be due to stress-related hormonal and immune dysregulation, though the evidence is not conclusive.",
-    type: "multiple_choice",
-    options: ["Yes, striking life events", "Yes, stressful life events", "No, no significant stressful events"],
-    required: true
-  },
-  {
-    id: "benign_condition",
-    question: "Have you been diagnosed with a benign (non-cancerous) breast condition?",
-    reason: "According to a 2015 study by Hartmann et al., women with a history of atypical hyperplasia have a 300-400% increased risk of breast cancer (relative risk, RR ≈ 4.0-5.0), women diagnosed with LCIS have a 150-200% increased risk (RR ≈ 2.5-3.0). Complex cysts generally have a minimal risk increase (RR ≈ 1.0-1.5).",
-    type: "multiple_choice",
-    options: ["Yes, Atypical Hyperplasia (ADH/ALH)", "Yes, Lobular Carcinoma In Situ (LCIS)", "Yes, complex or complicated cysts", "Yes, other benign condition (e.g., simple cysts, fibrocystic changes)", "No, I have not been diagnosed with any benign breast conditions"],
-    required: true
-  },
-  {
-    id: "precancerous_condition",
-    question: "Have you been diagnosed with breast cancer?",
-    reason: "According to a 2015 study by Hartmann et al., women with a history of breast cancer will have a 300-400% increased risk of breast cancer recurrence (relative risk, RR ≈ 4.0-5.0)",
-    type: "multiple_choice",
-    options: ["Yes, I am currently receiving treatment for breast cancer", "Yes, I am a breast cancer survivor taking medication to prevent recurrence", "No, I have not been diagnosed with breast cancer"],
-    required: true
-  },
-  {
-    id: "cancer_stage",
-    question: "What stage was your breast cancer at the time of diagnosis?",
-    reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
-    type: "multiple_choice",
-    options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
-    required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, I am currently receiving treatment for breast cancer" }
-  },
-  {
-    id: "cancer_stage_survivor",
-    question: "What stage was your breast cancer at the time of diagnosis?",
-    reason: "Understanding your cancer stage helps us provide more personalized guidance and appropriate support resources for your specific situation.",
-    type: "multiple_choice",
-    options: ["Stage 0", "Stage 1", "Stage 2", "Stage 3", "Stage 4"],
-    required: true,
-    condition: { questionId: "precancerous_condition", answer: "Yes, I am a breast cancer survivor taking medication to prevent recurrence" }
-  },
-  {
-    id: "mammogram_frequency",
-    question: "How often do you undergo mammograms or other breast cancer screenings?",
-    reason: "According to a 2020 study by Hofvind et al., women who undergo annual mammography screening have a 40-50% reduced risk of interval breast cancer (relative risk, RR ≈ 0.50-0.60) compared to those who never screen. Biennial screening (every 2 years) reduces the risk by 20-30% (RR ≈ 0.70-0.80), but interval cancers, which are often more aggressive, are more likely than with annual screening.",
-    type: "multiple_choice",
-    options: ["Annually (once a year)", "Biennially (every 2 years)", "Never or irregularly"],
-    required: true
-  },
-  {
-    id: "breast_symptoms",
-    question: "Do you have any breast symptoms such as lumps, pain, or nipple discharge?",
-    reason: "According to a 2017 study by Kosters et al., women who regularly perform BSE have a 15-20% reduced risk of interval breast cancer detection (relative risk, RR ≈ 0.80-0.85). BSE may facilitate earlier detection of palpable tumors between mammogram screenings.",
-    type: "multiple_choice",
-    options: ["I have breast pain", "I have a lump in my breast", "I have swollen breast or changed in size or shape", "Yes, I have other symptoms", "No, I don't have any symptoms"],
-    required: true
-  },
-  {
-    id: "other_symptoms_detail",
-    question: "Please specify what other breast symptoms you are experiencing:",
-    reason: "Understanding the specific nature of breast symptoms helps healthcare providers assess the urgency and determine appropriate next steps for evaluation and care.",
-    type: "multiple_choice",
-    options: ["Nipple discharge", "Skin changes (dimpling, puckering, or orange-peel texture)", "Both nipple discharge and skin changes"],
-    required: true,
-    condition: { questionId: "breast_symptoms", answer: "Yes, I have other symptoms" }
-  },
-  {
-    id: "pain_level",
-    question: "How painful is it? (Do you experience feelings of heaviness, tenderness, a burning, prickling, or stabbing pain, or a feeling of tightness?)",
-    reason: "According to a 2019 study by Stachs et al., breast pain (mastalgia) alone is rarely associated with breast cancer, with a minimal 0-10% increased likelihood of cancer detection (relative risk, RR ≈ 1.0-1.10) compared to women without pain, as most cases are benign and hormonal.",
-    type: "multiple_choice",
-    options: ["Severe Cyclical Pain in Breast or Armpit", "Severe and Continuous Non-Cyclical Breast Pain in one part of the breast or armpit", "Mild Pain"],
-    required: true,
-    condition: { questionId: "breast_symptoms", answer: "I have breast pain" }
-  },
-  {
-    id: "lump_characteristics",
-    question: "Regarding the lump, is it larger than 2 cm or growing rapidly?",
-    reason: "According to a 2017 study by Kerlikowske et al., women with breast lumps larger than 2 cm and showing rapid growth have a 2-3 times higher risk of breast cancer (relative risk, RR ≈ 2.0-3.0) compared to women with smaller, stable lumps or no lumps.",
-    type: "multiple_choice",
-    options: ["Growing Lump with size over 5cm", "Growing Lump size over 2cm", "Stable Lump size over 2cm", "Stable Lump size below 2cm"],
-    required: true,
-    condition: { questionId: "breast_symptoms", answer: "I have a lump in my breast" }
-  },
-  {
-    id: "swelling_characteristics",
-    question: "Are you currently experiencing swollen breast or persistent changes in breast size or shape?",
-    reason: "According to a 2020 study by Gewefel et al., women with persistent changes in breast size or shape have a 50-100% increased risk of breast cancer (relative risk, RR ≈ 1.50-2.00) compared to women without these symptoms. These changes may indicate malignancy or high-risk proliferative lesions requiring medical evaluation.",
-    type: "multiple_choice",
-    options: ["Yes, I have swollen breast or armpit", "Yes, I have persistent changes in breast size or shape"],
-    required: true,
-    condition: { questionId: "breast_symptoms", answer: "I have swollen breast or changed in size or shape" }
-  },
-  {
-    id: "swelling_timing",
-    question: "When did you first notice these changes?",
-    reason: "The timing of breast changes can help determine the urgency of medical evaluation and potential causes, whether related to hormonal cycles, recent changes, or other factors.",
-    type: "multiple_choice",
-    options: ["Within the past week", "Within the past month"],
-    required: true,
-    condition: { questionId: "swelling_characteristics", answer: "Other changes" }
+    title: "Section 6: Lifestyle and Environmental Factors",
+    description: "Modifiable lifestyle and environmental risk factors",
+    questions: [
+      {
+        id: "western_diet",
+        question: "Do you regularly follow a Western diet (e.g., high in processed foods, red meats, saturated fats, and low in fruits, vegetables, and fiber)?",
+        reason: "According to a 2018 study by Castello et al., women adhering to a Western dietary pattern have a 33% increased risk of breast cancer (relative risk, RR ≈ 1.33) compared to those following a Mediterranean diet.",
+        type: "multiple_choice" as const,
+        options: ["Yes, Western diet", "Yes, mixed diet with some Western elements", "No, mostly non-Western diet (e.g., Mediterranean or plant-based)"],
+        required: true
+      },
+      {
+        id: "smoke",
+        question: "Do you currently smoke tobacco products?",
+        reason: "According to a 2024 study by Hussain et al., current smoking increases breast cancer risk by 10-15% (relative risk, RR ≈ 1.10-1.15) compared to never-smokers.",
+        type: "multiple_choice" as const,
+        options: ["Yes", "No"],
+        required: true
+      },
+      {
+        id: "alcohol",
+        question: "How many alcoholic drinks do you consume per day, on average?",
+        reason: "According to a 2021 study by Sun et al., consuming one alcoholic drink per day increases breast cancer risk by 7-10% (RR ≈ 1.07-1.10), and two or more drinks further elevates risk by 15-20% per additional drink.",
+        type: "multiple_choice" as const,
+        options: ["2 or more drinks", "1 drink", "None"],
+        required: true
+      },
+      {
+        id: "night_shift",
+        question: "Do you regularly work night shifts (e.g., shifts including midnight to 5:00 AM)?",
+        reason: "According to a 2021 meta-analysis by Manouchehri et al., women who regularly work night shifts have a 8-13% increased risk of breast cancer (relative risk, RR ≈ 1.08-1.13).",
+        type: "multiple_choice" as const,
+        options: ["Yes", "No"],
+        required: true
+      },
+      {
+        id: "stressful_events",
+        question: "Have you experienced striking stressful life events (e.g., death of a close family member, divorce, or major financial crisis)?",
+        reason: "According to a 2013 meta-analysis by Lin et al., women who have experienced stressful to striking life events have a 10-107% increased risk of breast cancer (relative risk, RR ≈ 1.1-2.07).",
+        type: "multiple_choice" as const,
+        options: ["Yes, striking life events", "Yes, stressful life events", "No, no significant stressful events"],
+        required: true
+      },
+      {
+        id: "chronic_stress",
+        question: "Do you experience chronic stress (e.g., ongoing high stress from work, family, or life events)?",
+        reason: "According to a 2022 meta-analysis by Zhang et al., women experiencing chronic stress have a 10-20% increased risk of breast cancer (relative risk, RR ≈ 1.10-1.20).",
+        type: "multiple_choice" as const,
+        options: ["Yes, chronic high stress", "Yes, occasional moderate stress", "No, low or no chronic stress"],
+        required: true
+      },
+      {
+        id: "sugar_diet",
+        question: "Do you regularly consume a high sugar diet (e.g., frequent intake of sugary drinks, desserts, or processed foods with added sugars)?",
+        reason: "According to a 2022 study by Farvid et al., women with a high intake of added sugars (e.g., ≥5 servings/week of sugary beverages) have a 10-20% increased risk of breast cancer (relative risk, RR ≈ 1.10-1.20).",
+        type: "multiple_choice" as const,
+        options: ["Yes, high sugar diet", "Yes, moderate sugar diet", "No, low or no added sugar diet"],
+        required: true
+      },
+      {
+        id: "exercise",
+        question: "Do you engage in regular moderate to vigorous exercise (e.g., at least 150 minutes per week of activities like brisk walking, running, or cycling)?",
+        reason: "According to a 2020 study by Guo et al., women who engage in regular moderate to vigorous physical activity (≥10 MET-hours/week) have a 15-20% reduced risk of breast cancer (relative risk, RR ≈ 0.80-0.85).",
+        type: "multiple_choice" as const,
+        options: ["Yes, regular moderate to vigorous exercise", "Yes, occasional light exercise", "No, little or no regular exercise"],
+        required: true
+      }
+    ]
   }
 ];
+
+// Flatten all questions for easier processing  
+const quizQuestions: QuizQuestion[] = quizSections.flatMap(section => 
+  section.questions.map(q => ({ ...q, section: section.title }))
+);
 
 interface QuizProps {
   onComplete: (answers: Record<string, any>) => void;

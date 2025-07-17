@@ -16,21 +16,21 @@ interface HealthReportProps {
     dailyPlan: Record<string, any>;
     reportData: {
       summary: {
-        riskScore: string;
-        riskCategory: string;
+        totalRiskScore: string;
+        overallRiskCategory: string;
         userProfile: string;
         profileDescription: string;
-        totalRiskFactors: number;
+        totalSections: number;
       };
-      riskAnalysis: {
-        identifiedFactors: string[];
-        protectiveFactors: string[];
-        riskBreakdown: Record<string, string[]>;
+      sectionAnalysis: {
+        sectionScores: { [key: string]: { score: number, factors: string[] } };
+        sectionSummaries: { [key: string]: string };
+        sectionBreakdown: Array<{ name: string, score: number, factorCount: number, riskLevel: string }>;
       };
-      actionPlan: {
-        immediate: string[];
-        ongoing: string[];
-        followUp: Record<string, string>;
+      personalizedPlan: {
+        dailyPlan: Record<string, any>;
+        coachingFocus: string[];
+        followUpTimeline: Record<string, string>;
       };
     };
     createdAt: string;
@@ -68,7 +68,7 @@ function getProfileIcon(profile: string) {
 
 export default function HealthReport({ report }: HealthReportProps) {
   const riskScore = parseFloat(report.riskScore);
-  const { summary, riskAnalysis, actionPlan } = report.reportData;
+  const { summary, sectionAnalysis, personalizedPlan } = report.reportData;
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">
@@ -105,7 +105,7 @@ export default function HealthReport({ report }: HealthReportProps) {
               <div className="text-sm text-gray-600 mb-2">Calculated Risk Score</div>
               <div className="flex items-center gap-4">
                 <div className="text-4xl font-bold text-indigo-600">
-                  {summary.riskScore}/100
+                  {summary.totalRiskScore}/100
                 </div>
                 <div className="flex-1">
                   <Progress 
@@ -131,78 +131,77 @@ export default function HealthReport({ report }: HealthReportProps) {
         </CardContent>
       </Card>
 
-      {/* Risk Analysis */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Risk Factors */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-orange-500" />
-              Risk Factors Identified
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {riskAnalysis.identifiedFactors.length > 0 ? (
-              <div className="space-y-3">
-                {riskAnalysis.identifiedFactors.slice(0, 5).map((factor, index) => (
-                  <div key={index} className="p-3 bg-orange-50 rounded-lg border-l-4 border-orange-200">
-                    <p className="text-sm text-gray-700">{factor}</p>
+      {/* Section-Based Risk Analysis */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-orange-500" />
+            Risk Analysis by Section
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+            {sectionAnalysis.sectionBreakdown.map((section, index) => (
+              <div key={index} className="p-4 border rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-sm text-gray-900">{section.name}</h4>
+                  <Badge variant={getRiskBadgeVariant(section.riskLevel)} className="text-xs">
+                    {section.riskLevel}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="text-lg font-bold text-indigo-600">
+                    {section.score.toFixed(0)}/100
                   </div>
-                ))}
-                {riskAnalysis.identifiedFactors.length > 5 && (
-                  <p className="text-sm text-gray-500 text-center">
-                    +{riskAnalysis.identifiedFactors.length - 5} more factors
-                  </p>
-                )}
-              </div>
-            ) : (
-              <p className="text-sm text-gray-600">No significant risk factors identified.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Protective Factors */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-green-500" />
-              Protective Factors
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {riskAnalysis.protectiveFactors.length > 0 ? (
-              <div className="space-y-3">
-                {riskAnalysis.protectiveFactors.map((factor, index) => (
-                  <div key={index} className="p-3 bg-green-50 rounded-lg border-l-4 border-green-200">
-                    <p className="text-sm text-gray-700">{factor}</p>
+                  <div className="flex-1">
+                    <Progress value={section.score} className="h-2" />
                   </div>
-                ))}
+                </div>
+                <p className="text-xs text-gray-500">
+                  {section.factorCount} risk factor{section.factorCount !== 1 ? 's' : ''} identified
+                </p>
               </div>
-            ) : (
-              <p className="text-sm text-gray-600">Focus on building protective lifestyle habits.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Immediate Action Plan */}
+      {/* Section Summaries */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Heart className="h-5 w-5 text-pink-500" />
+            Detailed Section Analysis
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {Object.entries(sectionAnalysis.sectionSummaries).map(([sectionName, summary]) => (
+            <div key={sectionName} className="border-l-4 border-blue-200 pl-4">
+              <h3 className="font-semibold text-gray-900 mb-2">{sectionName}</h3>
+              <p className="text-sm text-gray-700 leading-relaxed">{summary}</p>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+      {/* Personalized Coaching Plan */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-500" />
-            Your Personalized Action Plan
+            Your Personalized Coaching Plan
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Immediate Priorities</h3>
+            <h3 className="font-semibold text-gray-900 mb-3">Primary Coaching Focus Areas</h3>
             <div className="grid gap-3">
-              {actionPlan.immediate.map((action, index) => (
+              {personalizedPlan.coachingFocus.map((focus, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                   <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mt-0.5">
                     {index + 1}
                   </div>
-                  <p className="text-sm text-gray-700 flex-1">{action}</p>
+                  <p className="text-sm text-gray-700 flex-1">{focus}</p>
                 </div>
               ))}
             </div>
@@ -211,12 +210,15 @@ export default function HealthReport({ report }: HealthReportProps) {
           <Separator />
 
           <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Ongoing Recommendations</h3>
-            <div className="grid md:grid-cols-2 gap-3">
-              {actionPlan.ongoing.slice(0, 6).map((action, index) => (
-                <div key={index} className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
-                  <Heart className="h-4 w-4 text-pink-500 mt-1 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">{action}</p>
+            <h3 className="font-semibold text-gray-900 mb-3">Follow-Up Timeline</h3>
+            <div className="grid gap-3">
+              {Object.entries(personalizedPlan.followUpTimeline).map(([timeframe, activity]) => (
+                <div key={timeframe} className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
+                  <div>
+                    <div className="font-medium text-sm text-gray-900 capitalize">{timeframe.replace('_', ' ')}</div>
+                    <p className="text-sm text-gray-700">{activity}</p>
+                  </div>
                 </div>
               ))}
             </div>
