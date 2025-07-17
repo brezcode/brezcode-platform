@@ -20,6 +20,8 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -75,7 +77,7 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
 
   // Email signup mutation
   const signupMutation = useMutation({
-    mutationFn: async (data: { email: string; password: string; quizAnswers: Record<string, any> }) => {
+    mutationFn: async (data: { firstName: string; lastName: string; email: string; password: string; quizAnswers: Record<string, any> }) => {
       try {
         const response = await apiRequest("POST", "/api/auth/signup", data);
         return response.json();
@@ -165,11 +167,38 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
           }
           
           signupMutation.mutate({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
             email: formData.email,
             password: formData.password,
             quizAnswers,
           });
         }} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <Input
+                id="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) => setFormData(prev => ({ ...prev, firstName: e.target.value }))}
+                placeholder="Enter your first name"
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <Input
+                id="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) => setFormData(prev => ({ ...prev, lastName: e.target.value }))}
+                placeholder="Enter your last name"
+                required
+              />
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="email">Email Address</Label>
             <Input

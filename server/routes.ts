@@ -54,6 +54,14 @@ declare module "express-session" {
   }
 }
 
+// Authentication middleware
+const isAuthenticated = (req: any, res: any, next: any) => {
+  if (req.session.userId && req.session.isAuthenticated) {
+    return next();
+  }
+  return res.status(401).json({ message: 'Authentication required' });
+};
+
 // Helper functions for sending notifications
 async function sendEmailVerification(email: string, code: string): Promise<void> {
   if (process.env.SENDGRID_API_KEY && process.env.FROM_EMAIL) {
@@ -386,6 +394,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
 
       const user = await storage.createUser({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         email: userData.email,
         password: hashedPassword,
         quizAnswers: userData.quizAnswers,
@@ -537,6 +547,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Generating report...');
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = 999; // Test user ID
+      reportData.createdAt = new Date().toISOString();
+      
+      // Add user information for display (will be replaced with real data after signup)
+      reportData.userInfo = {
+        firstName: "Demo",
+        lastName: "User"
+      };
 
       console.log('Report generated successfully');
       res.json({
@@ -546,6 +563,56 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error generating demo health report:', error);
       console.error('Error stack:', error.stack);
+      res.status(500).json({ 
+        success: false, 
+        message: 'Internal server error',
+        error: error.message 
+      });
+    }
+  });
+
+  // Authenticated report generation (after signup)
+  app.post('/api/reports/generate', isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      const { quizAnswers } = req.body;
+      const userId = req.session.userId;
+
+      if (!quizAnswers) {
+        return res.status(400).json({ 
+          success: false, 
+          message: 'Quiz answers are required' 
+        });
+      }
+
+      // Get user information
+      const user = await storage.getUser(userId!);
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          message: 'User not found' 
+        });
+      }
+
+      // Import the report generator
+      const { reportGenerator } = await import('./reportGenerator');
+
+      // Generate comprehensive report with user information
+      const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
+      reportData.userId = userId;
+      reportData.createdAt = new Date().toISOString();
+      
+      // Add real user information for display
+      reportData.userInfo = {
+        firstName: user.firstName,
+        lastName: user.lastName
+      };
+
+      res.json({
+        success: true,
+        report: reportData
+      });
+    } catch (error) {
+      console.error('Error generating authenticated health report:', error);
       res.status(500).json({ 
         success: false, 
         message: 'Internal server error',

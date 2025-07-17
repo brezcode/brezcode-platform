@@ -4,6 +4,8 @@ import { z } from "zod";
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   isEmailVerified: boolean("is_email_verified").default(false),
@@ -66,6 +68,8 @@ export const userNotifications = pgTable("user_notifications", {
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
+  firstName: true,
+  lastName: true,
   email: true,
   password: true,
   quizAnswers: true,
@@ -77,6 +81,8 @@ export const loginSchema = z.object({
 });
 
 export const signupSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
   quizAnswers: z.record(z.any()),

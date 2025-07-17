@@ -101,9 +101,11 @@ export default function HealthReport({ report }: HealthReportProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Your Breast Health Report</h1>
+          <h1 className="text-3xl font-bold text-gray-900">
+            {report.userInfo?.firstName ? `${report.userInfo.firstName}'s` : 'Your'} Breast Health Report
+          </h1>
           <p className="text-gray-600 mt-1">
-            Generated on {new Date(report.createdAt).toLocaleDateString()}
+            Generated on {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
           </p>
         </div>
         <Button variant="outline" className="flex items-center gap-2">

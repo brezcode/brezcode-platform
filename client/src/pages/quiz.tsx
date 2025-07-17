@@ -16,8 +16,9 @@ export default function QuizPage() {
     // Store answers in localStorage for report generation
     localStorage.setItem('brezcode_quiz_answers', JSON.stringify(answers));
     
-    // For test mode: Go directly to demo report page
-    setLocation('/demo-report');
+    // Start the proper flow: quiz → signup → report
+    setQuizCompleted(true);
+    setShowTransition(true);
   };
 
   const handleQuizClose = () => {
@@ -29,8 +30,8 @@ export default function QuizPage() {
   };
 
   const handleSignupComplete = () => {
-    // After successful signup, redirect to home page
-    setLocation('/');
+    // After successful signup, redirect to personalized report page
+    setLocation('/personalized-report');
   };
 
   // Show transition page after quiz completion
