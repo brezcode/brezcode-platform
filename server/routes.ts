@@ -571,6 +571,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // User feedback API for continuous learning
+  app.post('/api/feedback', requireAuth, async (req: any, res) => {
+    try {
+      const { submitUserFeedback } = await import('./userFeedback');
+      const result = await submitUserFeedback(req.user.id, req.body);
+      res.json(result);
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      res.status(500).json({ success: false, message: 'Failed to submit feedback' });
+    }
+  });
+
+  // Internationalization API
+  app.get('/api/translations/:languageCode', async (req, res) => {
+    try {
+      const { i18nManager } = await import('./internationalization');
+      const { languageCode } = req.params;
+      
+      // Get common translations (you could expand this to get all translations)
+      const commonKeys = [
+        'quiz.title', 'quiz.age.title', 'report.title', 'coaching.daily_tip',
+        'button.continue', 'button.submit'
+      ];
+      
+      const translations: Record<string, string> = {};
+      for (const key of commonKeys) {
+        translations[key] = await i18nManager.getTranslation(key, languageCode);
+      }
+      
+      res.json(translations);
+    } catch (error) {
+      console.error('Error fetching translations:', error);
+      res.status(500).json({ error: 'Failed to fetch translations' });
+    }
+  });
+
+  // Set user language preference
+  app.post('/api/user/language', requireAuth, async (req: any, res) => {
+    try {
+      const { i18nManager } = await import('./internationalization');
+      const { languageCode } = req.body;
+      
+      await i18nManager.setUserLanguage(req.user.id, languageCode);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error setting user language:', error);
+      res.status(500).json({ success: false, message: 'Failed to set language' });
+    }
+  });
+
+  // Daily coaching API
+  app.get('/api/coaching/daily', requireAuth, async (req: any, res) => {
+    try {
+      const { coachingEngine } = await import('./coachingEngine');
+      const { i18nManager } = await import('./internationalization');
+      
+      const languageCode = await i18nManager.getUserLanguage(req.user.id);
+      const coaching = await coachingEngine.getPersonalizedCoaching(
+        req.user.id,
+        req.user.profile || 'general',
+        languageCode
+      );
+      
+      res.json(coaching);
+    } catch (error) {
+      console.error('Error fetching daily coaching:', error);
+      res.status(500).json({ error: 'Failed to fetch coaching content' });
+    }
+  });
+
+  // Record daily interaction
+  app.post('/api/coaching/interaction', requireAuth, async (req: any, res) => {
+    try {
+      const { coachingEngine } = await import('./coachingEngine');
+      await coachingEngine.recordDailyInteraction(req.user.id, req.body);
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error recording interaction:', error);
+      res.status(500).json({ success: false, message: 'Failed to record interaction' });
+    }
+  });
+
   // Authenticated report generation (after signup)
   app.post('/api/reports/generate', isAuthenticated, async (req: Request, res: Response) => {
     try {

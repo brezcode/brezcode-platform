@@ -1,4 +1,6 @@
 import type { HealthReport, InsertHealthReport } from "@shared/schema";
+import { enhancedAI } from "./enhancedAI";
+import { knowledgeBaseManager } from "./knowledgeBase";
 
 // Risk factor definitions based on BC Assessment Quiz
 interface RiskFactor {
@@ -19,27 +21,29 @@ interface ProfileCharacteristics {
   preventionPriorities: string[];
 }
 
-// SECTION 1: DEMOGRAPHIC FACTORS
+// SECTION 1: DEMOGRAPHIC FACTORS (CORRECTED - Age 30 is NOT high risk)
 const SECTION1_FACTORS: RiskFactor[] = [
-  // Q1: Age (now included per CSV)
-  { question: "age", answer: "50-59", relativeRisk: 1.14, category: "demographic", explanation: "Age 50-59: RR = 1.14" },
-  { question: "age", answer: "60-69", relativeRisk: 1.67, category: "demographic", explanation: "Age 60-69: RR = 1.67" },
-  { question: "age", answer: "70+", relativeRisk: 3.33, category: "demographic", explanation: "Age 70+: RR = 3.33" },
+  // Q1: Age - CORRECTED per evidence-based knowledge
+  // Age 30 is NOT in an age group where breast cancer incidence increases significantly
+  { question: "age", answer: "50-59", relativeRisk: 1.14, category: "demographic", explanation: "Age 50-59: Moderate increase in risk (RR = 1.14)" },
+  { question: "age", answer: "60-69", relativeRisk: 1.67, category: "demographic", explanation: "Age 60-69: Notable increase in risk (RR = 1.67)" },
+  { question: "age", answer: "70+", relativeRisk: 3.33, category: "demographic", explanation: "Age 70+: Significantly higher risk (RR = 3.33)" },
+  // Ages 20-49 have baseline risk (RR = 1.0)
   // Q3: Ethnicity (now included per CSV)
-  { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "demographic", explanation: "White (non-Hispanic): RR = 1.64 vs Asian" },
-  { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "demographic", explanation: "Black: RR = 2.25 vs Asian" },
-  { question: "ethnicity", answer: "American Indian", relativeRisk: 1.74, category: "demographic", explanation: "American Indian: RR = 1.74 vs Asian" },
-  { question: "ethnicity", answer: "Hispanic/Latino", relativeRisk: 1.15, category: "demographic", explanation: "Hispanic/Latino: RR = 1.15 vs Asian" },
+  { question: "ethnicity", answer: "White (non-Hispanic)", relativeRisk: 1.64, category: "demographic", explanation: "White (non-Hispanic): Higher risk vs Asian baseline (RR = 1.64)" },
+  { question: "ethnicity", answer: "Black", relativeRisk: 2.25, category: "demographic", explanation: "Black: Higher risk vs Asian baseline (RR = 2.25)" },
+  { question: "ethnicity", answer: "American Indian", relativeRisk: 1.74, category: "demographic", explanation: "American Indian: Higher risk vs Asian baseline (RR = 1.74)" },
+  { question: "ethnicity", answer: "Hispanic/Latino", relativeRisk: 1.15, category: "demographic", explanation: "Hispanic/Latino: Slightly higher risk vs Asian baseline (RR = 1.15)" },
 ];
 
-// SECTION 2: FAMILY HISTORY AND GENETICS
+// SECTION 2: FAMILY HISTORY AND GENETICS (CORRECTED - Most BC patients have NO family history)
 const SECTION2_FACTORS: RiskFactor[] = [
-  // Q4: Family History
-  { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
-  { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history: RR = 1.5" },
-  { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history: RR = 2.0" },
+  // Q4: Family History - CRITICAL CORRECTION: 85% of BC patients have NO family history
+  { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history increases risk (RR = 2.0), but remember: 85% of breast cancer patients have NO family history" },
+  { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history slightly increases risk (RR = 1.5)" },
+  { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "Multiple family history increases risk (RR = 2.0)" },
   // Q5: BRCA Testing
-  { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 mutation: RR = 1.7" },
+  { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 mutation increases risk (RR = 1.7)" },
 ];
 
 // SECTION 3: REPRODUCTIVE AND HORMONAL FACTORS
@@ -64,14 +68,14 @@ const SECTION4_FACTORS: RiskFactor[] = [
   // Symptoms are for screening recommendations, not risk calculation
 ];
 
-// SECTION 5: SCREENING AND PRECANCEROUS RISK FACTORS
+// SECTION 5: SCREENING AND PRECANCEROUS RISK FACTORS (CORRECTED - No assumptions about density)
 const SECTION5_FACTORS: RiskFactor[] = [
-  // Q18: Dense Breast
-  { question: "dense_breast", answer: "Yes", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue: RR = 2.0" },
+  // Q18: Dense Breast - CORRECTED: Only assess if screening was done
+  { question: "dense_breast", answer: "Yes", relativeRisk: 2.0, category: "medical", explanation: "Dense breast tissue increases risk (RR = 2.0) - determined through mammography screening" },
   // Q19: Benign/Precancerous Conditions
-  { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia: RR = 4.5" },
-  { question: "benign_condition", answer: "Yes, LCIS", relativeRisk: 2.75, category: "medical", explanation: "LCIS: RR = 2.75" },
-  { question: "benign_condition", answer: "Yes, complex/complicated cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts: RR = 1.25" },
+  { question: "benign_condition", answer: "Yes, Atypical Hyperplasia (ADH/ALH)", relativeRisk: 4.5, category: "medical", explanation: "Atypical hyperplasia significantly increases risk (RR = 4.5)" },
+  { question: "benign_condition", answer: "Yes, LCIS", relativeRisk: 2.75, category: "medical", explanation: "LCIS increases risk (RR = 2.75)" },
+  { question: "benign_condition", answer: "Yes, complex/complicated cysts", relativeRisk: 1.25, category: "medical", explanation: "Complex cysts slightly increase risk (RR = 1.25)" },
   // Q20: Cancer History
   { question: "cancer_history", answer: "Yes, I am a Breast Cancer Patient currently undergoing treatment", relativeRisk: 4.5, category: "medical", explanation: "Current cancer treatment: RR = 4.5" },
   { question: "cancer_history", answer: "Yes, I am a Breast Cancer Survivor taking medication to lower the risk of recurrence", relativeRisk: 4.5, category: "medical", explanation: "Cancer survivor: RR = 4.5" },
@@ -295,28 +299,42 @@ export class BreastHealthReportGenerator {
         const ethnicity = quizAnswers.ethnicity || 'not specified';
         const isPostmenopausal = quizAnswers.menopause?.includes('Yes');
         
-        return `As a ${age}-year-old ${ethnicity} woman living in ${country}, you are in an age group where breast cancer incidence increases significantly. ${ethnicity.includes('White') ? 'White women have higher breast cancer risk compared to Asian women, with higher overall incidence rates.' : ''} 
+        // CORRECTED: Age 30 is NOT in an age group where breast cancer incidence increases significantly
+        let ageRiskDescription = '';
+        if (age < 40) {
+          ageRiskDescription = 'baseline risk for breast cancer. Breast cancer incidence does not increase significantly until after age 50';
+        } else if (age < 50) {
+          ageRiskDescription = 'moderate risk - approaching the age when breast cancer incidence begins to increase';
+        } else if (age < 60) {
+          ageRiskDescription = 'moderately elevated risk - breast cancer incidence increases notably after age 50';
+        } else if (age < 70) {
+          ageRiskDescription = 'elevated risk - breast cancer incidence increases significantly in this age group';
+        } else {
+          ageRiskDescription = 'highest risk - breast cancer incidence is highest in women over 70';
+        }
+        
+        return `As a ${age}-year-old ${ethnicity} woman living in ${country}, you are in an age group with ${ageRiskDescription}. ${ethnicity.includes('White') ? 'White women have higher breast cancer risk compared to Asian women, with higher overall incidence rates.' : ''} 
 
-At ${age}, regular annual mammograms and clinical breast exams are essential for early detection. ${isPostmenopausal ? 'As you are postmenopausal, we recommend maintaining your body weight below BMI 30, as excess weight after menopause increases estrogen production and breast cancer risk.' : ''} Continue with consistent screening schedules and stay informed about any family history changes that might affect your risk profile.
+At ${age}, ${age >= 40 ? 'regular annual mammograms and clinical breast exams are essential for early detection' : 'focus on breast awareness and discuss screening plans with your healthcare provider as you approach age 40'}. ${isPostmenopausal ? 'As you are postmenopausal, we recommend maintaining your body weight below BMI 30, as excess weight after menopause increases estrogen production and breast cancer risk.' : ''} Continue with consistent screening schedules and stay informed about any family history changes that might affect your risk profile.
 
 While demographic factors like age and ethnicity cannot be changed, maintaining a healthy lifestyle becomes increasingly important as we age. Focus on regular exercise, balanced nutrition, and stress management to support your overall health and potentially reduce risk factors within your control.`;
         
       case 'Genetic':
         if (!hasFactors) {
-          return `Great news about your family history! Your health score here is ${sectionData.score}/100, which means you don't have major genetic risk factors. This is really encouraging - about 85% of women who get breast cancer don't have a family history of it either.
+          return `IMPORTANT: Even though you have no family history of breast cancer, you still need to be alert! This is a critical fact: 85% of breast cancer patients also have NO family history. Having no family history does NOT mean you are safe from breast cancer. Your health score here is ${sectionData.score}/100.
 
-Even though your genes look good, it's still important to take care of yourself. Keep living a healthy lifestyle with regular exercise, limit alcohol, and maintain a healthy weight. These habits are powerful tools for preventing many types of cancer.
+Stay vigilant with regular screening and breast awareness. Most breast cancers occur in women with no family history, so don't let this give you false security. Continue with recommended screening schedules and maintain healthy lifestyle habits including regular exercise, limited alcohol consumption, and maintaining a healthy weight.
 
-It's worth keeping track of your family's health history and updating it as you learn new information. If anything changes in your family (like a relative being diagnosed), let your doctor know. You might want to talk to a genetic counselor if you ever have questions about your family history. For now though, you can feel confident that your genetics are working in your favor!`
+Keep tracking your family's health history and update it as new information becomes available. If anything changes in your family (like a relative being diagnosed), inform your doctor immediately. Even without family history, you should still discuss your personal risk factors with your healthcare provider to determine the best screening schedule for you.`
         } else {
           const hasBRCA = quizAnswers.brca_test?.includes('BRCA');
           const familyHistory = quizAnswers.family_history;
           
-          return `As you have first-degree relative with breast cancer and positive BRCA1/2 test results, this is considered very high risk requiring intensive surveillance and risk reduction strategies. Your health score for this section is ${sectionData.score}/100.
+          return `You have genetic risk factors including ${familyHistory?.includes('first-degree') ? 'first-degree family history' : 'family history'} of breast cancer${hasBRCA ? ' and positive BRCA1/2 test results' : ''}. This requires enhanced surveillance and risk reduction strategies. Your health score for this section is ${sectionData.score}/100.
 
-With your positive BRCA mutation, you have significantly elevated lifetime risk and should work closely with a high-risk breast clinic for specialized care including enhanced screening protocols with both mammography and breast MRI starting at age 25-30. Your family history combined with genetic mutation creates a hereditary cancer syndrome requiring comprehensive management.
+${hasBRCA ? 'With your positive BRCA mutation, you have significantly elevated lifetime risk and should work closely with a high-risk breast clinic for specialized care including enhanced screening protocols with both mammography and breast MRI starting at age 25-30.' : 'Your family history increases your risk and warrants discussion with your healthcare provider about enhanced screening protocols.'}
 
-Risk reduction options include prophylactic medications, enhanced surveillance, and in some cases surgical prevention strategies. Discuss with your oncology team about chemoprevention options like tamoxifen or aromatase inhibitors. Share this genetic information with your female relatives so they can also receive appropriate risk assessment and genetic counseling.`
+Risk reduction options include enhanced surveillance, lifestyle modifications, and in some cases medications or surgical prevention strategies. Discuss with your healthcare team about chemoprevention options and appropriate screening schedules. Share this genetic information with your female relatives so they can also receive appropriate risk assessment and genetic counseling.`
         }
         
       case 'Hormonal':
@@ -347,10 +365,16 @@ Most breast cancers are estrogen-driven, making hormonal balance crucial for pre
         const denseBreast = quizAnswers.dense_breast;
         const benignCondition = quizAnswers.benign_condition;
         const mammogramFreq = quizAnswers.mammogram_frequency;
+        const hasScreening = mammogramFreq && !mammogramFreq.includes('Never');
         
-        return `You have ${denseBreast?.includes('Yes') ? 'dense breast tissue' : 'average breast density'}${benignCondition?.includes('Yes') ? ` and ${benignCondition?.toLowerCase().replace('yes, ', '')}` : ''} from your screening results, and these findings necessitate enhanced surveillance protocols beyond standard screening guidelines. At age ${age}, you should maintain annual mammograms with consideration for supplemental breast MRI due to your high-risk findings. Dense breast tissue can mask tumors on standard mammography, making additional imaging modalities essential for optimal detection. ${benignCondition?.includes('Atypical') ? 'Your atypical hyperplasia represents a high-risk lesion requiring discussion of chemoprevention options with your oncologist, including medications like tamoxifen or aromatase inhibitors.' : ''} 
+        // CORRECTED: Never assume breast density without screening
+        if (!hasScreening) {
+          return `You have not had mammogram screening, so your breast density is unknown. At age ${age}, you should discuss screening recommendations with your healthcare provider. Regular screening is essential for early detection, especially as breast cancer risk increases with age. ${benignCondition?.includes('Yes') ? `Your history of ${benignCondition?.toLowerCase().replace('yes, ', '')} may warrant earlier or more frequent screening.` : ''} Schedule a consultation with your healthcare provider to establish an appropriate screening schedule based on your individual risk factors. Early detection through screening significantly improves treatment outcomes and survival rates.`;
+        }
+        
+        return `Based on your screening history, you have ${denseBreast?.includes('Yes') ? 'dense breast tissue' : 'breast tissue of average density'}${benignCondition?.includes('Yes') ? ` and ${benignCondition?.toLowerCase().replace('yes, ', '')}` : ''} from your screening results. ${denseBreast?.includes('Yes') ? 'Dense breast tissue can mask tumors on standard mammography, making additional imaging modalities important for optimal detection.' : ''} At age ${age}, maintain regular mammograms as recommended by your healthcare provider. ${benignCondition?.includes('Atypical') ? 'Your atypical hyperplasia represents a high-risk lesion requiring discussion of chemoprevention options with your oncologist.' : ''} 
 
-Maintain strict adherence to your enhanced screening schedule and ensure your imaging is performed at centers with expertise in high-risk breast surveillance. Partner closely with your healthcare team to develop a personalized screening protocol that optimizes early detection while considering your individual risk factors and preferences.`;
+Maintain adherence to your screening schedule and ensure your imaging is performed at centers with expertise in breast surveillance. Partner closely with your healthcare team to develop a personalized screening protocol.`;
         
       case 'Lifestyle':
         const diet = quizAnswers.western_diet;

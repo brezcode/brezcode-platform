@@ -110,10 +110,38 @@ This is a subscription-based web application that provides AI-powered breast hea
 - `SENDGRID_API_KEY`: SendGrid API key for email verification
 - `FROM_EMAIL`: Verified sender email address for verification emails
 
+## International Expansion & Scalability
+
+### Database Architecture
+- **Current Database**: PostgreSQL (Neon Serverless) - Excellent for international deployment
+- **ORM**: Drizzle ORM with full TypeScript support
+- **Advantages**: Unicode support, JSONB for flexible content, serverless scaling
+- **Multi-language support**: Built-in with translation tables and user preferences
+
+### Internationalization System
+- **Languages Supported**: English, Chinese (Simplified/Traditional), Spanish, French, German, Japanese, Korean
+- **Translation Management**: Database-driven with caching for performance
+- **User Preferences**: Language, timezone, date format, notification frequency
+- **Content Localization**: Quiz questions, reports, coaching tips all translatable
+
+### Daily Coaching Engine
+- **Personalized Content**: AI-generated tips based on user profile and progress
+- **Engagement Tracking**: Streak counts, interaction scoring, milestone celebrations
+- **Multi-channel Delivery**: Email, SMS, push notifications (time-zone aware)
+- **Analytics**: User engagement metrics, health improvement tracking
+
+### Production Hosting Recommendations
+- **Recommended**: Vercel + Neon PostgreSQL ($39/month for production)
+- **Alternative**: Railway (simpler deployment, similar pricing)
+- **Enterprise**: AWS/Azure multi-region for high-scale deployment
+- **Performance**: Global CDN, edge functions, database connection pooling
+
 ## Changelog
 
 ```
 Changelog:
+- January 17, 2025. INTERNATIONAL EXPANSION: Restructured for multi-language support with 8 languages (EN, ZH-CN, ZH-TW, ES, FR, DE, JA, KO), implemented daily coaching engine with personalized AI content, enhanced database schema for user preferences and analytics, added production hosting recommendations for global deployment, created internationalization and coaching API endpoints
+- January 17, 2025. MAJOR UPGRADE: Implemented evidence-based medical accuracy system with OpenAI GPT-4o - fixed critical content errors (Age 30 NOT high risk, 85% BC patients have no family history, no breast density assumptions without screening), created comprehensive knowledge base with user feedback system, enhanced AI with evidence-based prompting from uploaded reference materials, all medical content now validated against "Code Chapter 1 to 14" medical reference book
 - January 17, 2025. Fixed quiz completion flow - removed incorrect redirect from QuizTransition component that was bypassing signup flow and causing 401 errors, now properly flows from quiz → transition → signup → report
 - January 17, 2025. Updated mammogram screening question logic - separated "Never or irregularly" into "Never" and "Irregularly" options, added conditional logic to skip dense breast tissue, benign condition, and cancer history questions when user selects "Never" for mammogram screening
 - January 17, 2025. Removed "Not Yet" option from menstrual age question - since users are aged 20-80, all participants must have already had their first menstrual period, making "Not Yet" option inappropriate for the target demographic

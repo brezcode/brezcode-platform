@@ -37,6 +37,15 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize knowledge base with evidence-based medical facts
+  try {
+    const { knowledgeBaseManager } = await import('./knowledgeBase');
+    await knowledgeBaseManager.initializeKnowledgeBase();
+    console.log('✅ Knowledge base initialized with evidence-based medical facts');
+  } catch (error) {
+    console.error('❌ Knowledge base initialization failed:', error);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
