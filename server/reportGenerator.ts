@@ -219,25 +219,27 @@ export class BreastHealthReportGenerator {
       totalMultiplier *= sectionMultiplier;
     });
     
-    // Calculate overall total health score
-    const totalFinalScore = Math.sqrt(totalMultiplier);
-    const overallHealthScore = this.convertToHealthScore(totalFinalScore);
+    // Calculate controllable health score (only Symptom + Lifestyle sections)
+    const controllableMultiplier = (sectionScores['Symptom']?.score ? (100 / sectionScores['Symptom'].score) : 1.0) * 
+                                   (sectionScores['Lifestyle']?.score ? (100 / sectionScores['Lifestyle'].score) : 1.0);
+    const controllableFinalScore = Math.sqrt(controllableMultiplier);
+    const controllableHealthScore = this.convertToHealthScore(controllableFinalScore);
     
-    calculationLog.push(`\n=== OVERALL TOTAL ===`);
-    calculationLog.push(`Combined multiplier: ${totalMultiplier.toFixed(2)}`);
-    calculationLog.push(`Total final score: √${totalMultiplier.toFixed(2)} = ${totalFinalScore.toFixed(2)} → ${overallHealthScore.toFixed(1)}/100 health score`);
+    calculationLog.push(`\n=== CONTROLLABLE HEALTH SCORE (Symptom + Lifestyle Only) ===`);
+    calculationLog.push(`Controllable multiplier: ${controllableMultiplier.toFixed(2)}`);
+    calculationLog.push(`Controllable final score: √${controllableMultiplier.toFixed(2)} = ${controllableFinalScore.toFixed(2)} → ${controllableHealthScore.toFixed(1)}/100 health score`);
     
     // Log the full calculation for debugging
     console.log('\n=== 6-SECTION HEALTH SCORE CALCULATION ===');
     console.log('Health Score: Higher = Healthier | 100 = Perfect Health | Lower = More Risk Factors Present');
     calculationLog.forEach(log => console.log(log.replace('RISK SCORE', 'HEALTH SCORE')));
-    console.log(`Final Health Score: ${Math.round(overallHealthScore * 10) / 10}/100 (Higher = Healthier)`);
+    console.log(`Controllable Health Score: ${Math.round(controllableHealthScore * 10) / 10}/100 (Higher = Healthier)`);
     console.log('==========================================\n');
     
     return {
       sectionScores: sectionScores,
-      totalScore: Math.round(overallHealthScore * 10) / 10,
-      overallHealthCategory: this.categorizeHealth(overallHealthScore)
+      totalScore: Math.round(controllableHealthScore * 10) / 10,
+      overallHealthCategory: this.categorizeHealth(controllableHealthScore)
     };
   }
 
@@ -266,17 +268,14 @@ export class BreastHealthReportGenerator {
     
     switch (sectionName) {
       case 'Demographic':
-        const isYoung = age < 40;
-        const isMiddleAge = age >= 40 && age < 60;
-        const isOlder = age >= 60;
+        const ethnicity = quizAnswers.ethnicity || 'not specified';
+        const isPostmenopausal = quizAnswers.menopause?.includes('Yes');
         
-        return `Hi there! As a ${age}-year-old woman living in ${country}, your health score for this section is ${sectionData.score}/100. ${hasFactors ? `The factors we're watching include: ${sectionData.factors.join(', ')}.` : 'Great news - no major demographic concerns here!'} 
+        return `As a ${age}-year-old ${ethnicity} woman living in ${country}, you are in an age group where breast cancer incidence increases significantly. ${hasFactors ? `Your demographic factors include: ${sectionData.factors.join(', ')}.` : 'Your demographic profile shows standard risk factors for your age group.'} 
 
-${isYoung ? `At your age, breast cancer is less common, but it's still smart to start good habits now. Begin doing monthly breast self-checks to get familiar with how your breasts normally feel. You don't need mammograms yet unless you have a strong family history.` : 
-isMiddleAge ? `You're at an age where regular screening becomes really important. If you haven't started mammograms yet, now's the time to begin (around age 40-50). Keep up with yearly mammograms and clinical breast exams.` :
-`At ${age}, you're in an age group where breast cancer becomes more common, but don't worry - regular screening catches most cancers early when they're very treatable. Keep up with your mammograms every 1-2 years as your doctor recommends.`}
+At ${age}, regular annual mammograms and clinical breast exams are essential for early detection. ${isPostmenopausal ? 'As you are postmenopausal, we recommend maintaining your body weight below BMI 30, as excess weight after menopause increases estrogen production and breast cancer risk.' : ''} Continue with consistent screening schedules and stay informed about any family history changes that might affect your risk profile.
 
-The good news is that no matter your age or background, you have real power to protect your health. Eat colorful fruits and vegetables, stay active, and keep a healthy weight. These simple steps can make a big difference in your overall health and may help reduce your risk.`;
+While demographic factors like age and ethnicity cannot be changed, maintaining a healthy lifestyle becomes increasingly important as we age. Focus on regular exercise, balanced nutrition, and stress management to support your overall health and potentially reduce risk factors within your control.`;
         
       case 'Genetic':
         if (!hasFactors) {
@@ -286,37 +285,60 @@ Even though your genes look good, it's still important to take care of yourself.
 
 It's worth keeping track of your family's health history and updating it as you learn new information. If anything changes in your family (like a relative being diagnosed), let your doctor know. You might want to talk to a genetic counselor if you ever have questions about your family history. For now though, you can feel confident that your genetics are working in your favor!`
         } else {
-          return `Your family history shows some important factors we need to watch: ${sectionData.factors.join(', ')}. Your health score for this section is ${sectionData.score}/100. I know this might feel scary, but having this knowledge is actually a gift - it means you can take action to protect yourself.
+          const hasBRCA = quizAnswers.brca_test?.includes('BRCA');
+          const familyHistory = quizAnswers.family_history;
+          
+          return `As you have ${familyHistory?.toLowerCase()} and ${hasBRCA ? 'positive BRCA1/2 test results' : 'genetic risk factors'}, this is considered very high risk requiring intensive surveillance and risk reduction strategies. Your health score for this section is ${sectionData.score}/100.
 
-Because of your family history, you'll likely need to start screening earlier than other women. ${age < 40 ? 'Even though you\'re young, talk to your doctor about starting mammograms 10 years before the age your relative was diagnosed, or at age 30-35, whichever comes first.' : age < 50 ? 'You may need mammograms yearly instead of every other year.' : 'Make sure you\'re getting mammograms yearly, and ask your doctor if you need additional screening like breast MRI.'}
+${hasBRCA ? 'With your positive BRCA mutation, you have significantly elevated lifetime risk and should work closely with a high-risk breast clinic for specialized care including enhanced screening protocols with both mammography and breast MRI starting at age 25-30.' : 'Your family history indicates hereditary risk patterns that warrant genetic counseling and consideration of enhanced screening protocols.'}
 
-Consider talking to a genetic counselor about BRCA testing if you haven't already. This isn't something to fear - it's information that can help you make the best choices for your health. Share this information with your sisters, daughters, and other female relatives too, so they can also be proactive about their health.`
+Risk reduction options include prophylactic medications, enhanced surveillance, and in some cases surgical prevention strategies. Discuss with your oncology team about chemoprevention options like tamoxifen or aromatase inhibitors. Share this genetic information with your female relatives so they can also receive appropriate risk assessment and genetic counseling.`
         }
         
       case 'Hormonal':
-        return `Your hormonal risk profile shows a score of ${sectionData.score}/100. ${hasFactors ? `Key factors affecting your estrogen exposure include: ${sectionData.factors.join(', ')}.` : 'Your hormonal profile shows minimal risk factors.'} Most breast cancers are estrogen-driven, making hormonal balance crucial for prevention. ${hasFactors ? 'Your current factors suggest prolonged or elevated estrogen exposure, which increases cellular proliferation in breast tissue.' : 'Your hormonal profile is relatively favorable for breast cancer prevention.'} To optimize hormonal health, maintain a healthy weight through balanced nutrition and regular exercise, as fat tissue produces estrogen. Limit alcohol consumption, which can increase estrogen levels and interfere with hormone metabolism. Consider discussing hormone replacement therapy risks and benefits with your healthcare provider if applicable. Include cruciferous vegetables (broccoli, kale, cabbage) in your diet, as they support healthy estrogen metabolism. Manage stress through meditation, yoga, or other relaxation techniques, as chronic stress can disrupt hormonal balance. Ensure adequate vitamin D levels, which may help regulate cell growth. Regular sleep patterns support healthy hormone production and regulation.`;
+        const menarcheAge = quizAnswers.menstrual_age;
+        const pregnancy = quizAnswers.pregnancy_age;
+        const oralContraceptives = quizAnswers.oral_contraceptives;
+        const menopause = quizAnswers.menopause;
+        const hrt = quizAnswers.hrt;
+        const bmi = parseFloat(quizAnswers.bmi || "25");
+        
+        return `Your hormonal risk profile shows a score of ${sectionData.score}/100. ${menarcheAge?.includes('Before 12') ? 'You experienced early menarche which increases lifetime estrogen exposure.' : ''} ${pregnancy?.includes('Never') ? 'Never having a full-term pregnancy increases estrogen exposure as pregnancy provides protective hormonal changes.' : ''} ${oralContraceptives?.includes('Yes') ? 'Current oral contraceptive use provides additional estrogen exposure.' : ''} ${menopause?.includes('55 or older') ? 'Late menopause extends your reproductive years and estrogen exposure.' : ''} ${hrt?.includes('Yes') ? 'Hormone replacement therapy adds additional estrogen exposure during postmenopausal years.' : ''} ${bmi >= 30 ? 'Your elevated BMI contributes to increased estrogen production from fat tissue, particularly important after menopause.' : ''}
+
+Most breast cancers are estrogen-driven, making hormonal balance crucial for prevention. To optimize hormonal health, maintain a healthy weight through balanced nutrition and regular exercise, as fat tissue produces estrogen. Limit alcohol consumption, which can increase estrogen levels and interfere with hormone metabolism. Include cruciferous vegetables (broccoli, kale, cabbage) in your diet, as they support healthy estrogen metabolism. Manage stress through meditation, yoga, or other relaxation techniques, as chronic stress can disrupt hormonal balance.`;
         
       case 'Symptom':
-        const hasSymptoms = quizAnswers.breast_symptoms !== "No, I don't have any symptoms";
+        const symptoms = quizAnswers.breast_symptoms;
+        const lumpCharacteristics = quizAnswers.lump_characteristics;
+        const hasSymptoms = symptoms !== "No, I don't have any symptoms";
+        
         if (hasSymptoms) {
-          return `You've reported breast symptoms that require attention and monitoring. While most breast symptoms are benign, any persistent changes warrant professional evaluation. We strongly recommend monthly breast self-examinations 7 days after your menstrual period (or on the same date each month if post-menopausal) to familiarize yourself with normal tissue patterns and detect changes early. Perform self-massage using gentle circular motions, which can help reduce symptoms like tenderness and improve lymphatic drainage. Schedule a clinical breast exam with your healthcare provider to discuss your symptoms and determine if additional imaging or evaluation is needed. Track your symptoms in relation to your menstrual cycle, as many breast changes are hormone-related and cyclical. Wear a well-fitted, supportive bra to reduce discomfort. Apply warm or cool compresses as needed for pain relief. Limit caffeine and salt intake, which may worsen breast tenderness. Most importantly, trust your body awareness – you know your body best, and any persistent or concerning changes should be evaluated promptly by a healthcare professional for peace of mind and appropriate care.`;
+          return `You have reported ${symptoms?.toLowerCase()}${lumpCharacteristics ? ` with characteristics of ${lumpCharacteristics?.toLowerCase()}` : ''}. While most breast symptoms are benign, any persistent changes warrant immediate professional evaluation. We recommend therapeutic treatment including regular self-massage using gentle circular motions to improve lymphatic drainage and reduce discomfort. Consider dietary supplements such as evening primrose oil, vitamin E, and omega-3 fatty acids which may help reduce breast tenderness and inflammation. Follow our daily coaching plan to improve your health score through targeted lifestyle modifications. Schedule immediate clinical evaluation with your healthcare provider for proper diagnostic workup. Track your symptoms carefully and maintain detailed records for your medical team. Most importantly, any new or changing breast symptoms require prompt medical attention for appropriate diagnosis and treatment planning.`;
         } else {
-          return `Excellent news – you haven't reported any current breast symptoms. This provides a wonderful baseline for ongoing breast health monitoring. Continue performing monthly breast self-examinations 7 days after your period to maintain familiarity with your normal breast tissue patterns. Even without symptoms, self-massage during these examinations can promote lymphatic drainage and help you stay connected with your breast health. Regular self-exams are your first line of defense for early detection of any future changes. Maintain this symptom-free status through healthy lifestyle choices including regular exercise, balanced nutrition, adequate hydration, and stress management. Schedule annual clinical breast exams with your healthcare provider as part of your preventive care routine. Remember that breast tissue naturally changes throughout your menstrual cycle and life stages, so familiarizing yourself with these normal variations is key. If you ever notice new lumps, persistent pain, nipple discharge, or changes in size or shape, don't hesitate to seek professional evaluation. Your current symptom-free status is an asset – use it as motivation to maintain excellent breast health practices and stay vigilant about any future changes that may arise.`;
+          return `You have not reported any current breast symptoms, which provides an excellent baseline for ongoing monitoring. Continue performing monthly breast self-examinations to maintain familiarity with your normal breast tissue patterns. Regular self-massage during examinations can promote lymphatic drainage and help maintain breast health. Follow our daily coaching plan to maintain your symptom-free status through optimal lifestyle choices. Schedule annual clinical breast exams with your healthcare provider as part of your preventive care routine. If you ever notice new lumps, persistent pain, nipple discharge, or changes in size or shape, seek immediate professional evaluation.`;
         }
         
       case 'Screening':
-        const hasHighRiskScreeningFactors = sectionData.factors.some(f => f.includes('Dense breast') || f.includes('Atypical') || f.includes('LCIS') || f.includes('cancer'));
-        if (hasHighRiskScreeningFactors) {
-          return `Your screening risk assessment shows a score of ${sectionData.score}/100 with significant factors requiring enhanced surveillance: ${sectionData.factors.join(', ')}. These findings necessitate a more intensive screening protocol than standard guidelines. We recommend annual mammograms starting earlier than age 40, potentially supplemented with breast MRI for enhanced detection capabilities. Dense breast tissue can mask tumors on mammograms, making additional imaging modalities crucial. If you have precancerous conditions like atypical hyperplasia or LCIS, discuss chemoprevention options with your oncologist. For cancer patients or survivors, maintaining optimal health through nutrition, exercise, and stress management becomes even more critical for preventing recurrence and supporting overall wellness. Regular follow-up appointments and adherence to your medical team's recommendations are essential. Stay current with emerging screening technologies and consider participating in clinical trials if appropriate. Your elevated screening risk profile requires vigilance, but modern surveillance methods provide excellent opportunities for early detection and successful intervention. Partner closely with your healthcare team to develop a personalized screening schedule that balances thorough monitoring with quality of life considerations.`;
-        } else {
-          return `Your screening risk profile shows a score of ${sectionData.score}/100 with standard risk factors. This suggests you can follow conventional screening guidelines while remaining vigilant about breast health. Begin annual mammograms at age 40, or earlier if recommended by your healthcare provider based on other risk factors. Perform monthly breast self-examinations consistently, as you are your own best advocate for detecting changes. Schedule annual clinical breast exams with your healthcare provider as part of your routine preventive care. Even with standard screening risk, maintain awareness of breast cancer symptoms and don't hesitate to report any concerns between scheduled screenings. Stay informed about advances in screening technology and discuss with your provider whether you might benefit from 3D mammography or other enhanced imaging techniques. Maintain detailed records of your screening results and share any family history changes with your healthcare team. While your current screening risk is manageable with standard protocols, consistency in screening adherence is crucial for early detection. Remember that guidelines may evolve based on new research, so stay connected with your healthcare team for the most current recommendations tailored to your individual risk profile.`;
-        }
+        const denseBreast = quizAnswers.dense_breast;
+        const benignCondition = quizAnswers.benign_condition;
+        const mammogramFreq = quizAnswers.mammogram_frequency;
+        
+        return `You have ${denseBreast?.includes('Yes') ? 'dense breast tissue' : 'average breast density'}${benignCondition?.includes('Yes') ? ` and ${benignCondition?.toLowerCase().replace('yes, ', '')}` : ''} from your screening results, and these findings necessitate enhanced surveillance protocols beyond standard screening guidelines. At age ${age}, you should maintain annual mammograms with consideration for supplemental breast MRI due to your high-risk findings. Dense breast tissue can mask tumors on standard mammography, making additional imaging modalities essential for optimal detection. ${benignCondition?.includes('Atypical') ? 'Your atypical hyperplasia represents a high-risk lesion requiring discussion of chemoprevention options with your oncologist, including medications like tamoxifen or aromatase inhibitors.' : ''} 
+
+Maintain strict adherence to your enhanced screening schedule and ensure your imaging is performed at centers with expertise in high-risk breast surveillance. Partner closely with your healthcare team to develop a personalized screening protocol that optimizes early detection while considering your individual risk factors and preferences.`;
         
       case 'Lifestyle':
+        const diet = quizAnswers.western_diet;
+        const smoking = quizAnswers.smoke;
+        const alcohol = quizAnswers.alcohol;
+        const nightShift = quizAnswers.night_shift;
+        const stress = quizAnswers.chronic_stress;
+        const exercise = quizAnswers.exercise;
+        
         if (hasFactors) {
-          return `Your lifestyle risk assessment shows a score of ${sectionData.score}/100 with modifiable factors: ${sectionData.factors.join(', ')}. The encouraging news is that these are areas where you have complete control and can make immediate positive changes. This is where our personalized coaching program can provide the most significant impact on reducing your breast cancer risk. We'll help you develop a tailored daily and weekly plan to address these specific lifestyle factors systematically. Focus on gradual, sustainable changes rather than dramatic overhauls – small consistent improvements compound over time. Prioritize stress management through mindfulness, meditation, or other relaxation techniques, as chronic stress affects immune function and hormone levels. Improve your diet by incorporating more plant-based foods, reducing processed foods, and limiting alcohol consumption. Establish a regular exercise routine combining cardiovascular activity with strength training. Create better sleep hygiene for hormonal balance and cellular repair. We'll provide ongoing support, tracking tools, and accountability to help these changes become lasting habits. Your lifestyle factors represent the greatest opportunity for risk reduction and overall wellness improvement. Together, we'll create a sustainable plan that fits your schedule, preferences, and goals while significantly impacting your breast health trajectory.`;
+          return `Your lifestyle analysis shows multiple modifiable risk factors including ${diet?.includes('Yes') ? 'Western diet consumption, ' : ''}${smoking?.includes('Yes') ? 'smoking, ' : ''}${alcohol?.includes('2 or more') ? 'regular alcohol consumption, ' : ''}${nightShift?.includes('Yes') ? 'night shift work, ' : ''}${stress?.includes('Yes') ? 'chronic high stress, ' : ''}${exercise?.includes('No') ? 'sedentary lifestyle' : ''}. Your health score for this section is ${sectionData.score}/100. These are areas where you have complete control and can make immediate positive changes to improve your health score toward the maximum of 100. Focus on transitioning to a Mediterranean-style diet rich in fruits, vegetables, and omega-3 fatty acids. Eliminate smoking and limit alcohol to no more than 3-4 drinks per week. Implement stress management techniques including meditation, yoga, or regular counseling. Establish a regular exercise routine combining cardiovascular activity with strength training for at least 150 minutes per week. Follow our daily coaching plan to systematically address these factors and track your progress toward optimal health.`;
         } else {
-          return `Excellent work! Your lifestyle risk assessment shows a score of ${sectionData.score}/100 with minimal modifiable risk factors. You're already demonstrating healthy lifestyle choices that support breast cancer prevention. Continue maintaining these positive habits while remaining open to further optimization. Our coaching program can help you sustain these healthy behaviors long-term and identify additional opportunities for wellness enhancement. Even with good baseline habits, small refinements can yield significant benefits for your overall health and spiritual well-being. Focus on consistency rather than perfection – maintaining your current healthy patterns through life's inevitable changes and challenges. Consider sharing your success strategies with friends and family, as social support strengthens healthy behaviors. Regularly reassess your lifestyle as circumstances change, such as work stress, family demands, or aging-related factors. Stay informed about emerging research on lifestyle factors and breast cancer prevention. Use your strong lifestyle foundation to support others in their health journeys. Remember that wellness encompasses physical, mental, and spiritual health – continue nurturing all aspects. Your commitment to healthy living serves as an inspiring example and provides the best foundation for long-term breast health and overall vitality.`;
+          return `Your lifestyle assessment shows excellent health habits with a score of ${sectionData.score}/100. You demonstrate healthy lifestyle choices including balanced nutrition, regular exercise, stress management, and avoiding harmful substances. Continue maintaining these positive habits and follow our daily coaching plan to sustain these behaviors long-term. Your strong lifestyle foundation provides optimal protection and supports your overall health score of 100. Focus on consistency and continue using your healthy lifestyle as a model for family and friends.`;
         }
         
       default:
