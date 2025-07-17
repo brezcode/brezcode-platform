@@ -86,7 +86,7 @@ const quizSections = [
         question: "At what age did you have your first menstrual period?",
         reason: "According to a 2021 study by Geunwon et al., early menarche (before age 12) increases breast cancer risk by 10-20% (RR ≈ 1.10-1.20) due to prolonged estrogen exposure.",
         type: "multiple_choice" as const,
-        options: ["Before 12 years old", "12 years old or later", "Not Yet"],
+        options: ["Before 12 years old", "12 years old or later"],
         required: true
       },
       {
