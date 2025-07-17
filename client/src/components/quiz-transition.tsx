@@ -1,14 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, FileText, Heart, Shield } from "lucide-react";
-import { useLocation } from "wouter";
 
 interface QuizTransitionProps {
   onContinue: () => void;
 }
 
 export default function QuizTransition({ onContinue }: QuizTransitionProps) {
-  const [, setLocation] = useLocation();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
       <Card className="w-full max-w-2xl">
@@ -75,13 +73,10 @@ export default function QuizTransition({ onContinue }: QuizTransitionProps) {
 
           <div className="text-center pt-4">
             <Button 
-              onClick={() => {
-                onContinue();
-                setLocation('/report');
-              }}
+              onClick={onContinue}
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg"
             >
-              Generate Your Health Report
+              Continue to Registration
             </Button>
             <p className="text-sm text-gray-500 mt-3">
               This will only take 2-3 minutes to complete
