@@ -277,6 +277,14 @@ export class BreastHealthReportGenerator {
     return 'needs_attention';
   }
 
+  categorizeRisk(healthScore: number): string {
+    // For health scores: lower scores = higher risk
+    if (healthScore >= 80) return 'low';       // 80-100: low risk (excellent health)
+    if (healthScore >= 65) return 'moderate';  // 65-79: moderate risk (good health)  
+    if (healthScore >= 50) return 'high';      // 50-64: high risk (fair health)
+    return 'very_high';                        // <50: very high risk (needs attention)
+  }
+
   generateSectionSummary(sectionName: string, sectionData: { score: number, factors: string[] }, quizAnswers: Record<string, any>): string {
     const age = parseInt(quizAnswers.age || "30");
     const country = quizAnswers.country || "United States";
@@ -287,7 +295,7 @@ export class BreastHealthReportGenerator {
         const ethnicity = quizAnswers.ethnicity || 'not specified';
         const isPostmenopausal = quizAnswers.menopause?.includes('Yes');
         
-        return `As a ${age}-year-old ${ethnicity} woman living in ${country}, you are in an age group where breast cancer incidence increases significantly. ${ethnicity.includes('White') ? 'White women have higher breast cancer risk compared to Asian women, with higher overall incidence rates.' : ''} ${hasFactors ? `Your demographic factors include: ${sectionData.factors.join(', ')}.` : 'Your demographic profile shows standard risk factors for your age group.'} 
+        return `As a ${age}-year-old ${ethnicity} woman living in ${country}, you are in an age group where breast cancer incidence increases significantly. ${ethnicity.includes('White') ? 'White women have higher breast cancer risk compared to Asian women, with higher overall incidence rates.' : ''} 
 
 At ${age}, regular annual mammograms and clinical breast exams are essential for early detection. ${isPostmenopausal ? 'As you are postmenopausal, we recommend maintaining your body weight below BMI 30, as excess weight after menopause increases estrogen production and breast cancer risk.' : ''} Continue with consistent screening schedules and stay informed about any family history changes that might affect your risk profile.
 
@@ -363,7 +371,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
     }
   }
   
-  categorizeRisk(riskScore: number): 'low' | 'moderate' | 'high' {
+  categorizeRiskOld(riskScore: number): 'low' | 'moderate' | 'high' {
     if (riskScore < 15) return 'low';
     if (riskScore < 30) return 'moderate';
     return 'high';

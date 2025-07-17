@@ -56,6 +56,30 @@ function getHealthBadgeVariant(category: string) {
   }
 }
 
+function getRiskBadgeVariant(riskLevel: string) {
+  switch (riskLevel) {
+    case 'low': return 'default';          // Green - good
+    case 'moderate': return 'secondary';   // Blue - moderate
+    case 'high': return 'outline';         // Gray - concerning
+    case 'very_high': return 'destructive'; // Red - urgent
+    default: return 'outline';
+  }
+}
+
+function getUncontrollableHealthCategory(score: number): string {
+  if (score >= 80) return 'Low Risk';       
+  if (score >= 65) return 'Moderate Risk';  
+  if (score >= 50) return 'High Risk';      
+  return 'Very High Risk';                        
+}
+
+function getUncontrollableRiskVariant(score: number): string {
+  if (score >= 80) return 'default';       // Green - low risk
+  if (score >= 65) return 'secondary';     // Blue - moderate risk  
+  if (score >= 50) return 'outline';       // Gray - high risk
+  return 'destructive';                    // Red - very high risk
+}
+
 function getProfileIcon(profile: string) {
   switch (profile) {
     case 'teenager': return '🌱';
@@ -70,6 +94,7 @@ function getProfileIcon(profile: string) {
 export default function HealthReport({ report }: HealthReportProps) {
   const healthScore = parseFloat(report.riskScore);
   const { summary, sectionAnalysis, personalizedPlan } = report.reportData;
+  const uncontrollableScore = parseFloat(summary.uncontrollableHealthScore || "0");
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">
@@ -95,8 +120,8 @@ export default function HealthReport({ report }: HealthReportProps) {
               <span className="text-2xl">{getProfileIcon(report.userProfile)}</span>
               <span>Your Health Score</span>
             </div>
-            <Badge variant={getHealthBadgeVariant(report.riskCategory)} className="ml-auto">
-              {report.riskCategory.replace('_', ' ').toUpperCase()}
+            <Badge variant={getUncontrollableRiskVariant(uncontrollableScore)} className="ml-auto">
+              {getUncontrollableHealthCategory(uncontrollableScore).toUpperCase()}
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -163,7 +188,7 @@ export default function HealthReport({ report }: HealthReportProps) {
               <div key={index} className="p-4 border rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold text-sm text-gray-900">{section.name}</h4>
-                  <Badge variant={getHealthBadgeVariant(section.riskLevel)} className="text-xs">
+                  <Badge variant={getRiskBadgeVariant(section.riskLevel)} className="text-xs">
                     {section.riskLevel}
                   </Badge>
                 </div>
