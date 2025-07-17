@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 export default function Navigation() {
   const [, setLocation] = useLocation();
@@ -75,6 +76,9 @@ export default function Navigation() {
               <a href="#app-features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Features</a>
               <a href="#reviews" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Reviews</a>
               <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Pricing</a>
+              <div className="text-white">
+                <LanguageSelector />
+              </div>
               
               {user ? (
                 <div className="flex items-center space-x-4">

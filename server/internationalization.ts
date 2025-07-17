@@ -4,7 +4,7 @@ import { eq } from 'drizzle-orm';
 
 export class InternationalizationManager {
   private translationCache = new Map<string, Map<string, string>>();
-  private supportedLanguages = ['en', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ja', 'ko'];
+  private supportedLanguages = ['en', 'zh-CN', 'zh-TW', 'es', 'fr', 'de', 'ja', 'ko', 'vi'];
 
   async initializeLanguages() {
     // Initialize supported languages
@@ -16,7 +16,8 @@ export class InternationalizationManager {
       { code: 'fr', name: 'Français' },
       { code: 'de', name: 'Deutsch' },
       { code: 'ja', name: '日本語' },
-      { code: 'ko', name: '한국어' }
+      { code: 'ko', name: '한국어' },
+      { code: 'vi', name: 'Tiếng Việt' }
     ];
 
     try {
@@ -170,7 +171,8 @@ export class InternationalizationManager {
         fr: 'Évaluation de la Santé Mammaire',
         de: 'Brustgesundheitsbewertung',
         ja: '乳房健康評価',
-        ko: '유방 건강 평가'
+        ko: '유방 건강 평가',
+        vi: 'Đánh Giá Sức Khỏe Vú'
       },
       
       'quiz.age.title': {
@@ -181,7 +183,8 @@ export class InternationalizationManager {
         fr: 'Quel est votre âge?',
         de: 'Wie alt sind Sie?',
         ja: 'あなたの年齢は？',
-        ko: '나이가 어떻게 되시나요?'
+        ko: '나이가 어떻게 되시나요?',
+        vi: 'Tuổi của bạn là bao nhiêu?'
       },
 
       // Report Section
@@ -193,7 +196,8 @@ export class InternationalizationManager {
         fr: 'Votre Rapport de Santé',
         de: 'Ihr Gesundheitsbericht',
         ja: 'あなたの健康レポート',
-        ko: '건강 보고서'
+        ko: '건강 보고서',
+        vi: 'Báo Cáo Sức Khỏe Của Bạn'
       },
 
       // Coaching Section
@@ -205,7 +209,8 @@ export class InternationalizationManager {
         fr: 'Conseil Santé Quotidien',
         de: 'Täglicher Gesundheitstipp',
         ja: '毎日の健康のヒント',
-        ko: '일일 건강 팁'
+        ko: '일일 건강 팁',
+        vi: 'Mẹo Sức Khỏe Hàng Ngày'
       },
 
       // Common Actions
@@ -217,7 +222,8 @@ export class InternationalizationManager {
         fr: 'Continuer',
         de: 'Weiter',
         ja: '続行',
-        ko: '계속'
+        ko: '계속',
+        vi: 'Tiếp tục'
       },
 
       'button.submit': {
@@ -228,7 +234,8 @@ export class InternationalizationManager {
         fr: 'Soumettre',
         de: 'Absenden',
         ja: '送信',
-        ko: '제출'
+        ko: '제출',
+        vi: 'Gửi'
       }
     };
 
