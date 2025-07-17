@@ -567,6 +567,8 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
       .sort(([,a], [,b]) => b.score - a.score)
       .slice(0, 3); // Top 3 priority areas
     
+    console.log('Generating coaching focus from sections:', sortedSections.map(([name, data]) => `${name}: ${data.score}`));
+    
     sortedSections.forEach(([sectionName, data]) => {
       if (data.score > 25) { // Only include sections needing intervention
         switch (sectionName) {
@@ -596,6 +598,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
       focus.push('Maintain current healthy practices with periodic check-ins and optimization');
     }
     
+    console.log('Final coaching focus array:', focus);
     return focus;
   }
 
@@ -632,7 +635,6 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
   
   private generateFollowUpPlan(userProfile: UserProfile, riskCategory: 'low' | 'moderate' | 'high'): Record<string, string> {
     const basePlan = {
-      "1_month": "Review daily plan implementation and adjust as needed",
       "3_months": "Assess progress on lifestyle changes and health metrics",
       "6_months": "Complete follow-up health assessment"
     };
@@ -640,6 +642,8 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
     if (riskCategory === 'high') {
       basePlan["2_weeks"] = "Schedule appointment with healthcare provider to discuss findings";
       basePlan["1_month"] = "Begin enhanced screening protocol if recommended";
+    } else {
+      basePlan["1_month"] = "Review daily plan implementation and adjust as needed";
     }
     
     if (userProfile === 'current_patient' || userProfile === 'survivor') {
@@ -647,6 +651,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
       basePlan["3_months"] = "Coordinate with regular surveillance schedule";
     }
     
+    console.log('Generated follow-up plan:', basePlan);
     return basePlan;
   }
 }
