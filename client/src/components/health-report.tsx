@@ -307,7 +307,7 @@ export default function HealthReport({ report }: HealthReportProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {Object.entries(actionPlan.followUp).map(([timeframe, action]) => (
+            {Object.entries(personalizedPlan.followUpTimeline).map(([timeframe, action]) => (
               <div key={timeframe} className="flex items-start gap-4 p-3 border rounded-lg">
                 <div className="text-sm font-semibold text-blue-600 whitespace-nowrap">
                   {timeframe.replace('_', ' ').toUpperCase()}
