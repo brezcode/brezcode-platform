@@ -567,8 +567,6 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
       .sort(([,a], [,b]) => b.score - a.score)
       .slice(0, 3); // Top 3 priority areas
     
-    console.log('Generating coaching focus from sections:', sortedSections.map(([name, data]) => `${name}: ${data.score}`));
-    
     sortedSections.forEach(([sectionName, data]) => {
       if (data.score > 25) { // Only include sections needing intervention
         switch (sectionName) {
@@ -597,8 +595,6 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
     if (focus.length === 0) {
       focus.push('Maintain current healthy practices with periodic check-ins and optimization');
     }
-    
-    console.log('Final coaching focus array:', focus);
     return focus;
   }
 
@@ -651,7 +647,7 @@ Maintain strict adherence to your enhanced screening schedule and ensure your im
       basePlan["3_months"] = "Coordinate with regular surveillance schedule";
     }
     
-    console.log('Generated follow-up plan:', basePlan);
+
     return basePlan;
   }
 }

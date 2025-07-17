@@ -249,23 +249,6 @@ export default function HealthReport({ report }: HealthReportProps) {
               ))}
             </div>
           </div>
-
-          <Separator />
-
-          <div>
-            <h3 className="font-semibold text-gray-900 mb-3">Follow-Up Timeline</h3>
-            <div className="grid gap-3">
-              {Object.entries(personalizedPlan.followUpTimeline).map(([timeframe, activity]) => (
-                <div key={timeframe} className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
-                  <Calendar className="h-4 w-4 text-gray-500 mt-1 flex-shrink-0" />
-                  <div>
-                    <div className="font-medium text-sm text-gray-900 capitalize">{timeframe.replace('_', ' ')}</div>
-                    <p className="text-sm text-gray-700">{activity}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
         </CardContent>
       </Card>
 
