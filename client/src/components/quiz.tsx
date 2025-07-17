@@ -370,6 +370,8 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
       .replace(/\(RR.*?\)/g, "")
       .replace(/approximately /g, "about ")
       .replace(/\(relative risk, RR ≈.*?\)/g, "")
+      .replace(/\s+\(\s*$/, "")  // Remove trailing opening parentheses
+      .replace(/\s+\(\s*\./g, ".")  // Remove stray "(" before periods
       .replace(/Compare to.*?, /g, "")
       .replace(/Women who /g, "Women who ")
       .replace(/women who /g, "women who ");
