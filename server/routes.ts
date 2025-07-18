@@ -188,9 +188,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (userData.email === "leedennyps@gmail.com") {
           console.log("Test email detected in legacy route - deleting existing user for re-registration");
           try {
-            await storage.deleteUser(userData.email);
+            const deleteResult = await storage.deleteUser(userData.email);
+            console.log("Legacy route delete result:", deleteResult);
+            // Continue to create new user after successful deletion
           } catch (deleteError) {
             console.error("Error deleting test user:", deleteError);
+            return res.status(500).json({ message: "Failed to reset test account" });
           }
         } else {
           return res.status(400).json({ 
@@ -402,9 +405,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (userData.email === "leedennyps@gmail.com") {
           console.log("Test email detected - deleting existing user for re-registration");
           try {
-            await storage.deleteUser(userData.email);
+            const deleteResult = await storage.deleteUser(userData.email);
+            console.log("Delete result:", deleteResult);
+            // Continue to create new user after successful deletion
           } catch (deleteError) {
             console.error("Error deleting test user:", deleteError);
+            return res.status(500).json({ message: "Failed to reset test account" });
           }
         } else {
           return res.status(400).json({ 
