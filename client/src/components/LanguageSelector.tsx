@@ -84,19 +84,19 @@ export function LanguageSelector() {
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className="w-4 h-4 text-white" />
+      <Globe className="w-4 h-4 text-yellow-400" />
       <Select value={currentLanguage} onValueChange={changeLanguage}>
-        <SelectTrigger className="w-[140px] border-white/20 bg-transparent text-white hover:bg-white/10">
+        <SelectTrigger className="w-[140px] border-yellow-400/30 bg-transparent text-yellow-400 hover:bg-yellow-400/10 focus:ring-yellow-400">
           <SelectValue>
             <div className="flex items-center gap-2">
               <span>{currentLang?.flag}</span>
-              <span className="text-sm">{currentLang?.name}</span>
+              <span className="text-sm text-yellow-400">{currentLang?.name}</span>
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-white border-yellow-400/20 z-[100]">
           {languages.map((lang) => (
-            <SelectItem key={lang.code} value={lang.code}>
+            <SelectItem key={lang.code} value={lang.code} className="hover:bg-yellow-50 focus:bg-yellow-50">
               <div className="flex items-center gap-2">
                 <span>{lang.flag}</span>
                 <span>{lang.name}</span>

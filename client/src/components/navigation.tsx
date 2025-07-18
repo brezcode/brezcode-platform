@@ -8,10 +8,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { Menu, X } from "lucide-react";
 
 export default function Navigation() {
   const [, setLocation] = useLocation();
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [authForm, setAuthForm] = useState({ email: "", username: "", password: "" });
   const { toast } = useToast();
   const { user, login, register, logout } = useAuth();
@@ -69,7 +71,7 @@ export default function Navigation() {
               <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-sm">BC</span>
               </div>
-              <span className="font-bold text-xl text-white">BrezCode</span>
+              <span className="font-bold text-xl text-yellow-400">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">About</a>
@@ -113,8 +115,74 @@ export default function Navigation() {
                 </div>
               )}
             </div>
+            
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="text-yellow-400 hover:text-yellow-300"
+              >
+                {showMobileMenu ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </div>
+        
+        {/* Mobile menu */}
+        {showMobileMenu && (
+          <div className="md:hidden bg-blue-600/95 backdrop-blur-sm border-t border-white/10">
+            <div className="px-4 py-6 space-y-4">
+              <div className="flex justify-center mb-4">
+                <LanguageSelector />
+              </div>
+              <div className="space-y-3">
+                <a href="#features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>About</a>
+                <a href="#app-features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Features</a>
+                <a href="#reviews" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Reviews</a>
+                <a href="#pricing" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Pricing</a>
+              </div>
+              
+              {user ? (
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.username}!</div>
+                  {user.isSubscriptionActive && (
+                    <Button 
+                      onClick={() => { setLocation("/chat"); setShowMobileMenu(false); }}
+                      className="w-full bg-yellow-400 text-black hover:bg-yellow-300 transition-colors font-semibold"
+                    >
+                      Open Chat
+                    </Button>
+                  )}
+                  <Button 
+                    variant="outline" 
+                    onClick={() => { handleLogout(); setShowMobileMenu(false); }}
+                    className="w-full border-white text-white hover:bg-white hover:text-blue-600"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+              ) : (
+                <div className="pt-4 border-t border-white/10 space-y-3">
+                  <Button 
+                    variant="ghost" 
+                    onClick={() => { setShowAuthModal(true); setShowMobileMenu(false); }}
+                    className="w-full text-yellow-400 hover:text-yellow-300 font-medium"
+                  >
+                    Log In
+                  </Button>
+                  <Button 
+                    onClick={() => { setShowAuthModal(true); setShowMobileMenu(false); }}
+                    className="w-full bg-white text-blue-600 hover:bg-gray-100 transition-colors font-semibold"
+                  >
+                    SIGN UP
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </nav>
 
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
