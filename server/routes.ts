@@ -618,21 +618,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Internationalization API
   app.get('/api/translations/:languageCode', async (req, res) => {
     try {
-      const { i18nManager } = await import('./internationalization');
       const { languageCode } = req.params;
       
-      // Get common translations (you could expand this to get all translations)
-      const commonKeys = [
-        'quiz.title', 'quiz.age.title', 'report.title', 'coaching.daily_tip',
-        'button.continue', 'button.submit'
-      ];
+      // Simple translation system for testing
+      const translations: Record<string, Record<string, string>> = {
+        'en': {
+          'quiz.title': 'Breast Cancer Assessment Quiz',
+          'quiz.age.title': 'What is your age?',
+          'report.title': 'Your Health Report',
+          'coaching.daily_tip': 'Daily Health Tip',
+          'button.continue': 'Continue',
+          'button.submit': 'Submit',
+          // Hero section translations
+          'hero.badge': 'Evidence-based AI coaching available 24/7',
+          'hero.statistic': '"1 in 8 women in US will develop breast cancer in their lifetime"... According to WHO',
+          'hero.title1': 'Good news! You can now',
+          'hero.reverse': 'REVERSE',
+          'hero.title2': 'the development',
+          'hero.title3': 'and lower the risk by',
+          'hero.percentage': '100% in 15 days.',
+          'hero.subtitle1': 'The #1 evidence-based AI breast health coaching platform to help you',
+          'hero.subtitle2': 'regain control of your wellness.',
+          'hero.urgency': 'Don\'t wait until it is too late, your family depends on you.',
+          'hero.cta': 'Take the quiz to start',
+          'hero.freeText': 'Start for free. Cancel any time.',
+          // App features section translations
+          'landing.appFeatures.title': 'An app, community, and',
+          'landing.appFeatures.subtitle': 'coach in your pocket',
+          'landing.appFeatures.description': 'After a quick quiz, we\'ll personalize your first weekly plan, introduce you to daily health rituals, and invite you to our private community. Our supportive coaches will be with you at every step of the way.'
+        },
+        'zh-CN': {
+          'quiz.title': '乳腺癌风险评估测试',
+          'quiz.age.title': '您的年龄是多少？',
+          'report.title': '您的健康报告',
+          'coaching.daily_tip': '每日健康提示',
+          'button.continue': '继续',
+          'button.submit': '提交',
+          // Hero section translations
+          'hero.badge': '24/7提供循证AI健康指导',
+          'hero.statistic': '"美国每8名女性中就有1名会在其一生中患乳腺癌"...根据世界卫生组织',
+          'hero.title1': '好消息！现在您可以',
+          'hero.reverse': '逆转',
+          'hero.title2': '疾病发展',
+          'hero.title3': '并在15天内降低风险',
+          'hero.percentage': '100%。',
+          'hero.subtitle1': '排名第一的循证AI乳腺健康指导平台',
+          'hero.subtitle2': '帮助您重新掌控健康。',
+          'hero.urgency': '不要等到为时已晚，您的家人依赖着您。',
+          'hero.cta': '开始测试',
+          'hero.freeText': '免费开始。随时取消。',
+          // App features section translations
+          'landing.appFeatures.title': '一款应用、社区和',
+          'landing.appFeatures.subtitle': '口袋里的健康教练',
+          'landing.appFeatures.description': '通过快速测试，我们将为您定制首个每周计划，介绍每日健康习惯，并邀请您加入我们的私人社区。我们的专业教练将在每一步陪伴您。'
+        },
+        'es': {
+          'quiz.title': 'Cuestionario de Evaluación de Cáncer de Mama',
+          'quiz.age.title': '¿Cuál es su edad?',
+          'report.title': 'Su Informe de Salud',
+          'coaching.daily_tip': 'Consejo de Salud Diario',
+          'button.continue': 'Continuar',
+          'button.submit': 'Enviar',
+          // Hero section translations
+          'hero.badge': 'Entrenamiento de IA basado en evidencia disponible 24/7',
+          'hero.statistic': '"1 de cada 8 mujeres en EE.UU. desarrollará cáncer de mama en su vida"... Según la OMS',
+          'hero.title1': '¡Buenas noticias! Ahora puedes',
+          'hero.reverse': 'REVERTIR',
+          'hero.title2': 'el desarrollo',
+          'hero.title3': 'y reducir el riesgo en',
+          'hero.percentage': '100% en 15 días.',
+          'hero.subtitle1': 'La plataforma #1 de entrenamiento de salud mamaria con IA basada en evidencia',
+          'hero.subtitle2': 'para ayudarte a recuperar el control de tu bienestar.',
+          'hero.urgency': 'No esperes hasta que sea demasiado tarde, tu familia depende de ti.',
+          'hero.cta': 'Hacer el cuestionario para comenzar',
+          'hero.freeText': 'Comienza gratis. Cancela en cualquier momento.',
+          // App features section translations
+          'landing.appFeatures.title': 'Una app, comunidad y',
+          'landing.appFeatures.subtitle': 'entrenador en tu bolsillo',
+          'landing.appFeatures.description': 'Después de un cuestionario rápido, personalizaremos tu primer plan semanal, te presentaremos rituales de salud diarios y te invitaremos a nuestra comunidad privada. Nuestros entrenadores te acompañarán en cada paso.'
+        }
+      };
       
-      const translations: Record<string, string> = {};
-      for (const key of commonKeys) {
-        translations[key] = await i18nManager.getTranslation(key, languageCode);
-      }
-      
-      res.json(translations);
+      res.json(translations[languageCode] || translations['en']);
     } catch (error) {
       console.error('Error fetching translations:', error);
       res.status(500).json({ error: 'Failed to fetch translations' });

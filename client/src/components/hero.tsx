@@ -1,11 +1,13 @@
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
+import { useTranslation } from "@/components/LanguageSelector";
 import happyWomanImage from "@assets/happy_women_using_phone-removebg-preview_1752232002425.png";
 
 export default function Hero() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const handleTakeQuiz = () => {
     setLocation("/quiz");
@@ -17,27 +19,27 @@ export default function Hero() {
         <div className="text-center mb-16">
           <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8">
             <div className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
-            <span className="text-white text-sm font-medium">Evidence-based AI coaching available 24/7</span>
+            <span className="text-white text-sm font-medium">{t('hero.badge', 'Evidence-based AI coaching available 24/7')}</span>
           </div>
 
           <p className="text-xl text-white/90 mb-6 max-w-4xl mx-auto leading-relaxed">
-            "1 in 8 women in US will <strong className="text-yellow-400">develop</strong> breast cancer in their lifetime"... According to WHO
+            {t('hero.statistic', '"1 in 8 women in US will develop breast cancer in their lifetime"... According to WHO')}
           </p>
 
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
-            Good news! You can now <span className="gradient-text">REVERSE</span> the development<br />
-            and lower the risk by <span className="text-yellow-400">100% in 15 days.</span>
+            {t('hero.title1', 'Good news! You can now')} <span className="gradient-text">{t('hero.reverse', 'REVERSE')}</span> {t('hero.title2', 'the development')}<br />
+            {t('hero.title3', 'and lower the risk by')} <span className="text-yellow-400">{t('hero.percentage', '100% in 15 days.')}</span>
           </h1>
 
           <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-4xl mx-auto leading-relaxed italic">
-            The #1 evidence-based AI breast health coaching platform to help you
+            {t('hero.subtitle1', 'The #1 evidence-based AI breast health coaching platform to help you')}
           </p>
           <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed italic">
-            regain control of your wellness.
+            {t('hero.subtitle2', 'regain control of your wellness.')}
           </p>
 
           <p className="text-lg text-white/90 mb-12 max-w-3xl mx-auto">
-            Don't wait until it is too late, your family depends on you.
+            {t('hero.urgency', 'Don\'t wait until it is too late, your family depends on you.')}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
@@ -45,12 +47,12 @@ export default function Hero() {
               onClick={() => setLocation("/quiz")}
               className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
             >
-              Take the quiz to start
+              {t('hero.cta', 'Take the quiz to start')}
             </Button>
           </div>
 
           <p className="text-white/80 text-lg mb-16">
-            Start for free. Cancel any time.
+            {t('hero.freeText', 'Start for free. Cancel any time.')}
           </p>
         </div>
 

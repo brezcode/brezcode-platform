@@ -165,5 +165,5 @@ export function useTranslation() {
     return translations[key] || fallback || key;
   };
 
-  return { t, currentLanguage, translations };
+  return { t, currentLanguage };
 }

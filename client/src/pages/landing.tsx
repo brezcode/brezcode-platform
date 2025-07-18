@@ -5,10 +5,12 @@ import Pricing from "@/components/pricing";
 import ChatInterface from "@/components/chat-interface";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import { useTranslation } from "@/components/LanguageSelector";
 import promiseImage from "@assets/Sunnyside p5_1752243629786.png";
 
 export default function LandingPage() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-white">
@@ -22,10 +24,10 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              An app, community, and <span className="sky-blue">coach in your pocket</span>
+              {t('landing.appFeatures.title', 'An app, community, and')} <span className="sky-blue">{t('landing.appFeatures.subtitle', 'coach in your pocket')}</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              After a quick quiz, we'll personalize your first weekly plan, introduce you to daily health rituals, and invite you to our private community. Our supportive coaches will be with you at every step of the way.
+              {t('landing.appFeatures.description', 'After a quick quiz, we\'ll personalize your first weekly plan, introduce you to daily health rituals, and invite you to our private community. Our supportive coaches will be with you at every step of the way.')}
             </p>
           </div>
 
