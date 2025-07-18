@@ -113,34 +113,34 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-8">
-              Our Promise to You
+              {t('promise.title', 'Our Promise to You')}
             </h2>
             <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-12 max-w-4xl mx-auto">
               <p className="text-xl md:text-2xl text-white leading-relaxed font-medium mb-12">
-                We know this is a deeply personal journey for you, as it was for us. We follow a strict code of conduct and promise to always put your health and wellness above all else.
+                {t('promise.description', 'We know this is a deeply personal journey for you, as it was for us. We follow a strict code of conduct and promise to always put your health and wellness above all else.')}
               </p>
               
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
-                  <h3 className="text-xl font-bold mb-3">No shame or guilt ever</h3>
+                  <h3 className="text-xl font-bold mb-3">{t('promise.noShame.title', 'No shame or guilt ever')}</h3>
                   <p className="text-white/90">
-                    Mindful lifestyle is about celebrating our wins, not making you feel bad.
+                    {t('promise.noShame.description', 'Mindful lifestyle is about celebrating our wins, not making you feel bad.')}
                   </p>
                 </div>
                 
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
-                  <h3 className="text-xl font-bold mb-3">Always private and secure</h3>
+                  <h3 className="text-xl font-bold mb-3">{t('promise.private.title', 'Always private and secure')}</h3>
                   <p className="text-white/90">
-                    This is a personal, private journey for you. We make privacy a top priority.
+                    {t('promise.private.description', 'This is a personal, private journey for you. We make privacy a top priority.')}
                   </p>
                 </div>
               </div>
               
               <div className="mt-8 flex justify-center">
                 <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-6 text-white">
-                  <h3 className="text-xl font-bold mb-3">Money back guarantee</h3>
+                  <h3 className="text-xl font-bold mb-3">{t('promise.guarantee.title', 'Money back guarantee')}</h3>
                   <p className="text-white/90">
-                    If you give it a fair shot and aren't happy after 30 days, just let us know!
+                    {t('promise.guarantee.description', 'If you give it a fair shot and aren\'t happy after 30 days, just let us know!')}
                   </p>
                 </div>
               </div>
@@ -154,10 +154,10 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              Results from real people like you
+              {t('testimonials.title', 'Results from real people like you')}
             </h2>
             <p className="text-lg text-gray-500 italic">
-              These are real customer reviews, and we have hundreds more
+              {t('testimonials.subtitle', 'These are real customer reviews, and we have hundreds more')}
             </p>
           </div>
 
@@ -168,9 +168,9 @@ export default function LandingPage() {
                   M
                 </div>
               </div>
-              <p className="text-gray-600 font-medium mb-6">Mia</p>
+              <p className="text-gray-600 font-medium mb-6">{t('testimonials.customer1.name', 'Mia')}</p>
               <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
-                "As a young woman, I ignored breast health. This app's fun, quick lessons taught me to listen to my body and act early!"
+                "{t('testimonials.customer1.quote', 'As a young woman, I ignored breast health. This app\'s fun, quick lessons taught me to listen to my body and act early!')}"
               </blockquote>
               <div className="flex items-center justify-center space-x-2">
                 <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -178,7 +178,7 @@ export default function LandingPage() {
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
+                <span className="text-sm text-gray-600">{t('testimonials.verified', 'Real BrezCode Customer')}</span>
               </div>
             </div>
 
@@ -188,9 +188,9 @@ export default function LandingPage() {
                   E
                 </div>
               </div>
-              <p className="text-gray-600 font-medium mb-6">Emily</p>
+              <p className="text-gray-600 font-medium mb-6">{t('testimonials.customer2.name', 'Emily')}</p>
               <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
-                "I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast."
+                "{t('testimonials.customer2.quote', 'I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast.')}"
               </blockquote>
               <div className="flex items-center justify-center space-x-2">
                 <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -198,7 +198,7 @@ export default function LandingPage() {
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
+                <span className="text-sm text-gray-600">{t('testimonials.verified', 'Real BrezCode Customer')}</span>
               </div>
             </div>
 
@@ -208,9 +208,9 @@ export default function LandingPage() {
                   A
                 </div>
               </div>
-              <p className="text-gray-600 font-medium mb-6">Aisha</p>
+              <p className="text-gray-600 font-medium mb-6">{t('testimonials.customer3.name', 'Aisha')}</p>
               <blockquote className="text-xl md:text-2xl text-gray-800 font-medium leading-relaxed mb-6">
-                "My sister had breast cancer, so I'm high-risk. The app's risk scoring and check-in reminders help me feel in control of my health!"
+                "{t('testimonials.customer3.quote', 'My sister had breast cancer, so I\'m high-risk. The app\'s risk scoring and check-in reminders help me feel in control of my health!')}"
               </blockquote>
               <div className="flex items-center justify-center space-x-2">
                 <div className="w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
@@ -218,7 +218,7 @@ export default function LandingPage() {
                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 </div>
-                <span className="text-sm text-gray-600">Real BrezCode Customer</span>
+                <span className="text-sm text-gray-600">{t('testimonials.verified', 'Real BrezCode Customer')}</span>
               </div>
             </div>
           </div>

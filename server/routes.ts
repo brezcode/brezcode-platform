@@ -712,7 +712,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'appFeatures.tracking.title': 'Progress Tracking',
           'appFeatures.tracking.description': 'Monitor your health improvements with our comprehensive tracking system and detailed analytics.',
           'appFeatures.alerts.title': 'Smart Alerts',
-          'appFeatures.alerts.description': 'Receive intelligent reminders and health alerts customized to your schedule and preferences.'
+          'appFeatures.alerts.description': 'Receive intelligent reminders and health alerts customized to your schedule and preferences.',
+          // Promise section translations
+          'promise.title': 'Our Promise to You',
+          'promise.description': 'We know this is a deeply personal journey for you, as it was for us. We follow a strict code of conduct and promise to always put your health and wellness above all else.',
+          'promise.noShame.title': 'No shame or guilt ever',
+          'promise.noShame.description': 'Mindful lifestyle is about celebrating our wins, not making you feel bad.',
+          'promise.private.title': 'Always private and secure',
+          'promise.private.description': 'This is a personal, private journey for you. We make privacy a top priority.',
+          'promise.guarantee.title': 'Money back guarantee',
+          'promise.guarantee.description': 'If you give it a fair shot and aren\'t happy after 30 days, just let us know!',
+          // Testimonials section translations
+          'testimonials.title': 'Results from real people like you',
+          'testimonials.subtitle': 'These are real customer reviews, and we have hundreds more',
+          'testimonials.customer1.name': 'Mia',
+          'testimonials.customer1.quote': 'As a young woman, I ignored breast health. This app\'s fun, quick lessons taught me to listen to my body and act early!',
+          'testimonials.customer2.name': 'Emily',
+          'testimonials.customer2.quote': 'I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast.',
+          'testimonials.customer3.name': 'Aisha',
+          'testimonials.customer3.quote': 'My sister had breast cancer, so I\'m high-risk. The app\'s risk scoring and check-in reminders help me feel in control of my health!',
+          'testimonials.verified': 'Real BrezCode Customer'
         };
         return res.json(englishTranslations);
       }
@@ -809,7 +828,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'appFeatures.tracking.title': '進度追蹤',
           'appFeatures.tracking.description': '通過我們的綜合追蹤系統和詳細分析監控您的健康改善。',
           'appFeatures.alerts.title': '智能提醒',
-          'appFeatures.alerts.description': '接收根據您的時程和偏好客製化的智能提醒和健康警示。'
+          'appFeatures.alerts.description': '接收根據您的時程和偏好客製化的智能提醒和健康警示。',
+          // Promise section translations
+          'promise.title': '我們對您的承諾',
+          'promise.description': '我們知道這是您深具個人意義的健康之旅，正如我們的經歷一樣。我們遵循嚴格的行為準則，承諾始終將您的健康與福祉置於首位。',
+          'promise.noShame.title': '絕不羞辱或內疚',
+          'promise.noShame.description': '正念生活方式在於慶祝我們的成功，而非讓您感到不良。',
+          'promise.private.title': '始終私密且安全',
+          'promise.private.description': '這是您個人私密的健康旅程。我們將隱私保護視為首要任務。',
+          'promise.guarantee.title': '退款保證',
+          'promise.guarantee.description': '如果您認真嘗試後30天內仍不滿意，請告知我們！',
+          // Testimonials section translations
+          'testimonials.title': '真實用戶的成果見證',
+          'testimonials.subtitle': '這些是真實的客戶評價，我們還有數百則更多見證',
+          'testimonials.customer1.name': 'Mia',
+          'testimonials.customer1.quote': '作為年輕女性，我忽視了乳房健康。這個應用程式有趣、快速的課程教會我聆聽身體並及早行動！',
+          'testimonials.customer2.name': 'Emily',
+          'testimonials.customer2.quote': '我發現腫塊時驚慌失措。應用程式指導我進行自我檢查和篩檢資訊，幫助我保持冷靜並快速獲得答案。',
+          'testimonials.customer3.name': 'Aisha',
+          'testimonials.customer3.quote': '我姊姊患有乳癌，所以我是高風險群。應用程式的風險評分和提醒檢查讓我感到能掌控自己的健康！',
+          'testimonials.verified': '真實BrezCode客戶'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',
