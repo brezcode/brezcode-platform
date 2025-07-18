@@ -84,13 +84,13 @@ export function LanguageSelector() {
 
   return (
     <div className="flex items-center gap-2">
-      <Globe className="w-4 h-4" />
+      <Globe className="w-4 h-4 text-white" />
       <Select value={currentLanguage} onValueChange={changeLanguage}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[140px] border-white/20 bg-transparent text-white hover:bg-white/10">
           <SelectValue>
             <div className="flex items-center gap-2">
               <span>{currentLang?.flag}</span>
-              <span>{currentLang?.name}</span>
+              <span className="text-sm">{currentLang?.name}</span>
             </div>
           </SelectValue>
         </SelectTrigger>

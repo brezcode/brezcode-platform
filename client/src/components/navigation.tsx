@@ -76,7 +76,7 @@ export default function Navigation() {
               <a href="#app-features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Features</a>
               <a href="#reviews" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Reviews</a>
               <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Pricing</a>
-              <div className="text-white">
+              <div className="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
                 <LanguageSelector />
               </div>
               
