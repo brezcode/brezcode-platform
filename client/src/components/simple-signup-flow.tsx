@@ -106,11 +106,20 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
       }
     },
     onError: (error: any) => {
-      toast({
-        title: "Signup Failed",
-        description: error.message || "Failed to create account",
-        variant: "destructive",
-      });
+      // Handle specific error types
+      if (error.message?.includes("email address is already registered")) {
+        toast({
+          title: "Email Already Registered",
+          description: "This email address is already registered. Please use a different email or try logging in instead.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Signup Failed",
+          description: error.message || "Failed to create account",
+          variant: "destructive",
+        });
+      }
     },
   });
 

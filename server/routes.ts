@@ -385,7 +385,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
-        return res.status(400).json({ message: "User already exists" });
+        // Special handling for test email - allow re-registration
+        if (userData.email === "leedennyps@gmail.com") {
+          console.log("Test email detected - deleting existing user for re-registration");
+          try {
+            await storage.deleteUser(userData.email);
+          } catch (deleteError) {
+            console.error("Error deleting test user:", deleteError);
+          }
+        } else {
+          return res.status(400).json({ 
+            message: "This email address is already registered. Please use a different email address or try logging in instead.",
+            type: "EMAIL_EXISTS"
+          });
+        }
       }
 
       // For simple signup, we'll verify email during the flow

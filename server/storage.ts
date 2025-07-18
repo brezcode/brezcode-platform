@@ -4,6 +4,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  deleteUser(email: string): Promise<boolean>; // For test email cleanup
   updateUserSubscription(
     id: number, 
     tier: SubscriptionTier, 
@@ -65,6 +66,34 @@ export class MemStorage implements IStorage {
     };
     this.users.set(id, user);
     return user;
+  }
+
+  async deleteUser(email: string): Promise<boolean> {
+    const user = await this.getUserByEmail(email);
+    if (!user) return false;
+    
+    // Delete the user
+    this.users.delete(user.id);
+    
+    // Also clean up any email verifications for this email
+    const keysToDelete: string[] = [];
+    for (const [key, verification] of this.emailVerifications.entries()) {
+      if (verification.email === email) {
+        keysToDelete.push(key);
+      }
+    }
+    keysToDelete.forEach(key => this.emailVerifications.delete(key));
+    
+    // Clean up health reports for this user
+    const reportsToDelete: number[] = [];
+    for (const [id, report] of this.healthReports.entries()) {
+      if (report.userId === user.id) {
+        reportsToDelete.push(id);
+      }
+    }
+    reportsToDelete.forEach(id => this.healthReports.delete(id));
+    
+    return true;
   }
 
   async updateUserSubscription(
