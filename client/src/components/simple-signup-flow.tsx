@@ -106,20 +106,34 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
       }
     },
     onError: (error: any) => {
-      // Handle specific error types
-      if (error.message?.includes("email address is already registered")) {
-        toast({
-          title: "Email Already Registered",
-          description: "This email address is already registered. Please use a different email or try logging in instead.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Signup Failed",
-          description: error.message || "Failed to create account",
-          variant: "destructive",
-        });
+      // Parse the error message to extract the actual server response
+      let errorMessage = error.message || "Failed to create account";
+      let title = "Signup Failed";
+      
+      // Extract JSON message from error string like "400: {"message":"..."}"
+      if (errorMessage.includes('{"message"')) {
+        try {
+          const jsonMatch = errorMessage.match(/\{.*\}/);
+          if (jsonMatch) {
+            const errorObj = JSON.parse(jsonMatch[0]);
+            errorMessage = errorObj.message;
+          }
+        } catch (parseError) {
+          // Keep original error message if parsing fails
+        }
       }
+      
+      // Handle specific error types based on the parsed message
+      if (errorMessage?.includes("email address is already registered") || errorMessage?.includes("User already exists")) {
+        title = "Email Already Registered";
+        errorMessage = "This email address is already registered. Please use a different email or try logging in instead.";
+      }
+      
+      toast({
+        title,
+        description: errorMessage,
+        variant: "destructive",
+      });
     },
   });
 
