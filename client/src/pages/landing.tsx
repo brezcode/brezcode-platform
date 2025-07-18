@@ -230,10 +230,10 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-              With measurable impact
+              {t('results.title', 'With measurable impact')}
             </h2>
             <p className="text-lg text-gray-500 italic">
-              Results reported from a recent customer survey
+              {t('results.subtitle', 'Results reported from a recent customer survey')}
             </p>
           </div>
 
@@ -241,30 +241,30 @@ export default function LandingPage() {
             <div className="space-y-4">
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">96% feel less anxiety</span>
+                <span className="font-medium">{t('results.anxiety', '96% feel less anxiety')}</span>
               </div>
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">90% improve diet quality</span>
+                <span className="font-medium">{t('results.diet', '90% improve diet quality')}</span>
               </div>
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">87% have better sleep</span>
+                <span className="font-medium">{t('results.sleep', '87% have better sleep')}</span>
               </div>
             </div>
             
             <div className="space-y-4">
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">80% feel accomplished</span>
+                <span className="font-medium">{t('results.accomplished', '80% feel accomplished')}</span>
               </div>
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">75% improve mental health</span>
+                <span className="font-medium">{t('results.mental', '75% improve mental health')}</span>
               </div>
               <div className="flex items-center text-lg text-gray-800">
                 <span className="w-2 h-2 bg-gray-800 rounded-full mr-3"></span>
-                <span className="font-medium">100% improve breast health</span>
+                <span className="font-medium">{t('results.breast', '100% improve breast health')}</span>
               </div>
             </div>
           </div>
@@ -276,10 +276,10 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Start Your Journey Today
+              {t('signup.title', 'Start Your Journey Today')}
             </h2>
             <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Join thousands of women taking control of their breast health with personalized AI guidance and support.
+              {t('signup.subtitle', 'Join thousands of women taking control of their breast health with personalized AI guidance and support.')}
             </p>
           </div>
           
@@ -290,10 +290,10 @@ export default function LandingPage() {
                   onClick={() => setLocation('/quiz')}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3"
                 >
-                  Start Your Health Assessment
+                  {t('signup.button', 'Start Your Health Assessment')}
                 </Button>
                 <p className="text-center text-sm text-gray-500">
-                  Complete our 23-question assessment to get personalized insights
+                  {t('signup.description', 'Complete our 23-question assessment to get personalized insights')}
                 </p>
               </div>
             </div>

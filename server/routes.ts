@@ -678,6 +678,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'features.activity7.title': 'Daily educational content and tips',
           'features.activity7.description': 'Increase awareness',
           'features.activity7.reduction': '-5% risk',
+          'features.activity8.title': 'AI-Risk Monitoring system',
+          'features.activity8.description': 'Early detection',
+          'features.activity8.reduction': '-50% risk',
           // Pricing section translations
           'pricing.title': 'Choose Your Health Journey',
           'pricing.subtitle': 'Start your transformation today with our evidence-based coaching',
@@ -731,7 +734,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'testimonials.customer2.quote': 'I found a lump and panicked. The app guided me through self-exams and screening info, helping me stay calm and get answers fast.',
           'testimonials.customer3.name': 'Aisha',
           'testimonials.customer3.quote': 'My sister had breast cancer, so I\'m high-risk. The app\'s risk scoring and check-in reminders help me feel in control of my health!',
-          'testimonials.verified': 'Real BrezCode Customer'
+          'testimonials.verified': 'Real BrezCode Customer',
+          // Results section translations
+          'results.title': 'With measurable impact',
+          'results.subtitle': 'Results reported from a recent customer survey',
+          'results.anxiety': '96% feel less anxiety',
+          'results.diet': '90% improve diet quality',
+          'results.sleep': '87% have better sleep',
+          'results.accomplished': '80% feel accomplished',
+          'results.mental': '75% improve mental health',
+          'results.breast': '100% improve breast health',
+          // Sign up section translations
+          'signup.title': 'Start Your Journey Today',
+          'signup.subtitle': 'Join thousands of women taking control of their breast health with personalized AI guidance and support.',
+          'signup.button': 'Start Your Health Assessment',
+          'signup.description': 'Complete our 23-question assessment to get personalized insights'
         };
         return res.json(englishTranslations);
       }
@@ -794,6 +811,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'features.activity7.title': '每日健康教育內容',
           'features.activity7.description': '提升健康意識',
           'features.activity7.reduction': '降低5%風險',
+          'features.activity8.title': 'AI風險監控系統',
+          'features.activity8.description': '早期檢測',
+          'features.activity8.reduction': '降低50%風險',
           // Pricing section translations
           'pricing.title': '選擇您的健康之路',
           'pricing.subtitle': '立即開始您的健康轉變，體驗循證指導',
@@ -847,7 +867,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'testimonials.customer2.quote': '我發現腫塊時驚慌失措。應用程式指導我進行自我檢查和篩檢資訊，幫助我保持冷靜並快速獲得答案。',
           'testimonials.customer3.name': 'Aisha',
           'testimonials.customer3.quote': '我姊姊患有乳癌，所以我是高風險群。應用程式的風險評分和提醒檢查讓我感到能掌控自己的健康！',
-          'testimonials.verified': '真實BrezCode客戶'
+          'testimonials.verified': '真實BrezCode客戶',
+          // Results section translations
+          'results.title': '具有可衡量的影響',
+          'results.subtitle': '來自最近客戶調查的結果報告',
+          'results.anxiety': '96% 減少焦慮感',
+          'results.diet': '90% 改善飲食品質',
+          'results.sleep': '87% 獲得更好睡眠',
+          'results.accomplished': '80% 感到有成就感',
+          'results.mental': '75% 改善心理健康',
+          'results.breast': '100% 改善乳房健康',
+          // Sign up section translations
+          'signup.title': '立即開始您的健康之旅',
+          'signup.subtitle': '加入數千名女性，透過個人化AI指導和支持掌控乳房健康。',
+          'signup.button': '開始健康評估',
+          'signup.description': '完成我們的23題評估以獲得個人化見解'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',

@@ -68,9 +68,9 @@ export default function Features() {
       borderColor: "border-indigo-200"
     },
     {
-      title: "AI-Risk Monitoring system",
-      description: "Early detection",
-      reduction: "-50% risk",
+      title: t('features.activity8.title', 'AI-Risk Monitoring system'),
+      description: t('features.activity8.description', 'Early detection'),
+      reduction: t('features.activity8.reduction', '-50% risk'),
       icon: "🤖",
       bgColor: "bg-yellow-50",
       borderColor: "border-yellow-200"
