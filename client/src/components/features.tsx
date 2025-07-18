@@ -2,65 +2,67 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
+import { useTranslation } from "@/components/LanguageSelector";
 import RiskReductionChart from "./risk-reduction-chart";
 import yogaImage from "@assets/yoga_1752241133489.png";
 
 export default function Features() {
   const [, setLocation] = useLocation();
+  const { t } = useTranslation();
 
   const activities = [
     {
-      title: "Daily 5mins breathing exercise",
-      description: "Lower Chronic stress",
-      reduction: "-15% risk",
+      title: t('features.activity1.title', 'Daily 5mins breathing exercise'),
+      description: t('features.activity1.description', 'Lower Chronic stress'),
+      reduction: t('features.activity1.reduction', '-15% risk'),
       icon: "🫁",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200"
     },
     {
-      title: "Daily 10mins mindfulness exercise",
-      description: "Increase positivity",
-      reduction: "-5% risk",
+      title: t('features.activity2.title', 'Daily 10mins mindfulness exercise'),
+      description: t('features.activity2.description', 'Increase positivity'),
+      reduction: t('features.activity2.reduction', '-5% risk'),
       icon: "🧘‍♀️",
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200"
     },
     {
-      title: "3x/weekly Self Breast Massage",
-      description: "Lower Chronic inflammation",
-      reduction: "-20% risk",
+      title: t('features.activity3.title', '3x/weekly Self Breast Massage'),
+      description: t('features.activity3.description', 'Lower Chronic inflammation'),
+      reduction: t('features.activity3.reduction', '-20% risk'),
       icon: "💆‍♀️",
       bgColor: "bg-pink-50",
       borderColor: "border-pink-200"
     },
     {
-      title: "Personalized dietary management",
-      description: "Lower Carcinogen",
-      reduction: "-20% risk",
+      title: t('features.activity4.title', 'Personalized dietary management'),
+      description: t('features.activity4.description', 'Lower Carcinogen'),
+      reduction: t('features.activity4.reduction', '-20% risk'),
       icon: "🥗",
       bgColor: "bg-green-50",
       borderColor: "border-green-200"
     },
     {
-      title: "Daily Physical exercise tracking",
-      description: "Lower oxidative stress",
-      reduction: "-40% risk",
+      title: t('features.activity5.title', 'Daily Physical exercise tracking'),
+      description: t('features.activity5.description', 'Lower oxidative stress'),
+      reduction: t('features.activity5.reduction', '-40% risk'),
       icon: "🏃‍♀️",
       bgColor: "bg-orange-50",
       borderColor: "border-orange-200"
     },
     {
-      title: "Monthly Self Breast Exam",
-      description: "Early Symptom Detection",
-      reduction: "-20% risk",
+      title: t('features.activity6.title', 'Monthly Self Breast Exam'),
+      description: t('features.activity6.description', 'Early Symptom Detection'),
+      reduction: t('features.activity6.reduction', '-20% risk'),
       icon: "🔍",
       bgColor: "bg-teal-50",
       borderColor: "border-teal-200"
     },
     {
-      title: "Daily educational content and tips",
-      description: "Increase awareness",
-      reduction: "-5% risk",
+      title: t('features.activity7.title', 'Daily educational content and tips'),
+      description: t('features.activity7.description', 'Increase awareness'),
+      reduction: t('features.activity7.reduction', '-5% risk'),
       icon: "📚",
       bgColor: "bg-indigo-50",
       borderColor: "border-indigo-200"
@@ -80,10 +82,10 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Evidence-Based <span className="sky-blue">Risk Reduction Activities</span>
+            {t('features.title', 'Evidence-based activities to reverse breast cancer development')}
           </h2>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Proven daily activities that work together to significantly reduce your breast cancer risk through lifestyle optimization.
+            {t('features.subtitle', 'All activities are scientifically proven to reduce breast cancer risk')}
           </p>
         </div>
 

@@ -2,41 +2,42 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslation } from "@/components/LanguageSelector";
 
-const plans = [
+const plans = (t: any) => [
   {
     id: "basic",
-    name: "Basic",
-    price: "$4.99",
+    name: t('pricing.basic.name', 'Basic'),
+    price: t('pricing.basic.price', '$4.99'),
     features: [
-      "Basic risk assessment",
-      "Weekly health tips",
-      "Limited AI chat (10 messages/day)"
+      t('pricing.basic.feature1', 'Basic risk assessment'),
+      t('pricing.basic.feature2', 'Weekly health tips'),
+      t('pricing.basic.feature3', 'Limited AI chat (10 messages/day)')
     ],
     buttonClass: "border-2 border-sky-blue text-sky-blue hover:bg-sky-blue hover:text-white"
   },
   {
     id: "pro",
-    name: "Pro",
-    price: "$9.99",
+    name: t('pricing.pro.name', 'Pro'),
+    price: t('pricing.pro.price', '$9.99'),
     popular: true,
     features: [
-      "Comprehensive risk assessment",
-      "Daily personalized coaching", 
-      "Unlimited AI chat support",
-      "Progress tracking & analytics"
+      t('pricing.pro.feature1', 'Comprehensive risk assessment'),
+      t('pricing.pro.feature2', 'Daily personalized coaching'), 
+      t('pricing.pro.feature3', 'Unlimited AI chat support'),
+      t('pricing.pro.feature4', 'Progress tracking & analytics')
     ],
     buttonClass: "gradient-bg text-white hover:shadow-lg"
   },
   {
     id: "premium",
-    name: "Premium",
-    price: "$19.99",
+    name: t('pricing.premium.name', 'Premium'),
+    price: t('pricing.premium.price', '$19.99'),
     features: [
-      "Advanced genetic risk analysis",
-      "Priority AI responses",
-      "Expert consultation scheduling",
-      "Family sharing (up to 4 members)"
+      t('pricing.premium.feature1', 'Advanced genetic risk analysis'),
+      t('pricing.premium.feature2', 'Priority AI responses'),
+      t('pricing.premium.feature3', 'Expert consultation scheduling'),
+      t('pricing.premium.feature4', 'Family sharing (up to 4 members)')
     ],
     buttonClass: "bg-sunny-yellow text-charcoal hover:bg-yellow-400"
   }
@@ -46,6 +47,7 @@ export default function Pricing() {
   const [, setLocation] = useLocation();
   const { user } = useAuth();
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleSubscribe = (tier: string) => {
     if (!user) {
@@ -67,6 +69,8 @@ export default function Pricing() {
 
     setLocation(`/subscribe/${tier}`);
   };
+
+  const planList = plans(t);
 
   return (
     <section id="pricing" className="py-20">

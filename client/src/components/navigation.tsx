@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
-import { LanguageSelector } from "@/components/LanguageSelector";
+import { LanguageSelector, useTranslation } from "@/components/LanguageSelector";
 import { Menu, X } from "lucide-react";
 
 export default function Navigation() {
@@ -17,6 +17,7 @@ export default function Navigation() {
   const [authForm, setAuthForm] = useState({ email: "", username: "", password: "" });
   const { toast } = useToast();
   const { user, login, register, logout } = useAuth();
+  const { t } = useTranslation();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,10 +75,10 @@ export default function Navigation() {
               <span className="font-bold text-xl text-yellow-400">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">About</a>
-              <a href="#app-features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Features</a>
+              <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.features', 'Features')}</a>
+              <a href="#app-features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.features', 'Features')}</a>
               <a href="#reviews" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Reviews</a>
-              <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Pricing</a>
+              <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.pricing', 'Pricing')}</a>
               <div className="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
                 <LanguageSelector />
               </div>
@@ -94,7 +95,7 @@ export default function Navigation() {
                     </Button>
                   )}
                   <Button variant="outline" onClick={handleLogout} className="border-white text-white hover:bg-white hover:text-blue-600">
-                    Sign Out
+                    {t('nav.logout', 'Sign Out')}
                   </Button>
                 </div>
               ) : (
@@ -104,13 +105,13 @@ export default function Navigation() {
                     onClick={() => setShowAuthModal(true)}
                     className="text-yellow-400 hover:text-yellow-300 font-medium"
                   >
-                    Log In
+                    {t('nav.signIn', 'Sign In')}
                   </Button>
                   <Button 
                     onClick={() => setShowAuthModal(true)}
                     className="bg-white text-blue-600 px-6 py-2 rounded-full hover:bg-gray-100 transition-colors font-semibold"
                   >
-                    SIGN UP
+                    {t('nav.signUp', 'Sign Up')}
                   </Button>
                 </div>
               )}
@@ -138,10 +139,10 @@ export default function Navigation() {
                 <LanguageSelector />
               </div>
               <div className="space-y-3">
-                <a href="#features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>About</a>
-                <a href="#app-features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Features</a>
+                <a href="#features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.features', 'Features')}</a>
+                <a href="#app-features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.features', 'Features')}</a>
                 <a href="#reviews" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Reviews</a>
-                <a href="#pricing" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>Pricing</a>
+                <a href="#pricing" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.pricing', 'Pricing')}</a>
               </div>
               
               {user ? (
