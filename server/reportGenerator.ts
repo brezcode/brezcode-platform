@@ -655,23 +655,32 @@ Maintain adherence to your screening schedule and ensure your imaging is perform
   }
   
   private generateFollowUpPlan(userProfile: UserProfile, riskCategory: 'low' | 'moderate' | 'high'): Record<string, string> {
-    const basePlan = {
-      "3_months": "Assess progress on lifestyle changes and health metrics",
-      "6_months": "Complete follow-up health assessment"
-    };
+    // Create timeline in chronological order
+    const basePlan: Record<string, string> = {};
     
+    // Add items in chronological order to maintain display sequence
     if (riskCategory === 'high') {
       basePlan["2_weeks"] = "Schedule appointment with healthcare provider to discuss findings";
+    }
+    
+    // 1 month timeline
+    if (userProfile === 'current_patient' || userProfile === 'survivor') {
+      basePlan["1_month"] = "Review plan with oncology team";
+    } else if (riskCategory === 'high') {
       basePlan["1_month"] = "Begin enhanced screening protocol if recommended";
     } else {
       basePlan["1_month"] = "Review daily plan implementation and adjust as needed";
     }
     
+    // 3 months timeline
     if (userProfile === 'current_patient' || userProfile === 'survivor') {
-      basePlan["1_month"] = "Review plan with oncology team";
       basePlan["3_months"] = "Coordinate with regular surveillance schedule";
+    } else {
+      basePlan["3_months"] = "Assess progress on lifestyle changes and health metrics";
     }
     
+    // 6 months timeline
+    basePlan["6_months"] = "Complete follow-up health assessment";
 
     return basePlan;
   }
