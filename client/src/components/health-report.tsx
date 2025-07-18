@@ -202,9 +202,19 @@ export default function HealthReport({ report }: HealthReportProps) {
                     <Progress value={section.score} className="h-2" />
                   </div>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {section.factorCount} risk factor{section.factorCount !== 1 ? 's' : ''} identified
-                </p>
+                {section.riskFactors && section.riskFactors.length > 0 ? (
+                  <div className="space-y-1">
+                    {section.riskFactors.map((factor: string, idx: number) => (
+                      <p key={idx} className="text-xs text-gray-600 leading-tight">
+                        • {factor}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-green-600">
+                    No risk factors identified in this area
+                  </p>
+                )}
               </div>
             ))}
           </div>

@@ -39,28 +39,28 @@ const SECTION1_FACTORS: RiskFactor[] = [
 // SECTION 2: FAMILY HISTORY AND GENETICS (CORRECTED - Most BC patients have NO family history)
 const SECTION2_FACTORS: RiskFactor[] = [
   // Q4: Family History - CRITICAL CORRECTION: 85% of BC patients have NO family history
-  { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree family history increases risk (RR = 2.0), but remember: 85% of breast cancer patients have NO family history" },
-  { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree family history slightly increases risk (RR = 1.5)" },
-  { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "Multiple family history increases risk (RR = 2.0)" },
+  { question: "family_history", answer: "Yes, I have first-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "First-degree relative with breast cancer - risk increased by 100%" },
+  { question: "family_history", answer: "Yes, I have second-degree relative with BC", relativeRisk: 1.5, category: "genetic", explanation: "Second-degree relative with breast cancer - risk increased by 50%" },
+  { question: "family_history", answer: "Yes, I have both first-degree relative and second-degree relative with BC", relativeRisk: 2.0, category: "genetic", explanation: "Multiple family history - risk increased by 100%" },
   // Q5: BRCA Testing
-  { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 mutation increases risk (RR = 1.7)" },
+  { question: "brca_test", answer: "BRCA1/2", relativeRisk: 1.7, category: "genetic", explanation: "BRCA1/2 genetic mutation - risk increased by 70%" },
 ];
 
 // SECTION 3: REPRODUCTIVE AND HORMONAL FACTORS
 const SECTION3_FACTORS: RiskFactor[] = [
   // Q6: Menstrual Age
-  { question: "menstrual_age", answer: "Before 12 years old", relativeRisk: 1.15, category: "hormonal", explanation: "Early menarche: RR = 1.15" },
+  { question: "menstrual_age", answer: "Before 12 years old", relativeRisk: 1.15, category: "hormonal", explanation: "Early menstruation (before age 12) - risk increased by 15%" },
   // Q7: Pregnancy Age
-  { question: "pregnancy_age", answer: "Never had a full-term pregnancy", relativeRisk: 1.27, category: "hormonal", explanation: "Nulliparity: RR = 1.27" },
-  { question: "pregnancy_age", answer: "Age 30 or older", relativeRisk: 1.3, category: "hormonal", explanation: "First pregnancy ≥30: RR = 1.3" },
-  { question: "pregnancy_age", answer: "Age 25-29", relativeRisk: 1.15, category: "hormonal", explanation: "First pregnancy 25-29: RR = 1.15" },
+  { question: "pregnancy_age", answer: "Never had a full-term pregnancy", relativeRisk: 1.27, category: "hormonal", explanation: "Never had full-term pregnancy - risk increased by 27%" },
+  { question: "pregnancy_age", answer: "Age 30 or older", relativeRisk: 1.3, category: "hormonal", explanation: "First pregnancy at age 30+ - risk increased by 30%" },
+  { question: "pregnancy_age", answer: "Age 25-29", relativeRisk: 1.15, category: "hormonal", explanation: "First pregnancy at age 25-29 - risk increased by 15%" },
   // Q8: Oral Contraceptives
-  { question: "oral_contraceptives", answer: "Yes, currently using", relativeRisk: 1.24, category: "hormonal", explanation: "Current oral contraceptive: RR = 1.24" },
-  { question: "oral_contraceptives", answer: "Yes, used in the past", relativeRisk: 1.07, category: "hormonal", explanation: "Past oral contraceptive: RR = 1.07" },
+  { question: "oral_contraceptives", answer: "Yes, currently using", relativeRisk: 1.24, category: "hormonal", explanation: "Currently using birth control pills - risk increased by 24%" },
+  { question: "oral_contraceptives", answer: "Yes, used in the past", relativeRisk: 1.07, category: "hormonal", explanation: "Past birth control pill use - risk increased by 7%" },
   // Q9: Menopause
-  { question: "menopause", answer: "Yes, at age 55 or older", relativeRisk: 1.75, category: "hormonal", explanation: "Late menopause: RR = 1.75" },
+  { question: "menopause", answer: "Yes, at age 55 or older", relativeRisk: 1.75, category: "hormonal", explanation: "Late menopause (age 55+) - risk increased by 75%" },
   // Q12: HRT
-  { question: "hrt", answer: "Yes", relativeRisk: 1.25, category: "hormonal", explanation: "HRT >5 years: RR = 1.25" },
+  { question: "hrt", answer: "Yes", relativeRisk: 1.25, category: "hormonal", explanation: "Hormone replacement therapy (5+ years) - risk increased by 25%" },
 ];
 
 // SECTION 4: SYMPTOM RISK FACTORS (these don't contribute to RR calculation but affect recommendations)
@@ -84,26 +84,26 @@ const SECTION5_FACTORS: RiskFactor[] = [
 // SECTION 6: LIFESTYLE AND ENVIRONMENTAL FACTORS
 const SECTION6_FACTORS: RiskFactor[] = [
   // Q22: Western Diet
-  { question: "western_diet", answer: "Yes, Western diet", relativeRisk: 1.33, category: "lifestyle", explanation: "Western diet: RR = 1.33" },
+  { question: "western_diet", answer: "Yes, Western diet", relativeRisk: 1.33, category: "lifestyle", explanation: "Western diet pattern - risk increased by 33%" },
   // Q23: Smoking
-  { question: "smoke", answer: "Yes", relativeRisk: 1.125, category: "lifestyle", explanation: "Current smoking: RR = 1.125" },
+  { question: "smoke", answer: "Yes", relativeRisk: 1.125, category: "lifestyle", explanation: "Current smoking - risk increased by 13%" },
   // Q24: Alcohol
-  { question: "alcohol", answer: "2 or more drinks", relativeRisk: 1.175, category: "lifestyle", explanation: "2+ drinks daily: RR = 1.175" },
-  { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 drink daily: RR = 1.085" },
+  { question: "alcohol", answer: "2 or more drinks", relativeRisk: 1.175, category: "lifestyle", explanation: "2+ alcoholic drinks daily - risk increased by 18%" },
+  { question: "alcohol", answer: "1 drink", relativeRisk: 1.085, category: "lifestyle", explanation: "1 alcoholic drink daily - risk increased by 9%" },
   // Q25: Night Shift
-  { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work: RR = 1.105" },
+  { question: "night_shift", answer: "Yes", relativeRisk: 1.105, category: "lifestyle", explanation: "Night shift work - risk increased by 11%" },
   // Q26: Stressful Events
-  { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Striking life events: RR = 1.585" },
-  { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Stressful life events: RR = 1.585" },
+  { question: "stressful_events", answer: "Yes, striking life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Major stressful life events - risk increased by 59%" },
+  { question: "stressful_events", answer: "Yes, stressful life events", relativeRisk: 1.585, category: "lifestyle", explanation: "Stressful life events - risk increased by 59%" },
   // Q27: Chronic Stress
-  { question: "chronic_stress", answer: "Yes, chronic high stress", relativeRisk: 1.15, category: "lifestyle", explanation: "Chronic high stress: RR = 1.15" },
-  { question: "chronic_stress", answer: "Yes, occasional moderate stress", relativeRisk: 1.05, category: "lifestyle", explanation: "Moderate stress: RR = 1.05" },
+  { question: "chronic_stress", answer: "Yes, chronic high stress", relativeRisk: 1.15, category: "lifestyle", explanation: "Chronic high stress - risk increased by 15%" },
+  { question: "chronic_stress", answer: "Yes, occasional moderate stress", relativeRisk: 1.05, category: "lifestyle", explanation: "Moderate stress levels - risk increased by 5%" },
   // Q28: Sugar
-  { question: "sugar_diet", answer: "Yes, high sugar diet", relativeRisk: 1.15, category: "lifestyle", explanation: "High sugar diet: RR = 1.15" },
-  { question: "sugar_diet", answer: "Yes, moderate sugar diet", relativeRisk: 1.05, category: "lifestyle", explanation: "Moderate sugar diet: RR = 1.05" },
+  { question: "sugar_diet", answer: "Yes, high sugar diet", relativeRisk: 1.15, category: "lifestyle", explanation: "High sugar diet - risk increased by 15%" },
+  { question: "sugar_diet", answer: "Yes, moderate sugar diet", relativeRisk: 1.05, category: "lifestyle", explanation: "Moderate sugar diet - risk increased by 5%" },
   // Q29: Exercise (protective factor)
-  { question: "exercise", answer: "No, little or no regular exercise", relativeRisk: 1.2, category: "lifestyle", explanation: "Sedentary lifestyle: RR = 1.2" },
-  { question: "exercise", answer: "Yes, occasional light exercise", relativeRisk: 1.1, category: "lifestyle", explanation: "Light exercise: RR = 1.1" },
+  { question: "exercise", answer: "No, little or no regular exercise", relativeRisk: 1.2, category: "lifestyle", explanation: "Sedentary lifestyle - risk increased by 20%" },
+  { question: "exercise", answer: "Yes, occasional light exercise", relativeRisk: 1.1, category: "lifestyle", explanation: "Limited exercise routine - risk increased by 10%" },
 ];
 
 // Combined sections for analysis
@@ -205,7 +205,7 @@ export class BreastHealthReportGenerator {
         if (bmi >= 30 && isPostmenopausal) {
           const oldMultiplier = sectionMultiplier;
           sectionMultiplier *= 1.3;
-          appliedFactors.push(`BMI ${bmi} (obese) + postmenopausal: RR = 1.3`);
+          appliedFactors.push(`BMI ${bmi.toFixed(1)} (obesity) + postmenopausal - risk increased by 30%`);
           calculationLog.push(`BMI ${bmi} (obese) + postmenopausal: ${oldMultiplier.toFixed(2)} × 1.3 = ${sectionMultiplier.toFixed(2)}`);
         }
       }
@@ -560,6 +560,7 @@ Maintain adherence to your screening schedule and ensure your imaging is perform
           name,
           score: data.score,
           factorCount: data.factors.length,
+          riskFactors: data.factors, // Add specific risk factors with percentages
           riskLevel: this.categorizeRisk(data.score)
         }))
       },
