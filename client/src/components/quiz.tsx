@@ -200,7 +200,7 @@ const quizSections = [
         question: "Have you been told that you have dense breast tissue based on a mammogram?",
         reason: "According to a 2019 meta-analysis by Bodewes et al., women with dense breasts have a 2 times higher risk of breast cancer (relative risk, RR ≈ 2.0) compared to women with non-dense breasts.",
         type: "multiple_choice" as const,
-        options: ["Yes", "No", "I don't know"],
+        options: ["Yes, I have dense breast tissue", "No, I don't have dense breast tissue", "I don't know"],
         required: true,
         condition: { questionId: "mammogram_frequency", answer: "Never", exclude: true }
       },
