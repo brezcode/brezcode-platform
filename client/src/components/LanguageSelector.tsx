@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { Globe } from 'lucide-react';
+import { Globe, ChevronDown } from 'lucide-react';
 
 const languages = [
   { code: 'en', name: 'English', flag: '🇺🇸' },
@@ -18,6 +17,8 @@ const languages = [
 export function LanguageSelector() {
   const [currentLanguage, setCurrentLanguage] = useState('en');
   const [translations, setTranslations] = useState<Record<string, string>>({});
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Detect browser language or load from localStorage
@@ -82,29 +83,56 @@ export function LanguageSelector() {
 
   const currentLang = languages.find(lang => lang.code === currentLanguage);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [isOpen]);
+
   return (
-    <div className="flex items-center gap-2">
+    <div className="relative flex items-center gap-2">
       <Globe className="w-4 h-4 text-yellow-400" />
-      <Select value={currentLanguage} onValueChange={changeLanguage}>
-        <SelectTrigger className="w-[140px] border-yellow-400/30 bg-transparent text-yellow-400 hover:bg-yellow-400/10 focus:ring-yellow-400">
-          <SelectValue>
-            <div className="flex items-center gap-2">
-              <span>{currentLang?.flag}</span>
-              <span className="text-sm text-yellow-400">{currentLang?.name}</span>
-            </div>
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent className="bg-white border-yellow-400/20 z-[100]">
-          {languages.map((lang) => (
-            <SelectItem key={lang.code} value={lang.code} className="hover:bg-yellow-50 focus:bg-yellow-50">
-              <div className="flex items-center gap-2">
-                <span>{lang.flag}</span>
-                <span>{lang.name}</span>
-              </div>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="relative" ref={dropdownRef}>
+        <Button
+          variant="outline"
+          className="w-[140px] border-yellow-400/30 bg-transparent text-yellow-400 hover:bg-yellow-400/10 focus:ring-yellow-400 focus:ring-2 justify-between"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <span>{currentLang?.flag}</span>
+            <span className="text-sm text-yellow-400">{currentLang?.name}</span>
+          </div>
+          <ChevronDown className="h-4 w-4 text-yellow-400" />
+        </Button>
+        
+        {isOpen && (
+          <div className="absolute top-full left-0 w-full mt-1 bg-white border border-yellow-400/20 rounded-md shadow-xl z-[9999] min-w-[140px]">
+            {languages.map((lang) => (
+              <button
+                key={lang.code}
+                className="w-full px-3 py-2 text-left hover:bg-yellow-50 focus:bg-yellow-50 first:rounded-t-md last:rounded-b-md transition-colors"
+                onClick={() => {
+                  changeLanguage(lang.code);
+                  setIsOpen(false);
+                }}
+              >
+                <div className="flex items-center gap-2">
+                  <span>{lang.flag}</span>
+                  <span className="text-sm text-gray-700">{lang.name}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
