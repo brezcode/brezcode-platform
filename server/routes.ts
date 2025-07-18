@@ -672,6 +672,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'landing.appFeatures.subtitle': '口袋里的健康教练',
           'landing.appFeatures.description': '通过快速测试，我们将为您定制首个每周计划，介绍每日健康习惯，并邀请您加入我们的私人社区。我们的专业教练将在每一步陪伴您。'
         },
+        'zh-TW': {
+          'quiz.title': '乳癌風險評估測驗',
+          'quiz.age.title': '您的年齡是多少？',
+          'report.title': '您的健康報告',
+          'coaching.daily_tip': '每日健康提示',
+          'button.continue': '繼續',
+          'button.submit': '提交',
+          // Hero section translations
+          'hero.badge': '24/7提供循證AI健康指導',
+          'hero.statistic': '"美國每8名女性中就有1名會在其一生中患乳癌"...根據世界衛生組織',
+          'hero.title1': '好消息！現在您可以',
+          'hero.reverse': '逆轉',
+          'hero.title2': '疾病發展',
+          'hero.title3': '並在15天內降低風險',
+          'hero.percentage': '100%。',
+          'hero.subtitle1': '排名第一的循證AI乳房健康指導平台',
+          'hero.subtitle2': '幫助您重新掌控健康。',
+          'hero.urgency': '不要等到為時已晚，您的家人依賴著您。',
+          'hero.cta': '開始測驗',
+          'hero.freeText': '免費開始。隨時取消。',
+          // App features section translations
+          'landing.appFeatures.title': '一款應用程式、社群和',
+          'landing.appFeatures.subtitle': '口袋裡的健康教練',
+          'landing.appFeatures.description': '透過快速測驗，我們將為您定制首個每週計劃，介紹每日健康習慣，並邀請您加入我們的私人社群。我們的專業教練將在每一步陪伴您。'
+        },
         'es': {
           'quiz.title': 'Cuestionario de Evaluación de Cáncer de Mama',
           'quiz.age.title': '¿Cuál es su edad?',

@@ -73,8 +73,8 @@ export function LanguageSelector() {
       console.warn('Failed to save language preference:', error);
     }
     
-    // Refresh the page to apply translations
-    window.location.reload();
+    // Force a re-render by dispatching a custom event
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: languageCode }));
   };
 
   const getTranslation = (key: string, fallback?: string) => {
@@ -143,8 +143,8 @@ export function useTranslation() {
   const [currentLanguage, setCurrentLanguage] = useState('en');
 
   useEffect(() => {
-    const loadTranslations = async () => {
-      const savedLanguage = localStorage.getItem('brezcode_language') || 'en';
+    const loadTranslations = async (lang?: string) => {
+      const savedLanguage = lang || localStorage.getItem('brezcode_language') || 'en';
       setCurrentLanguage(savedLanguage);
       
       try {
@@ -158,7 +158,19 @@ export function useTranslation() {
       }
     };
 
+    // Initial load
     loadTranslations();
+
+    // Listen for language changes
+    const handleLanguageChange = (event: CustomEvent) => {
+      loadTranslations(event.detail);
+    };
+
+    window.addEventListener('languageChanged', handleLanguageChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('languageChanged', handleLanguageChange as EventListener);
+    };
   }, []);
 
   const t = (key: string, fallback?: string) => {
