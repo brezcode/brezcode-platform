@@ -428,10 +428,8 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
         return;
       }
 
-      if (currentAnswer === "Yes, before age 55" && userAge >= 55) {
-        setValidationError("Please verify: You are currently " + userAge + " years old and selected 'Yes, before age 55' for menopause. If you are 55 or older and went through menopause before age 55, this is correct. However, if you went through menopause at age 55 or later, please select 'Yes, at age 55 or older'.");
-        return;
-      }
+      // Note: Removed validation for userAge >= 55 with "Yes, before age 55" 
+      // This is perfectly valid - a 60-year-old can have had menopause before age 55
 
       if (currentAnswer === "Not yet" && userAge >= 60) {
         setValidationError("Please verify: You are currently " + userAge + " years old and selected 'Not yet' for menopause. Most women go through menopause by age 60. Please double-check if you have truly not gone through menopause yet, or select the appropriate menopause option.");
