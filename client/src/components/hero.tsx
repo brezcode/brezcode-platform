@@ -75,33 +75,33 @@ export default function Hero() {
 
             {/* Chat Bubbles */}
             <div className="absolute top-4 right-4 bg-white rounded-2xl p-3 shadow-lg max-w-48 z-20">
-              <p className="text-sm text-gray-700">Hey Sue, how'd it go yesterday?</p>
+              <p className="text-sm text-gray-700">{t('hero.chat1', 'Hey Sue, how\'d it go yesterday?')}</p>
             </div>
 
             <div className="absolute top-20 right-8 bg-purple-500 rounded-2xl p-3 shadow-lg max-w-48 z-20">
-              <p className="text-sm text-white">I am following the plan, and feeling great today!</p>
+              <p className="text-sm text-white">{t('hero.chat2', 'I am following the plan, and feeling great today!')}</p>
             </div>
 
             <div className="absolute bottom-20 left-4 bg-green-500 rounded-2xl p-3 shadow-lg max-w-40 z-20">
-              <p className="text-sm text-white">Great work sticking to your plan!</p>
+              <p className="text-sm text-white">{t('hero.chat3', 'Great work sticking to your plan!')}</p>
             </div>
           </div>
 
           <div className="text-left">
             <div className="text-6xl font-bold text-white mb-4">96%</div>
             <div className="text-2xl font-bold text-white mb-4">
-              of members report<br />
-              reduced anxiety after 90 days
+              {t('hero.members.title', 'of members report')}<br />
+              {t('hero.members.subtitle', 'reduced anxiety after 90 days')}
             </div>
             <p className="text-blue-100 mb-8">
-              In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.
+              {t('hero.members.study', 'In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.')}
             </p>
 
             <Button 
               onClick={handleTakeQuiz}
               className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all"
             >
-              Take the quiz to start
+              {t('hero.cta', 'Take the quiz to start')}
             </Button>
           </div>
         </div>

@@ -748,7 +748,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'signup.title': 'Start Your Journey Today',
           'signup.subtitle': 'Join thousands of women taking control of their breast health with personalized AI guidance and support.',
           'signup.button': 'Start Your Health Assessment',
-          'signup.description': 'Complete our 23-question assessment to get personalized insights'
+          'signup.description': 'Complete our 23-question assessment to get personalized insights',
+          // Hero chat bubbles and member stats
+          'hero.chat1': 'Hey Sue, how\'d it go yesterday?',
+          'hero.chat2': 'I am following the plan, and feeling great today!',
+          'hero.chat3': 'Great work sticking to your plan!',
+          'hero.members.title': 'of members report',
+          'hero.members.subtitle': 'reduced anxiety after 90 days',
+          'hero.members.study': 'In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.',
+          // Risk chart translations
+          'riskChart.total': 'Total Risk Reduction: 175% 🎯',
+          'riskChart.maxProtection': 'Maximum protection achieved! 🛡️',
+          // Additional pricing translations
+          'pricing.extra.messaging': 'AI chatbot messaging interface',
+          'pricing.extra.community': 'Supportive community',
+          'pricing.extra.moderation': 'Focus on moderation',
+          'pricing.extra.affordable': 'Affordable cost',
+          'pricing.startQuiz': 'Take the quiz to start',
+          'pricing.noCard': 'Start immediately • No credit card required • Cancel anytime',
+          'pricing.guarantee': '30-day money-back guarantee',
+          'pricing.cancel': 'Cancel anytime',
+          'pricing.noFees': 'No hidden fees'
         };
         return res.json(englishTranslations);
       }
@@ -881,7 +901,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'signup.title': '立即開始您的健康之旅',
           'signup.subtitle': '加入數千名女性，透過個人化AI指導和支持掌控乳房健康。',
           'signup.button': '開始健康評估',
-          'signup.description': '完成我們的23題評估以獲得個人化見解'
+          'signup.description': '完成我們的23題評估以獲得個人化見解',
+          // Hero chat bubbles and member stats
+          'hero.chat1': '嘿蘇，昨天怎麼樣？',
+          'hero.chat2': '我正在遵循計劃，今天感覺很棒！',
+          'hero.chat3': '很棒，繼續堅持您的計劃！',
+          'hero.members.title': '的會員報告',
+          'hero.members.subtitle': '90天後焦慮減少',
+          'hero.members.study': '此外，根據第三方研究驗證，BrezCode會員在90天後平均感到80%的成就感。',
+          // Risk chart translations
+          'riskChart.total': '總風險降低：175% 🎯',
+          'riskChart.maxProtection': '達到最大保護！🛡️',
+          // Additional pricing translations
+          'pricing.extra.messaging': 'AI聊天機器人訊息介面',
+          'pricing.extra.community': '支持性社群',
+          'pricing.extra.moderation': '專注適度',
+          'pricing.extra.affordable': '實惠價格',
+          'pricing.startQuiz': '開始測驗',
+          'pricing.noCard': '立即開始・無需信用卡・隨時取消',
+          'pricing.guarantee': '30天退款保證',
+          'pricing.cancel': '隨時取消',
+          'pricing.noFees': '無隱藏費用'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',

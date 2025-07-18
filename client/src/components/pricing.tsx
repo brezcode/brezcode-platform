@@ -129,25 +129,25 @@ export default function Pricing() {
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>AI chatbot messaging interface</span>
+                    <span>{t('pricing.extra.messaging', 'AI chatbot messaging interface')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Supportive community</span>
+                    <span>{t('pricing.extra.community', 'Supportive community')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Focus on moderation</span>
+                    <span>{t('pricing.extra.moderation', 'Focus on moderation')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Affordable cost</span>
+                    <span>{t('pricing.extra.affordable', 'Affordable cost')}</span>
                   </div>
                 </div>
               </div>
@@ -156,11 +156,11 @@ export default function Pricing() {
                 onClick={() => setLocation("/quiz")}
                 className="w-full py-4 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
               >
-                Take the quiz to start
+                {t('pricing.startQuiz', 'Take the quiz to start')}
               </Button>
 
               <p className="text-sm text-gray-500 mt-4">
-                Start immediately • No credit card required • Cancel anytime
+                {t('pricing.noCard', 'Start immediately • No credit card required • Cancel anytime')}
               </p>
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function Pricing() {
         {/* Money Back Guarantee */}
         <div className="text-center mt-12">
           <p className="text-gray-600">
-            <span className="font-semibold">30-day money-back guarantee</span> • Cancel anytime • No hidden fees
+            <span className="font-semibold">{t('pricing.guarantee', '30-day money-back guarantee')}</span> • {t('pricing.cancel', 'Cancel anytime')} • {t('pricing.noFees', 'No hidden fees')}
           </p>
         </div>
       </div>

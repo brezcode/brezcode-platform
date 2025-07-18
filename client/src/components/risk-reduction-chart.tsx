@@ -1,6 +1,8 @@
 import React from 'react';
+import { useTranslation } from './LanguageSelector';
 
 export default function RiskReductionChart() {
+  const { t } = useTranslation();
   const data = [
     { name: "Breathing", reduction: 15, fullName: "Daily 5mins breathing exercise" },
     { name: "Mindfulness", reduction: 5, fullName: "Daily 10mins mindfulness exercise" },
@@ -75,8 +77,8 @@ export default function RiskReductionChart() {
       {/* Total Risk Reduction Display */}
       <div className="mt-8 text-center">
         <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-8 py-4 rounded-2xl shadow-lg">
-          <div className="text-2xl font-bold">Total Risk Reduction: 175% 🎯</div>
-          <div className="text-sm opacity-90 mt-1">Maximum protection achieved! 🛡️</div>
+          <div className="text-2xl font-bold">{t('riskChart.total', 'Total Risk Reduction: 175% 🎯')}</div>
+          <div className="text-sm opacity-90 mt-1">{t('riskChart.maxProtection', 'Maximum protection achieved! 🛡️')}</div>
         </div>
       </div>
     </div>
