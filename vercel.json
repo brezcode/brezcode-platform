@@ -9,10 +9,10 @@
       }
     },
     {
-      "src": "client/package.json",
+      "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "client/dist"
       }
     }
   ],
@@ -37,6 +37,9 @@
       "maxDuration": 30
     }
   },
+  "buildCommand": "npm run build",
+  "outputDirectory": "client/dist",
+  "installCommand": "npm install",
   "env": {
     "NODE_ENV": "production"
   },

@@ -1,41 +1,99 @@
 # BrezCode Deployment Guide - www.brezcode.com
 
-## Custom Domain Setup
+## Quick Deployment Steps
 
-### 1. Vercel Deployment (Recommended)
+### Step 1: GitHub Repository Setup
+1. **Create GitHub Repository**:
+   - Go to https://github.com/new
+   - Repository name: `brezcode-health-app`
+   - Set to Public (required for Vercel free tier)
+   - Initialize with README
 
-#### Step 1: Deploy to Vercel
-1. Connect GitHub repository to Vercel
-2. Import project with these settings:
-   - Framework: Other
-   - Build Command: `npm run build`
-   - Output Directory: `client/dist`
-   - Install Command: `npm install`
+2. **Upload Project to GitHub**:
+   - Download all files from this Replit
+   - Upload to your GitHub repository
+   - Commit with message: "Initial BrezCode deployment"
 
-#### Step 2: Environment Variables
-Add these to Vercel dashboard:
+### Step 2: Vercel Deployment (FREE)
+
+#### Auto-Deploy Setup:
+
+1. **Connect to Vercel** (FREE):
+   - Go to https://vercel.com/new
+   - Import your GitHub repository
+   - Configure project settings:
+     ```
+     Framework Preset: Other
+     Build Command: cd client && npm run build
+     Output Directory: client/dist
+     Install Command: npm install
+     ```
+
+2. **Deploy Settings**:
+   - Root Directory: `./` (leave empty)
+   - Node Version: 18.x
+   - Build & Development Settings: Use default
+
+### Step 3: Environment Variables Setup
+**In Vercel Dashboard → Project Settings → Environment Variables:**
+
+**Required for Production:**
+```bash
+# Database (Neon Free Tier)
+DATABASE_URL=your_neon_database_connection_string
+
+# AI & Email Services
+OPENAI_API_KEY=your_openai_api_key
+SENDGRID_API_KEY=your_sendgrid_api_key
+FROM_EMAIL=your_verified_sender_email
+
+# Security
+SESSION_SECRET=your_random_session_secret_64_chars
+
+# SMS (Optional - fallback to console logging)
+TWILIO_ACCOUNT_SID=your_twilio_account_sid
+TWILIO_AUTH_TOKEN=your_twilio_auth_token  
+TWILIO_PHONE_NUMBER=your_twilio_phone_number
 ```
-DATABASE_URL=your_neon_database_url
-OPENAI_API_KEY=your_openai_key
-SENDGRID_API_KEY=your_sendgrid_key
-FROM_EMAIL=your_verified_email
-SESSION_SECRET=your_session_secret
-TWILIO_ACCOUNT_SID=your_twilio_sid
-TWILIO_AUTH_TOKEN=your_twilio_token
-TWILIO_PHONE_NUMBER=your_twilio_phone
+
+**How to Get Each Secret:**
+- **DATABASE_URL**: From Neon dashboard → Connection Details
+- **OPENAI_API_KEY**: From OpenAI platform → API Keys  
+- **SENDGRID_API_KEY**: From SendGrid → API Keys
+- **SESSION_SECRET**: Generate random 64-character string
+
+### Step 4: Custom Domain Setup (www.brezcode.com)
+
+#### In Vercel Dashboard:
+1. Go to Project Settings → Domains
+2. Add Domain: `www.brezcode.com`
+3. Vercel will show DNS configuration
+
+#### In Your Domain Provider (GoDaddy/Namecheap):
+**Required DNS Records:**
+```
+Type: CNAME
+Name: www  
+Value: cname.vercel-dns.com
+TTL: 3600 (1 hour)
+
+Type: A (for apex domain - optional)
+Name: @
+Value: 76.76.19.19  
+TTL: 3600
 ```
 
-#### Step 3: Custom Domain Configuration
-1. In Vercel dashboard, go to Project Settings → Domains
-2. Add custom domain: `www.brezcode.com`
-3. Configure DNS records with your domain provider:
-   - Type: CNAME
-   - Name: www
-   - Value: cname.vercel-dns.com
+**Steps:**
+1. Login to your domain registrar
+2. Go to DNS Management/DNS Settings
+3. Add the CNAME record above
+4. Wait 24-48 hours for DNS propagation
+5. Verify at https://whatsmydns.net
 
-#### Step 4: SSL Certificate
-- Vercel automatically provisions SSL certificates
-- Force HTTPS redirects are enabled by default
+#### SSL Certificate:
+- ✅ Automatic (Vercel provides free SSL)
+- ✅ HTTPS redirect (enabled by default)
+- ✅ Global CDN (100+ edge locations)
 
 ### 2. Domain DNS Configuration
 
