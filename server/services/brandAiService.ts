@@ -67,26 +67,45 @@ export class BrandAiService {
 
   // Search brand's knowledge base
   async searchKnowledge(brandId: string, query: string, category?: string): Promise<BrandKnowledgeBase[]> {
-    let dbQuery = db
-      .select()
-      .from(brandKnowledgeBase)
-      .where(and(
-        eq(brandKnowledgeBase.brandId, brandId),
-        eq(brandKnowledgeBase.isActive, true)
-      ));
+    console.log(`Searching knowledge for brand ${brandId} with query: "${query}"`);
+    
+    let whereConditions = [
+      eq(brandKnowledgeBase.brandId, brandId),
+      eq(brandKnowledgeBase.isActive, true)
+    ];
 
     if (category) {
-      dbQuery = dbQuery.where(eq(brandKnowledgeBase.category, category));
+      whereConditions.push(eq(brandKnowledgeBase.category, category));
     }
 
-    const knowledge = await dbQuery;
+    const knowledge = await db
+      .select()
+      .from(brandKnowledgeBase)
+      .where(and(...whereConditions));
     
-    // Simple text matching - in production, you'd use vector search
-    return knowledge.filter(k => 
-      k.content.toLowerCase().includes(query.toLowerCase()) ||
-      k.title.toLowerCase().includes(query.toLowerCase()) ||
-      k.tags?.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-    );
+    console.log(`Found ${knowledge.length} total knowledge entries for brand ${brandId}`);
+    
+    // Enhanced text matching with meaningful keyword search
+    const stopWords = ['show', 'me', 'how', 'to', 'do', 'tell', 'what', 'is', 'the', 'a', 'an', 'and', 'or', 'but', 'for', 'in', 'on', 'at', 'by', 'with'];
+    const queryWords = query.toLowerCase()
+      .split(/[\s\-]+/)
+      .filter(word => word.length > 2 && !stopWords.includes(word));
+    
+    const filtered = knowledge.filter(k => {
+      const titleLower = k.title.toLowerCase();
+      const contentLower = k.content.toLowerCase();
+      const tagsString = k.tags?.join(' ').toLowerCase() || '';
+      const searchText = `${titleLower} ${contentLower} ${tagsString}`;
+      
+      // Check if any meaningful query word appears in combined search text
+      const hasMatch = queryWords.some(word => searchText.includes(word));
+      
+      return hasMatch;
+    });
+    
+    console.log(`Filtered to ${filtered.length} relevant entries for query: "${query}"`);
+    
+    return filtered;
   }
 
   // Create or get chat session
@@ -170,6 +189,7 @@ export class BrandAiService {
 
     // Search relevant knowledge
     const relevantKnowledge = await this.searchKnowledge(brandId, userMessage);
+    console.log(`Found ${relevantKnowledge.length} relevant knowledge entries for "${userMessage}"`);
     
     // Get recent chat history for context
     const chatHistory = await this.getChatHistory(brandId, sessionId, 5);
