@@ -551,12 +551,7 @@ export default function UserHomepage() {
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => {
-                    // Create iPhone widget functionality
-                    if ('serviceWorker' in navigator) {
-                      alert('To create an iPhone widget:\n\n1. Open this app in Safari\n2. Tap the Share button\n3. Select "Add to Home Screen"\n4. Long press home screen → tap "+" → add widget\n\nYour health tips will appear as a native widget!');
-                    }
-                  }}
+                  onClick={() => setLocation('/brezcode/notifications?tab=iphone')}
                 >
                   <Smartphone className="h-4 w-4 mr-2" />
                   Create iPhone Widget

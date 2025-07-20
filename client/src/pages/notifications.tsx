@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bell, Calendar, Settings, Smartphone, Clock, Heart, User, MessageSquare } from 'lucide-react';
 import WebPushNotifications from '@/components/WebPushNotifications';
 import NotificationDemo from '@/components/NotificationDemo';
+import IPhoneWidgetGuide from '@/components/IPhoneWidgetGuide';
 
 export default function NotificationsPage() {
   return (
@@ -24,9 +25,9 @@ export default function NotificationsPage() {
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="demo">Live Demo</TabsTrigger>
           <TabsTrigger value="setup">Setup</TabsTrigger>
+          <TabsTrigger value="iphone">iPhone Widget</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="iphone">iPhone Widget</TabsTrigger>
         </TabsList>
 
         {/* Demo Tab */}
@@ -37,6 +38,11 @@ export default function NotificationsPage() {
         {/* Setup Tab */}
         <TabsContent value="setup" className="space-y-6">
           <WebPushNotifications />
+        </TabsContent>
+
+        {/* iPhone Widget Tab */}
+        <TabsContent value="iphone" className="space-y-6">
+          <IPhoneWidgetGuide />
         </TabsContent>
 
         {/* Schedule Tab */}
