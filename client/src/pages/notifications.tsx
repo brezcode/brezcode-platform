@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Bell, Calendar, Settings, Smartphone, Clock, Heart, User, MessageSquare } from 'lucide-react';
 import WebPushNotifications from '@/components/WebPushNotifications';
+import NotificationDemo from '@/components/NotificationDemo';
 
 export default function NotificationsPage() {
   return (
@@ -19,13 +20,19 @@ export default function NotificationsPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="setup" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="demo" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="demo">Live Demo</TabsTrigger>
           <TabsTrigger value="setup">Setup</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
           <TabsTrigger value="iphone">iPhone Widget</TabsTrigger>
         </TabsList>
+
+        {/* Demo Tab */}
+        <TabsContent value="demo" className="space-y-6">
+          <NotificationDemo />
+        </TabsContent>
 
         {/* Setup Tab */}
         <TabsContent value="setup" className="space-y-6">

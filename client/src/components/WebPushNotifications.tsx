@@ -159,6 +159,29 @@ export default function WebPushNotifications() {
     }
   };
 
+  const sendBreastHealthTip = async () => {
+    try {
+      // Show immediate browser notification for demo
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('🌸 Daily Breast Health Tip', {
+          body: 'Take 5 minutes today for deep breathing exercises. Stress reduction can help lower cortisol levels and support immune function.',
+          icon: '/health-icon.png',
+          tag: 'health-tip'
+        });
+      }
+
+      await apiRequest('POST', '/api/notifications/test', {
+        title: '🌸 Daily Breast Health Tip',
+        body: 'Take 5 minutes today for deep breathing exercises. Stress reduction can help lower cortisol levels and support immune function.',
+        icon: '/health-icon.png'
+      });
+      
+      console.log('📲 Breast health tip notification sent');
+    } catch (error) {
+      console.error('❌ Failed to send health tip notification:', error);
+    }
+  };
+
   const updatePreferences = async (newPreferences: Partial<NotificationPreferences>) => {
     const updatedPreferences = { ...preferences, ...newPreferences };
     setPreferences(updatedPreferences);
@@ -244,22 +267,32 @@ export default function WebPushNotifications() {
                 <CheckCircle className="h-4 w-4" />
                 Notifications are active
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-1 gap-2">
                 <Button 
-                  onClick={showTestNotification}
-                  variant="outline"
+                  onClick={sendBreastHealthTip}
+                  variant="default"
                   size="sm"
+                  className="bg-pink-600 hover:bg-pink-700"
                 >
-                  Test Notification
+                  🌸 Demo Health Tip
                 </Button>
-                <Button 
-                  onClick={unsubscribeFromPush}
-                  variant="outline"
-                  size="sm"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Disabling...' : 'Disable'}
-                </Button>
+                <div className="grid grid-cols-2 gap-2">
+                  <Button 
+                    onClick={showTestNotification}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Test Notification
+                  </Button>
+                  <Button 
+                    onClick={unsubscribeFromPush}
+                    variant="outline"
+                    size="sm"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Disabling...' : 'Disable'}
+                  </Button>
+                </div>
               </div>
             </div>
           )}
