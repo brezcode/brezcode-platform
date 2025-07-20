@@ -7,6 +7,7 @@ import { Bell, Calendar, Settings, Smartphone, Clock, Heart, User, MessageSquare
 import WebPushNotifications from '@/components/WebPushNotifications';
 import NotificationDemo from '@/components/NotificationDemo';
 import IPhoneWidgetGuide from '@/components/IPhoneWidgetGuide';
+import AppleWatchIntegration from '@/components/AppleWatchIntegration';
 
 export default function NotificationsPage() {
   return (
@@ -22,10 +23,11 @@ export default function NotificationsPage() {
       </div>
 
       <Tabs defaultValue="demo" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="demo">Live Demo</TabsTrigger>
           <TabsTrigger value="setup">Setup</TabsTrigger>
           <TabsTrigger value="iphone">iPhone Widget</TabsTrigger>
+          <TabsTrigger value="watch">Apple Watch</TabsTrigger>
           <TabsTrigger value="schedule">Schedule</TabsTrigger>
           <TabsTrigger value="history">History</TabsTrigger>
         </TabsList>
@@ -43,6 +45,16 @@ export default function NotificationsPage() {
         {/* iPhone Widget Tab */}
         <TabsContent value="iphone" className="space-y-6">
           <IPhoneWidgetGuide />
+        </TabsContent>
+
+        {/* Apple Watch Tab */}
+        <TabsContent value="watch" className="space-y-6">
+          <AppleWatchIntegration 
+            onHealthDataUpdate={(data) => {
+              console.log('Apple Watch health data updated:', data);
+              // Integration with health recommendations
+            }}
+          />
         </TabsContent>
 
         {/* Schedule Tab */}

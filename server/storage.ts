@@ -28,6 +28,8 @@ export class MemStorage implements IStorage {
   private users: Map<number, User>;
   private emailVerifications: Map<string, EmailVerification>;
   private healthReports: Map<number, HealthReport>;
+  private healthMetrics: Map<number, any>;
+  private healthDataSync: Map<number, any>;
   currentId: number;
   currentEmailVerificationId: number;
   currentHealthReportId: number;
@@ -36,6 +38,8 @@ export class MemStorage implements IStorage {
     this.users = new Map();
     this.emailVerifications = new Map();
     this.healthReports = new Map();
+    this.healthMetrics = new Map();
+    this.healthDataSync = new Map();
     this.currentId = 1;
     this.currentEmailVerificationId = 1;
     this.currentHealthReportId = 1;
@@ -188,6 +192,49 @@ export class MemStorage implements IStorage {
   async getLatestHealthReport(userId: number): Promise<HealthReport | undefined> {
     const reports = await this.getHealthReports(userId);
     return reports[0]; // Most recent due to sorting
+  }
+
+  // Apple Health Data Management
+  async createHealthMetrics(metrics: any): Promise<any> {
+    const id = this.healthMetrics.size + 1;
+    const newMetrics = { id, ...metrics };
+    this.healthMetrics.set(id, newMetrics);
+    return Promise.resolve(newMetrics);
+  }
+
+  async getHealthMetricsByUser(userId: number, days: number = 30): Promise<any[]> {
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - days);
+    
+    const userMetrics = Array.from(this.healthMetrics.values())
+      .filter(metrics => 
+        metrics.userId === userId && 
+        new Date(metrics.date) >= cutoffDate
+      )
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    return Promise.resolve(userMetrics);
+  }
+
+  async getLatestHealthMetrics(userId: number): Promise<any | null> {
+    const userMetrics = Array.from(this.healthMetrics.values())
+      .filter(metrics => metrics.userId === userId)
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    return Promise.resolve(userMetrics[0] || null);
+  }
+
+  async updateHealthDataSync(userId: number, settings: any): Promise<any> {
+    const existing = this.healthDataSync.get(userId);
+    const updated = existing ? { ...existing, ...settings, updatedAt: new Date() } : 
+                              { id: userId, userId, ...settings, createdAt: new Date(), updatedAt: new Date() };
+    
+    this.healthDataSync.set(userId, updated);
+    return Promise.resolve(updated);
+  }
+
+  async getHealthDataSyncByUser(userId: number): Promise<any | null> {
+    return Promise.resolve(this.healthDataSync.get(userId) || null);
   }
 }
 

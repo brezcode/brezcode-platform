@@ -556,6 +556,15 @@ export default function UserHomepage() {
                   <Smartphone className="h-4 w-4 mr-2" />
                   Create iPhone Widget
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/brezcode/notifications?tab=watch')}
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Connect Apple Watch
+                </Button>
               </CardContent>
             </Card>
           </div>

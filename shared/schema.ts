@@ -73,6 +73,53 @@ export const userNotifications = pgTable("user_notifications", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Apple Watch and Health Data Integration
+export const healthMetrics = pgTable("health_metrics", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  date: timestamp("date").notNull(),
+  // Heart Rate Data
+  heartRateResting: integer("heart_rate_resting"), // bpm
+  heartRateMax: integer("heart_rate_max"), // bpm
+  heartRateVariability: real("heart_rate_variability"), // milliseconds
+  // Activity Data
+  steps: integer("steps"),
+  distanceWalking: real("distance_walking"), // kilometers
+  caloriesBurned: integer("calories_burned"),
+  activeMinutes: integer("active_minutes"),
+  exerciseMinutes: integer("exercise_minutes"),
+  standHours: integer("stand_hours"),
+  // Sleep Data
+  sleepDuration: real("sleep_duration"), // hours
+  sleepQuality: varchar("sleep_quality"), // 'poor', 'fair', 'good', 'excellent'
+  // Health Metrics
+  weight: real("weight"), // kg
+  bodyFat: real("body_fat"), // percentage
+  bloodPressureSystolic: integer("blood_pressure_systolic"),
+  bloodPressureDiastolic: integer("blood_pressure_diastolic"),
+  // Stress and Recovery
+  stressLevel: varchar("stress_level"), // 'low', 'moderate', 'high'
+  recoveryScore: integer("recovery_score"), // 0-100
+  // Raw data from Apple Health
+  rawHealthData: jsonb("raw_health_data"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Health Data Sync Settings
+export const healthDataSync = pgTable("health_data_sync", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  isAppleHealthEnabled: boolean("is_apple_health_enabled").default(false),
+  isAppleWatchConnected: boolean("is_apple_watch_connected").default(false),
+  lastSyncAt: timestamp("last_sync_at"),
+  syncFrequency: varchar("sync_frequency").default("daily"), // 'hourly', 'daily', 'weekly'
+  enabledMetrics: jsonb("enabled_metrics").default([]), // Array of metric types to sync
+  syncErrors: jsonb("sync_errors"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Knowledge Base for AI Memory and Learning
 export const knowledgeBase = pgTable("knowledge_base", {
   id: serial("id").primaryKey(),
