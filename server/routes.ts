@@ -791,7 +791,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.premium.feature1': 'Easy Risk scoring and tracking',
           'pricing.premium.feature2': 'Weekly Planning',
           'pricing.premium.feature3': 'Analytics & dashboard',
-          'pricing.premium.feature4': 'Personalized recommendations'
+          'pricing.premium.feature4': 'Personalized recommendations',
+          // Risk chart activity names
+          'riskChart.breathing': 'Breathing',
+          'riskChart.mindfulness': 'Mindfulness', 
+          'riskChart.massage': 'Massage',
+          'riskChart.diet': 'Diet',
+          'riskChart.exercise': 'Exercise',
+          'riskChart.exam': 'Exam',
+          'riskChart.education': 'Education',
+          'riskChart.aiMonitor': 'AI Monitor',
+          'riskChart.reach100': 'Reach Risk Reduction of 100%',
+          'riskChart.combineAll': 'Combine all activities for maximum protection!',
+          'riskChart.byActivity': 'Risk Reduction by Activity'
         };
         return res.json(englishTranslations);
       }
@@ -967,7 +979,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.premium.feature1': '簡易風險評分和追蹤',
           'pricing.premium.feature2': '每週規劃',
           'pricing.premium.feature3': '分析和儀表板',
-          'pricing.premium.feature4': '個人化建議'
+          'pricing.premium.feature4': '個人化建議',
+          // Risk chart activity names
+          'riskChart.breathing': '呼吸練習',
+          'riskChart.mindfulness': '正念冥想', 
+          'riskChart.massage': '按摩',
+          'riskChart.diet': '飲食管理',
+          'riskChart.exercise': '運動',
+          'riskChart.exam': '自我檢查',
+          'riskChart.education': '健康教育',
+          'riskChart.aiMonitor': 'AI監測',
+          'riskChart.reach100': '達到100%風險降低',
+          'riskChart.combineAll': '結合所有活動以獲得最大保護！',
+          'riskChart.byActivity': '各活動風險降低程度'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',

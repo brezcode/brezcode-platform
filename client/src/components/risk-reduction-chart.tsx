@@ -4,14 +4,14 @@ import { useTranslation } from './LanguageSelector';
 export default function RiskReductionChart() {
   const { t } = useTranslation();
   const data = [
-    { name: "Breathing", reduction: 15, fullName: "Daily 5mins breathing exercise" },
-    { name: "Mindfulness", reduction: 5, fullName: "Daily 10mins mindfulness exercise" },
-    { name: "Massage", reduction: 20, fullName: "3x/weekly Self Breast Massage" },
-    { name: "Diet", reduction: 20, fullName: "Personalized dietary management" },
-    { name: "Exercise", reduction: 40, fullName: "Daily Physical exercise tracking" },
-    { name: "Exam", reduction: 20, fullName: "Monthly Self Breast Exam" },
-    { name: "Education", reduction: 5, fullName: "Daily educational content and tips" },
-    { name: "AI Monitor", reduction: 50, fullName: "AI-Risk Monitoring system" }
+    { name: t('riskChart.breathing', 'Breathing'), reduction: 15, fullName: t('features.activity1.title', 'Daily 5mins breathing exercise') },
+    { name: t('riskChart.mindfulness', 'Mindfulness'), reduction: 5, fullName: t('features.activity2.title', 'Daily 10mins mindfulness exercise') },
+    { name: t('riskChart.massage', 'Massage'), reduction: 20, fullName: t('features.activity3.title', '3x/weekly Self Breast Massage') },
+    { name: t('riskChart.diet', 'Diet'), reduction: 20, fullName: t('features.activity4.title', 'Personalized dietary management') },
+    { name: t('riskChart.exercise', 'Exercise'), reduction: 40, fullName: t('features.activity5.title', 'Daily Physical exercise tracking') },
+    { name: t('riskChart.exam', 'Exam'), reduction: 20, fullName: t('features.activity6.title', 'Monthly Self Breast Exam') },
+    { name: t('riskChart.education', 'Education'), reduction: 5, fullName: t('features.activity7.title', 'Daily educational content and tips') },
+    { name: t('riskChart.aiMonitor', 'AI Monitor'), reduction: 50, fullName: t('features.activity8.title', 'AI-Risk Monitoring system') }
   ];
 
   // Calculate width percentage based on max value of 50%
@@ -35,12 +35,12 @@ export default function RiskReductionChart() {
               {/* Celebration Header inside phone */}
               <div className="text-center mb-6">
                 <h3 className="text-lg font-bold text-green-600 mb-1">
-                  🎉 Reach Risk Reduction of 100% 🎊
+                  🎉 {t('riskChart.reach100', 'Reach Risk Reduction of 100%')} 🎊
                 </h3>
                 <p className="text-xs text-gray-600 mb-2">
-                  Combine all activities for maximum protection! 🌟
+                  {t('riskChart.combineAll', 'Combine all activities for maximum protection!')} 🌟
                 </p>
-                <h4 className="text-md font-bold text-gray-800 mb-4">Risk Reduction by Activity</h4>
+                <h4 className="text-md font-bold text-gray-800 mb-4">{t('riskChart.byActivity', 'Risk Reduction by Activity')}</h4>
               </div>
 
               {/* Custom Bar Chart */}
