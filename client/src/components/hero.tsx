@@ -105,11 +105,11 @@ export default function Hero() {
                 {t('hero.cta', 'Take the quiz to start')}
               </Button>
               <Button 
-                onClick={() => setLocation("/brezcode/health-preferences")}
+                onClick={() => setLocation("/brezcode/health-setup")}
                 variant="outline"
                 className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-8 py-3 rounded-full text-lg font-bold transition-all"
               >
-                🗓️ Try Health Scheduling
+                🗓️ Create My Health Plan
               </Button>
             </div>
           </div>
