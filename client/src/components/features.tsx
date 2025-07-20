@@ -108,7 +108,7 @@ export default function Features() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             {/* Left side - Content */}
             <div>
-              <h3 className="text-3xl font-bold mb-8 text-sky-600">Brezcode can help you</h3>
+              <h3 className="text-3xl font-bold mb-8 text-sky-600">{t('features.help.title', 'Brezcode can help you')}</h3>
 
               <div className="space-y-6">
                 <div className="flex items-start space-x-4">
@@ -118,8 +118,8 @@ export default function Features() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold mb-2">Reduce breast cancer risk</h4>
-                    <p className="text-gray-600">No matter where you are on your journey, Brezcode can help you reduce risk, with no pressure to be perfect.</p>
+                    <h4 className="text-lg font-bold mb-2">{t('features.help.benefit1.title', 'Reduce breast cancer risk')}</h4>
+                    <p className="text-gray-600">{t('features.help.benefit1.description', 'No matter where you are on your journey, Brezcode can help you reduce risk, with no pressure to be perfect.')}</p>
                   </div>
                 </div>
 
@@ -130,8 +130,8 @@ export default function Features() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold mb-2">Gain control over your wellness</h4>
-                    <p className="text-gray-600">We'll teach you the science-backed habits and techniques to gain control over your breast health.</p>
+                    <h4 className="text-lg font-bold mb-2">{t('features.help.benefit2.title', 'Gain control over your wellness')}</h4>
+                    <p className="text-gray-600">{t('features.help.benefit2.description', 'We\'ll teach you the science-backed habits and techniques to gain control over your breast health.')}</p>
                   </div>
                 </div>
 
@@ -142,8 +142,8 @@ export default function Features() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold mb-2">Reduce anxiety and stress</h4>
-                    <p className="text-gray-600">The days of anxiety ruining your day or week are over. Learn to enjoy peace of mind with fewer negative effects.</p>
+                    <h4 className="text-lg font-bold mb-2">{t('features.help.benefit3.title', 'Reduce anxiety and stress')}</h4>
+                    <p className="text-gray-600">{t('features.help.benefit3.description', 'The days of anxiety ruining your day or week are over. Learn to enjoy peace of mind with fewer negative effects.')}</p>
                   </div>
                 </div>
 
@@ -154,15 +154,15 @@ export default function Features() {
                     </svg>
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold mb-2">Improve your well-being</h4>
-                    <p className="text-gray-600">Taking care of your health can have a big positive impact on your sleep, mental health, relationships, and more.</p>
+                    <h4 className="text-lg font-bold mb-2">{t('features.help.benefit4.title', 'Improve your well-being')}</h4>
+                    <p className="text-gray-600">{t('features.help.benefit4.description', 'Taking care of your health can have a big positive impact on your sleep, mental health, relationships, and more.')}</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8">
                 <Button onClick={() => setLocation('/quiz')} className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
-                  Take the quiz to start
+                  {t('features.help.button', 'Take the quiz to start')}
                 </Button>
               </div>
             </div>

@@ -768,7 +768,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.noCard': 'Start immediately • No credit card required • Cancel anytime',
           'pricing.guarantee': '30-day money-back guarantee',
           'pricing.cancel': 'Cancel anytime',
-          'pricing.noFees': 'No hidden fees'
+          'pricing.noFees': 'No hidden fees',
+          // Features help section
+          'features.help.title': 'Brezcode can help you',
+          'features.help.benefit1.title': 'Reduce breast cancer risk',
+          'features.help.benefit1.description': 'No matter where you are on your journey, Brezcode can help you reduce risk, with no pressure to be perfect.',
+          'features.help.benefit2.title': 'Gain control over your wellness',
+          'features.help.benefit2.description': 'We\'ll teach you the science-backed habits and techniques to gain control over your breast health.',
+          'features.help.benefit3.title': 'Reduce anxiety and stress',
+          'features.help.benefit3.description': 'The days of anxiety ruining your day or week are over. Learn to enjoy peace of mind with fewer negative effects.',
+          'features.help.benefit4.title': 'Improve your well-being',
+          'features.help.benefit4.description': 'Taking care of your health can have a big positive impact on your sleep, mental health, relationships, and more.',
+          'features.help.button': 'Take the quiz to start'
         };
         return res.json(englishTranslations);
       }
@@ -921,7 +932,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.noCard': '立即開始・無需信用卡・隨時取消',
           'pricing.guarantee': '30天退款保證',
           'pricing.cancel': '隨時取消',
-          'pricing.noFees': '無隱藏費用'
+          'pricing.noFees': '無隱藏費用',
+          // Features help section
+          'features.help.title': 'Brezcode可以幫助您',
+          'features.help.benefit1.title': '降低乳癌風險',
+          'features.help.benefit1.description': '無論您在健康旅程的哪個階段，Brezcode都能幫助您降低風險，沒有完美的壓力。',
+          'features.help.benefit2.title': '掌控您的健康',
+          'features.help.benefit2.description': '我們將教您科學支持的習慣和技巧，讓您掌控乳房健康。',
+          'features.help.benefit3.title': '減少焦慮和壓力',
+          'features.help.benefit3.description': '焦慮破壞您一天或一週的日子已經結束了。學會享受內心平靜，減少負面影響。',
+          'features.help.benefit4.title': '改善您的整體健康',
+          'features.help.benefit4.description': '照顧您的健康對睡眠、心理健康、人際關係等方面都有很大的正面影響。',
+          'features.help.button': '開始測驗'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',
