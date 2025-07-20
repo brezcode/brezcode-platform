@@ -35,7 +35,7 @@ export default function AvatarDemo() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest("POST", "/api/avatar/message", {
+      const response = await apiRequest("POST", "/api/avatar/chat", {
         sessionId,
         message,
         language: 'en',
