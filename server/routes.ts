@@ -171,6 +171,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Brand AI routes for multi-brand AI system
   const brandAiRoutes = await import('./routes/brandAiRoutes');
   app.use('/api/brand-ai', brandAiRoutes.default);
+  
+  // Food Analysis routes
+  const foodRoutes = await import('./routes/foodRoutes');
+  app.use('/api', foodRoutes.default);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
@@ -677,23 +681,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Outbound call endpoint
-  app.post('/api/voice/call', brandMiddleware, async (req, res) => {
-    try {
-      const { phoneNumber, message, language } = req.body;
-      const brandId = req.brand?.id;
-      
-      if (!brandId) {
-        return res.status(400).json({ error: 'Brand context required' });
-      }
 
-      const result = await TwilioVoiceService.makeOutboundCall(brandId, phoneNumber, message, language);
-      res.json({ success: true, ...result });
-    } catch (error: any) {
-      console.error('Outbound call error:', error);
-      res.status(500).json({ error: 'Failed to make call', message: error.message });
-    }
-  });
 
   // Internationalization API with AI translations
   app.get('/api/translations/:languageCode', async (req, res) => {

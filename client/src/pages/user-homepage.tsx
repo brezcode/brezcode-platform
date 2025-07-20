@@ -33,7 +33,8 @@ import {
   Activity,
   Smartphone,
   Bell,
-  ArrowLeft
+  ArrowLeft,
+  Apple
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -635,6 +636,15 @@ export default function UserHomepage() {
                 >
                   <Activity className="h-4 w-4 mr-2" />
                   Connect Apple Watch
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/brezcode/food-analysis')}
+                >
+                  <Apple className="h-4 w-4 mr-2" />
+                  Analyze Food
                 </Button>
               </CardContent>
             </Card>
