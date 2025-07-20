@@ -13,7 +13,8 @@ import {
   User,
   Sparkles,
   Heart,
-  Clock
+  Clock,
+  ChevronDown
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -32,6 +33,27 @@ export default function AvatarDemo() {
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [sessionId] = useState(`session-${Date.now()}`);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  const messagesContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom when new messages arrive
+  React.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  // Check if user has scrolled up to show scroll button
+  const handleScroll = () => {
+    if (messagesContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
+      const isAtBottom = scrollHeight - scrollTop <= clientHeight + 100;
+      setShowScrollButton(!isAtBottom);
+    }
+  };
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -133,44 +155,48 @@ export default function AvatarDemo() {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Chat Interface */}
           <div className="lg:col-span-2">
-            <Card className="h-[600px] flex flex-col">
-              <CardHeader className="flex-shrink-0">
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="h-5 w-5" />
-                  Chat with Your AI Health Assistant
-                </CardTitle>
+            <Card className="h-[600px] flex flex-col bg-gray-50">
+              {/* WhatsApp-style Header */}
+              <CardHeader className="bg-green-600 text-white border-b-0 shrink-0 rounded-t-lg">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <Avatar className="h-12 w-12 border-2 border-green-200">
+                      <AvatarImage src="/api/placeholder/48/48" alt="AI Avatar" />
+                      <AvatarFallback className="bg-green-700 text-white">
+                        <Bot className="h-6 w-6" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"></div>
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-white">AI Health Assistant</h3>
+                    <p className="text-sm text-green-100">Online • Ready to help</p>
+                  </div>
+                </div>
               </CardHeader>
               
-              {/* Messages */}
-              <CardContent className="flex-1 flex flex-col">
-                <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+              <CardContent className="flex-1 flex flex-col p-0 min-h-0 relative">
+                {/* Messages Container */}
+                <div 
+                  ref={messagesContainerRef}
+                  onScroll={handleScroll}
+                  className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50"
+                  style={{ backgroundImage: 'url("data:image/svg+xml,%3csvg xmlns=\'http://www.w3.org/2000/svg\' version=\'1.1\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' viewBox=\'0 0 40 40\' width=\'40\' height=\'40\' opacity=\'0.03\'%3e%3cg%3e%3cpath d=\'M20 0L30 20L20 40L10 20z\' fill=\'%23000\'/%3e%3c/g%3e%3c/svg%3e")' }}
+                >
                   {messages.map((message, index) => (
                     <div
                       key={index}
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div className={`flex items-start gap-2 max-w-[80%] ${
-                        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                      }`}>
-                        <Avatar className="h-8 w-8">
-                          {message.role === 'user' ? (
-                            <AvatarFallback className="bg-blue-600 text-white">
-                              <User className="h-4 w-4" />
-                            </AvatarFallback>
-                          ) : (
-                            <AvatarFallback className="bg-purple-600 text-white">
-                              <Bot className="h-4 w-4" />
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
-                        <div className={`rounded-lg p-3 ${
+                      <div className={`max-w-[85%] ${message.role === 'user' ? 'ml-12' : 'mr-12'}`}>
+                        <div className={`rounded-2xl p-3 shadow-sm ${
                           message.role === 'user' 
-                            ? 'bg-blue-600 text-white' 
-                            : 'bg-gray-100 text-gray-900'
+                            ? 'bg-green-500 text-white rounded-br-md' 
+                            : 'bg-white text-gray-900 rounded-bl-md'
                         }`}>
-                          <p className="text-sm">{message.content}</p>
-                          <div className={`text-xs mt-1 flex items-center gap-1 ${
-                            message.role === 'user' ? 'text-blue-100' : 'text-gray-500'
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                          <div className={`text-xs mt-1 flex items-center justify-end gap-1 ${
+                            message.role === 'user' ? 'text-green-100' : 'text-gray-500'
                           }`}>
                             <Clock className="h-3 w-3" />
                             {formatTime(message.timestamp)}
@@ -182,13 +208,8 @@ export default function AvatarDemo() {
                   
                   {sendMessageMutation.isPending && (
                     <div className="flex justify-start">
-                      <div className="flex items-center gap-2">
-                        <Avatar className="h-8 w-8">
-                          <AvatarFallback className="bg-purple-600 text-white">
-                            <Bot className="h-4 w-4" />
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="bg-gray-100 rounded-lg p-3">
+                      <div className="max-w-[85%] mr-12">
+                        <div className="bg-white rounded-2xl rounded-bl-md p-3 shadow-sm">
                           <div className="flex space-x-1">
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                             <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-100"></div>
@@ -198,25 +219,42 @@ export default function AvatarDemo() {
                       </div>
                     </div>
                   )}
+                  
+                  {/* Invisible div for scrolling to bottom */}
+                  <div ref={messagesEndRef} />
                 </div>
 
-                {/* Input */}
-                <div className="flex gap-2 shrink-0">
-                  <Input
-                    value={inputMessage}
-                    onChange={(e) => setInputMessage(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="Ask about health routines, self-exams, or wellness tips..."
-                    disabled={sendMessageMutation.isPending}
-                    className="flex-1"
-                  />
-                  <Button 
-                    onClick={handleSendMessage}
-                    disabled={!inputMessage.trim() || sendMessageMutation.isPending}
+                {/* Scroll to bottom button */}
+                {showScrollButton && (
+                  <Button
+                    onClick={scrollToBottom}
+                    className="absolute bottom-20 right-4 rounded-full w-10 h-10 bg-green-600 hover:bg-green-700 text-white shadow-lg"
                     size="icon"
                   >
-                    <Send className="h-4 w-4" />
+                    <ChevronDown className="h-4 w-4" />
                   </Button>
+                )}
+
+                {/* Input Container */}
+                <div className="p-4 bg-white border-t shrink-0">
+                  <div className="flex gap-2">
+                    <Input
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Type a message about health routines, self-exams, or wellness tips..."
+                      disabled={sendMessageMutation.isPending}
+                      className="flex-1 rounded-full border-gray-300 focus:border-green-500 focus:ring-green-500"
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      disabled={!inputMessage.trim() || sendMessageMutation.isPending}
+                      className="rounded-full bg-green-600 hover:bg-green-700 text-white w-10 h-10"
+                      size="icon"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
