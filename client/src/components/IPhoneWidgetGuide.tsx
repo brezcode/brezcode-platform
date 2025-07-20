@@ -74,7 +74,7 @@ export default function IPhoneWidgetGuide() {
   const installPWA = () => {
     // Check if app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
-      alert('App is already installed! 🎉\n\nTo add widgets:\n1. Long press your home screen\n2. Tap the "+" button\n3. Search for your health app\n4. Select widget size and add');
+      alert('App is already installed! 🎉\n\nNote: Web apps may not support widgets yet.\n\nBut you can still:\n• Get push notifications\n• Use app from home screen\n• Access all health features\n\nTap "Enable Notifications" in the app for alerts!');
       return;
     }
 
@@ -179,31 +179,63 @@ export default function IPhoneWidgetGuide() {
 
           {/* Troubleshooting */}
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-            <h3 className="font-medium text-yellow-900 mb-2">Can't Find the '+' Button?</h3>
-            <div className="text-sm text-yellow-800 space-y-2">
-              <p><strong>Step by step:</strong></p>
-              <ol className="list-decimal ml-4 space-y-1">
-                <li>Make sure the app is added to your home screen first</li>
-                <li>Long press an EMPTY space on home screen (not on any app icon)</li>
-                <li>Apps will start wiggling/jiggling</li>
-                <li>Look in the TOP LEFT corner for a small '+' symbol</li>
-                <li>If no '+' appears, try pressing and holding longer</li>
-                <li>On older iPhones, the '+' might be at the top of the screen</li>
-              </ol>
-              <p className="mt-2"><strong>Still having trouble?</strong> Try restarting your iPhone and repeat the process.</p>
+            <h3 className="font-medium text-yellow-900 mb-2">Troubleshooting Common Issues</h3>
+            <div className="text-sm text-yellow-800 space-y-3">
+              
+              <div>
+                <p><strong>Can't find the app on home screen?</strong></p>
+                <ul className="list-disc ml-4 space-y-1 mt-1">
+                  <li>Swipe right to check additional home screen pages</li>
+                  <li>Check the App Library (swipe left to the end)</li>
+                  <li>Search by swiping down on home screen and typing "health" or "brez"</li>
+                  <li>The app might have a generic name like "Web App" or the website domain</li>
+                </ul>
+              </div>
+
+              <div>
+                <p><strong>Can't find the '+' button for widgets?</strong></p>
+                <ol className="list-decimal ml-4 space-y-1 mt-1">
+                  <li>Long press an EMPTY space on home screen (not on any app icon)</li>
+                  <li>Apps will start wiggling/jiggling</li>
+                  <li>Look in the TOP LEFT corner for a small '+' symbol</li>
+                  <li>If no '+' appears, try pressing and holding longer</li>
+                  <li>On older iPhones, the '+' might be at the top center</li>
+                </ol>
+              </div>
+
+              <div>
+                <p><strong>Can't search for the app in widgets?</strong></p>
+                <ul className="list-disc ml-4 space-y-1 mt-1">
+                  <li>Make sure iOS is updated (widgets require iOS 14+)</li>
+                  <li>Try searching for "web", "health", or the exact app name</li>
+                  <li>The app may not support widgets yet - this is normal for web apps</li>
+                  <li>Focus on using the app from home screen instead</li>
+                </ul>
+              </div>
+
+              <p className="mt-2 font-medium">
+                <strong>Alternative:</strong> Even without widgets, you'll get push notifications when you enable them in the app!
+              </p>
             </div>
           </div>
 
-          {/* Benefits */}
+          {/* Alternative: Push Notifications */}
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h3 className="font-medium text-green-900 mb-2">Widget Benefits</h3>
-            <ul className="text-sm text-green-800 space-y-1">
-              <li>• Daily health tips without opening the app</li>
-              <li>• Quick access to your health calendar</li>
-              <li>• Native iPhone notifications</li>
-              <li>• Glanceable health information</li>
-              <li>• Personalized reminders and tips</li>
-            </ul>
+            <h3 className="font-medium text-green-900 mb-2">Good News: Push Notifications Work!</h3>
+            <div className="text-sm text-green-800 space-y-2">
+              <p>Even if widgets aren't available, you still get all the benefits:</p>
+              <ul className="list-disc ml-4 space-y-1">
+                <li>Daily health tips sent directly to your iPhone</li>
+                <li>Activity reminders and alerts</li>
+                <li>Native iPhone notifications</li>
+                <li>Health calendar access from home screen</li>
+                <li>No need to open the app constantly</li>
+              </ul>
+              <div className="bg-white border border-green-300 rounded p-3 mt-3">
+                <p className="font-medium text-green-900">Next Step:</p>
+                <p>Go to the "Live Demo" tab and enable push notifications to start receiving health tips!</p>
+              </div>
+            </div>
           </div>
 
         </CardContent>
