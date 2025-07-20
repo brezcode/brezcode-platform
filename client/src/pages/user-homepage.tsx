@@ -116,6 +116,18 @@ export default function UserHomepage() {
     }
   });
 
+  // Fetch Apple Watch health data
+  const { data: appleWatchData, isLoading: appleWatchLoading } = useQuery({
+    queryKey: ['/api/apple-health/metrics'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/apple-health/metrics');
+      const data = await response.json();
+      return data.metrics;
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    retry: false, // Don't retry if no data
+  });
+
   // Send message to AI
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
@@ -320,6 +332,65 @@ export default function UserHomepage() {
                         Based on your activities and consistency
                       </div>
                     </div>
+
+                    {/* Apple Watch Health Data */}
+                    {appleWatchData && !appleWatchLoading && (
+                      <div className="mt-4 pt-4 border-t">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Activity className="h-4 w-4 text-red-500" />
+                          <span className="text-sm font-medium">Apple Watch</span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-2 text-xs">
+                          <div className="bg-red-50 dark:bg-red-900/20 p-2 rounded">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Heart className="h-3 w-3 text-red-500" />
+                              <span className="font-medium">Heart Rate</span>
+                            </div>
+                            <div className="text-sm font-bold text-red-600">
+                              {appleWatchData.heartRate} bpm
+                            </div>
+                          </div>
+
+                          <div className="bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Activity className="h-3 w-3 text-blue-500" />
+                              <span className="font-medium">Steps</span>
+                            </div>
+                            <div className="text-sm font-bold text-blue-600">
+                              {appleWatchData.steps?.toLocaleString() || 0}
+                            </div>
+                          </div>
+
+                          <div className="bg-orange-50 dark:bg-orange-900/20 p-2 rounded">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Flame className="h-3 w-3 text-orange-500" />
+                              <span className="font-medium">Calories</span>
+                            </div>
+                            <div className="text-sm font-bold text-orange-600">
+                              {appleWatchData.caloriesBurned}
+                            </div>
+                          </div>
+
+                          <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Clock className="h-3 w-3 text-purple-500" />
+                              <span className="font-medium">Sleep</span>
+                            </div>
+                            <div className="text-sm font-bold text-purple-600">
+                              {appleWatchData.sleepHours ? `${appleWatchData.sleepHours.toFixed(1)}h` : '0h'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-2 text-xs text-muted-foreground text-center">
+                          Last sync: {appleWatchData.lastSync ? 
+                            format(new Date(appleWatchData.lastSync), 'MMM d, h:mm a') : 
+                            'Never'
+                          }
+                        </div>
+                      </div>
+                    )}
                   </>
                 )}
               </CardContent>
