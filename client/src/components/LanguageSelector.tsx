@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, createContext, useContext, ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Globe, ChevronDown } from 'lucide-react';
 
@@ -178,4 +178,94 @@ export function useTranslation() {
   };
 
   return { t, currentLanguage };
+}
+
+// Language Context for global state management
+interface LanguageContextType {
+  currentLanguage: string;
+  translations: Record<string, string>;
+  changeLanguage: (languageCode: string) => Promise<void>;
+  t: (key: string, fallback?: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export function LanguageProvider({ children }: { children: ReactNode }) {
+  const [currentLanguage, setCurrentLanguage] = useState('en');
+  const [translations, setTranslations] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    // Detect browser language or load from localStorage
+    const savedLanguage = localStorage.getItem('brezcode_language');
+    const browserLanguage = navigator.language.toLowerCase();
+    
+    let detectedLanguage = 'en';
+    if (savedLanguage) {
+      detectedLanguage = savedLanguage;
+    } else if (languages.some(lang => lang.code === browserLanguage)) {
+      detectedLanguage = browserLanguage;
+    } else if (languages.some(lang => lang.code === browserLanguage.split('-')[0])) {
+      detectedLanguage = languages.find(lang => lang.code.startsWith(browserLanguage.split('-')[0]))?.code || 'en';
+    }
+    
+    setCurrentLanguage(detectedLanguage);
+    loadTranslations(detectedLanguage);
+  }, []);
+
+  const loadTranslations = async (languageCode: string) => {
+    try {
+      const response = await fetch(`/api/translations/${languageCode}`);
+      if (response.ok) {
+        const data = await response.json();
+        setTranslations(data);
+      }
+    } catch (error) {
+      console.warn('Failed to load translations:', error);
+    }
+  };
+
+  const changeLanguage = async (languageCode: string) => {
+    setCurrentLanguage(languageCode);
+    localStorage.setItem('brezcode_language', languageCode);
+    
+    // Load new translations
+    await loadTranslations(languageCode);
+    
+    // Emit language change event
+    window.dispatchEvent(new CustomEvent('languageChanged', { detail: languageCode }));
+    
+    // If user is logged in, save preference to backend
+    try {
+      const response = await fetch('/api/user/language', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ languageCode }),
+      });
+      if (!response.ok) {
+        console.warn('Failed to save language preference');
+      }
+    } catch (error) {
+      console.warn('Failed to save language preference:', error);
+    }
+  };
+
+  const t = (key: string, fallback?: string) => {
+    return translations[key] || fallback || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ currentLanguage, translations, changeLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+}
+
+export function useLanguageContext() {
+  const context = useContext(LanguageContext);
+  if (context === undefined) {
+    throw new Error('useLanguageContext must be used within a LanguageProvider');
+  }
+  return context;
 }

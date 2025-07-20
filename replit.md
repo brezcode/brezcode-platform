@@ -1,30 +1,37 @@
-# BrezCode - Breast Health Coach AI
+# Multi-Tenant Health Assessment SAAS Platform
 
 ## Overview
 
-This is a subscription-based web application that provides AI-powered breast health coaching through a conversational interface. The application features a modern landing page inspired by the BrezCode design document with evidence-based risk reduction activities, AI chat functionality, and subscription tiers. It's built as a full-stack React application with an Express.js backend, designed to run on Replit with session-based authentication and in-memory storage for the MVP.
+This is a comprehensive SAAS platform that enables brands to create customized health assessment applications. Originally built as BrezCode (breast health coaching), it has been transformed into a white-label solution where each brand can configure their own landing page templates, health focus areas, branding, and content. The platform supports unlimited brands with multi-tenant architecture, subdomain routing, and comprehensive customization capabilities.
 
 ## System Architecture
 
+### SAAS Platform Architecture
+- **Multi-Tenancy**: Complete brand isolation with subdomain routing (brand.brezcode.com)
+- **Template System**: Configurable landing page sections (Hero, Features, Pricing, FAQ, etc.)
+- **Brand Management**: Database-driven brand configurations with custom branding
+- **Admin Interface**: Full-featured dashboard for brand configuration and management
+
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
-- **Routing**: Wouter for client-side routing
+- **Routing**: Wouter for client-side routing with brand context
 - **UI Components**: Radix UI primitives with shadcn/ui styling system
-- **Styling**: Tailwind CSS with custom design tokens inspired by Sunnyside.co
-- **State Management**: TanStack Query for server state management
-- **Payment Integration**: Stripe React components for subscription handling
+- **Styling**: Tailwind CSS with brand-specific color customization
+- **State Management**: TanStack Query + Brand Context Provider
+- **Dynamic Components**: Template-based rendering with brand-specific content
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server
-- **API Design**: RESTful endpoints for authentication, chat, and payments
-- **Session Management**: Express sessions with in-memory storage
-- **Authentication**: Session-based with bcrypt password hashing
-- **AI Integration**: OpenAI GPT-4o for conversational health coaching
+- **Multi-Tenant Database**: PostgreSQL with brand, brand_configs, and brand_quiz_configs tables
+- **Brand Middleware**: Automatic brand resolution from subdomain/domain
+- **API Design**: RESTful endpoints for brands, configurations, and health assessments
+- **Authentication**: Session-based with brand-specific user management
 
-### Build System
-- **Bundler**: Vite for frontend development and building
-- **TypeScript**: Full TypeScript support across client and server
-- **Module System**: ESM modules throughout the application
+### Database Schema
+- **brands**: Brand identity and domain configuration
+- **brand_configs**: Customizable content templates and branding
+- **brand_quiz_configs**: Health focus and quiz customization
+- **brand_users**: User management per brand with subscription tracking
 
 ## Key Components
 
@@ -154,6 +161,7 @@ This is a subscription-based web application that provides AI-powered breast hea
 
 ```
 Changelog:
+- January 20, 2025. SAAS PLATFORM TRANSFORMATION: Completely restructured the application into a multi-tenant SAAS platform for creating branded health assessment apps. Implemented comprehensive template system with Hero, How It Works, Features, Customer Reviews, Pricing, FAQ, and Final CTA sections. Created brand management system with database schema for multi-brand support, dynamic landing page components, admin dashboard, and configuration forms. Each brand can now have custom subdomains, branding, content, and full white-label customization
 - January 20, 2025. TRANSLATION SYSTEM COMPLETED: Achieved 100% Traditional Chinese translation coverage for entire landing page - fixed systematic translation gaps in hero section benefits, pricing components, risk reduction chart activities, phone mockup content, and complete footer including company description, navigation links, and copyright notice. Implemented comprehensive translation keys covering all user-visible content across components
 - January 18, 2025. ARCHITECTURE OVERVIEW: Created comprehensive architecture documentation and mobile roadmap - PWA, iPhone widgets, push notifications, smart timing system planned with detailed technical implementation guide for next development phases
 - January 17, 2025. INTERNATIONAL EXPANSION: Restructured for multi-language support with 8 languages (EN, ZH-CN, ZH-TW, ES, FR, DE, JA, KO), implemented daily coaching engine with personalized AI content, enhanced database schema for user preferences and analytics, added production hosting recommendations for global deployment, created internationalization and coaching API endpoints

@@ -1,5 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import brandRoutes from "./brandRoutes";
+import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
 import session from "express-session";
 import Stripe from "stripe";
 import OpenAI from "openai";
@@ -142,6 +144,12 @@ try {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply brand middleware globally
+  app.use(brandMiddleware);
+  app.use(defaultBrandMiddleware);
+  
+  // Register brand routes
+  app.use(brandRoutes);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

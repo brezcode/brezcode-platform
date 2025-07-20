@@ -45,6 +45,14 @@ app.use((req, res, next) => {
   } catch (error) {
     console.error('❌ Knowledge base initialization failed:', error);
   }
+
+  // Initialize default brand
+  try {
+    const { seedDefaultBrand } = await import('./seedBrand');
+    await seedDefaultBrand();
+  } catch (error) {
+    console.error('Failed to seed default brand:', error);
+  }
   
   const server = await registerRoutes(app);
 
