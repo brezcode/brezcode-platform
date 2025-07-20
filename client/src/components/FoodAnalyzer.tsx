@@ -77,7 +77,39 @@ export default function FoodAnalyzer() {
         setSelectedImage(imageData);
         // Auto-analyze when image is uploaded
         const base64Data = imageData.split(',')[1];
-        analyzeFoodMutation.mutate(base64Data);
+        
+        // Compress image if too large (over 4MB base64)
+        if (base64Data.length > 4 * 1024 * 1024) {
+          // Create canvas to compress image
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate new dimensions (max 1024px)
+            const maxSize = 1024;
+            let { width, height } = img;
+            
+            if (width > height && width > maxSize) {
+              height = (height * maxSize) / width;
+              width = maxSize;
+            } else if (height > maxSize) {
+              width = (width * maxSize) / height;
+              height = maxSize;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
+            
+            // Draw and compress
+            ctx?.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+            analyzeFoodMutation.mutate(compressedBase64);
+          };
+          img.src = imageData;
+        } else {
+          analyzeFoodMutation.mutate(base64Data);
+        }
       };
       reader.readAsDataURL(file);
     }
