@@ -133,27 +133,23 @@ export default function HealthSetup() {
       console.log('Form data being submitted:', data);
       
       // Save preferences first
-      const preferencesResponse = await apiRequest('/api/health/preferences', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
+      const preferencesResponse = await apiRequest('POST', '/api/health/preferences', data);
+      const preferences = await preferencesResponse.json();
 
       // Generate personalized schedule for the next week
       const startDate = new Date();
       const endDate = new Date();
       endDate.setDate(startDate.getDate() + 7);
 
-      const scheduleResponse = await apiRequest('/api/health/schedule/generate', {
-        method: 'POST',
-        body: JSON.stringify({
-          startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0],
-          preferences: data,
-          quizResults: quizData // Include quiz results for personalization
-        }),
+      const scheduleResponse = await apiRequest('POST', '/api/health/schedule/generate', {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        preferences: data,
+        quizResults: quizData // Include quiz results for personalization
       });
+      const schedule = await scheduleResponse.json();
 
-      return { preferences: preferencesResponse, schedule: scheduleResponse };
+      return { preferences, schedule };
     },
     onSuccess: (response) => {
       toast({

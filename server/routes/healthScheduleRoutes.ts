@@ -44,9 +44,13 @@ router.get("/templates", async (req, res) => {
 // Save customer health preferences
 router.post("/preferences", requireCustomerAuth, async (req: any, res) => {
   try {
+    console.log("Received preferences request:", req.body);
     const preferences = healthPreferencesFormSchema.parse(req.body);
+    console.log("Parsed preferences:", preferences);
+    
     const brandId = req.brand!.id;
     const customerId = req.customerId;
+    console.log("Brand ID:", brandId, "Customer ID:", customerId);
 
     const savedPreferences = await HealthScheduleService.saveHealthPreferences(
       brandId,
@@ -54,6 +58,7 @@ router.post("/preferences", requireCustomerAuth, async (req: any, res) => {
       preferences
     );
     
+    console.log("Preferences saved successfully:", savedPreferences);
     res.json({
       success: true,
       preferences: savedPreferences,
