@@ -200,10 +200,10 @@ export class BrandAiService {
 
       aiResponse = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
     } catch (error: any) {
-      console.log("OpenAI API unavailable, providing fallback response");
+      console.log("OpenAI API unavailable, providing knowledge-based fallback response");
       
-      // Provide fallback response based on brand expertise
-      aiResponse = this.generateFallbackResponse(config.expertise, userMessage, relevantKnowledge);
+      // Provide intelligent fallback response using knowledge base
+      aiResponse = this.generateKnowledgeBasedResponse(config.expertise, userMessage, relevantKnowledge);
     }
 
     // Save AI response
@@ -286,6 +286,129 @@ Key guidelines:
     }
 
     return prompt;
+  }
+
+  // Generate intelligent knowledge-based response when OpenAI is unavailable
+  private generateKnowledgeBasedResponse(expertise: string, message: string, knowledge: BrandKnowledgeBase[]): string {
+    const lowerMessage = message.toLowerCase();
+    
+    // Use knowledge base for intelligent responses
+    if (knowledge.length > 0) {
+      const relevantKnowledge = knowledge[0]; // Use most relevant
+      let response = '';
+      
+      // Specific responses based on message content
+      if (lowerMessage.includes('self') && lowerMessage.includes('exam')) {
+        response = this.extractSelfExamInstructions(relevantKnowledge.content);
+      } else if (lowerMessage.includes('nutrition') || lowerMessage.includes('diet') || lowerMessage.includes('food')) {
+        response = this.extractNutritionInfo(relevantKnowledge.content);
+      } else if (lowerMessage.includes('exercise') || lowerMessage.includes('fitness') || lowerMessage.includes('workout')) {
+        response = this.extractExerciseInfo(relevantKnowledge.content);
+      } else if (lowerMessage.includes('stress') || lowerMessage.includes('anxiety') || lowerMessage.includes('relax')) {
+        response = this.extractStressInfo(relevantKnowledge.content);
+      } else if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening')) {
+        response = this.extractScreeningInfo(relevantKnowledge.content);
+      } else {
+        // General response with key information
+        const paragraphs = relevantKnowledge.content.split('\n\n');
+        response = paragraphs.slice(0, 3).join('\n\n');
+      }
+      
+      return `${response}\n\n💡 This information is from our evidence-based health knowledge base. For personalized advice, please consult with your healthcare provider.`;
+    }
+
+    // Fallback to expertise-based response
+    return this.generateFallbackResponse(expertise, message, knowledge);
+  }
+
+  // Extract self-examination instructions from knowledge content
+  private extractSelfExamInstructions(content: string): string {
+    const lines = content.split('\n');
+    const steps = lines.filter(line => 
+      line.match(/^\d+\./) || 
+      line.includes('**') || 
+      line.toLowerCase().includes('step') ||
+      line.toLowerCase().includes('examine') ||
+      line.toLowerCase().includes('feel')
+    );
+    
+    if (steps.length > 0) {
+      return `Here's how to perform a breast self-examination:\n\n${steps.slice(0, 8).join('\n')}`;
+    }
+    
+    return content.substring(0, 400) + '...';
+  }
+
+  // Extract nutrition information from knowledge content
+  private extractNutritionInfo(content: string): string {
+    const lines = content.split('\n');
+    const nutritionInfo = lines.filter(line => 
+      line.includes('*') || 
+      line.toLowerCase().includes('food') ||
+      line.toLowerCase().includes('eat') ||
+      line.toLowerCase().includes('vitamin') ||
+      line.toLowerCase().includes('antioxidant')
+    );
+    
+    if (nutritionInfo.length > 0) {
+      return `Here's nutrition guidance for breast health:\n\n${nutritionInfo.slice(0, 10).join('\n')}`;
+    }
+    
+    return content.substring(0, 400) + '...';
+  }
+
+  // Extract exercise information from knowledge content
+  private extractExerciseInfo(content: string): string {
+    const lines = content.split('\n');
+    const exerciseInfo = lines.filter(line => 
+      line.includes('*') || 
+      line.toLowerCase().includes('exercise') ||
+      line.toLowerCase().includes('activity') ||
+      line.toLowerCase().includes('workout') ||
+      line.toLowerCase().includes('minute')
+    );
+    
+    if (exerciseInfo.length > 0) {
+      return `Here's exercise guidance for breast health:\n\n${exerciseInfo.slice(0, 8).join('\n')}`;
+    }
+    
+    return content.substring(0, 400) + '...';
+  }
+
+  // Extract stress management information from knowledge content
+  private extractStressInfo(content: string): string {
+    const lines = content.split('\n');
+    const stressInfo = lines.filter(line => 
+      line.includes('*') || 
+      line.toLowerCase().includes('stress') ||
+      line.toLowerCase().includes('relax') ||
+      line.toLowerCase().includes('meditation') ||
+      line.toLowerCase().includes('mindful')
+    );
+    
+    if (stressInfo.length > 0) {
+      return `Here's stress management guidance:\n\n${stressInfo.slice(0, 8).join('\n')}`;
+    }
+    
+    return content.substring(0, 400) + '...';
+  }
+
+  // Extract screening information from knowledge content
+  private extractScreeningInfo(content: string): string {
+    const lines = content.split('\n');
+    const screeningInfo = lines.filter(line => 
+      line.includes('*') || 
+      line.toLowerCase().includes('age') ||
+      line.toLowerCase().includes('mammogram') ||
+      line.toLowerCase().includes('screening') ||
+      line.toLowerCase().includes('annual')
+    );
+    
+    if (screeningInfo.length > 0) {
+      return `Here's screening guidance:\n\n${screeningInfo.slice(0, 10).join('\n')}`;
+    }
+    
+    return content.substring(0, 400) + '...';
   }
 
   // Generate fallback response when OpenAI is unavailable
