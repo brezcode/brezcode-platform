@@ -126,6 +126,174 @@ export class HealthScheduleService {
     return { schedule, activities };
   }
 
+  // Generate personalized schedule based on quiz results
+  static async generatePersonalizedScheduleFromQuiz(
+    brandId: string,
+    customerId: string,
+    startDate: Date,
+    endDate: Date,
+    preferences: any,
+    quizResults?: any
+  ): Promise<any[]> {
+    // Get all available activity templates
+    const allTemplates = await this.getActivityTemplates();
+    
+    // Personalize activities based on quiz results
+    const personalizedActivities = this.personalizeActivitiesFromQuiz(
+      allTemplates,
+      preferences,
+      quizResults
+    );
+
+    // Create schedule first
+    const [schedule] = await db
+      .insert(healthSchedules)
+      .values({
+        brandId,
+        customerId,
+        name: "Personalized Health Plan",
+        description: "AI-generated schedule based on your health assessment",
+      })
+      .returning();
+
+    // Generate and save scheduled activities
+    const activities = await this.generateScheduledActivitiesFromTemplates(
+      schedule.id,
+      personalizedActivities,
+      startDate,
+      endDate,
+      preferences
+    );
+
+    return activities;
+  }
+
+  // Personalize activity selection based on quiz results
+  private static personalizeActivitiesFromQuiz(
+    templates: any[],
+    preferences: any,
+    quizResults?: any
+  ) {
+    const selected: any[] = [];
+    
+    // Always include essential activities
+    const essentialActivities = ['self-breast-exam', 'breathing-exercise'];
+    
+    // Add activities based on quiz results
+    if (quizResults) {
+      const age = parseInt(quizResults['1']) || 25;
+      const activityLevel = quizResults['21'] || 'Rarely/Never';
+      const stressLevel = quizResults['16'] || 'Low';
+      const familyHistory = quizResults['11'] === 'Yes';
+      
+      // Age-based recommendations
+      if (age >= 40) {
+        essentialActivities.push('cardio-workout', 'yoga-session');
+        if (familyHistory) {
+          essentialActivities.push('self-massage'); // Additional prevention focus
+        }
+      } else if (age >= 30) {
+        essentialActivities.push('yoga-session', 'strength-training');
+      } else {
+        essentialActivities.push('cardio-workout'); // Build foundation
+      }
+      
+      // Activity level adjustments
+      if (activityLevel === 'Daily' || activityLevel === '5+ times per week') {
+        essentialActivities.push('strength-training');
+      } else if (activityLevel === 'Rarely/Never' || activityLevel === '1-2 times per week') {
+        // Focus on gentle activities for beginners
+        essentialActivities.push('stretching-routine');
+      }
+      
+      // Stress level considerations
+      if (stressLevel === 'Very high' || stressLevel === 'High') {
+        essentialActivities.push('meditation', 'breathing-exercise');
+      }
+    }
+    
+    // Map to template activities with appropriate frequency
+    templates.forEach(template => {
+      if (essentialActivities.includes(template.id)) {
+        let frequency = 'weekly';
+        
+        // Adjust frequency based on activity type and user profile
+        if (template.id === 'self-breast-exam') {
+          frequency = 'monthly'; // Once per month as recommended
+        } else if (template.id === 'breathing-exercise') {
+          frequency = 'daily'; // Daily stress relief
+        } else if (preferences?.fitnessLevel === 'advanced') {
+          frequency = template.id.includes('cardio') || template.id.includes('strength') ? 'biweekly' : 'weekly';
+        } else if (preferences?.fitnessLevel === 'beginner') {
+          frequency = 'weekly'; // Gentle start
+        }
+        
+        selected.push({
+          templateId: template.id,
+          frequency,
+          preferredDays: preferences?.availableDays || [1, 3, 5],
+          preferredTime: preferences?.preferredTime || 'morning'
+        });
+      }
+    });
+    
+    return selected;
+  }
+
+  // Generate scheduled activities from templates
+  private static async generateScheduledActivitiesFromTemplates(
+    scheduleId: string,
+    activityConfigs: any[],
+    startDate: Date,
+    endDate: Date,
+    preferences: any
+  ) {
+    const activities: InsertScheduledActivity[] = [];
+
+    for (const config of activityConfigs) {
+      const dates = this.generateActivityDates(
+        startDate,
+        endDate,
+        config.frequency,
+        config.preferredDays || preferences.availableDays,
+        preferences.preferredTime
+      );
+
+      for (const date of dates) {
+        activities.push({
+          scheduleId,
+          templateId: config.templateId,
+          scheduledDate: date.toISOString().split('T')[0],
+          scheduledTime: config.preferredTime || this.getTimeFromPreference(preferences.preferredTime),
+          status: "pending",
+        });
+      }
+    }
+
+    if (activities.length > 0) {
+      await db.insert(scheduledActivities).values(activities);
+    }
+
+    // Return activities with template details
+    const detailedActivities = [];
+    for (const activity of activities) {
+      const template = await db
+        .select()
+        .from(activityTemplates)
+        .where(eq(activityTemplates.id, activity.templateId))
+        .limit(1);
+      
+      if (template[0]) {
+        detailedActivities.push({
+          ...activity,
+          template: template[0]
+        });
+      }
+    }
+
+    return detailedActivities;
+  }
+
   // Generate scheduled activities for the next 30 days
   private static async generateScheduledActivities(
     scheduleId: string,

@@ -46,8 +46,8 @@ export default function QuizTransition({ onContinue }: QuizTransitionProps) {
             <div className="flex items-start space-x-3 p-4 bg-white rounded-lg border">
               <Heart className="w-6 h-6 text-red-600 mt-1" />
               <div>
-                <h4 className="font-semibold text-gray-800">Health Coaching</h4>
-                <p className="text-sm text-gray-600">AI-powered guidance tailored to your specific health profile</p>
+                <h4 className="font-semibold text-gray-800">Personalized Health Schedule</h4>
+                <p className="text-sm text-gray-600">Daily activities tailored to your assessment results and health goals</p>
               </div>
             </div>
           </div>

@@ -32,6 +32,7 @@ function Router() {
         <Route path="/:brand/quiz" component={QuizPage} />
         <Route path="/:brand/avatar-quiz" component={() => import("@/pages/avatar-quiz")} />
         <Route path="/:brand/avatar-demo" component={() => import("@/pages/avatar-demo")} />
+        <Route path="/:brand/health-setup" component={() => import("@/pages/health-setup")} />
         <Route path="/:brand/health-calendar" component={() => import("@/pages/health-calendar")} />
         <Route path="/:brand/health-preferences" component={() => import("@/pages/health-preferences")} />
         <Route path="/:brand/report" component={ReportPage} />

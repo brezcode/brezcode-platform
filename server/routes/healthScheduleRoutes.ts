@@ -119,6 +119,46 @@ router.post("/schedule", requireCustomerAuth, async (req: any, res) => {
   }
 });
 
+// Generate personalized schedule based on preferences and quiz results
+router.post("/schedule/generate", requireCustomerAuth, async (req: any, res) => {
+  try {
+    const { startDate, endDate, preferences, quizResults } = req.body;
+    const brandId = req.brand!.id;
+    const customerId = req.customerId;
+
+    // Save preferences first if provided
+    if (preferences) {
+      await HealthScheduleService.saveHealthPreferences(
+        brandId,
+        customerId,
+        preferences
+      );
+    }
+
+    // Generate personalized schedule activities
+    const activities = await HealthScheduleService.generatePersonalizedScheduleFromQuiz(
+      brandId,
+      customerId,
+      new Date(startDate),
+      new Date(endDate),
+      preferences || await HealthScheduleService.getHealthPreferences(brandId, customerId),
+      quizResults
+    );
+    
+    res.json({
+      success: true,
+      activities,
+      message: `Generated ${activities.length} personalized activities based on your assessment results`
+    });
+  } catch (error: any) {
+    console.error("Error generating personalized schedule:", error);
+    res.status(500).json({ 
+      error: "Failed to generate personalized schedule",
+      message: error.message 
+    });
+  }
+});
+
 // ===== SCHEDULED ACTIVITIES =====
 
 // Get scheduled activities for date range
