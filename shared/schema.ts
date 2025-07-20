@@ -5,6 +5,9 @@ import { z } from "zod";
 // Import brand schema for multi-tenancy
 export * from "./brand-schema";
 
+// Import health schedule schema for health planning
+export * from "./health-schedule-schema";
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   firstName: text("first_name").notNull(),

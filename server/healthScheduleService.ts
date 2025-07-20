@@ -176,61 +176,56 @@ export class HealthScheduleService {
   ) {
     const selected: any[] = [];
     
-    // Always include essential activities
-    const essentialActivities = ['self-breast-exam', 'breathing-exercise'];
+    // Always include essential activities - match by name/category
+    const essentialActivities = [
+      { name: 'Self Breast Exam', category: 'self_exam', frequency: 'monthly' },
+      { name: 'Stress Relief Meditation', category: 'wellness', frequency: 'daily' }
+    ];
     
-    // Add activities based on quiz results
+    // Add activities based on user profile and risk level
     if (quizResults) {
-      const age = parseInt(quizResults['1']) || 25;
-      const activityLevel = quizResults['21'] || 'Rarely/Never';
-      const stressLevel = quizResults['16'] || 'Low';
-      const familyHistory = quizResults['11'] === 'Yes';
+      const userProfile = quizResults.userProfile || 'premenopausal';
+      const riskLevel = quizResults.riskLevel || 'moderate';
       
-      // Age-based recommendations
-      if (age >= 40) {
-        essentialActivities.push('cardio-workout', 'yoga-session');
-        if (familyHistory) {
-          essentialActivities.push('self-massage'); // Additional prevention focus
-        }
-      } else if (age >= 30) {
-        essentialActivities.push('yoga-session', 'strength-training');
-      } else {
-        essentialActivities.push('cardio-workout'); // Build foundation
+      // Add activities based on risk level and profile
+      if (riskLevel === 'high' || userProfile === 'current_patient') {
+        essentialActivities.push(
+          { name: 'Gentle Breast Massage', category: 'massage', frequency: 'weekly' },
+          { name: 'Nutrition Planning', category: 'wellness', frequency: 'weekly' }
+        );
       }
       
-      // Activity level adjustments
-      if (activityLevel === 'Daily' || activityLevel === '5+ times per week') {
-        essentialActivities.push('strength-training');
-      } else if (activityLevel === 'Rarely/Never' || activityLevel === '1-2 times per week') {
-        // Focus on gentle activities for beginners
-        essentialActivities.push('stretching-routine');
+      // Add exercise based on fitness level
+      if (preferences?.fitnessLevel === 'beginner') {
+        essentialActivities.push(
+          { name: 'Cardio Walk', category: 'exercise', frequency: 'biweekly' },
+          { name: 'Upper Body Strength', category: 'exercise', frequency: 'weekly' }
+        );
+      } else if (preferences?.fitnessLevel === 'intermediate' || preferences?.fitnessLevel === 'advanced') {
+        essentialActivities.push(
+          { name: 'Yoga Flow', category: 'exercise', frequency: 'biweekly' },
+          { name: 'Cardio Walk', category: 'exercise', frequency: 'weekly' },
+          { name: 'Upper Body Strength', category: 'exercise', frequency: 'biweekly' }
+        );
       }
-      
-      // Stress level considerations
-      if (stressLevel === 'Very high' || stressLevel === 'High') {
-        essentialActivities.push('meditation', 'breathing-exercise');
-      }
+    } else {
+      // Default activities for basic plan
+      essentialActivities.push(
+        { name: 'Cardio Walk', category: 'exercise', frequency: 'weekly' },
+        { name: 'Gentle Breast Massage', category: 'massage', frequency: 'weekly' }
+      );
     }
     
-    // Map to template activities with appropriate frequency
-    templates.forEach(template => {
-      if (essentialActivities.includes(template.id)) {
-        let frequency = 'weekly';
-        
-        // Adjust frequency based on activity type and user profile
-        if (template.id === 'self-breast-exam') {
-          frequency = 'monthly'; // Once per month as recommended
-        } else if (template.id === 'breathing-exercise') {
-          frequency = 'daily'; // Daily stress relief
-        } else if (preferences?.fitnessLevel === 'advanced') {
-          frequency = template.id.includes('cardio') || template.id.includes('strength') ? 'biweekly' : 'weekly';
-        } else if (preferences?.fitnessLevel === 'beginner') {
-          frequency = 'weekly'; // Gentle start
-        }
-        
+    // Match templates to essential activities
+    essentialActivities.forEach(essential => {
+      const matchingTemplate = templates.find(template => 
+        template.name === essential.name && template.category === essential.category
+      );
+      
+      if (matchingTemplate) {
         selected.push({
-          templateId: template.id,
-          frequency,
+          templateId: matchingTemplate.id,
+          frequency: essential.frequency,
           preferredDays: preferences?.availableDays || [1, 3, 5],
           preferredTime: preferences?.preferredTime || 'morning'
         });
@@ -279,8 +274,8 @@ export class HealthScheduleService {
     for (const activity of activities) {
       const template = await db
         .select()
-        .from(activityTemplates)
-        .where(eq(activityTemplates.id, activity.templateId))
+        .from(healthActivityTemplates)
+        .where(eq(healthActivityTemplates.id, activity.templateId))
         .limit(1);
       
       if (template[0]) {
