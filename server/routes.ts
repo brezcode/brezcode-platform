@@ -5,7 +5,9 @@ import brandCustomersRouter from "./routes/brandCustomers";
 import brandFeaturesRouter from "./routes/brandFeatures";
 import avatarRoutes from "./routes/avatarRoutes";
 import healthScheduleRoutes from "./routes/healthScheduleRoutes";
+import notificationRoutes from "./routes/notificationRoutes";
 import { TwilioVoiceService } from "./twilioVoiceService";
+import { notificationService } from "./notificationService";
 import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
 import session from "express-session";
 import Stripe from "stripe";
@@ -149,6 +151,9 @@ try {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize notification service
+  notificationService.initialize().catch(console.error);
+  
   // Apply brand middleware globally
   app.use(brandMiddleware);
   app.use(defaultBrandMiddleware);
@@ -161,6 +166,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/features', brandFeaturesRouter);
   app.use('/api/avatar', avatarRoutes);
   app.use('/api/health', healthScheduleRoutes);
+  app.use('/api/notifications', notificationRoutes);
   
   // Brand AI routes for multi-brand AI system
   const brandAiRoutes = await import('./routes/brandAiRoutes');

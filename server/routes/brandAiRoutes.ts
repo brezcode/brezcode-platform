@@ -230,4 +230,160 @@ router.get('/chat/:brandId/:sessionId', async (req, res) => {
   }
 });
 
+// Training endpoints for AI improvement
+
+// Add training content
+router.post('/training/content', async (req, res) => {
+  try {
+    const { brandId, title, content, category, tags, documentType } = req.body;
+
+    if (!brandId || !title || !content) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Brand ID, title, and content are required' 
+      });
+    }
+
+    const trainingContent = await brandAiService.addTrainingContent(
+      brandId, 
+      title, 
+      content, 
+      category, 
+      tags, 
+      documentType
+    );
+
+    res.json({
+      success: true,
+      trainingContent,
+      message: 'Training content added successfully'
+    });
+
+  } catch (error: any) {
+    console.error('Add training content error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to add training content',
+      details: error.message 
+    });
+  }
+});
+
+// Process uploaded document
+router.post('/training/upload-document', async (req, res) => {
+  try {
+    const { brandId, fileName, fileContent, documentType, extractedText } = req.body;
+
+    if (!brandId || !fileName || !extractedText) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Brand ID, file name, and extracted text are required' 
+      });
+    }
+
+    const processedDocument = await brandAiService.processUploadedDocument(
+      brandId, 
+      fileName, 
+      fileContent, 
+      documentType, 
+      extractedText
+    );
+
+    res.json({
+      success: true,
+      processedDocument,
+      message: 'Document uploaded and processed successfully'
+    });
+
+  } catch (error: any) {
+    console.error('Upload document error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to process uploaded document',
+      details: error.message 
+    });
+  }
+});
+
+// Update training prompts
+router.post('/training/prompts', async (req, res) => {
+  try {
+    const { brandId, customSystemPrompt, customPersonality, trainingInstructions } = req.body;
+
+    if (!brandId) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Brand ID is required' 
+      });
+    }
+
+    const updatedConfig = await brandAiService.updateTrainingPrompts(
+      brandId, 
+      customSystemPrompt, 
+      customPersonality, 
+      trainingInstructions
+    );
+
+    res.json({
+      success: true,
+      config: updatedConfig,
+      message: 'Training prompts updated successfully'
+    });
+
+  } catch (error: any) {
+    console.error('Update training prompts error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to update training prompts',
+      details: error.message 
+    });
+  }
+});
+
+// Get all training content
+router.get('/training/:brandId', async (req, res) => {
+  try {
+    const { brandId } = req.params;
+
+    const trainingContent = await brandAiService.getTrainingContent(brandId);
+
+    res.json({
+      success: true,
+      trainingContent,
+      count: trainingContent.length
+    });
+
+  } catch (error: any) {
+    console.error('Get training content error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to get training content',
+      details: error.message 
+    });
+  }
+});
+
+// Delete training content
+router.delete('/training/:brandId/:contentId', async (req, res) => {
+  try {
+    const { brandId, contentId } = req.params;
+
+    // Update to mark as inactive instead of deleting
+    const result = await brandAiService.deactivateKnowledge(brandId, contentId);
+
+    res.json({
+      success: true,
+      message: 'Training content removed successfully'
+    });
+
+  } catch (error: any) {
+    console.error('Delete training content error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to remove training content',
+      details: error.message 
+    });
+  }
+});
+
 export default router;

@@ -60,6 +60,9 @@ export default function BrandAiAdmin() {
   const [searchQuery, setSearchQuery] = useState('');
   const [fileContent, setFileContent] = useState('');
   const [fileName, setFileName] = useState('');
+  const [trainingPrompt, setTrainingPrompt] = useState('');
+  const [trainingInstructions, setTrainingInstructions] = useState<string[]>(['']);
+  const [customPersonality, setCustomPersonality] = useState('');
 
   const queryClient = useQueryClient();
 
@@ -70,6 +73,16 @@ export default function BrandAiAdmin() {
       const response = await apiRequest('GET', `/api/brand-ai/config/${selectedBrand}`);
       const data = await response.json();
       return data.config as BrandAiConfig;
+    }
+  });
+
+  // Fetch training content
+  const { data: trainingContent, isLoading: trainingLoading } = useQuery({
+    queryKey: ['/api/brand-ai/training', selectedBrand],
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/brand-ai/training/${selectedBrand}`);
+      const data = await response.json();
+      return data.trainingContent as KnowledgeEntry[];
     }
   });
 
@@ -136,6 +149,61 @@ export default function BrandAiAdmin() {
     }
   });
 
+  // Add training content
+  const addTrainingMutation = useMutation({
+    mutationFn: async (training: { title: string; content: string; category: string; tags: string[] }) => {
+      const response = await apiRequest('POST', '/api/brand-ai/training/content', {
+        brandId: selectedBrand,
+        ...training
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/brand-ai/training', selectedBrand] });
+    }
+  });
+
+  // Upload training document
+  const uploadTrainingDocMutation = useMutation({
+    mutationFn: async (docData: { fileName: string; extractedText: string; documentType: string }) => {
+      const response = await apiRequest('POST', '/api/brand-ai/training/upload-document', {
+        brandId: selectedBrand,
+        ...docData
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      setFileName('');
+      setFileContent('');
+      queryClient.invalidateQueries({ queryKey: ['/api/brand-ai/training', selectedBrand] });
+    }
+  });
+
+  // Update training prompts
+  const updatePromptsMutation = useMutation({
+    mutationFn: async (prompts: { customSystemPrompt?: string; customPersonality?: string; trainingInstructions?: string[] }) => {
+      const response = await apiRequest('POST', '/api/brand-ai/training/prompts', {
+        brandId: selectedBrand,
+        ...prompts
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/brand-ai/config', selectedBrand] });
+    }
+  });
+
+  // Delete training content
+  const deleteTrainingMutation = useMutation({
+    mutationFn: async (contentId: string) => {
+      const response = await apiRequest('DELETE', `/api/brand-ai/training/${selectedBrand}/${contentId}`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/brand-ai/training', selectedBrand] });
+    }
+  });
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
@@ -146,6 +214,20 @@ export default function BrandAiAdmin() {
       };
       reader.readAsText(file);
     }
+  };
+
+  const handleAddTrainingInstruction = () => {
+    setTrainingInstructions([...trainingInstructions, '']);
+  };
+
+  const handleUpdateTrainingInstruction = (index: number, value: string) => {
+    const updated = [...trainingInstructions];
+    updated[index] = value;
+    setTrainingInstructions(updated);
+  };
+
+  const handleRemoveTrainingInstruction = (index: number) => {
+    setTrainingInstructions(trainingInstructions.filter((_, i) => i !== index));
   };
 
   if (configLoading) {
@@ -175,8 +257,12 @@ export default function BrandAiAdmin() {
         </Badge>
       </div>
 
-      <Tabs defaultValue="config" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="training" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="training" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            AI Training
+          </TabsTrigger>
           <TabsTrigger value="config" className="flex items-center gap-2">
             <Settings className="h-4 w-4" />
             Configuration
@@ -194,6 +280,205 @@ export default function BrandAiAdmin() {
             Search & Test
           </TabsTrigger>
         </TabsList>
+
+        {/* NEW: AI Training Tab - Main Feature */}
+        <TabsContent value="training" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Brain className="h-5 w-5" />
+                AI Training System
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Train your AI avatar with custom prompts and upload documents for intelligent responses
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              
+              {/* Training Prompts Section */}
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Custom Training Prompts</h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">System Prompt Override</label>
+                    <Textarea
+                      placeholder="Enter custom system prompt to override default behavior..."
+                      value={trainingPrompt}
+                      onChange={(e) => setTrainingPrompt(e.target.value)}
+                      rows={4}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Personality Traits</label>
+                    <Input
+                      placeholder="e.g., friendly, professional, empathetic, detailed"
+                      value={customPersonality}
+                      onChange={(e) => setCustomPersonality(e.target.value)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium">Training Instructions</label>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={handleAddTrainingInstruction}
+                      >
+                        <Plus className="h-4 w-4 mr-1" />
+                        Add Instruction
+                      </Button>
+                    </div>
+                    
+                    {trainingInstructions.map((instruction, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          placeholder={`Training instruction ${index + 1}...`}
+                          value={instruction}
+                          onChange={(e) => handleUpdateTrainingInstruction(index, e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleRemoveTrainingInstruction(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <Button
+                    onClick={() => updatePromptsMutation.mutate({
+                      customSystemPrompt: trainingPrompt || undefined,
+                      customPersonality: customPersonality || undefined,
+                      trainingInstructions: trainingInstructions.filter(Boolean)
+                    })}
+                    disabled={updatePromptsMutation.isPending}
+                    className="w-full"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    {updatePromptsMutation.isPending ? 'Updating...' : 'Update AI Training'}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Document Upload Section */}
+              <div className="border-t pt-6 space-y-4">
+                <h3 className="text-lg font-semibold">Document Upload Training</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Upload Training Document</label>
+                      <Input
+                        type="file"
+                        accept=".txt,.md,.pdf,.doc,.docx"
+                        onChange={handleFileUpload}
+                      />
+                    </div>
+                    
+                    {fileName && (
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium">Document Type</label>
+                        <Select defaultValue="text">
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="text">Text Document</SelectItem>
+                            <SelectItem value="manual">Training Manual</SelectItem>
+                            <SelectItem value="guidelines">Guidelines</SelectItem>
+                            <SelectItem value="faq">FAQ Document</SelectItem>
+                            <SelectItem value="research">Research Paper</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Document Preview</label>
+                    <Textarea
+                      value={fileContent}
+                      readOnly
+                      rows={8}
+                      placeholder="Upload a document to see preview..."
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
+                
+                {fileName && fileContent && (
+                  <Button
+                    onClick={() => uploadTrainingDocMutation.mutate({
+                      fileName,
+                      extractedText: fileContent,
+                      documentType: 'text'
+                    })}
+                    disabled={uploadTrainingDocMutation.isPending}
+                    className="w-full"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    {uploadTrainingDocMutation.isPending ? 'Processing...' : 'Upload & Train AI'}
+                  </Button>
+                )}
+              </div>
+
+              {/* Training Content List */}
+              <div className="border-t pt-6 space-y-4">
+                <h3 className="text-lg font-semibold">Training Content Library</h3>
+                
+                {trainingLoading ? (
+                  <div className="text-center py-4">
+                    <Bot className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Loading training content...</p>
+                  </div>
+                ) : trainingContent && trainingContent.length > 0 ? (
+                  <div className="space-y-3">
+                    {trainingContent.map((content) => (
+                      <div key={content.id} className="border rounded-lg p-4 space-y-2">
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1">
+                            <h4 className="font-medium">{content.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {content.content.substring(0, 150)}...
+                            </p>
+                            <div className="flex gap-2">
+                              <Badge variant="secondary">{content.category}</Badge>
+                              {content.tags?.map((tag) => (
+                                <Badge key={tag} variant="outline" className="text-xs">{tag}</Badge>
+                              ))}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => deleteTrainingMutation.mutate(content.id)}
+                            disabled={deleteTrainingMutation.isPending}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 space-y-2">
+                    <FileText className="h-8 w-8 mx-auto text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      No training content uploaded yet. Start by adding custom prompts or uploading documents.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="config" className="space-y-6">
           <Card>
