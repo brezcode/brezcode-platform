@@ -4,19 +4,31 @@ import { brands, brandConfigs, type Brand, type BrandConfig } from "@shared/bran
 import { eq, and } from "drizzle-orm";
 
 export class BrandService {
-  // Extract brand context from request (subdomain or custom domain)
+  // Extract brand context from request (path-based or subdomain)
   static getBrandContext(req: Request): string | null {
     const host = req.get('host') || '';
+    const path = req.path;
     
-    // Check for custom domain first
-    if (host && !host.includes('localhost') && !host.includes('replit')) {
-      return host;
+    // Handle leadgen.to domain with path-based routing
+    if (host === 'leadgen.to' || host === 'www.leadgen.to' || host.includes('localhost')) {
+      // Check if path starts with brand name: /brezcode, /acme, etc.
+      const pathSegments = path.split('/').filter(Boolean);
+      if (pathSegments.length > 0 && pathSegments[0] !== 'api' && pathSegments[0] !== 'admin') {
+        return pathSegments[0]; // Return brand name from path
+      }
+      return 'brezcode'; // Default brand for root path
     }
     
-    // Check for subdomain pattern: subdomain.brezcode.com
-    const subdomainMatch = host.match(/^([a-zA-Z0-9-]+)\.brezcode\./);
-    if (subdomainMatch) {
+    // Check for subdomain pattern: brand.leadgen.to
+    const subdomainMatch = host.match(/^([a-zA-Z0-9-]+)\.leadgen\.to$/);
+    if (subdomainMatch && subdomainMatch[1] !== 'www') {
       return subdomainMatch[1];
+    }
+    
+    // Legacy subdomain pattern: brand.brezcode.com
+    const legacySubdomainMatch = host.match(/^([a-zA-Z0-9-]+)\.brezcode\./);
+    if (legacySubdomainMatch) {
+      return legacySubdomainMatch[1];
     }
     
     // Default to main brand
@@ -31,8 +43,7 @@ export class BrandService {
       .where(
         and(
           eq(brands.isActive, true),
-          // Check both subdomain and custom domain
-          // or(eq(brands.subdomain, domain), eq(brands.customDomain, domain))
+          eq(brands.subdomain, domain)
         )
       )
       .limit(1);

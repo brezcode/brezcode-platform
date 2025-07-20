@@ -5,7 +5,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { BrandProvider } from "@/components/BrandProvider";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/components/LanguageSelector";
+import { DomainRouter } from "@/components/DomainRouter";
 import LandingPage from "@/pages/landing";
+import DomainLanding from "@/pages/domain-landing";
 import ChatPage from "@/pages/chat";
 import QuizPage from "@/pages/quiz";
 import ReportPage from "@/pages/report";
@@ -18,18 +20,35 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/" component={LandingPage} />
-      <Route path="/quiz" component={QuizPage} />
-      <Route path="/report" component={ReportPage} />
-      <Route path="/test-report" component={TestReportPage} />
-      <Route path="/demo-report" component={DemoReportPage} />
-      <Route path="/personalized-report" component={PersonalizedReportPage} />
-      <Route path="/chat" component={ChatPage} />
-      <Route path="/subscribe/:tier" component={SubscribePage} />
-      <Route path="/admin" component={AdminPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <>
+      <DomainRouter />
+      <Switch>
+        {/* Root paths */}
+        <Route path="/" component={DomainLanding} />
+        <Route path="/admin" component={AdminPage} />
+        
+        {/* Brand-specific paths */}
+        <Route path="/:brand" component={LandingPage} />
+        <Route path="/:brand/quiz" component={QuizPage} />
+        <Route path="/:brand/report" component={ReportPage} />
+        <Route path="/:brand/test-report" component={TestReportPage} />
+        <Route path="/:brand/demo-report" component={DemoReportPage} />
+        <Route path="/:brand/personalized-report" component={PersonalizedReportPage} />
+        <Route path="/:brand/chat" component={ChatPage} />
+        <Route path="/:brand/subscribe/:tier" component={SubscribePage} />
+        
+        {/* Legacy paths (redirect to brand-specific) */}
+        <Route path="/quiz" component={QuizPage} />
+        <Route path="/report" component={ReportPage} />
+        <Route path="/test-report" component={TestReportPage} />
+        <Route path="/demo-report" component={DemoReportPage} />
+        <Route path="/personalized-report" component={PersonalizedReportPage} />
+        <Route path="/chat" component={ChatPage} />
+        <Route path="/subscribe/:tier" component={SubscribePage} />
+        
+        <Route component={NotFound} />
+      </Switch>
+    </>
   );
 }
 

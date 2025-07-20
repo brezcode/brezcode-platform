@@ -10,7 +10,7 @@ export async function seedDefaultBrand() {
     if (!existingBrand) {
       console.log('Creating default BrezCode brand...');
       
-      // Create default brand
+      // Create default brand  
       const [brand] = await db
         .insert(brands)
         .values({
