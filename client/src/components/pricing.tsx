@@ -77,7 +77,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Free 15-day trial, then <span className="sky-blue">simple pricing</span>
+            {t('pricing.header.trial', 'Free 15-day trial, then')} <span className="sky-blue">{t('pricing.header.simple', 'simple pricing')}</span>
           </h2>
         </div>
 
@@ -85,17 +85,17 @@ export default function Pricing() {
           <div className="bg-gradient-to-r from-sky-50 to-blue-50 rounded-3xl shadow-xl p-12 border-2 border-sky-blue relative">
             <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
               <span className="bg-gradient-to-r from-sky-blue to-blue-500 text-white px-8 py-3 rounded-full text-lg font-bold">
-                ⭐ BEST VALUE
+                ⭐ {t('pricing.bestValue', 'BEST VALUE')}
               </span>
             </div>
 
             <div className="text-center">
-              <h3 className="text-3xl font-bold mb-4">BrezCode Premium</h3>
+              <h3 className="text-3xl font-bold mb-4">{t('pricing.premium.title', 'BrezCode Premium')}</h3>
               <div className="text-6xl font-bold mb-2 sky-blue">
-                Free
+                {t('pricing.premium.free', 'Free')}
               </div>
-              <p className="text-xl text-gray-600 mb-2">15 days, then $4.99/month</p>
-              <p className="text-gray-500 mb-8">Cancel anytime • No hidden fees</p>
+              <p className="text-xl text-gray-600 mb-2">{t('pricing.premium.price', '15 days, then $4.99/month')}</p>
+              <p className="text-gray-500 mb-8">{t('pricing.premium.terms', 'Cancel anytime • No hidden fees')}</p>
 
               <div className="grid md:grid-cols-2 gap-6 mb-8 text-left">
                 <div className="space-y-3">
@@ -103,25 +103,25 @@ export default function Pricing() {
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Easy Risk scoring and tracking</span>
+                    <span>{t('pricing.premium.feature1', 'Easy Risk scoring and tracking')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Weekly Planning</span>
+                    <span>{t('pricing.premium.feature2', 'Weekly Planning')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Analytics & dashboard</span>
+                    <span>{t('pricing.premium.feature3', 'Analytics & dashboard')}</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
                     </svg>
-                    <span>Personalized recommendations</span>
+                    <span>{t('pricing.premium.feature4', 'Personalized recommendations')}</span>
                   </div>
                 </div>
                 <div className="space-y-3">

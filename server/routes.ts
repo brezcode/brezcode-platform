@@ -779,7 +779,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'features.help.benefit3.description': 'The days of anxiety ruining your day or week are over. Learn to enjoy peace of mind with fewer negative effects.',
           'features.help.benefit4.title': 'Improve your well-being',
           'features.help.benefit4.description': 'Taking care of your health can have a big positive impact on your sleep, mental health, relationships, and more.',
-          'features.help.button': 'Take the quiz to start'
+          'features.help.button': 'Take the quiz to start',
+          // Premium pricing section
+          'pricing.header.trial': 'Free 15-day trial, then',
+          'pricing.header.simple': 'simple pricing',
+          'pricing.bestValue': 'BEST VALUE',
+          'pricing.premium.title': 'BrezCode Premium',
+          'pricing.premium.free': 'Free',
+          'pricing.premium.price': '15 days, then $4.99/month',
+          'pricing.premium.terms': 'Cancel anytime • No hidden fees',
+          'pricing.premium.feature1': 'Easy Risk scoring and tracking',
+          'pricing.premium.feature2': 'Weekly Planning',
+          'pricing.premium.feature3': 'Analytics & dashboard',
+          'pricing.premium.feature4': 'Personalized recommendations'
         };
         return res.json(englishTranslations);
       }
@@ -943,7 +955,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'features.help.benefit3.description': '焦慮破壞您一天或一週的日子已經結束了。學會享受內心平靜，減少負面影響。',
           'features.help.benefit4.title': '改善您的整體健康',
           'features.help.benefit4.description': '照顧您的健康對睡眠、心理健康、人際關係等方面都有很大的正面影響。',
-          'features.help.button': '開始測驗'
+          'features.help.button': '開始測驗',
+          // Premium pricing section
+          'pricing.header.trial': '免費15天試用，然後',
+          'pricing.header.simple': '簡單定價',
+          'pricing.bestValue': '最佳價值',
+          'pricing.premium.title': 'BrezCode高級版',
+          'pricing.premium.free': '免費',
+          'pricing.premium.price': '15天，然後每月$4.99',
+          'pricing.premium.terms': '隨時取消・無隱藏費用',
+          'pricing.premium.feature1': '簡易風險評分和追蹤',
+          'pricing.premium.feature2': '每週規劃',
+          'pricing.premium.feature3': '分析和儀表板',
+          'pricing.premium.feature4': '個人化建議'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',
