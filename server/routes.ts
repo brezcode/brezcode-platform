@@ -161,6 +161,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/features', brandFeaturesRouter);
   app.use('/api/avatar', avatarRoutes);
   app.use('/api/health', healthScheduleRoutes);
+  
+  // Brand AI routes for multi-brand AI system
+  const brandAiRoutes = await import('./routes/brandAiRoutes');
+  app.use('/api/brand-ai', brandAiRoutes.default);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

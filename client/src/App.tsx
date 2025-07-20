@@ -22,6 +22,7 @@ import AvatarDemoPage from "@/pages/avatar-demo";
 import HealthSetupPage from "@/pages/health-setup";
 import HealthCalendarPage from "@/pages/health-calendar";
 import HealthPreferencesPage from "@/pages/health-preferences";
+import BrandAiAdmin from "@/pages/brand-ai-admin";
 
 function Router() {
   return (
@@ -40,6 +41,7 @@ function Router() {
         <Route path="/:brand/health-setup" component={HealthSetupPage} />
         <Route path="/:brand/health-calendar" component={HealthCalendarPage} />
         <Route path="/:brand/health-preferences" component={HealthPreferencesPage} />
+        <Route path="/:brand/ai-admin" component={BrandAiAdmin} />
         <Route path="/:brand/report" component={ReportPage} />
         <Route path="/:brand/test-report" component={TestReportPage} />
         <Route path="/:brand/demo-report" component={DemoReportPage} />

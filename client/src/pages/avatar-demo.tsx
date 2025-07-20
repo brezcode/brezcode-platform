@@ -57,7 +57,9 @@ export default function AvatarDemo() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest("POST", "/api/avatar/chat", {
+      // Use the brand-specific AI system
+      const response = await apiRequest("POST", "/api/brand-ai/chat", {
+        brandId: 'brezcode', // Default brand for demo
         sessionId,
         message,
         language: 'en',

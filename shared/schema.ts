@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, varchar, real } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -101,6 +101,57 @@ export const userFeedback = pgTable("user_feedback", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Brand Knowledge Base Tables for Multi-Brand AI Training
+export const brandKnowledgeBase = pgTable('brand_knowledge_base', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  brandId: text('brand_id').notNull(),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  category: text('category').notNull(), // e.g., 'health_guidance', 'procedures', 'faq', 'medical_info'
+  fileType: text('file_type'), // pdf, txt, docx, etc.
+  fileName: text('file_name'),
+  tags: text('tags').array(),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const brandChatSessions = pgTable('brand_chat_sessions', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  brandId: text('brand_id').notNull(),
+  sessionId: text('session_id').notNull(),
+  userId: text('user_id'), // Optional: link to authenticated user
+  language: text('language').default('en'),
+  createdAt: timestamp('created_at').defaultNow(),
+  lastActiveAt: timestamp('last_active_at').defaultNow(),
+});
+
+export const brandChatMessages = pgTable('brand_chat_messages', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  sessionId: text('session_id').notNull(),
+  brandId: text('brand_id').notNull(),
+  role: text('role').notNull(), // 'user' or 'assistant'
+  content: text('content').notNull(),
+  timestamp: timestamp('timestamp').defaultNow(),
+  knowledgeUsed: text('knowledge_used').array(), // IDs of knowledge base entries used
+});
+
+export const brandAiConfig = pgTable('brand_ai_config', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  brandId: text('brand_id').notNull().unique(),
+  assistantName: text('assistant_name').default('AI Health Assistant'),
+  systemPrompt: text('system_prompt'),
+  temperature: real('temperature').default(0.7),
+  maxTokens: integer('max_tokens').default(500),
+  model: text('model').default('gpt-4o'),
+  expertise: text('expertise').notNull(), // e.g., 'breast_health', 'general_health', 'fitness', 'nutrition'
+  personality: text('personality'), // assistant personality traits
+  disclaimers: text('disclaimers').array(),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).pick({
   firstName: true,
   lastName: true,
@@ -179,6 +230,16 @@ export type KnowledgeBase = typeof knowledgeBase.$inferSelect;
 export type InsertKnowledgeBase = typeof knowledgeBase.$inferInsert;
 export type UserFeedback = typeof userFeedback.$inferSelect;
 export type InsertUserFeedback = typeof userFeedback.$inferInsert;
+
+// Brand Knowledge Base Types
+export type BrandKnowledgeBase = typeof brandKnowledgeBase.$inferSelect;
+export type InsertBrandKnowledgeBase = typeof brandKnowledgeBase.$inferInsert;
+export type BrandChatSession = typeof brandChatSessions.$inferSelect;
+export type InsertBrandChatSession = typeof brandChatSessions.$inferInsert;
+export type BrandChatMessage = typeof brandChatMessages.$inferSelect;
+export type InsertBrandChatMessage = typeof brandChatMessages.$inferInsert;
+export type BrandAiConfig = typeof brandAiConfig.$inferSelect;
+export type InsertBrandAiConfig = typeof brandAiConfig.$inferInsert;
 
 // Internationalization Support
 export const languages = pgTable("languages", {

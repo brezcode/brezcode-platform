@@ -62,6 +62,14 @@ app.use((req, res, next) => {
     console.error('Failed to seed default brand:', error);
   }
   
+  // Initialize brand knowledge bases
+  try {
+    const { initializeBrandKnowledge } = await import('./initializeBrandKnowledge');
+    await initializeBrandKnowledge();
+  } catch (error) {
+    console.error('Failed to initialize brand knowledge:', error);
+  }
+  
   const server = await registerRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
