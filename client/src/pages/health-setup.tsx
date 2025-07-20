@@ -159,9 +159,9 @@ export default function HealthSetup() {
       queryClient.invalidateQueries({ queryKey: ['/api/health/preferences'] });
       queryClient.invalidateQueries({ queryKey: ['/api/health/activities'] });
       
-      // Redirect to health calendar to see the schedule
+      // Redirect to dashboard after setup
       setTimeout(() => {
-        setLocation('/brezcode/health-calendar');
+        setLocation('/brezcode/dashboard');
       }, 1500);
     },
     onError: (error: any) => {

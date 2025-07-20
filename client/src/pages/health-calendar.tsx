@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, dateFnsLocalizer } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay } from 'date-fns';
 import { enUS } from 'date-fns/locale';
+import { useLocation } from 'wouter';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -19,7 +20,8 @@ import {
   Flame,
   Award,
   TrendingUp,
-  Plus
+  Plus,
+  ArrowLeft
 } from 'lucide-react';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -68,6 +70,7 @@ export default function HealthCalendar() {
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Get current date range for calendar
   const startDate = new Date();
@@ -176,8 +179,20 @@ export default function HealthCalendar() {
       <div className="max-w-7xl mx-auto px-4">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Health Calendar</h1>
-          <p className="text-gray-600">Track your daily health activities and build healthy habits</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Health Calendar</h1>
+              <p className="text-gray-600">Track your daily health activities and build healthy habits</p>
+            </div>
+            <Button 
+              variant="outline" 
+              onClick={() => setLocation('/brezcode/dashboard')}
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </div>
         </div>
 
         {/* Stats Dashboard */}

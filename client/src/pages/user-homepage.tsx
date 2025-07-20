@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { useLocation } from 'wouter';
 import { 
   MessageCircle, 
   Send, 
@@ -29,7 +30,10 @@ import {
   Award,
   Flame,
   BarChart3,
-  Activity
+  Activity,
+  Smartphone,
+  Bell,
+  ArrowLeft
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -72,6 +76,7 @@ export default function UserHomepage() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -524,17 +529,37 @@ export default function UserHomepage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                <Button variant="outline" className="w-full justify-start" size="sm">
-                  <Heart className="h-4 w-4 mr-2" />
-                  Start Wellness Check
-                </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm">
-                  <Activity className="h-4 w-4 mr-2" />
-                  Log Activity
-                </Button>
-                <Button variant="outline" className="w-full justify-start" size="sm">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/brezcode/health-calendar')}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Schedule Session
+                  Health Calendar
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/brezcode/notifications')}
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Push Notifications
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => {
+                    // Create iPhone widget functionality
+                    if ('serviceWorker' in navigator) {
+                      alert('To create an iPhone widget:\n\n1. Open this app in Safari\n2. Tap the Share button\n3. Select "Add to Home Screen"\n4. Long press home screen → tap "+" → add widget\n\nYour health tips will appear as a native widget!');
+                    }
+                  }}
+                >
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Create iPhone Widget
                 </Button>
               </CardContent>
             </Card>
