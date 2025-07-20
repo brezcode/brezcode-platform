@@ -17,6 +17,11 @@ import PersonalizedReportPage from "@/pages/personalized-report";
 import SubscribePage from "@/pages/subscribe";
 import AdminPage from "@/pages/admin";
 import NotFound from "@/pages/not-found";
+import AvatarQuizPage from "@/pages/avatar-quiz";
+import AvatarDemoPage from "@/pages/avatar-demo";
+import HealthSetupPage from "@/pages/health-setup";
+import HealthCalendarPage from "@/pages/health-calendar";
+import HealthPreferencesPage from "@/pages/health-preferences";
 
 function Router() {
   return (
@@ -30,11 +35,11 @@ function Router() {
         {/* Brand-specific paths */}
         <Route path="/:brand" component={LandingPage} />
         <Route path="/:brand/quiz" component={QuizPage} />
-        <Route path="/:brand/avatar-quiz" component={() => import("@/pages/avatar-quiz")} />
-        <Route path="/:brand/avatar-demo" component={() => import("@/pages/avatar-demo")} />
-        <Route path="/:brand/health-setup" component={() => import("@/pages/health-setup")} />
-        <Route path="/:brand/health-calendar" component={() => import("@/pages/health-calendar")} />
-        <Route path="/:brand/health-preferences" component={() => import("@/pages/health-preferences")} />
+        <Route path="/:brand/avatar-quiz" component={AvatarQuizPage} />
+        <Route path="/:brand/avatar-demo" component={AvatarDemoPage} />
+        <Route path="/:brand/health-setup" component={HealthSetupPage} />
+        <Route path="/:brand/health-calendar" component={HealthCalendarPage} />
+        <Route path="/:brand/health-preferences" component={HealthPreferencesPage} />
         <Route path="/:brand/report" component={ReportPage} />
         <Route path="/:brand/test-report" component={TestReportPage} />
         <Route path="/:brand/demo-report" component={DemoReportPage} />
