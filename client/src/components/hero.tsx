@@ -97,12 +97,21 @@ export default function Hero() {
               {t('hero.members.study', 'In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.')}
             </p>
 
-            <Button 
-              onClick={handleTakeQuiz}
-              className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all"
-            >
-              {t('hero.cta', 'Take the quiz to start')}
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Button 
+                onClick={handleTakeQuiz}
+                className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all"
+              >
+                {t('hero.cta', 'Take the quiz to start')}
+              </Button>
+              <Button 
+                onClick={() => setLocation("/brezcode/health-preferences")}
+                variant="outline"
+                className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-8 py-3 rounded-full text-lg font-bold transition-all"
+              >
+                🗓️ Try Health Scheduling
+              </Button>
+            </div>
           </div>
         </div>
       </div>

@@ -75,11 +75,12 @@ export default function Navigation() {
               <span className="font-bold text-xl text-yellow-400">BrezCode</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
+              <button onClick={() => setLocation("/brezcode/health-preferences")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Health Setup</button>
+              <button onClick={() => setLocation("/brezcode/health-calendar")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Health Calendar</button>
+              <button onClick={() => setLocation("/brezcode/avatar-demo")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">AI Assistant</button>
               <a href="#how-it-works" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.howItWorks', 'How it works')}</a>
               <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.features', 'Features')}</a>
-              <a href="#reviews" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.reviews', 'Reviews')}</a>
               <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.pricing', 'Pricing')}</a>
-              <a href="#faq" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.faq', 'FAQ')}</a>
               <div className="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
                 <LanguageSelector />
               </div>
