@@ -213,7 +213,7 @@ export default function HealthCalendar() {
                   <div>
                     <p className="text-sm text-gray-600">Current Streak</p>
                     <p className="text-2xl font-bold text-orange-600">
-                      {Math.max(...(stats.streaks.map(s => s.currentStreak) || [0]))}
+                      {stats?.streaks?.length > 0 ? Math.max(...stats.streaks.map(s => s.currentStreak)) : 0}
                     </p>
                   </div>
                   <Flame className="h-8 w-8 text-orange-600" />
