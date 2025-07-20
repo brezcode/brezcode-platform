@@ -4,6 +4,11 @@ import { AvatarRequirementsService } from "../avatarRequirementsService";
 import { brandMiddleware, requireBrand } from "../brandMiddleware";
 import { z } from "zod";
 import { avatarQuizSchema } from "@shared/avatar-schema";
+import OpenAI from "openai";
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 const router = Router();
 
@@ -377,19 +382,11 @@ router.post("/chat", async (req: any, res) => {
       return res.status(400).json({ error: "Message is required" });
     }
 
-    // For demo purposes, create a basic response
-    const demoResponse = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
-          {
-            role: "system",
-            content: `You are a professional health assistant specializing in breast health education and self-care. Your role is to provide clear, step-by-step guidance for self breast exams and general breast health practices. Always include appropriate medical disclaimers and encourage professional medical consultation when needed.
+    console.log("Demo chat request:", { message, sessionId });
+    console.log("OpenAI API Key exists:", !!process.env.OPENAI_API_KEY);
+
+    // Use the same pattern as the working chat service
+    const systemPrompt = `You are a professional health assistant specializing in breast health education and self-care. Your role is to provide clear, step-by-step guidance for self breast exams and general breast health practices. Always include appropriate medical disclaimers and encourage professional medical consultation when needed.
 
 Key guidelines:
 - Provide detailed, easy-to-follow instructions
@@ -397,24 +394,24 @@ Key guidelines:
 - Include timing recommendations (when to do exams)
 - Emphasize the importance of regular self-exams
 - Always recommend professional medical care for any concerns
-- Be thorough but not overwhelming`
-          },
-          {
-            role: "user", 
-            content: message
-          }
-        ],
-        max_tokens: 500,
-        temperature: 0.7,
-      }),
+- Be thorough but not overwhelming`;
+
+    const messages = [
+      { role: "system", content: systemPrompt },
+      { role: "user", content: message }
+    ];
+
+    console.log("Calling OpenAI with", messages.length, "messages");
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: messages as any,
+      max_tokens: 500,
+      temperature: 0.7,
     });
 
-    if (!demoResponse.ok) {
-      throw new Error('OpenAI API error');
-    }
-
-    const aiData = await demoResponse.json();
-    const aiResponse = aiData.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
+    console.log("OpenAI response received successfully");
+    const aiResponse = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
 
     res.json({
       success: true,
@@ -423,7 +420,11 @@ Key guidelines:
     });
 
   } catch (error: any) {
-    console.error("Demo chat error:", error);
+    console.error("Demo chat error details:", {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({ 
       error: "Failed to process message",
       message: error.message 
