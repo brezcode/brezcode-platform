@@ -43,7 +43,7 @@ export default function IPhoneWidgetGuide() {
       title: "Add Widget",
       description: "Long press home screen, tap '+', search for your app",
       icon: <Plus className="h-6 w-6" />,
-      detail: "Once the app is on your home screen, long press an empty area, tap the '+' button, and search for the health app to add widgets."
+      detail: "After adding the app to home screen:\n\n1. Long press any EMPTY area on your home screen (not on an app)\n2. All apps will start wiggling\n3. Look for a '+' button in the TOP LEFT corner\n4. Tap the '+' button\n5. Search for your health app name\n6. Select widget size and tap 'Add Widget'\n7. Tap 'Done' in top right corner"
     }
   ];
 
@@ -112,7 +112,7 @@ export default function IPhoneWidgetGuide() {
                   onClick={() => {
                     if (typeof window !== 'undefined') {
                       navigator.clipboard.writeText(window.location.href);
-                      alert('✅ URL copied! Now:\n\n1. Open Safari on your iPhone\n2. Paste this URL\n3. Follow the widget setup steps');
+                      alert('✅ URL copied! Now:\n\n1. Open Safari on your iPhone\n2. Paste this URL and visit it\n3. Tap Share button (square with arrow)\n4. Select "Add to Home Screen"\n5. Long press empty home screen area\n6. Look for "+" in TOP LEFT corner\n7. Search for your health app\n8. Add widget!');
                     }
                   }}
                   size="sm"
@@ -174,6 +174,23 @@ export default function IPhoneWidgetGuide() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Troubleshooting */}
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <h3 className="font-medium text-yellow-900 mb-2">Can't Find the '+' Button?</h3>
+            <div className="text-sm text-yellow-800 space-y-2">
+              <p><strong>Step by step:</strong></p>
+              <ol className="list-decimal ml-4 space-y-1">
+                <li>Make sure the app is added to your home screen first</li>
+                <li>Long press an EMPTY space on home screen (not on any app icon)</li>
+                <li>Apps will start wiggling/jiggling</li>
+                <li>Look in the TOP LEFT corner for a small '+' symbol</li>
+                <li>If no '+' appears, try pressing and holding longer</li>
+                <li>On older iPhones, the '+' might be at the top of the screen</li>
+              </ol>
+              <p className="mt-2"><strong>Still having trouble?</strong> Try restarting your iPhone and repeat the process.</p>
             </div>
           </div>
 
