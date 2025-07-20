@@ -46,6 +46,14 @@ app.use((req, res, next) => {
     console.error('❌ Knowledge base initialization failed:', error);
   }
 
+  // Initialize platform features
+  try {
+    const { seedFeatures } = await import('./seedFeatures');
+    await seedFeatures();
+  } catch (error) {
+    console.error('Failed to seed platform features:', error);
+  }
+
   // Initialize default brand
   try {
     const { seedDefaultBrand } = await import('./seedBrand');

@@ -1,6 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import brandRoutes from "./brandRoutes";
+import brandCustomersRouter from "./routes/brandCustomers";
+import brandFeaturesRouter from "./routes/brandFeatures";
 import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
 import session from "express-session";
 import Stripe from "stripe";
@@ -150,6 +152,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register brand routes
   app.use(brandRoutes);
+  
+  // Brand customer and feature routes (B2B2C multi-tenant)
+  app.use('/api/customers', brandCustomersRouter);
+  app.use('/api/features', brandFeaturesRouter);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
