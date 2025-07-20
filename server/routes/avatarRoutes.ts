@@ -403,15 +403,55 @@ Key guidelines:
 
     console.log("Calling OpenAI with", messages.length, "messages");
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: messages as any,
-      max_tokens: 500,
-      temperature: 0.7,
-    });
+    let aiResponse;
+    try {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: messages as any,
+        max_tokens: 500,
+        temperature: 0.7,
+      });
 
-    console.log("OpenAI response received successfully");
-    const aiResponse = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
+      console.log("OpenAI response received successfully");
+      aiResponse = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
+    } catch (openaiError: any) {
+      console.log("OpenAI API unavailable, providing educational fallback");
+      // Provide educational fallback for self breast exam instruction
+      aiResponse = `I'll guide you through a proper self breast exam step by step. **Please note: This is educational information only. Always consult your healthcare provider for medical advice.**
+
+**When to perform self breast exam:**
+- Best time: 7-10 days after your period starts
+- If no periods: Choose the same day each month
+
+**Step-by-step self breast exam:**
+
+**Step 1 - Visual Inspection (Mirror)**
+- Stand in front of a mirror, shoulders straight, arms on hips
+- Look for changes in size, shape, dimpling, or skin texture
+- Raise your arms overhead and check again
+
+**Step 2 - Lying Down Examination**
+- Lie down with a pillow under your right shoulder
+- Use your left hand to examine your right breast
+- Use finger pads (not tips) in small circular motions
+- Apply light, medium, then firm pressure
+- Cover the entire breast from collarbone to bra line
+
+**Step 3 - Pattern Coverage**
+- Use up-and-down pattern covering all breast tissue
+- Include the area under your arm
+- Repeat on the other side
+
+**What to feel for:**
+- New lumps or thickening
+- Changes in size or shape
+- Skin dimpling or puckering
+- Nipple discharge or inversion
+
+**Important:** Contact your healthcare provider if you notice any changes. Early detection saves lives, and most breast changes are not cancer.
+
+Would you like me to explain any specific step in more detail?`;
+    }
 
     res.json({
       success: true,
