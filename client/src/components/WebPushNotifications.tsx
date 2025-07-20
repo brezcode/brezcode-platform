@@ -162,8 +162,8 @@ export default function WebPushNotifications() {
   const sendBreastHealthTip = async () => {
     try {
       // Show immediate browser notification for demo
-      if ('Notification' in window && Notification.permission === 'granted') {
-        new Notification('🌸 Daily Breast Health Tip', {
+      if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'granted') {
+        new window.Notification('🌸 Daily Breast Health Tip', {
           body: 'Take 5 minutes today for deep breathing exercises. Stress reduction can help lower cortisol levels and support immune function.',
           icon: '/health-icon.png',
           tag: 'health-tip'

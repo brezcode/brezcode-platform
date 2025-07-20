@@ -35,11 +35,21 @@ const healthTips = [
 export default function NotificationDemo() {
   const [lastSent, setLastSent] = useState<string>('');
   const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationSupported, setNotificationSupported] = useState(false);
+  const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
+
+  // Check notification support on component mount
+  React.useEffect(() => {
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      setNotificationSupported(true);
+      setNotificationPermission(window.Notification.permission);
+    }
+  }, []);
 
   const sendDemoNotification = (tip: typeof healthTips[0]) => {
     // Show browser notification if permission granted
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(tip.title, {
+    if (typeof window !== 'undefined' && 'Notification' in window && window.Notification.permission === 'granted') {
+      new window.Notification(tip.title, {
         body: tip.body,
         icon: '/health-icon.png',
         tag: `health-tip-${tip.type}`,
@@ -83,8 +93,9 @@ export default function NotificationDemo() {
   };
 
   const requestNotificationPermission = async () => {
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission();
+    if (typeof window !== 'undefined' && 'Notification' in window) {
+      const permission = await window.Notification.requestPermission();
+      setNotificationPermission(permission);
       if (permission === 'granted') {
         sendDemoNotification(healthTips[0]);
       }
@@ -109,7 +120,24 @@ export default function NotificationDemo() {
           <p className="text-sm text-blue-800 mb-2">
             <strong>Try the demo:</strong> Click any notification type below to see how breast health tips appear on your device
           </p>
-          {Notification.permission !== 'granted' && (
+          
+          {!notificationSupported && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-3 mb-2">
+              <p className="text-sm text-yellow-800">
+                Browser notifications are not supported on this device.
+              </p>
+            </div>
+          )}
+          
+          {notificationSupported && notificationPermission === 'denied' && (
+            <div className="bg-red-50 border border-red-200 rounded p-3 mb-2">
+              <p className="text-sm text-red-800">
+                Notifications are blocked. Please enable them in your browser settings.
+              </p>
+            </div>
+          )}
+          
+          {notificationSupported && notificationPermission !== 'granted' && notificationPermission !== 'denied' && (
             <Button 
               onClick={requestNotificationPermission}
               size="sm"
@@ -117,6 +145,14 @@ export default function NotificationDemo() {
             >
               Enable Browser Notifications First
             </Button>
+          )}
+          
+          {notificationSupported && notificationPermission === 'granted' && (
+            <div className="bg-green-50 border border-green-200 rounded p-3">
+              <p className="text-sm text-green-800">
+                ✅ Notifications enabled! Try the demo buttons below.
+              </p>
+            </div>
           )}
         </div>
 
