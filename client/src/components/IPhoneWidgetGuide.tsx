@@ -23,9 +23,9 @@ export default function IPhoneWidgetGuide() {
   const steps = [
     {
       title: "Open in Safari",
-      description: "Make sure you're viewing this app in Safari on your iPhone",
+      description: "Copy the website URL and open it in Safari on your iPhone",
       icon: <Smartphone className="h-6 w-6" />,
-      detail: "Open Safari and navigate to this health app. Other browsers like Chrome won't work for adding to home screen."
+      detail: "Copy this URL: " + window.location.href + "\n\nThen on your iPhone:\n1. Open Safari app\n2. Paste the URL in the address bar\n3. Visit the website\n\nNote: Chrome/other browsers won't work for widgets"
     },
     {
       title: "Tap Share Button",
@@ -93,20 +93,42 @@ export default function IPhoneWidgetGuide() {
         </CardHeader>
         <CardContent className="space-y-6">
           
-          {/* Quick Install Button */}
+          {/* Website URL Display */}
           <div className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               <div>
-                <h3 className="font-semibold text-blue-900">Add to iPhone</h3>
-                <p className="text-sm text-blue-700">Install as app and create widgets</p>
+                <h3 className="font-semibold text-blue-900">Website URL for iPhone</h3>
+                <p className="text-sm text-blue-700">Copy this URL and open it in Safari on your iPhone</p>
               </div>
-              <Button 
-                onClick={installPWA}
-                className="bg-blue-600 hover:bg-blue-700"
-              >
-                <Download className="h-4 w-4 mr-2" />
-                Install App
-              </Button>
+              
+              <div className="bg-white border rounded-lg p-3">
+                <code className="text-sm text-gray-800 break-all">
+                  {typeof window !== 'undefined' ? window.location.href : 'Loading...'}
+                </code>
+              </div>
+              
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      navigator.clipboard.writeText(window.location.href);
+                      alert('✅ URL copied! Now:\n\n1. Open Safari on your iPhone\n2. Paste this URL\n3. Follow the widget setup steps');
+                    }
+                  }}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  Copy URL
+                </Button>
+                <Button 
+                  onClick={installPWA}
+                  size="sm"
+                  variant="outline"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Show Guide
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -180,7 +202,7 @@ export default function IPhoneWidgetGuide() {
           <div className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <h3 className="font-medium text-blue-900 mb-2">Current Step: {steps[currentStep]?.title}</h3>
-              <p className="text-sm text-blue-800 mb-3">{steps[currentStep]?.detail}</p>
+              <div className="text-sm text-blue-800 mb-3 whitespace-pre-line">{steps[currentStep]?.detail}</div>
               
               <div className="flex items-center justify-between">
                 <Button 
