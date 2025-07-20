@@ -3,6 +3,9 @@ import { createServer, type Server } from "http";
 import brandRoutes from "./brandRoutes";
 import brandCustomersRouter from "./routes/brandCustomers";
 import brandFeaturesRouter from "./routes/brandFeatures";
+import avatarRoutes from "./routes/avatarRoutes";
+import healthScheduleRoutes from "./routes/healthScheduleRoutes";
+import { TwilioVoiceService } from "./twilioVoiceService";
 import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
 import session from "express-session";
 import Stripe from "stripe";
@@ -156,6 +159,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Brand customer and feature routes (B2B2C multi-tenant)
   app.use('/api/customers', brandCustomersRouter);
   app.use('/api/features', brandFeaturesRouter);
+  app.use('/api/avatar', avatarRoutes);
+  app.use('/api/health', healthScheduleRoutes);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
@@ -626,6 +631,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error submitting feedback:', error);
       res.status(500).json({ success: false, message: 'Failed to submit feedback' });
+    }
+  });
+
+  // Twilio Voice API endpoints for AI Avatar integration
+  app.post('/voice/incoming', async (req, res) => {
+    try {
+      const twiml = await TwilioVoiceService.handleIncomingCall(req);
+      res.type('text/xml');
+      res.send(twiml);
+    } catch (error) {
+      console.error('Voice incoming call error:', error);
+      res.status(500).send('Error handling call');
+    }
+  });
+
+  app.post('/voice/process-input', async (req, res) => {
+    try {
+      const twiml = await TwilioVoiceService.processVoiceInput(req);
+      res.type('text/xml');
+      res.send(twiml);
+    } catch (error) {
+      console.error('Voice input processing error:', error);
+      res.status(500).send('Error processing voice input');
+    }
+  });
+
+  app.post('/voice/status', async (req, res) => {
+    try {
+      await TwilioVoiceService.handleCallStatus(req);
+      res.sendStatus(200);
+    } catch (error) {
+      console.error('Call status error:', error);
+      res.status(500).send('Error handling call status');
+    }
+  });
+
+  // Outbound call endpoint
+  app.post('/api/voice/call', brandMiddleware, async (req, res) => {
+    try {
+      const { phoneNumber, message, language } = req.body;
+      const brandId = req.brand?.id;
+      
+      if (!brandId) {
+        return res.status(400).json({ error: 'Brand context required' });
+      }
+
+      const result = await TwilioVoiceService.makeOutboundCall(brandId, phoneNumber, message, language);
+      res.json({ success: true, ...result });
+    } catch (error: any) {
+      console.error('Outbound call error:', error);
+      res.status(500).json({ error: 'Failed to make call', message: error.message });
     }
   });
 

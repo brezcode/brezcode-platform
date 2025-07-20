@@ -30,6 +30,10 @@ function Router() {
         {/* Brand-specific paths */}
         <Route path="/:brand" component={LandingPage} />
         <Route path="/:brand/quiz" component={QuizPage} />
+        <Route path="/:brand/avatar-quiz" component={() => import("@/pages/avatar-quiz")} />
+        <Route path="/:brand/avatar-demo" component={() => import("@/pages/avatar-demo")} />
+        <Route path="/:brand/health-calendar" component={() => import("@/pages/health-calendar")} />
+        <Route path="/:brand/health-preferences" component={() => import("@/pages/health-preferences")} />
         <Route path="/:brand/report" component={ReportPage} />
         <Route path="/:brand/test-report" component={TestReportPage} />
         <Route path="/:brand/demo-report" component={DemoReportPage} />
