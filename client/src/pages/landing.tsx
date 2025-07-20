@@ -16,18 +16,16 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white">
       <Navigation />
       <Hero />
-      <Features />
       
-      
-      {/* App Features Section */}
-      <section id="app-features" className="py-20 bg-gray-50">
+      {/* How It Works Section */}
+      <section id="how-it-works" className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              {t('landing.appFeatures.title', 'An app, community, and')} <span className="sky-blue">{t('landing.appFeatures.subtitle', 'coach in your pocket')}</span>
+              {t('landing.howItWorks.title', 'How')} <span className="sky-blue">{t('landing.howItWorks.subtitle', 'BrezCode Works')}</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              {t('landing.appFeatures.description', 'After a quick quiz, we\'ll personalize your first weekly plan, introduce you to daily health rituals, and invite you to our private community. Our supportive coaches will be with you at every step of the way.')}
+              {t('landing.howItWorks.description', 'After a quick quiz, we\'ll personalize your first weekly plan, introduce you to daily health rituals, and invite you to our private community. Our supportive coaches will be with you at every step of the way.')}
             </p>
           </div>
 
@@ -107,6 +105,111 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Features Section */}
+      <Features />
+
+      {/* Reviews Section */}
+      <section id="reviews" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              {t('reviews.title', 'What Our Users')} <span className="sky-blue">{t('reviews.subtitle', 'Are Saying')}</span>
+            </h2>
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              {t('reviews.description', 'Real stories from women who have transformed their health journey with BrezCode.')}
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-sky-blue rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">S</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Sarah M.</h4>
+                  <div className="flex text-yellow-400">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 leading-relaxed">
+                "BrezCode helped me understand my risk factors and gave me a clear action plan. The AI coach is incredibly supportive and knowledgeable."
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-sunny-yellow rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">M</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Maria L.</h4>
+                  <div className="flex text-yellow-400">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 leading-relaxed">
+                "The personalized recommendations are amazing. I've made real changes to my lifestyle and feel more confident about my health."
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
+              <div className="flex items-center mb-6">
+                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                  <span className="text-white font-bold">J</span>
+                </div>
+                <div>
+                  <h4 className="font-semibold">Jennifer K.</h4>
+                  <div className="flex text-yellow-400">
+                    ★★★★★
+                  </div>
+                </div>
+              </div>
+              <p className="text-gray-600 leading-relaxed">
+                "Having 24/7 access to evidence-based health guidance has been life-changing. BrezCode is like having a health expert in my pocket."
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Pricing Section */}
+      <Pricing />
+
+      {/* FAQ Section */}
+      <section id="faq" className="py-20 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              {t('faq.title', 'Frequently Asked')} <span className="sky-blue">{t('faq.subtitle', 'Questions')}</span>
+            </h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-lg mb-3">Is my health information secure?</h3>
+              <p className="text-gray-600">Yes, we use bank-level encryption and are HIPAA compliant. Your health data is never shared with third parties.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-lg mb-3">How accurate are the risk assessments?</h3>
+              <p className="text-gray-600">Our assessments are based on evidence-based medical research and validated risk models used by healthcare professionals.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-lg mb-3">Can I cancel my subscription anytime?</h3>
+              <p className="text-gray-600">Yes, you can cancel your subscription at any time. There are no long-term commitments or cancellation fees.</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <h3 className="font-semibold text-lg mb-3">Is this a replacement for medical care?</h3>
+              <p className="text-gray-600">No, BrezCode is designed to complement your healthcare, not replace it. Always consult with healthcare professionals for medical decisions.</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Promise Section */}
       <section className="py-20 bg-gradient-to-br from-purple-600 to-indigo-700">
