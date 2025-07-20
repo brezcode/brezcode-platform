@@ -803,7 +803,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'riskChart.aiMonitor': 'AI Monitor',
           'riskChart.reach100': 'Reach Risk Reduction of 100%',
           'riskChart.combineAll': 'Combine all activities for maximum protection!',
-          'riskChart.byActivity': 'Risk Reduction by Activity'
+          'riskChart.byActivity': 'Risk Reduction by Activity',
+          // Footer translations
+          'footer.description': 'Empowering women with AI-driven breast health insights and personalized coaching for proactive wellness management.',
+          'footer.product': 'Product',
+          'footer.features': 'Features',
+          'footer.pricing': 'Pricing',
+          'footer.faq': 'FAQ',
+          'footer.support': 'Support',
+          'footer.company': 'Company',
+          'footer.about': 'About',
+          'footer.privacy': 'Privacy',
+          'footer.terms': 'Terms',
+          'footer.contact': 'Contact',
+          'footer.copyright': '© 2024 BrezCode. All rights reserved. This service is for informational purposes only and does not replace professional medical advice.'
         };
         return res.json(englishTranslations);
       }
@@ -991,7 +1004,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'riskChart.aiMonitor': 'AI監測',
           'riskChart.reach100': '達到100%風險降低',
           'riskChart.combineAll': '結合所有活動以獲得最大保護！',
-          'riskChart.byActivity': '各活動風險降低程度'
+          'riskChart.byActivity': '各活動風險降低程度',
+          // Footer translations
+          'footer.description': '透過AI驅動的乳房健康洞察和個人化指導，賦能女性進行主動的健康管理。',
+          'footer.product': '產品',
+          'footer.features': '功能特色',
+          'footer.pricing': '價格方案',
+          'footer.faq': '常見問題',
+          'footer.support': '客戶支援',
+          'footer.company': '公司',
+          'footer.about': '關於我們',
+          'footer.privacy': '隱私政策',
+          'footer.terms': '服務條款',
+          'footer.contact': '聯絡我們',
+          'footer.copyright': '© 2024 BrezCode. 版權所有。本服務僅供參考用途，不能替代專業醫療建議。'
         },
         'zh-CN': {
           'quiz.title': '乳腺癌风险评估',

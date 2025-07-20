@@ -315,7 +315,7 @@ export default function LandingPage() {
                 <span className="text-xl font-semibold">BrezCode</span>
               </div>
               <p className="text-gray-400 mb-6 leading-relaxed">
-                Empowering women with AI-driven breast health insights and personalized coaching for proactive wellness management.
+                {t('footer.description', 'Empowering women with AI-driven breast health insights and personalized coaching for proactive wellness management.')}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center hover:bg-sky-blue transition-colors">
@@ -331,26 +331,26 @@ export default function LandingPage() {
               </div>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Product</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('footer.product', 'Product')}</h3>
               <ul className="space-y-2">
-                <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">Features</a></li>
-                <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Support</a></li>
+                <li><a href="#features" className="text-gray-400 hover:text-white transition-colors">{t('footer.features', 'Features')}</a></li>
+                <li><a href="#pricing" className="text-gray-400 hover:text-white transition-colors">{t('footer.pricing', 'Pricing')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.faq', 'FAQ')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.support', 'Support')}</a></li>
               </ul>
             </div>
             <div>
-              <h3 className="text-lg font-semibold mb-4">Company</h3>
+              <h3 className="text-lg font-semibold mb-4">{t('footer.company', 'Company')}</h3>
               <ul className="space-y-2">
-                <li><a href="#about" className="text-gray-400 hover:text-white transition-colors">About</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Terms</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                <li><a href="#about" className="text-gray-400 hover:text-white transition-colors">{t('footer.about', 'About')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.privacy', 'Privacy')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.terms', 'Terms')}</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">{t('footer.contact', 'Contact')}</a></li>
               </ul>
             </div>
           </div>
           <div className="border-t border-gray-700 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 BrezCode. All rights reserved. This service is for informational purposes only and does not replace professional medical advice.</p>
+            <p>{t('footer.copyright', '© 2024 BrezCode. All rights reserved. This service is for informational purposes only and does not replace professional medical advice.')}</p>
           </div>
         </div>
       </footer>
