@@ -130,6 +130,8 @@ export default function HealthSetup() {
 
   const savePreferencesAndSchedule = useMutation({
     mutationFn: async (data: FormData) => {
+      console.log('Form data being submitted:', data);
+      
       // Save preferences first
       const preferencesResponse = await apiRequest('/api/health/preferences', {
         method: 'POST',
@@ -167,6 +169,7 @@ export default function HealthSetup() {
       }, 1500);
     },
     onError: (error: any) => {
+      console.error('Form submission error:', error);
       toast({
         title: "Error",
         description: error.message || "Failed to create your health schedule",
