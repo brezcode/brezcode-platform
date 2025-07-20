@@ -368,4 +368,67 @@ router.get("/knowledge/:configId/search", async (req: any, res) => {
   }
 });
 
+// Demo chat endpoint (no auth required for testing)
+router.post("/chat", async (req: any, res) => {
+  try {
+    const { message, sessionId } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    // For demo purposes, create a basic response
+    const demoResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional health assistant specializing in breast health education and self-care. Your role is to provide clear, step-by-step guidance for self breast exams and general breast health practices. Always include appropriate medical disclaimers and encourage professional medical consultation when needed.
+
+Key guidelines:
+- Provide detailed, easy-to-follow instructions
+- Use encouraging and supportive language
+- Include timing recommendations (when to do exams)
+- Emphasize the importance of regular self-exams
+- Always recommend professional medical care for any concerns
+- Be thorough but not overwhelming`
+          },
+          {
+            role: "user", 
+            content: message
+          }
+        ],
+        max_tokens: 500,
+        temperature: 0.7,
+      }),
+    });
+
+    if (!demoResponse.ok) {
+      throw new Error('OpenAI API error');
+    }
+
+    const aiData = await demoResponse.json();
+    const aiResponse = aiData.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
+
+    res.json({
+      success: true,
+      response: aiResponse,
+      timestamp: new Date().toISOString(),
+    });
+
+  } catch (error: any) {
+    console.error("Demo chat error:", error);
+    res.status(500).json({ 
+      error: "Failed to process message",
+      message: error.message 
+    });
+  }
+});
+
 export default router;

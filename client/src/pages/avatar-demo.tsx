@@ -35,20 +35,18 @@ export default function AvatarDemo() {
 
   const sendMessageMutation = useMutation({
     mutationFn: async (message: string) => {
-      return apiRequest('/api/avatar/chat', {
-        method: 'POST',
-        body: JSON.stringify({
-          sessionId,
-          message,
-          language: 'en',
-        }),
+      const response = await apiRequest("POST", "/api/avatar/message", {
+        sessionId,
+        message,
+        language: 'en',
       });
+      return response.json();
     },
-    onSuccess: (response) => {
+    onSuccess: (data) => {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: response.response,
-        timestamp: response.timestamp,
+        content: data.response || data.message || 'I apologize, but I couldn\'t generate a response.',
+        timestamp: data.timestamp || new Date().toISOString(),
       }]);
     },
     onError: (error: any) => {
