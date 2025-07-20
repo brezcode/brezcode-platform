@@ -201,7 +201,7 @@ export default function AvatarDemo() {
                 </div>
 
                 {/* Input */}
-                <div className="flex gap-2">
+                <div className="flex gap-2 shrink-0">
                   <Input
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}

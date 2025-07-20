@@ -417,40 +417,34 @@ Key guidelines:
     } catch (openaiError: any) {
       console.log("OpenAI API unavailable, providing educational fallback");
       // Provide educational fallback for self breast exam instruction
-      aiResponse = `I'll guide you through a proper self breast exam step by step. **Please note: This is educational information only. Always consult your healthcare provider for medical advice.**
+      // Provide conversational guidance based on the message
+      if (message.toLowerCase().includes('self breast exam') || message.toLowerCase().includes('breast exam')) {
+        aiResponse = `I'm here to guide you through a self breast exam. This is important for your health, and I'll walk you through it step by step.
 
-**When to perform self breast exam:**
-- Best time: 7-10 days after your period starts
-- If no periods: Choose the same day each month
+First, let me tell you when to do this - the best time is about 7-10 days after your period starts, when your breasts are least tender. If you don't have periods, just pick the same day each month.
 
-**Step-by-step self breast exam:**
+Let's start with the first step: Stand in front of a mirror with your shoulders straight and arms on your hips. Look at your breasts - you're checking for any changes in size, shape, or if you notice any dimpling or unusual skin texture. Then raise your arms overhead and look again.
 
-**Step 1 - Visual Inspection (Mirror)**
-- Stand in front of a mirror, shoulders straight, arms on hips
-- Look for changes in size, shape, dimpling, or skin texture
-- Raise your arms overhead and check again
+Are you ready to move to the next step, or would you like me to explain this part more?`;
+      } else if (message.toLowerCase().includes('next step') || message.toLowerCase().includes('continue')) {
+        aiResponse = `Great! Now for the examination part. You'll want to lie down and put a small pillow under your right shoulder. Use your left hand to examine your right breast.
 
-**Step 2 - Lying Down Examination**
-- Lie down with a pillow under your right shoulder
-- Use your left hand to examine your right breast
-- Use finger pads (not tips) in small circular motions
-- Apply light, medium, then firm pressure
-- Cover the entire breast from collarbone to bra line
+Here's the technique: Use the pads of your fingers, not the tips, and make small circular motions. Start with light pressure, then medium, then firm pressure to feel the different layers of breast tissue. Cover the entire breast area from your collarbone down to your bra line.
 
-**Step 3 - Pattern Coverage**
-- Use up-and-down pattern covering all breast tissue
-- Include the area under your arm
-- Repeat on the other side
+The pattern is important - go up and down like you're mowing a lawn, making sure to cover all the tissue including the area under your arm. Take your time with this.
 
-**What to feel for:**
-- New lumps or thickening
-- Changes in size or shape
-- Skin dimpling or puckering
-- Nipple discharge or inversion
+What should you be feeling for? Any new lumps, thickening, or areas that feel different from the rest. Remember, many women have naturally lumpy breast tissue, so you're looking for changes from what's normal for you.
 
-**Important:** Contact your healthcare provider if you notice any changes. Early detection saves lives, and most breast changes are not cancer.
+Should I continue with what to do if you find something unusual?`;
+      } else {
+        aiResponse = `Hello! I'm your health assistant and I'm here to help you learn about breast health and self-examination techniques. I can guide you step-by-step through a proper self breast exam, which is an important part of taking care of your health.
 
-Would you like me to explain any specific step in more detail?`;
+Self breast exams help you become familiar with how your breasts normally look and feel, so you can notice any changes early. Early detection is key for the best health outcomes.
+
+Would you like me to walk you through how to perform a self breast exam? I'll guide you through each step in a supportive way.
+
+Please remember: This is educational guidance only. Always consult with your healthcare provider for medical advice and regular professional screenings.`;
+      }
     }
 
     res.json({
