@@ -324,6 +324,18 @@ export const healthReportSchema = z.object({
   dailyPlan: z.record(z.any()),
 });
 
+// Export insert and select schemas for health reports
+export const insertHealthReportSchema = createInsertSchema(healthReports);
+
+// Export all the necessary types
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
+export type SubscriptionTier = "basic" | "pro" | "premium" | null;
+export type EmailVerification = typeof emailVerifications.$inferSelect;
+export type InsertEmailVerification = typeof emailVerifications.$inferInsert;
+export type HealthReport = typeof healthReports.$inferSelect;
+export type InsertHealthReport = typeof healthReports.$inferInsert;
+
 export const coachingTipSchema = z.object({
   category: z.string(),
   targetProfile: z.string(),
@@ -351,14 +363,9 @@ export const userFeedbackSchema = z.object({
   userComment: z.string(),
 });
 
-export type InsertUser = z.infer<typeof insertUserSchema>;
-export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SignupData = z.infer<typeof signupSchema>;
-export type EmailVerification = typeof emailVerifications.$inferSelect;
-export type SubscriptionTier = "basic" | "pro" | "premium";
-export type HealthReport = typeof healthReports.$inferSelect;
-export type InsertHealthReport = typeof healthReports.$inferInsert;
 export type KnowledgeBase = typeof knowledgeBase.$inferSelect;
 export type InsertKnowledgeBase = typeof knowledgeBase.$inferInsert;
 export type UserFeedback = typeof userFeedback.$inferSelect;

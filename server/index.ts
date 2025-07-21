@@ -1,5 +1,5 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
+import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
@@ -38,6 +38,10 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log('Starting server...');
+  
+  // Comment out problematic initializations for now
+  /*
   // Initialize knowledge base with evidence-based medical facts
   try {
     const { knowledgeBaseManager } = await import('./knowledgeBase');
@@ -78,6 +82,7 @@ app.use((req, res, next) => {
   } catch (error) {
     console.error('Failed to seed business questions:', error);
   }
+  */
   
   const server = await registerRoutes(app);
 
