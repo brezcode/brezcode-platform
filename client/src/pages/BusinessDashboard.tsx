@@ -83,10 +83,19 @@ export default function BusinessDashboard() {
       href: "/engagement",
       color: "pink",
       status: "available"
+    },
+    {
+      icon: Brain,
+      title: "AI Trainer",
+      description: "Train and optimize your AI assistants",
+      action: "Open Trainer",
+      href: "/ai-trainer",
+      color: "violet",
+      status: "available"
     }
   ];
 
-  const recentStrategies = strategies?.slice(0, 3) || [];
+  const recentStrategies = Array.isArray(strategies) ? strategies.slice(0, 3) : [];
 
   return (
     <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -122,7 +131,7 @@ export default function BusinessDashboard() {
             <Target className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.totalStrategies || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.totalStrategies || 0}</div>
             <p className="text-xs text-green-600 flex items-center mt-1">
               <ArrowUpRight className="w-3 h-3 mr-1" />
               Active business plans
@@ -136,7 +145,7 @@ export default function BusinessDashboard() {
             <Zap className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.activeTools || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.activeTools || 0}</div>
             <p className="text-xs text-blue-600 flex items-center mt-1">
               <Activity className="w-3 h-3 mr-1" />
               Automation running

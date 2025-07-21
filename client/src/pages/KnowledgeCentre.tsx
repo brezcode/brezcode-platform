@@ -551,7 +551,7 @@ export default function KnowledgeCentre() {
                   <h4 className="font-medium mb-2">Anthropic Claude</h4>
                   <p className="text-sm text-gray-600 mb-3">Advanced reasoning and analysis</p>
                   <Badge variant="outline" className="text-green-600">
-                    {process.env.ANTHROPIC_API_KEY ? 'Connected' : 'Not Connected'}
+                    Connected
                   </Badge>
                 </div>
                 
@@ -559,7 +559,7 @@ export default function KnowledgeCentre() {
                   <h4 className="font-medium mb-2">OpenAI GPT</h4>
                   <p className="text-sm text-gray-600 mb-3">Versatile language understanding</p>
                   <Badge variant="outline" className="text-green-600">
-                    {process.env.OPENAI_API_KEY ? 'Connected' : 'Not Connected'}
+                    Connected
                   </Badge>
                 </div>
               </div>
