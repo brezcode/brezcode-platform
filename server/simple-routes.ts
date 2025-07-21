@@ -556,9 +556,159 @@ Format your response as JSON with the exact structure:
     }
   });
 
-  // Simple API routes for testing
-  app.get("/api/test", (req, res) => {
-    res.json({ message: "API is working!" });
+  // AI Trainer API Routes
+  app.get("/api/ai-trainer/strategies", async (req, res) => {
+    try {
+      const assistantId = parseInt(req.query.assistantId as string) || 1;
+      
+      // Mock training strategies for demo
+      const strategies = [
+        {
+          id: `strategy_${assistantId}_1`,
+          assistantId,
+          strategyType: 'response_pattern',
+          priority: 'high',
+          title: 'Improve Response Conciseness',
+          description: 'Recent conversations show responses are too lengthy, affecting user engagement',
+          implementation: [
+            'Add bullet point formatting guidelines',
+            'Set maximum response length targets',
+            'Train with concise response examples',
+            'Implement response structure templates'
+          ],
+          expectedImprovement: 'Increase user engagement by 25% and reduce response time',
+          timeline: '1-2 weeks',
+          metrics: ['Response length', 'User engagement', 'Completion rates'],
+          isImplemented: false,
+          progress: 0
+        },
+        {
+          id: `strategy_${assistantId}_2`,
+          assistantId,
+          strategyType: 'knowledge_gap',
+          priority: 'medium',
+          title: 'Expand Technical Knowledge Base',
+          description: 'Users frequently ask technical questions that require more specialized knowledge',
+          implementation: [
+            'Upload technical documentation',
+            'Create FAQ sections for common technical issues',
+            'Add industry-specific terminology',
+            'Include troubleshooting procedures'
+          ],
+          expectedImprovement: 'Improve accuracy on technical queries by 40%',
+          timeline: '2-3 weeks',
+          metrics: ['Technical accuracy', 'User satisfaction', 'Escalation rate'],
+          isImplemented: true,
+          progress: 100
+        }
+      ];
+      
+      res.json(strategies);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/ai-trainer/analytics", async (req, res) => {
+    try {
+      const assistantId = parseInt(req.query.assistantId as string) || 1;
+      
+      // Mock analytics data
+      const analytics = {
+        overallScore: 87,
+        improvementRate: 15,
+        trainingSessions: 34,
+        avgSatisfaction: 4.3,
+        responseQuality: 89,
+        accuracy: 92,
+        helpfulness: 86,
+        strongAreas: [
+          'Professional communication style',
+          'Quick response time',
+          'Accurate factual information',
+          'Helpful problem-solving approach'
+        ],
+        weakAreas: [
+          'Complex multi-step processes',
+          'Emotional support scenarios',
+          'Advanced technical troubleshooting',
+          'Handling ambiguous requests'
+        ]
+      };
+      
+      res.json(analytics);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/ai-trainer/generate-strategy", async (req, res) => {
+    try {
+      const { assistantId, focus } = req.body;
+      
+      const { AITrainerService } = await import('./aiTrainerService');
+      
+      // Mock performance data for strategy generation
+      const performanceData = {
+        averageRating: 3.8,
+        commonIssues: ['long responses', 'technical accuracy'],
+        conversationAnalyses: [],
+        assistantConfig: {
+          personality: 'professional',
+          expertise: ['customer service', 'general knowledge']
+        }
+      };
+      
+      const strategies = await AITrainerService.generateTrainingStrategies(
+        assistantId,
+        performanceData
+      );
+      
+      res.json({ success: true, strategies });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/ai-trainer/implement/:strategyId", async (req, res) => {
+    try {
+      const strategyId = req.params.strategyId;
+      const assistantId = parseInt(req.query.assistantId as string) || 1;
+      
+      const { AITrainerService } = await import('./aiTrainerService');
+      const result = await AITrainerService.implementTrainingStrategy(strategyId, assistantId);
+      
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/ai-trainer/auto-train", async (req, res) => {
+    try {
+      const { assistantId } = req.body;
+      
+      // Mock auto-training process
+      const result = {
+        success: true,
+        strategiesImplemented: 2,
+        improvementsFound: [
+          'Updated response templates for better clarity',
+          'Enhanced knowledge base with recent FAQ updates',
+          'Improved conversation flow for technical support'
+        ],
+        nextReview: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+        performance: {
+          before: 82,
+          after: 89,
+          improvement: 7
+        }
+      };
+      
+      res.json(result);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
   });
 
   // Create HTTP server

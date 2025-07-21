@@ -34,6 +34,7 @@ import UserProfile from "@/pages/UserProfile";
 import LoginPage from "@/pages/LoginPage";
 import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AvatarSetup from "@/pages/AvatarSetup";
+import AITrainer from "@/pages/AITrainer";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/user-profile" component={UserProfile} />
         <Route path="/knowledge-centre" component={KnowledgeCentre} />
         <Route path="/avatar-setup" component={AvatarSetup} />
+        <Route path="/ai-trainer" component={AITrainer} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/health" component={LeadGenLanding} />
         
