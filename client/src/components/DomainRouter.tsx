@@ -12,10 +12,9 @@ export function DomainRouter() {
     
     // Handle leadgen.to domain routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to') {
-      // If visiting root domain, redirect to /brezcode
+      // If visiting root domain, stay on LeadGen landing page
       if (path === '/' || path === '') {
-        setLocation('/brezcode');
-        return;
+        return; // Don't redirect, show LeadGen landing
       }
       
       // Check if path starts with brand name
@@ -25,9 +24,13 @@ export function DomainRouter() {
         return;
       }
       
-      // Valid brand paths: /brezcode, /acme, etc.
+      // Valid brand paths and core platform routes
       const validBrands = ['brezcode', 'admin']; // Add more brands as needed
-      if (!validBrands.includes(pathSegments[0]) && !pathSegments[0].startsWith('api')) {
+      const coreRoutes = ['login', 'business-consultant', 'dashboard', 'user-profile']; // Core platform routes
+      
+      if (!validBrands.includes(pathSegments[0]) && 
+          !coreRoutes.includes(pathSegments[0]) && 
+          !pathSegments[0].startsWith('api')) {
         setLocation('/brezcode');
         return;
       }
