@@ -148,9 +148,11 @@ export function EmailVerificationStep({
           {developmentMode && (
             <>
               <br />
-              <span className="text-xs text-muted-foreground">
-                Development mode: Check console/logs for verification code
-              </span>
+              <div className="mt-2 p-2 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+                <span className="text-xs text-yellow-800 dark:text-yellow-200">
+                  🔧 Development Mode: Check browser console or server logs for your verification code
+                </span>
+              </div>
             </>
           )}
         </CardDescription>
