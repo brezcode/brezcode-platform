@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { LogIn, UserPlus, Zap } from "lucide-react";
+import { EmailVerificationStep } from "@/components/EmailVerificationStep";
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
@@ -26,6 +27,10 @@ export default function LoginPage() {
     password: "",
     confirmPassword: "",
   });
+
+  // Email verification state
+  const [showEmailVerification, setShowEmailVerification] = useState(false);
+  const [registrationEmail, setRegistrationEmail] = useState("");
 
   // Redirect if already logged in
   if (user) {
@@ -74,11 +79,13 @@ export default function LoginPage() {
     
     try {
       await register(registerForm.firstName, registerForm.lastName, registerForm.email, registerForm.password);
+      // Set up email verification flow using existing BrezCode system
+      setRegistrationEmail(registerForm.email);
+      setShowEmailVerification(true);
       toast({
         title: "Account Created!",
-        description: "Welcome to LeadGen.to - your business automation platform",
+        description: "Please verify your email to complete registration",
       });
-      setLocation("/dashboard");
     } catch (error: any) {
       toast({
         title: "Registration Failed",
@@ -87,6 +94,33 @@ export default function LoginPage() {
       });
     }
   };
+
+  const handleEmailVerificationComplete = () => {
+    setShowEmailVerification(false);
+    toast({
+      title: "Email Verified!",
+      description: "Welcome to LeadGen.to - your business automation platform",
+    });
+    setLocation("/dashboard");
+  };
+
+  const handleBackFromVerification = () => {
+    setShowEmailVerification(false);
+    setRegistrationEmail("");
+  };
+
+  // Show email verification step if needed
+  if (showEmailVerification) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+        <EmailVerificationStep
+          email={registrationEmail}
+          onVerificationComplete={handleEmailVerificationComplete}
+          onBack={handleBackFromVerification}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">

@@ -43,11 +43,25 @@ export function useAuth() {
 
   const registerMutation = useMutation({
     mutationFn: async ({ firstName, lastName, email, password }: { firstName: string; lastName: string; email: string; password: string }) => {
-      const response = await apiRequest("POST", "/api/register", { username: firstName + " " + lastName, email, password });
+      const response = await apiRequest("POST", "/api/auth/signup", { firstName, lastName, email, password });
       return response.json();
     },
     onSuccess: (userData) => {
       queryClient.setQueryData(["/api/me"], userData);
+    },
+  });
+
+  const sendEmailVerificationMutation = useMutation({
+    mutationFn: async ({ email }: { email: string }) => {
+      const response = await apiRequest("POST", "/api/auth/send-email-verification", { email });
+      return response.json();
+    },
+  });
+
+  const verifyEmailMutation = useMutation({
+    mutationFn: async ({ email, code }: { email: string; code: string }) => {
+      const response = await apiRequest("POST", "/api/auth/verify-email", { email, code });
+      return response.json();
     },
   });
 
@@ -69,6 +83,14 @@ export function useAuth() {
     return registerMutation.mutateAsync({ firstName, lastName, email, password });
   };
 
+  const sendEmailVerification = async (email: string) => {
+    return sendEmailVerificationMutation.mutateAsync({ email });
+  };
+
+  const verifyEmail = async (email: string, code: string) => {
+    return verifyEmailMutation.mutateAsync({ email, code });
+  };
+
   const logout = async () => {
     return logoutMutation.mutateAsync();
   };
@@ -78,9 +100,13 @@ export function useAuth() {
     isLoading,
     login,
     register,
+    sendEmailVerification,
+    verifyEmail,
     logout,
     isLoggingIn: loginMutation.isPending,
     isRegistering: registerMutation.isPending,
+    isEmailVerificationPending: sendEmailVerificationMutation.isPending,
+    isEmailVerifyPending: verifyEmailMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
   };
 }
