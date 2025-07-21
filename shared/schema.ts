@@ -271,6 +271,8 @@ export const insertUserSchema = createInsertSchema(users).pick({
   email: true,
   password: true,
   quizAnswers: true,
+}).extend({
+  username: z.string().min(1, "Name is required").optional(), // Accept username and convert to firstName/lastName
 });
 
 export const loginSchema = z.object({
