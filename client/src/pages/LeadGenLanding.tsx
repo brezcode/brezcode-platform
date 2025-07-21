@@ -156,10 +156,10 @@ export function LeadGenLanding() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              Business Solutions & Tools
+              Platform Capabilities & Client Success
             </h2>
             <p className="text-xl text-gray-600">
-              Explore our AI-powered business automation tools and integrations
+              See how businesses use our AI platform tools to automate their operations
             </p>
           </div>
           
@@ -207,25 +207,48 @@ export function LeadGenLanding() {
               </CardContent>
             </Card>
 
-            <Card className="overflow-hidden border-2 border-dashed border-gray-300">
-              <CardContent className="p-8 text-center">
-                <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                  <Zap className="w-8 h-8 text-gray-400" />
+            <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
+              <div className="bg-gradient-to-br from-green-500 to-teal-600 p-6 text-white">
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
+                    <Heart className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">BrezCode</h3>
+                    <p className="text-green-100">Client Success Story</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">Your Business Here</h3>
-                <p className="text-gray-600 mb-6">
-                  Launch your complete business automation platform with AI avatar, landing pages, 
-                  lead generation, and customer engagement tools.
+                <p className="text-green-100 mb-6">
+                  Health assessment platform built using LeadGen tools - showcasing AI assessments, dietary recommendations, and multi-channel engagement
                 </p>
-                <div className="space-y-2 text-sm text-gray-500 mb-6">
-                  <div>• AI-powered landing pages</div>
-                  <div>• Automated lead capture</div>
-                  <div>• Multi-channel messaging</div>
-                  <div>• Sales pipeline management</div>
+                <div className="flex flex-wrap gap-2 mb-6">
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                    Health Focus
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                    AI Assessments
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                    Multi-Language
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                    Live Demo
+                  </Badge>
                 </div>
-                <Button variant="outline" className="w-full">
-                  Get Started
-                </Button>
+              </div>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-600">
+                    <span className="font-semibold text-green-600">✓ Live Business</span>
+                    <br />
+                    Built entirely with LeadGen platform tools
+                  </div>
+                  <Link href="/brezcode">
+                    <Button className="bg-green-600 hover:bg-green-700">
+                      View Demo
+                    </Button>
+                  </Link>
+                </div>
               </CardContent>
             </Card>
           </div>
