@@ -15,6 +15,7 @@ export interface PendingUser {
   email: string;
   firstName: string;
   lastName: string;
+  phoneNumber?: string;
   subscriptionTier?: string;
   isEmailVerified: boolean;
   verificationCode: string;
@@ -57,6 +58,7 @@ export class EmailVerificationModule {
     email: string;
     firstName: string;
     lastName: string;
+    phoneNumber?: string;
     subscriptionTier?: string;
   }): PendingUser {
     return {
@@ -124,19 +126,52 @@ export class EmailVerificationModule {
   }
 
   /**
-   * Send verification code (override this method for actual email sending)
+   * Send verification code via email and SMS
    */
-  async sendVerificationCode(email: string, code: string): Promise<void> {
-    // Default implementation - log to console
+  async sendVerificationCode(email: string, code: string, phoneNumber?: string): Promise<void> {
+    // Always log to console for development
     console.log(`Verification code for ${email}: ${code}`);
     
-    // In production, replace with actual email service:
-    // await emailService.send({
-    //   to: email,
-    //   subject: "Verify your email address",
-    //   template: "verification-code",
-    //   data: { code }
-    // });
+    // Try to send via SMS if phone number provided and Twilio is configured
+    if (phoneNumber) {
+      try {
+        const { TwilioSMSService } = await import('./twilioSMSService');
+        await TwilioSMSService.sendEmailVerificationViaSMS(phoneNumber, email, code);
+        console.log(`Verification code sent via SMS to ${phoneNumber}`);
+      } catch (error: any) {
+        console.log(`SMS failed, falling back to console logging: ${error.message}`);
+      }
+    }
+    
+    // Try to send via email using SendGrid if configured
+    try {
+      const sgMail = await import('@sendgrid/mail');
+      if (process.env.SENDGRID_API_KEY && process.env.FROM_EMAIL) {
+        sgMail.default.setApiKey(process.env.SENDGRID_API_KEY);
+        
+        const msg = {
+          to: email,
+          from: process.env.FROM_EMAIL,
+          subject: "Verify your email address",
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>Email Verification</h2>
+              <p>Your verification code is:</p>
+              <div style="font-size: 24px; font-weight: bold; color: #007bff; padding: 20px; background: #f8f9fa; border-radius: 5px; text-align: center; margin: 20px 0;">
+                ${code}
+              </div>
+              <p>This code will expire in 15 minutes.</p>
+              <p>If you didn't request this verification, please ignore this email.</p>
+            </div>
+          `
+        };
+        
+        await sgMail.default.send(msg);
+        console.log(`Verification email sent to ${email}`);
+      }
+    } catch (error: any) {
+      console.log(`Email sending failed, using console logging: ${error.message}`);
+    }
   }
 }
 
@@ -147,7 +182,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
   return {
     // Signup endpoint that creates pending user
     signup: async (req: any, res: any) => {
-      const { firstName, lastName, email, password, subscriptionTier } = req.body;
+      const { firstName, lastName, email, password, phoneNumber, subscriptionTier } = req.body;
       
       if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({ error: "All fields are required" });
@@ -159,6 +194,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           email,
           firstName,
           lastName,
+          phoneNumber,
           subscriptionTier
         });
         
@@ -166,7 +202,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
         req.session.pendingUser = pendingUser;
         
         // Send verification code
-        await emailModule.sendVerificationCode(email, pendingUser.verificationCode);
+        await emailModule.sendVerificationCode(email, pendingUser.verificationCode, pendingUser.phoneNumber);
         
         res.json({
           message: "Account created successfully. Please verify your email.",
@@ -232,7 +268,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
         req.session.pendingUser = updatedPendingUser;
         
         // Send new code
-        await emailModule.sendVerificationCode(email, updatedPendingUser.verificationCode);
+        await emailModule.sendVerificationCode(email, updatedPendingUser.verificationCode, updatedPendingUser.phoneNumber);
         
         res.json({ message: "Verification code resent successfully" });
       } catch (error: any) {

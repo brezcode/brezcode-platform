@@ -26,6 +26,7 @@ export default function LoginPage() {
     email: "",
     password: "",
     confirmPassword: "",
+    phoneNumber: "",
   });
 
   // Email verification state
@@ -89,6 +90,7 @@ export default function LoginPage() {
           lastName: registerForm.lastName,
           email: registerForm.email,
           password: registerForm.password,
+          phoneNumber: registerForm.phoneNumber,
         }),
       });
 
@@ -245,6 +247,19 @@ export default function LoginPage() {
                       onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}
                       required
                     />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="register-phone">Phone Number (optional)</Label>
+                    <Input
+                      id="register-phone"
+                      type="tel"
+                      placeholder="+1 (555) 123-4567 - For SMS verification"
+                      value={registerForm.phoneNumber}
+                      onChange={(e) => setRegisterForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Optional: Receive verification codes via SMS in addition to email
+                    </p>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-password">Password</Label>
