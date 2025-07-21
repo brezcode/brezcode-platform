@@ -42,8 +42,8 @@ export function useAuth() {
   });
 
   const registerMutation = useMutation({
-    mutationFn: async ({ username, email, password }: { username: string; email: string; password: string }) => {
-      const response = await apiRequest("POST", "/api/register", { username, email, password });
+    mutationFn: async ({ firstName, lastName, email, password }: { firstName: string; lastName: string; email: string; password: string }) => {
+      const response = await apiRequest("POST", "/api/register", { username: firstName + " " + lastName, email, password });
       return response.json();
     },
     onSuccess: (userData) => {
@@ -65,8 +65,8 @@ export function useAuth() {
     return loginMutation.mutateAsync({ email, password });
   };
 
-  const register = async (username: string, email: string, password: string) => {
-    return registerMutation.mutateAsync({ username, email, password });
+  const register = async (firstName: string, lastName: string, email: string, password: string) => {
+    return registerMutation.mutateAsync({ firstName, lastName, email, password });
   };
 
   const logout = async () => {

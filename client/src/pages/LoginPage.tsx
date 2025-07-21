@@ -20,7 +20,8 @@ export default function LoginPage() {
   });
   
   const [registerForm, setRegisterForm] = useState({
-    username: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -44,7 +45,7 @@ export default function LoginPage() {
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
-        description: error.message || "Invalid email or password",
+        description: error.message || "Invalid email or password. Don't have an account? Click Sign Up to register.",
         variant: "destructive",
       });
     }
@@ -53,6 +54,15 @@ export default function LoginPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!registerForm.firstName.trim() || !registerForm.lastName.trim()) {
+      toast({
+        title: "Registration Failed",
+        description: "Please enter both first and last name",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (registerForm.password !== registerForm.confirmPassword) {
       toast({
         title: "Registration Failed",
@@ -63,7 +73,7 @@ export default function LoginPage() {
     }
     
     try {
-      await register(registerForm.username, registerForm.email, registerForm.password);
+      await register(registerForm.firstName, registerForm.lastName, registerForm.email, registerForm.password);
       toast({
         title: "Account Created!",
         description: "Welcome to LeadGen.to - your business automation platform",
@@ -151,16 +161,29 @@ export default function LoginPage() {
               
               <TabsContent value="register" className="space-y-4">
                 <form onSubmit={handleRegister} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="register-username">Username</Label>
-                    <Input
-                      id="register-username"
-                      type="text"
-                      placeholder="Choose a username"
-                      value={registerForm.username}
-                      onChange={(e) => setRegisterForm(prev => ({ ...prev, username: e.target.value }))}
-                      required
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="register-firstname">First Name</Label>
+                      <Input
+                        id="register-firstname"
+                        type="text"
+                        placeholder="First name"
+                        value={registerForm.firstName}
+                        onChange={(e) => setRegisterForm(prev => ({ ...prev, firstName: e.target.value }))}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="register-lastname">Last Name</Label>
+                      <Input
+                        id="register-lastname"
+                        type="text"
+                        placeholder="Last name"
+                        value={registerForm.lastName}
+                        onChange={(e) => setRegisterForm(prev => ({ ...prev, lastName: e.target.value }))}
+                        required
+                      />
+                    </div>
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="register-email">Email</Label>
