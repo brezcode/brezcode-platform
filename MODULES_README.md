@@ -10,9 +10,8 @@ This project includes a complete, reusable email verification system that can be
 - ✅ Configurable code expiry (default: 15 minutes)
 - ✅ Resend functionality with cooldown protection
 - ✅ Express.js middleware integration
-- ✅ Multi-channel delivery: Email (SendGrid) + SMS (Twilio)
-- ✅ Intelligent fallbacks: SMS → Email → Console logging
-- ✅ Phone number support for dual verification
+- ✅ SendGrid email integration with HTML templates
+- ✅ Console logging fallback for development
 
 ### Quick Integration
 
@@ -119,7 +118,6 @@ function CustomVerificationForm() {
   "lastName": "Doe", 
   "email": "john@example.com",
   "password": "password123",
-  "phoneNumber": "+1234567890",
   "subscriptionTier": "basic"
 }
 ```
@@ -233,19 +231,14 @@ export const action = async ({ request }: ActionArgs) => {
 
 ## Production Deployment
 
-1. **Environment Variables**: Set up email and SMS service credentials
+1. **Environment Variables**: Set up SendGrid email service credentials
    ```bash
    # SendGrid for Email
    SENDGRID_API_KEY=your_sendgrid_api_key
    FROM_EMAIL=noreply@yourdomain.com
-   
-   # Twilio for SMS (optional)
-   TWILIO_ACCOUNT_SID=your_twilio_account_sid
-   TWILIO_AUTH_TOKEN=your_twilio_auth_token
-   TWILIO_PHONE_NUMBER=your_twilio_phone_number
    ```
 
-2. **Multi-Channel Setup**: Configure both email and SMS for maximum delivery
+2. **Email Service Setup**: Configure SendGrid for professional email delivery
 3. **Database**: Consider storing verification attempts for audit trails
 4. **Rate Limiting**: Add request rate limiting to verification endpoints
 5. **Monitoring**: Add logging and monitoring for verification success rates

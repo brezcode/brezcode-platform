@@ -15,7 +15,6 @@ export interface PendingUser {
   email: string;
   firstName: string;
   lastName: string;
-  phoneNumber?: string;
   subscriptionTier?: string;
   isEmailVerified: boolean;
   verificationCode: string;
@@ -58,7 +57,6 @@ export class EmailVerificationModule {
     email: string;
     firstName: string;
     lastName: string;
-    phoneNumber?: string;
     subscriptionTier?: string;
   }): PendingUser {
     return {
@@ -126,22 +124,11 @@ export class EmailVerificationModule {
   }
 
   /**
-   * Send verification code via email and SMS
+   * Send verification code via email (with SendGrid integration)
    */
-  async sendVerificationCode(email: string, code: string, phoneNumber?: string): Promise<void> {
+  async sendVerificationCode(email: string, code: string): Promise<void> {
     // Always log to console for development
     console.log(`Verification code for ${email}: ${code}`);
-    
-    // Try to send via SMS if phone number provided and Twilio is configured
-    if (phoneNumber) {
-      try {
-        const { TwilioSMSService } = await import('./twilioSMSService');
-        await TwilioSMSService.sendEmailVerificationViaSMS(phoneNumber, email, code);
-        console.log(`Verification code sent via SMS to ${phoneNumber}`);
-      } catch (error: any) {
-        console.log(`SMS failed, falling back to console logging: ${error.message}`);
-      }
-    }
     
     // Try to send via email using SendGrid if configured
     try {
@@ -182,7 +169,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
   return {
     // Signup endpoint that creates pending user
     signup: async (req: any, res: any) => {
-      const { firstName, lastName, email, password, phoneNumber, subscriptionTier } = req.body;
+      const { firstName, lastName, email, password, subscriptionTier } = req.body;
       
       if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({ error: "All fields are required" });
@@ -194,7 +181,6 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           email,
           firstName,
           lastName,
-          phoneNumber,
           subscriptionTier
         });
         
@@ -202,7 +188,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
         req.session.pendingUser = pendingUser;
         
         // Send verification code
-        await emailModule.sendVerificationCode(email, pendingUser.verificationCode, pendingUser.phoneNumber);
+        await emailModule.sendVerificationCode(email, pendingUser.verificationCode);
         
         res.json({
           message: "Account created successfully. Please verify your email.",
@@ -268,7 +254,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
         req.session.pendingUser = updatedPendingUser;
         
         // Send new code
-        await emailModule.sendVerificationCode(email, updatedPendingUser.verificationCode, updatedPendingUser.phoneNumber);
+        await emailModule.sendVerificationCode(email, updatedPendingUser.verificationCode);
         
         res.json({ message: "Verification code resent successfully" });
       } catch (error: any) {
