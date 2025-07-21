@@ -34,7 +34,7 @@ export default function BusinessDashboard() {
       icon: Brain,
       title: "AI Avatar Assistant",
       description: "Configure your 24/7 virtual assistant",
-      action: "Setup Avatar",
+      action: "Setup Assistant",
       href: "/avatar-setup",
       color: "blue",
       status: "available"

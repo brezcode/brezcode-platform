@@ -504,6 +504,58 @@ Format your response as JSON with the exact structure:
     }
   });
 
+  // Business management API routes
+  app.get("/api/user/businesses", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      
+      const { BusinessService } = await import('./businessService');
+      const businesses = await BusinessService.getUserBusinesses(userId);
+      
+      res.json(businesses);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/user/businesses", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const business = { ...req.body, userId };
+      
+      const { BusinessService } = await import('./businessService');
+      const newBusiness = await BusinessService.createBusiness(business);
+      
+      res.json(newBusiness);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/business/:businessId/stats", async (req, res) => {
+    try {
+      const businessId = parseInt(req.params.businessId);
+      
+      const { BusinessService } = await import('./businessService');
+      const stats = await BusinessService.getBusinessStats(businessId);
+      
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/industries", async (req, res) => {
+    try {
+      const { BusinessService } = await import('./businessService');
+      const industries = BusinessService.getIndustries();
+      
+      res.json(industries);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Simple API routes for testing
   app.get("/api/test", (req, res) => {
     res.json({ message: "API is working!" });
