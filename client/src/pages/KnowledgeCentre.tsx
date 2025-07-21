@@ -299,28 +299,35 @@ export default function KnowledgeCentre() {
       <p className="text-gray-600">Train AI assistants to act on your behalf with custom knowledge and expertise.</p>
 
       <Tabs defaultValue="chat" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="chat">
-            <MessageSquare className="h-4 w-4 mr-2" />
-            Chat
-          </TabsTrigger>
-          <TabsTrigger value="knowledge">
-            <BookOpen className="h-4 w-4 mr-2" />
-            Knowledge
-          </TabsTrigger>
-          <TabsTrigger value="assistants">
-            <Bot className="h-4 w-4 mr-2" />
-            Assistants
-          </TabsTrigger>
-          <TabsTrigger value="analytics">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Analytics
-          </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col space-y-3">
+          {/* First row of tabs */}
+          <TabsList className="grid w-full grid-cols-3 h-auto p-2">
+            <TabsTrigger value="chat" className="flex items-center justify-center space-x-2 py-3">
+              <MessageSquare className="h-4 w-4" />
+              <span>Chat</span>
+            </TabsTrigger>
+            <TabsTrigger value="knowledge" className="flex items-center justify-center space-x-2 py-3">
+              <BookOpen className="h-4 w-4" />
+              <span>Knowledge</span>
+            </TabsTrigger>
+            <TabsTrigger value="assistants" className="flex items-center justify-center space-x-2 py-3">
+              <Bot className="h-4 w-4" />
+              <span>Assistants</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Second row of tabs */}
+          <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+            <TabsTrigger value="analytics" className="flex items-center justify-center space-x-2 py-3">
+              <BarChart3 className="h-4 w-4" />
+              <span>Analytics</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center justify-center space-x-2 py-3">
+              <Settings className="h-4 w-4" />
+              <span>Settings</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="chat" className="space-y-4">
           <Card>

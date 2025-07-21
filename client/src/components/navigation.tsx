@@ -74,14 +74,18 @@ export default function Navigation() {
               </div>
               <span className="font-bold text-xl text-yellow-400">BrezCode</span>
             </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <button onClick={() => setLocation("/brezcode/health-preferences")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Health Setup</button>
-              <button onClick={() => setLocation("/brezcode/health-calendar")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">Health Calendar</button>
-              <button onClick={() => setLocation("/brezcode/avatar-demo")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">AI Assistant</button>
-              <a href="#how-it-works" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.howItWorks', 'How it works')}</a>
-              <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.features', 'Features')}</a>
-              <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium">{t('nav.pricing', 'Pricing')}</a>
-              <div className="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm">
+            <div className="hidden lg:flex items-center">
+              <div className="flex items-center space-x-6 mr-8">
+                <button onClick={() => setLocation("/brezcode/health-preferences")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">Health Setup</button>
+                <button onClick={() => setLocation("/brezcode/health-calendar")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">Health Calendar</button>
+                <button onClick={() => setLocation("/brezcode/avatar-demo")} className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">AI Assistant</button>
+              </div>
+              <div className="flex items-center space-x-6 mr-8">
+                <a href="#how-it-works" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">{t('nav.howItWorks', 'How it works')}</a>
+                <a href="#features" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">{t('nav.features', 'Features')}</a>
+                <a href="#pricing" className="text-yellow-400 hover:text-yellow-300 transition-colors font-medium px-2 py-1">{t('nav.pricing', 'Pricing')}</a>
+              </div>
+              <div className="bg-white/10 rounded-lg px-3 py-1 backdrop-blur-sm mr-6">
                 <LanguageSelector />
               </div>
               
@@ -101,11 +105,11 @@ export default function Navigation() {
                   </Button>
                 </div>
               ) : (
-                <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-4">
                   <Button 
                     variant="ghost" 
                     onClick={() => setShowAuthModal(true)}
-                    className="text-yellow-400 hover:text-yellow-300 font-medium"
+                    className="text-yellow-400 hover:text-yellow-300 font-medium px-4 py-2"
                   >
                     {t('nav.signIn', 'Sign In')}
                   </Button>
@@ -120,7 +124,7 @@ export default function Navigation() {
             </div>
             
             {/* Mobile menu button */}
-            <div className="md:hidden">
+            <div className="lg:hidden">
               <Button
                 variant="ghost"
                 size="sm"
@@ -135,17 +139,18 @@ export default function Navigation() {
         
         {/* Mobile menu */}
         {showMobileMenu && (
-          <div className="md:hidden bg-blue-600/95 backdrop-blur-sm border-t border-white/10">
+          <div className="lg:hidden bg-blue-600/95 backdrop-blur-sm border-t border-white/10">
             <div className="px-4 py-6 space-y-4">
               <div className="flex justify-center mb-4">
                 <LanguageSelector />
               </div>
-              <div className="space-y-3">
-                <a href="#how-it-works" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.howItWorks', 'How it works')}</a>
-                <a href="#features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.features', 'Features')}</a>
-                <a href="#reviews" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.reviews', 'Reviews')}</a>
-                <a href="#pricing" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.pricing', 'Pricing')}</a>
-                <a href="#faq" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center" onClick={() => setShowMobileMenu(false)}>{t('nav.faq', 'FAQ')}</a>
+              <div className="grid grid-cols-2 gap-4">
+                <a href="#how-it-works" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg" onClick={() => setShowMobileMenu(false)}>{t('nav.howItWorks', 'How it works')}</a>
+                <a href="#features" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg" onClick={() => setShowMobileMenu(false)}>{t('nav.features', 'Features')}</a>
+                <a href="#reviews" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg" onClick={() => setShowMobileMenu(false)}>{t('nav.reviews', 'Reviews')}</a>
+                <a href="#pricing" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg" onClick={() => setShowMobileMenu(false)}>{t('nav.pricing', 'Pricing')}</a>
+                <a href="#faq" className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg" onClick={() => setShowMobileMenu(false)}>{t('nav.faq', 'FAQ')}</a>
+                <button onClick={() => { setLocation("/brezcode/health-preferences"); setShowMobileMenu(false); }} className="block text-yellow-400 hover:text-yellow-300 transition-colors font-medium text-center py-3 px-4 bg-white/5 rounded-lg">Health Setup</button>
               </div>
               
               {user ? (

@@ -159,7 +159,7 @@ export default function BusinessDashboard() {
             <Users className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.leadsGenerated || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.leadsGenerated || 0}</div>
             <p className="text-xs text-green-600 flex items-center mt-1">
               <TrendingUp className="w-3 h-3 mr-1" />
               This month
@@ -173,7 +173,7 @@ export default function BusinessDashboard() {
             <CreditCard className="h-4 w-4 text-orange-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats?.salesClosed || 0}</div>
+            <div className="text-2xl font-bold">{(stats as any)?.salesClosed || 0}</div>
             <p className="text-xs text-orange-600 flex items-center mt-1">
               <CheckCircle className="w-3 h-3 mr-1" />
               Revenue generated
@@ -196,34 +196,34 @@ export default function BusinessDashboard() {
               </p>
             </CardHeader>
             <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {quickActions.map((action, index) => {
                   const IconComponent = action.icon;
                   return (
                     <div
                       key={index}
-                      className={`p-4 rounded-lg border-2 hover:border-${action.color}-200 transition-colors cursor-pointer group`}
+                      className="p-6 rounded-lg border-2 border-gray-200 hover:border-blue-300 transition-all duration-200 cursor-pointer group hover:shadow-md"
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`p-2 rounded-lg bg-${action.color}-100`}>
-                          <IconComponent className={`w-5 h-5 text-${action.color}-600`} />
+                      <div className="flex flex-col items-center text-center space-y-4">
+                        <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors">
+                          <IconComponent className="w-8 h-8 text-blue-600" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                        <div className="space-y-2">
+                          <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors text-lg">
                             {action.title}
                           </h3>
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-gray-600 leading-relaxed">
                             {action.description}
                           </p>
-                          <Link href={action.href}>
-                            <Button 
-                              size="sm" 
-                              className={`mt-3 bg-${action.color}-600 hover:bg-${action.color}-700`}
-                            >
-                              {action.action}
-                            </Button>
-                          </Link>
                         </div>
+                        <Link href={action.href} className="w-full">
+                          <Button 
+                            size="sm" 
+                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4"
+                          >
+                            {action.action}
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   );
@@ -310,37 +310,50 @@ export default function BusinessDashboard() {
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="engagement">Engagement</TabsTrigger>
-                <TabsTrigger value="sales">Sales</TabsTrigger>
-                <TabsTrigger value="automation">Automation</TabsTrigger>
-              </TabsList>
+              <div className="flex flex-col space-y-3">
+                <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+                  <TabsTrigger value="overview" className="flex items-center justify-center py-3">
+                    <span>Performance Overview</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="engagement" className="flex items-center justify-center py-3">
+                    <span>Customer Engagement</span>
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+                  <TabsTrigger value="sales" className="flex items-center justify-center py-3">
+                    <span>Sales Performance</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="automation" className="flex items-center justify-center py-3">
+                    <span>Automation Metrics</span>
+                  </TabsTrigger>
+                </TabsList>
+              </div>
               
               <TabsContent value="overview" className="space-y-4">
                 <div className="grid md:grid-cols-3 gap-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>AI Avatar Interactions</span>
-                      <span className="font-medium">{stats?.customerInteractions || 0}</span>
+                      <span className="font-medium">{(stats as any)?.customerInteractions || 0}</span>
                     </div>
-                    <Progress value={Math.min(100, (stats?.customerInteractions || 0) * 2)} />
+                    <Progress value={Math.min(100, ((stats as any)?.customerInteractions || 0) * 2)} />
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Completed Actions</span>
-                      <span className="font-medium">{stats?.completedActions || 0}</span>
+                      <span className="font-medium">{(stats as any)?.completedActions || 0}</span>
                     </div>
-                    <Progress value={Math.min(100, (stats?.completedActions || 0) * 5)} />
+                    <Progress value={Math.min(100, ((stats as any)?.completedActions || 0) * 5)} />
                   </div>
                   
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span>Tools Configured</span>
-                      <span className="font-medium">{stats?.activeTools || 0}/6</span>
+                      <span className="font-medium">{(stats as any)?.activeTools || 0}/6</span>
                     </div>
-                    <Progress value={((stats?.activeTools || 0) / 6) * 100} />
+                    <Progress value={(((stats as any)?.activeTools || 0) / 6) * 100} />
                   </div>
                 </div>
               </TabsContent>

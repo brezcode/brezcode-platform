@@ -535,24 +535,31 @@ export default function AITrainer() {
 
       {/* Main Tabs */}
       <Tabs defaultValue="strategies" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="strategies">
-            <Target className="h-4 w-4 mr-2" />
-            Strategies
-          </TabsTrigger>
-          <TabsTrigger value="recommendations">
-            <Lightbulb className="h-4 w-4 mr-2" />
-            Recommendations
-          </TabsTrigger>
-          <TabsTrigger value="analysis">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Analysis
-          </TabsTrigger>
-          <TabsTrigger value="settings">
-            <Settings className="h-4 w-4 mr-2" />
-            Settings
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex flex-col space-y-3">
+          {/* First row of tabs */}
+          <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+            <TabsTrigger value="strategies" className="flex items-center justify-center space-x-2 py-3">
+              <Target className="h-4 w-4" />
+              <span>Training Strategies</span>
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="flex items-center justify-center space-x-2 py-3">
+              <Lightbulb className="h-4 w-4" />
+              <span>AI Recommendations</span>
+            </TabsTrigger>
+          </TabsList>
+          
+          {/* Second row of tabs */}
+          <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+            <TabsTrigger value="analysis" className="flex items-center justify-center space-x-2 py-3">
+              <BarChart3 className="h-4 w-4" />
+              <span>Performance Analysis</span>
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center justify-center space-x-2 py-3">
+              <Settings className="h-4 w-4" />
+              <span>Trainer Settings</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <TabsContent value="strategies" className="space-y-4">
           <TrainingStrategies />
