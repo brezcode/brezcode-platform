@@ -6,6 +6,7 @@ import brandFeaturesRouter from "./routes/brandFeatures";
 import avatarRoutes from "./routes/avatarRoutes";
 import healthScheduleRoutes from "./routes/healthScheduleRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
+import { businessRoutes } from "./businessRoutes";
 import { TwilioVoiceService } from "./twilioVoiceService";
 import { notificationService } from "./notificationService";
 import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
@@ -179,6 +180,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Dietary Recommendation routes
   const dietaryRoutes = await import('./routes/dietaryRoutes');
   app.use('/api', dietaryRoutes.default);
+
+  // Business consultant routes
+  app.use('/api/business', businessRoutes);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

@@ -28,6 +28,7 @@ import NotificationsPage from "@/pages/notifications";
 import FoodAnalysisPage from "@/pages/food-analysis";
 import DietaryRecommendationsPage from "@/pages/dietary-recommendations";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
+import BusinessConsultant from "@/pages/BusinessConsultant";
 
 function Router() {
   return (
@@ -36,6 +37,7 @@ function Router() {
       <Switch>
         {/* Root paths */}
         <Route path="/" component={LeadGenLanding} />
+        <Route path="/business-consultant" component={BusinessConsultant} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/health" component={LeadGenLanding} />
         

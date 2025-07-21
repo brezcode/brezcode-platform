@@ -70,6 +70,14 @@ app.use((req, res, next) => {
   } catch (error) {
     console.error('Failed to initialize brand knowledge:', error);
   }
+
+  // Initialize business onboarding questions
+  try {
+    const { seedOnboardingQuestions } = await import('./seedBusinessQuestions');
+    await seedOnboardingQuestions();
+  } catch (error) {
+    console.error('Failed to seed business questions:', error);
+  }
   
   const server = await registerRoutes(app);
 

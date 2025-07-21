@@ -45,14 +45,16 @@ export function LeadGenLanding() {
             and engage customers with AI-powered content. Connect to email, SMS, WhatsApp, LinkedIn, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/brezcode">
+            <Link href="/business-consultant">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8">
+                Get Business Strategy
+              </Button>
+            </Link>
+            <Link href="/brezcode">
+              <Button variant="outline" size="lg" className="px-8">
                 Try Live Demo
               </Button>
             </Link>
-            <Button variant="outline" size="lg" className="px-8">
-              Schedule Demo Call
-            </Button>
           </div>
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>

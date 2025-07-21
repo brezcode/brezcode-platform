@@ -8,6 +8,9 @@ export * from "./brand-schema";
 // Import health schedule schema for health planning
 export * from "./health-schedule-schema";
 
+// Import business schema for business automation
+export * from "./business-schema";
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   firstName: text("first_name").notNull(),
