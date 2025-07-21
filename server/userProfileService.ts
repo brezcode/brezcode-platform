@@ -3,21 +3,33 @@ import { userProfiles, userDashboardStats, userToolUsage, type User } from "@sha
 import { eq } from "drizzle-orm";
 
 export interface UserProfileData {
-  businessName: string;
-  industry: string;
-  businessModel: string;
-  targetAudience: string;
-  monthlyRevenue: string;
-  teamSize: string;
-  marketingChannels: string[];
-  businessChallenges: string[];
-  businessGoals: string[];
-  growthTimeline: string;
-  marketingBudget: string;
-  businessTools: string[];
-  uniqueValue: string;
-  customerAcquisition: string;
-  customerServiceNeeds: string;
+  // Personal Information (Primary)
+  fullName: string;
+  location: string;
+  timezone: string;
+  phoneNumber?: string;
+  personalGoals: string[];
+  workStyle: string;
+  communicationPreference: string;
+  availabilityHours: string;
+  personalChallenges: string[];
+  
+  // Business Information (Optional/Secondary)
+  businessName?: string;
+  industry?: string;
+  businessModel?: string;
+  targetAudience?: string;
+  monthlyRevenue?: string;
+  teamSize?: string;
+  marketingChannels?: string[];
+  businessChallenges?: string[];
+  businessGoals?: string[];
+  growthTimeline?: string;
+  marketingBudget?: string;
+  businessTools?: string[];
+  uniqueValue?: string;
+  customerAcquisition?: string;
+  customerServiceNeeds?: string;
   preferences?: any;
 }
 

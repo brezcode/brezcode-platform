@@ -30,6 +30,19 @@ export const users = pgTable("users", {
 export const userProfiles = pgTable("user_profiles", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
+  
+  // Personal Information (Primary)
+  fullName: text("full_name"),
+  location: text("location"),
+  timezone: text("timezone"),
+  phoneNumber: text("phone_number"),
+  personalGoals: jsonb("personal_goals"), // Array of personal goals
+  workStyle: text("work_style"),
+  communicationPreference: text("communication_preference"),
+  availabilityHours: text("availability_hours"),
+  personalChallenges: jsonb("personal_challenges"), // Array of personal challenges
+  
+  // Business Information (Optional/Secondary)
   businessName: text("business_name"),
   industry: text("industry"),
   businessModel: text("business_model"),

@@ -6,21 +6,33 @@ const router = Router();
 
 // Profile schema for validation
 const profileSchema = z.object({
-  businessName: z.string().min(1, "Business name is required"),
-  industry: z.string().min(1, "Industry is required"),
-  businessModel: z.string().min(1, "Business model is required"),
-  targetAudience: z.string().min(1, "Target audience is required"),
-  monthlyRevenue: z.string().min(1, "Monthly revenue range is required"),
-  teamSize: z.string().min(1, "Team size is required"),
-  marketingChannels: z.array(z.string()).min(1, "Select at least one marketing channel"),
-  businessChallenges: z.array(z.string()).min(1, "Select at least one challenge"),
-  businessGoals: z.array(z.string()).min(1, "Select at least one goal"),
-  growthTimeline: z.string().min(1, "Growth timeline is required"),
-  marketingBudget: z.string().min(1, "Marketing budget is required"),
-  businessTools: z.array(z.string()),
-  uniqueValue: z.string().min(1, "Unique value proposition is required"),
-  customerAcquisition: z.string().min(1, "Customer acquisition method is required"),
-  customerServiceNeeds: z.string().min(1, "Customer service needs are required"),
+  // Personal Information (Primary)
+  fullName: z.string().min(1, "Full name is required"),
+  location: z.string().min(1, "Location is required"),
+  timezone: z.string().min(1, "Timezone is required"),
+  phoneNumber: z.string().optional(),
+  personalGoals: z.array(z.string()).min(1, "Select at least one personal goal"),
+  workStyle: z.string().min(1, "Work style is required"),
+  communicationPreference: z.string().min(1, "Communication preference is required"),
+  availabilityHours: z.string().min(1, "Availability is required"),
+  personalChallenges: z.array(z.string()).min(1, "Select at least one challenge"),
+  
+  // Business Information (Optional/Secondary)
+  businessName: z.string().optional(),
+  industry: z.string().optional(),
+  businessModel: z.string().optional(),
+  targetAudience: z.string().optional(),
+  monthlyRevenue: z.string().optional(),
+  teamSize: z.string().optional(),
+  marketingChannels: z.array(z.string()).optional(),
+  businessChallenges: z.array(z.string()).optional(),
+  businessGoals: z.array(z.string()).optional(),
+  growthTimeline: z.string().optional(),
+  marketingBudget: z.string().optional(),
+  businessTools: z.array(z.string()).optional(),
+  uniqueValue: z.string().optional(),
+  customerAcquisition: z.string().optional(),
+  customerServiceNeeds: z.string().optional(),
   preferences: z.any().optional(),
 });
 
