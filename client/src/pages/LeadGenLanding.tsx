@@ -22,8 +22,8 @@ export function LeadGenLanding() {
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
             <a href="#platforms" className="text-gray-600 hover:text-blue-600 transition-colors">Platforms</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
-            <Link href="/dashboard">
-              <Button variant="outline">Dashboard</Button>
+            <Link href="/login">
+              <Button variant="outline">Login</Button>
             </Link>
             <Link href="/brezcode">
               <Button variant="outline">Demo Platform</Button>
@@ -48,9 +48,9 @@ export function LeadGenLanding() {
             and engage customers with AI-powered content. Connect to email, SMS, WhatsApp, LinkedIn, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/business-consultant">
+            <Link href="/login">
               <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8">
-                Get Business Strategy
+                Get Started Free
               </Button>
             </Link>
             <Link href="/brezcode">

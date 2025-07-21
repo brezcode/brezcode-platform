@@ -31,6 +31,7 @@ import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import BusinessConsultant from "@/pages/BusinessConsultant";
 import BusinessDashboard from "@/pages/BusinessDashboard";
 import UserProfile from "@/pages/UserProfile";
+import LoginPage from "@/pages/LoginPage";
 
 function Router() {
   return (
@@ -39,6 +40,7 @@ function Router() {
       <Switch>
         {/* Root paths */}
         <Route path="/" component={LeadGenLanding} />
+        <Route path="/login" component={LoginPage} />
         <Route path="/business-consultant" component={BusinessConsultant} />
         <Route path="/dashboard" component={BusinessDashboard} />
         <Route path="/user-profile" component={UserProfile} />
