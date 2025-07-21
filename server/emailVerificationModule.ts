@@ -18,7 +18,7 @@ export interface PendingUser {
   subscriptionTier?: string;
   isEmailVerified: boolean;
   verificationCode: string;
-  codeGeneratedAt: Date;
+  codeGeneratedAt: Date | string;
 }
 
 export interface EmailVerificationConfig {
@@ -72,9 +72,10 @@ export class EmailVerificationModule {
   /**
    * Check if verification code is expired
    */
-  isCodeExpired(codeGeneratedAt: Date): boolean {
+  isCodeExpired(codeGeneratedAt: Date | string): boolean {
     const now = new Date();
-    const expiryTime = new Date(codeGeneratedAt.getTime() + (this.config.codeExpiryMinutes * 60 * 1000));
+    const generatedTime = typeof codeGeneratedAt === 'string' ? new Date(codeGeneratedAt) : codeGeneratedAt;
+    const expiryTime = new Date(generatedTime.getTime() + (this.config.codeExpiryMinutes * 60 * 1000));
     return now > expiryTime;
   }
 
@@ -115,11 +116,10 @@ export class EmailVerificationModule {
    * Complete email verification and return verified user
    */
   completeVerification(pendingUser: PendingUser) {
+    const { verificationCode, codeGeneratedAt, ...verifiedUser } = pendingUser;
     return {
-      ...pendingUser,
-      isEmailVerified: true,
-      verificationCode: undefined, // Clear the code
-      codeGeneratedAt: undefined
+      ...verifiedUser,
+      isEmailVerified: true
     };
   }
 
@@ -210,8 +210,12 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
       
       const pendingUser = req.session.pendingUser;
       
-      if (!pendingUser || pendingUser.email !== email) {
-        return res.status(400).json({ error: "No pending verification found for this email" });
+      if (!pendingUser) {
+        return res.status(400).json({ error: "No pending verification found. Please register again." });
+      }
+      
+      if (pendingUser.email !== email) {
+        return res.status(400).json({ error: "Email mismatch. Please use the email you registered with." });
       }
       
       const validation = emailModule.validateCode(pendingUser, code);
