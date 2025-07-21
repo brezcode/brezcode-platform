@@ -180,6 +180,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user, message: "Login successful" });
   });
 
+  // Frontend expects /api/login endpoint
+  app.post("/api/login", (req, res) => {
+    const { email, password } = req.body;
+    
+    // Basic validation
+    if (!email || !password) {
+      return res.status(400).json({ error: "Email and password are required" });
+    }
+    
+    // For now, accept any login credentials for development
+    const user = {
+      id: 1,
+      email,
+      firstName: "Demo",
+      lastName: "User",
+      subscriptionTier: "basic"
+    };
+    
+    // Set session
+    (req as any).session.userId = user.id;
+    (req as any).session.isAuthenticated = true;
+    
+    res.json({ user, message: "Login successful" });
+  });
+
   // Import the email verification module
   const { defaultEmailVerification, createEmailVerificationRoutes } = await import('./emailVerificationModule');
   
