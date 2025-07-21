@@ -11,12 +11,12 @@ export class BrandService {
     
     // Handle leadgen.to domain with path-based routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to' || host.includes('localhost')) {
-      // Check if path starts with brand name: /brezcode, /acme, etc.
+      // Check if path starts with brand name: /brezcode, /health, etc.
       const pathSegments = path.split('/').filter(Boolean);
       if (pathSegments.length > 0 && pathSegments[0] !== 'api' && pathSegments[0] !== 'admin') {
         return pathSegments[0]; // Return brand name from path
       }
-      return 'brezcode'; // Default brand for root path
+      return null; // No brand for root leadgen.to landing page
     }
     
     // Check for subdomain pattern: brand.leadgen.to

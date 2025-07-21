@@ -27,6 +27,7 @@ import UserHomepage from "@/pages/user-homepage";
 import NotificationsPage from "@/pages/notifications";
 import FoodAnalysisPage from "@/pages/food-analysis";
 import DietaryRecommendationsPage from "@/pages/dietary-recommendations";
+import { LeadGenLanding } from "@/pages/LeadGenLanding";
 
 function Router() {
   return (
@@ -34,8 +35,9 @@ function Router() {
       <DomainRouter />
       <Switch>
         {/* Root paths */}
-        <Route path="/" component={DomainLanding} />
+        <Route path="/" component={LeadGenLanding} />
         <Route path="/admin" component={AdminPage} />
+        <Route path="/health" component={LeadGenLanding} />
         
         {/* Brand-specific paths */}
         <Route path="/:brand" component={LandingPage} />
