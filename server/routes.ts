@@ -175,6 +175,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Food Analysis routes
   const foodRoutes = await import('./routes/foodRoutes');
   app.use('/api', foodRoutes.default);
+  
+  // Dietary Recommendation routes
+  const dietaryRoutes = await import('./routes/dietaryRoutes');
+  app.use('/api', dietaryRoutes.default);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

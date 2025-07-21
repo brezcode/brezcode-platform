@@ -34,7 +34,8 @@ import {
   Smartphone,
   Bell,
   ArrowLeft,
-  Apple
+  Apple,
+  Brain
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -645,6 +646,15 @@ export default function UserHomepage() {
                 >
                   <Apple className="h-4 w-4 mr-2" />
                   Analyze Food
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/brezcode/dietary-recommendations')}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  Meal Plans (AI)
                 </Button>
               </CardContent>
             </Card>

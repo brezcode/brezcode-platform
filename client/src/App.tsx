@@ -26,6 +26,7 @@ import BrandAiAdmin from "@/pages/brand-ai-admin";
 import UserHomepage from "@/pages/user-homepage";
 import NotificationsPage from "@/pages/notifications";
 import FoodAnalysisPage from "@/pages/food-analysis";
+import DietaryRecommendationsPage from "@/pages/dietary-recommendations";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
         <Route path="/:brand/dashboard" component={UserHomepage} />
         <Route path="/:brand/notifications" component={NotificationsPage} />
         <Route path="/:brand/food-analysis" component={FoodAnalysisPage} />
+        <Route path="/:brand/dietary-recommendations" component={DietaryRecommendationsPage} />
         <Route path="/:brand/report" component={ReportPage} />
         <Route path="/:brand/test-report" component={TestReportPage} />
         <Route path="/:brand/demo-report" component={DemoReportPage} />
