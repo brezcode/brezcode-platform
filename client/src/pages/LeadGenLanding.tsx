@@ -2,7 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Heart, Brain, Target, Shield, Users, Zap, BarChart3, Globe } from "lucide-react";
+import { Heart, Brain, Target, Shield, Users, Zap, BarChart3, Globe, Store, MessageSquare, Calendar, Mail, Phone, Linkedin, Image, CreditCard } from "lucide-react";
 
 export function LeadGenLanding() {
   return (
@@ -33,17 +33,16 @@ export function LeadGenLanding() {
       <section className="py-20 px-4">
         <div className="container mx-auto text-center max-w-4xl">
           <Badge className="mb-6 bg-blue-100 text-blue-700 hover:bg-blue-200">
-            🚀 AI-Powered Health Platforms
+            🚀 Ultimate Business AI Platform
           </Badge>
           <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent leading-tight">
-            Build Your Own
+            The Ultimate Business
             <br />
-            Health Assessment Platform
+            AI Platform
           </h1>
           <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-            Launch white-label health and wellness platforms with Claude AI-powered assessments, 
-            personalized recommendations, and comprehensive analytics. Perfect for healthcare brands, 
-            wellness coaches, and medical organizations.
+            Create landing pages, manage products, generate leads, handle sales, provide customer service, 
+            and engage customers with AI-powered content. Connect to email, SMS, WhatsApp, LinkedIn, and more.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/brezcode">
@@ -57,20 +56,20 @@ export function LeadGenLanding() {
           </div>
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-3xl font-bold text-blue-600">99%</div>
-              <div className="text-sm text-gray-600">User Satisfaction</div>
+              <div className="text-3xl font-bold text-blue-600">10K+</div>
+              <div className="text-sm text-gray-600">Businesses</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-600">500+</div>
-              <div className="text-sm text-gray-600">Health Assessments</div>
+              <div className="text-3xl font-bold text-purple-600">300%</div>
+              <div className="text-sm text-gray-600">Lead Increase</div>
             </div>
             <div>
               <div className="text-3xl font-bold text-pink-600">24/7</div>
-              <div className="text-sm text-gray-600">AI Support</div>
+              <div className="text-sm text-gray-600">AI Assistant</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-green-600">HIPAA</div>
-              <div className="text-sm text-gray-600">Compliant</div>
+              <div className="text-3xl font-bold text-green-600">AI</div>
+              <div className="text-sm text-gray-600">Powered</div>
             </div>
           </div>
         </div>
@@ -81,10 +80,10 @@ export function LeadGenLanding() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              Everything You Need for Health Platforms
+              Everything You Need to Run Your Business
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Comprehensive suite of AI-powered features built with Claude for superior intelligence and accuracy
+              Complete business automation platform with AI avatar, lead generation, sales management, and customer engagement
             </p>
           </div>
           
@@ -92,59 +91,59 @@ export function LeadGenLanding() {
             <Card className="border-2 hover:border-blue-200 transition-colors">
               <CardHeader>
                 <Brain className="w-12 h-12 text-blue-600 mb-4" />
-                <CardTitle>Claude AI Integration</CardTitle>
+                <CardTitle>AI Avatar Assistant</CardTitle>
                 <CardDescription>
-                  Advanced AI powered by Anthropic's Claude for superior health coaching and recommendations
+                  Claude-powered virtual assistant that handles customer service, sales, and engagement 24/7
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="border-2 hover:border-purple-200 transition-colors">
               <CardHeader>
-                <Target className="w-12 h-12 text-purple-600 mb-4" />
-                <CardTitle>Smart Assessments</CardTitle>
+                <Store className="w-12 h-12 text-purple-600 mb-4" />
+                <CardTitle>Landing Pages & Catalog</CardTitle>
                 <CardDescription>
-                  Personalized health questionnaires with intelligent scoring and risk analysis
+                  Create stunning landing pages and product catalogs with AI-generated content and images
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="border-2 hover:border-pink-200 transition-colors">
               <CardHeader>
-                <Heart className="w-12 h-12 text-pink-600 mb-4" />
-                <CardTitle>Dietary Recommendations</CardTitle>
+                <Target className="w-12 h-12 text-pink-600 mb-4" />
+                <CardTitle>Lead Generation</CardTitle>
                 <CardDescription>
-                  AI-powered meal planning with photo analysis and nutritional breakdowns
+                  Capture, qualify, and nurture leads automatically with intelligent forms and AI follow-up
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="border-2 hover:border-green-200 transition-colors">
               <CardHeader>
-                <Shield className="w-12 h-12 text-green-600 mb-4" />
-                <CardTitle>HIPAA Compliance</CardTitle>
+                <CreditCard className="w-12 h-12 text-green-600 mb-4" />
+                <CardTitle>Sales Management</CardTitle>
                 <CardDescription>
-                  Enterprise-grade security with encrypted data and compliance management
+                  Complete CRM with pipeline management, automated follow-ups, and payment processing
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="border-2 hover:border-yellow-200 transition-colors">
               <CardHeader>
-                <Users className="w-12 h-12 text-yellow-600 mb-4" />
-                <CardTitle>Multi-Tenant Platform</CardTitle>
+                <Calendar className="w-12 h-12 text-yellow-600 mb-4" />
+                <CardTitle>Booking Service</CardTitle>
                 <CardDescription>
-                  White-label solutions with custom branding for unlimited client organizations
+                  Automated appointment scheduling with calendar integration and reminder notifications
                 </CardDescription>
               </CardHeader>
             </Card>
 
             <Card className="border-2 hover:border-indigo-200 transition-colors">
               <CardHeader>
-                <BarChart3 className="w-12 h-12 text-indigo-600 mb-4" />
-                <CardTitle>Advanced Analytics</CardTitle>
+                <MessageSquare className="w-12 h-12 text-indigo-600 mb-4" />
+                <CardTitle>Multi-Channel Engagement</CardTitle>
                 <CardDescription>
-                  Comprehensive reporting and insights for health outcomes and user engagement
+                  Connect email, SMS, WhatsApp, LinkedIn with AI-generated daily content and campaigns
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -157,52 +156,53 @@ export function LeadGenLanding() {
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4 text-gray-900">
-              Live Health Platforms
+              Business Solutions & Tools
             </h2>
             <p className="text-xl text-gray-600">
-              Explore our deployed health assessment platforms in action
+              Explore our AI-powered business automation tools and integrations
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-8">
             <Card className="overflow-hidden hover:shadow-xl transition-shadow duration-300">
-              <div className="bg-gradient-to-br from-pink-500 to-rose-600 p-6 text-white">
+              <div className="bg-gradient-to-br from-blue-500 to-purple-600 p-6 text-white">
                 <div className="flex items-center space-x-3 mb-4">
                   <div className="w-12 h-12 bg-white/20 rounded-lg flex items-center justify-center">
-                    <Heart className="w-6 h-6" />
+                    <Brain className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold">BrezCode</h3>
-                    <p className="text-pink-100">Breast Health Assessment</p>
+                    <h3 className="text-2xl font-bold">AI Business Suite</h3>
+                    <p className="text-blue-100">Complete Business Automation</p>
                   </div>
                 </div>
-                <p className="text-pink-100 mb-6">
-                  Comprehensive breast health assessment with AI-powered risk analysis and personalized recommendations
+                <p className="text-blue-100 mb-6">
+                  End-to-end business platform with AI avatar, lead generation, sales management, and multi-channel customer engagement
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                    Risk Assessment
+                    AI Avatar
                   </Badge>
                   <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                    Health Coaching
+                    Lead Generation
                   </Badge>
                   <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                    Meal Planning
+                    Sales CRM
+                  </Badge>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0">
+                    Multi-Channel
                   </Badge>
                 </div>
               </div>
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-600">
-                    <span className="font-semibold text-green-600">✓ Live Platform</span>
+                    <span className="font-semibold text-green-600">✓ Coming Soon</span>
                     <br />
-                    Multi-language support • Apple Health integration
+                    Email • SMS • WhatsApp • LinkedIn integration
                   </div>
-                  <Link href="/brezcode">
-                    <Button className="bg-pink-600 hover:bg-pink-700">
-                      Explore Platform
-                    </Button>
-                  </Link>
+                  <Button className="bg-blue-600 hover:bg-blue-700">
+                    Join Waitlist
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -212,16 +212,16 @@ export function LeadGenLanding() {
                 <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <Zap className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">Your Platform Here</h3>
+                <h3 className="text-xl font-bold mb-2 text-gray-900">Your Business Here</h3>
                 <p className="text-gray-600 mb-6">
-                  Launch your own branded health assessment platform with custom questionnaires, 
-                  AI recommendations, and comprehensive analytics.
+                  Launch your complete business automation platform with AI avatar, landing pages, 
+                  lead generation, and customer engagement tools.
                 </p>
                 <div className="space-y-2 text-sm text-gray-500 mb-6">
-                  <div>• Custom branding & domain</div>
-                  <div>• Tailored health focus areas</div>
-                  <div>• Integrated payment processing</div>
-                  <div>• Advanced reporting dashboard</div>
+                  <div>• AI-powered landing pages</div>
+                  <div>• Automated lead capture</div>
+                  <div>• Multi-channel messaging</div>
+                  <div>• Sales pipeline management</div>
                 </div>
                 <Button variant="outline" className="w-full">
                   Get Started
@@ -239,29 +239,29 @@ export function LeadGenLanding() {
             Powered by Advanced AI Technology
           </h2>
           <p className="text-lg text-gray-600 mb-12">
-            Built with Claude AI for superior intelligence and medical accuracy
+            Built with Claude AI for intelligent business automation and customer engagement
           </p>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <div className="p-6 rounded-lg border bg-gradient-to-br from-blue-50 to-purple-50">
               <Brain className="w-8 h-8 text-blue-600 mx-auto mb-3" />
               <div className="font-semibold text-gray-900">Claude AI</div>
-              <div className="text-sm text-gray-600">Advanced reasoning</div>
+              <div className="text-sm text-gray-600">Advanced business AI</div>
             </div>
             <div className="p-6 rounded-lg border">
-              <Shield className="w-8 h-8 text-green-600 mx-auto mb-3" />
-              <div className="font-semibold text-gray-900">HIPAA Secure</div>
-              <div className="text-sm text-gray-600">Enterprise security</div>
+              <Mail className="w-8 h-8 text-green-600 mx-auto mb-3" />
+              <div className="font-semibold text-gray-900">Multi-Channel</div>
+              <div className="text-sm text-gray-600">Email, SMS, WhatsApp</div>
             </div>
             <div className="p-6 rounded-lg border">
-              <Globe className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-              <div className="font-semibold text-gray-900">Multi-language</div>
-              <div className="text-sm text-gray-600">Global accessibility</div>
+              <Image className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+              <div className="font-semibold text-gray-900">AI Content</div>
+              <div className="text-sm text-gray-600">Images & copy</div>
             </div>
             <div className="p-6 rounded-lg border">
               <Zap className="w-8 h-8 text-yellow-600 mx-auto mb-3" />
-              <div className="font-semibold text-gray-900">Real-time</div>
-              <div className="text-sm text-gray-600">Instant responses</div>
+              <div className="font-semibold text-gray-900">Automation</div>
+              <div className="text-sm text-gray-600">24/7 operations</div>
             </div>
           </div>
         </div>
@@ -271,10 +271,10 @@ export function LeadGenLanding() {
       <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="container mx-auto max-w-4xl text-center text-white">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to Launch Your Health Platform?
+            Ready to Automate Your Business?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Join forward-thinking healthcare organizations using our AI-powered platform
+            Join thousands of businesses using AI to generate leads, manage sales, and engage customers
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/brezcode">
@@ -287,7 +287,7 @@ export function LeadGenLanding() {
             </Button>
           </div>
           <div className="mt-8 text-sm text-blue-200">
-            No credit card required • HIPAA compliant • 30-day free trial
+            No credit card required • 30-day free trial • Cancel anytime
           </div>
         </div>
       </section>
@@ -304,23 +304,25 @@ export function LeadGenLanding() {
                 <span className="text-xl font-bold">LeadGen.to</span>
               </div>
               <p className="text-gray-400 text-sm">
-                AI-powered health assessment platforms for the modern healthcare industry.
+                Complete AI business automation platform for modern entrepreneurs and enterprises.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Platforms</h4>
+              <h4 className="font-semibold mb-4">Solutions</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link href="/brezcode" className="hover:text-white transition-colors">BrezCode</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Custom Platform</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Landing Pages</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Lead Generation</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Sales CRM</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">AI Avatar</a></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Features</h4>
+              <h4 className="font-semibold mb-4">Integrations</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition-colors">AI Assessments</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Health Coaching</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">Email Marketing</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">SMS & WhatsApp</a></li>
+                <li><a href="#" className="hover:text-white transition-colors">LinkedIn</a></li>
                 <li><a href="#" className="hover:text-white transition-colors">Analytics</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Multi-tenant</a></li>
               </ul>
             </div>
             <div>
