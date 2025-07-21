@@ -252,17 +252,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
 
       // Handle username conversion to firstName/lastName if needed
-      let firstName = userData.firstName;
-      let lastName = userData.lastName;
+      let firstName = userData.firstName || '';
+      let lastName = userData.lastName || '';
       
-      if (!firstName && !lastName && (userData as any).username) {
-        const nameParts = (userData as any).username.trim().split(' ');
-        firstName = nameParts[0] || (userData as any).username;
+      if (userData.username && (!firstName || !lastName)) {
+        const nameParts = userData.username.trim().split(' ');
+        firstName = nameParts[0] || userData.username;
         lastName = nameParts.slice(1).join(' ') || '';
       }
 
+
+
       const user = await storage.createUser({
-        firstName: firstName || '',
+        firstName: firstName || 'User',
         lastName: lastName || '',
         email: userData.email,
         password: hashedPassword,

@@ -265,15 +265,33 @@ export const brandAiConfig = pgTable('brand_ai_config', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  firstName: true,
-  lastName: true,
-  email: true,
-  password: true,
-  quizAnswers: true,
-}).extend({
-  username: z.string().min(1, "Name is required").optional(), // Accept username and convert to firstName/lastName
-});
+// Accept either username OR firstName/lastName for registration
+export const insertUserSchema = z.object({
+  username: z.string().min(1, "Name is required").optional(),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(), 
+  email: z.string().email(),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  quizAnswers: z.record(z.any()).optional(),
+}).refine(
+  (data) => data.username || (data.firstName && data.lastName),
+  {
+    message: "Either username or both firstName and lastName are required",
+    path: ["username"],
+  }
+);
+
+// Type for creating users - always has firstName/lastName
+export type InsertUserData = z.infer<typeof insertUserSchema>;
+
+// Helper type for actual database insert (after username conversion)
+export type CreateUserData = {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  quizAnswers?: Record<string, any>;
+};
 
 export const loginSchema = z.object({
   email: z.string().email(),

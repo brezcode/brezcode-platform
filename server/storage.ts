@@ -1,9 +1,9 @@
-import { users, emailVerifications, healthReports, type User, type InsertUser, type SubscriptionTier, type EmailVerification, type HealthReport, type InsertHealthReport } from "@shared/schema";
+import { users, emailVerifications, healthReports, type User, type InsertUser, type SubscriptionTier, type EmailVerification, type HealthReport, type InsertHealthReport, type CreateUserData } from "@shared/schema";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createUser(user: CreateUserData): Promise<User>;
   deleteUser(email: string): Promise<boolean>; // For test email cleanup
   updateUserSubscription(
     id: number, 
@@ -55,11 +55,14 @@ export class MemStorage implements IStorage {
     );
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
+  async createUser(insertUser: CreateUserData): Promise<User> {
     const id = this.currentId++;
     const user: User = { 
-      ...insertUser,
       id,
+      firstName: insertUser.firstName,
+      lastName: insertUser.lastName,
+      email: insertUser.email,
+      password: insertUser.password,
       quizAnswers: insertUser.quizAnswers || null,
       isEmailVerified: false,
       subscriptionTier: null,
