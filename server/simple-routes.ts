@@ -180,97 +180,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ user, message: "Login successful" });
   });
 
-  app.post("/api/auth/signup", (req, res) => {
-    const { firstName, lastName, email, password } = req.body;
-    
-    // Basic validation
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-    
-    // Store user data for verification but DO NOT authenticate yet
-    const pendingUser = {
-      id: Date.now(), // Simple ID generation
-      email,
-      firstName,
-      lastName,
-      subscriptionTier: "basic",
-      isEmailVerified: false,
-      verificationCode: Math.floor(100000 + Math.random() * 900000).toString()
-    };
-    
-    // Store pending user in session for verification
-    (req as any).session.pendingUser = pendingUser;
-    
-    // Send verification code (for now, just log it)
-    console.log(`Verification code for ${email}: ${pendingUser.verificationCode}`);
-    
-    res.json({ 
-      message: "Account created successfully. Please verify your email.",
-      requiresVerification: true,
-      email: email
-    });
-  });
-
-  // Email verification endpoint
-  app.post("/api/auth/verify-email", (req, res) => {
-    const { email, code } = req.body;
-    
-    if (!email || !code) {
-      return res.status(400).json({ error: "Email and verification code are required" });
-    }
-    
-    const pendingUser = (req as any).session.pendingUser;
-    
-    if (!pendingUser || pendingUser.email !== email) {
-      return res.status(400).json({ error: "No pending verification found for this email" });
-    }
-    
-    if (pendingUser.verificationCode !== code) {
-      return res.status(400).json({ error: "Invalid verification code" });
-    }
-    
-    // Email verified successfully - now authenticate the user
-    const verifiedUser = {
-      ...pendingUser,
-      isEmailVerified: true
-    };
-    
-    // Set authenticated session
-    (req as any).session.userId = verifiedUser.id;
-    (req as any).session.isAuthenticated = true;
-    (req as any).session.pendingUser = null; // Clear pending user
-    
-    res.json({ 
-      user: verifiedUser, 
-      message: "Email verified successfully" 
-    });
-  });
-
-  // Resend verification code endpoint
-  app.post("/api/auth/resend-verification", (req, res) => {
-    const { email } = req.body;
-    
-    if (!email) {
-      return res.status(400).json({ error: "Email is required" });
-    }
-    
-    const pendingUser = (req as any).session.pendingUser;
-    
-    if (!pendingUser || pendingUser.email !== email) {
-      return res.status(400).json({ error: "No pending verification found for this email" });
-    }
-    
-    // Generate new verification code
-    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
-    pendingUser.verificationCode = newCode;
-    (req as any).session.pendingUser = pendingUser;
-    
-    // Send new verification code (for now, just log it)
-    console.log(`New verification code for ${email}: ${newCode}`);
-    
-    res.json({ message: "Verification code resent successfully" });
-  });
+  // Import the email verification module
+  const { defaultEmailVerification, createEmailVerificationRoutes } = await import('./emailVerificationModule');
+  
+  // Create email verification routes using the module
+  const emailRoutes = createEmailVerificationRoutes(defaultEmailVerification);
+  
+  // Use the modular email verification endpoints
+  app.post("/api/auth/signup", emailRoutes.signup);
+  app.post("/api/auth/verify-email", emailRoutes.verifyEmail);
+  app.post("/api/auth/resend-verification", emailRoutes.resendVerification);
 
   app.post("/api/auth/logout", (req, res) => {
     (req as any).session.destroy((err: any) => {
