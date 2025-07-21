@@ -12,16 +12,11 @@ import {
 } from "@shared/avatar-schema";
 import { eq, and, desc } from "drizzle-orm";
 import { AvatarRequirementsService } from "./avatarRequirementsService";
-import OpenAI from "openai";
+import { enhancedAI } from './enhancedAI';
 
 // HeyGen API configuration
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 const HEYGEN_BASE_URL = "https://api.heygen.com/v2";
-
-// OpenAI for conversation handling
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY!,
-});
 
 export class AvatarService {
   // Create a new interactive avatar session
@@ -156,15 +151,17 @@ export class AvatarService {
         { role: "user", content: message }
       ];
 
-      // Get AI response
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: messages as any,
-        max_tokens: 500,
-        temperature: 0.7,
-      });
+      // Generate AI response using enhanced Claude AI
+      const conversationHistory = (chat.messages as any[] || []).slice(-5); // Last 5 messages for context
+      
+      const claudeResponse = await enhancedAI.generateHealthCoachResponse(
+        message,
+        conversationHistory,
+        customer,
+        relevantKnowledge
+      );
 
-      const aiResponse = completion.choices[0]?.message?.content || "I apologize, but I couldn't generate a response.";
+      const aiResponse = claudeResponse.content || "I apologize, but I couldn't generate a response.";
 
       // Update customer memory
       await this.updateCustomerMemory(

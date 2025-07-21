@@ -1,8 +1,4 @@
-import OpenAI from 'openai';
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+import { enhancedAI } from './enhancedAI';
 
 interface NutritionalData {
   totalCalories: number;
