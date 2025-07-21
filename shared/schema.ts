@@ -26,6 +26,56 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// User Profile and Business Information
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  businessName: text("business_name"),
+  industry: text("industry"),
+  businessModel: text("business_model"),
+  targetAudience: text("target_audience"),
+  monthlyRevenue: text("monthly_revenue"),
+  teamSize: text("team_size"),
+  marketingChannels: jsonb("marketing_channels"), // Array of channels
+  businessChallenges: jsonb("business_challenges"), // Array of challenges
+  businessGoals: jsonb("business_goals"), // Array of goals
+  growthTimeline: text("growth_timeline"),
+  marketingBudget: text("marketing_budget"),
+  businessTools: jsonb("business_tools"), // Array of tools
+  uniqueValue: text("unique_value"),
+  customerAcquisition: text("customer_acquisition"),
+  customerServiceNeeds: text("customer_service_needs"),
+  preferences: jsonb("preferences"), // User preferences and settings
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Dashboard and Tools Usage Tracking
+export const userDashboardStats = pgTable("user_dashboard_stats", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  totalStrategies: integer("total_strategies").default(0),
+  activeTools: integer("active_tools").default(0),
+  completedActions: integer("completed_actions").default(0),
+  customerInteractions: integer("customer_interactions").default(0),
+  leadsGenerated: integer("leads_generated").default(0),
+  salesClosed: integer("sales_closed").default(0),
+  lastLoginAt: timestamp("last_login_at"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Tool and Assistant Usage
+export const userToolUsage = pgTable("user_tool_usage", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  toolName: text("tool_name").notNull(), // 'ai_avatar', 'landing_page', 'lead_gen', 'crm', 'email', 'sms', etc.
+  usageCount: integer("usage_count").default(0),
+  lastUsed: timestamp("last_used"),
+  isActive: boolean("is_active").default(true),
+  configuration: jsonb("configuration"), // Tool-specific settings
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 export const emailVerifications = pgTable("email_verifications", {
   id: serial("id").primaryKey(),
   email: text("email").notNull(),

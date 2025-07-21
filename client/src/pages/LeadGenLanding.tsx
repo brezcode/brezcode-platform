@@ -22,6 +22,9 @@ export function LeadGenLanding() {
             <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
             <a href="#platforms" className="text-gray-600 hover:text-blue-600 transition-colors">Platforms</a>
             <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
+            <Link href="/dashboard">
+              <Button variant="outline">Dashboard</Button>
+            </Link>
             <Link href="/brezcode">
               <Button variant="outline">Demo Platform</Button>
             </Link>

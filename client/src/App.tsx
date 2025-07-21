@@ -29,6 +29,8 @@ import FoodAnalysisPage from "@/pages/food-analysis";
 import DietaryRecommendationsPage from "@/pages/dietary-recommendations";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import BusinessConsultant from "@/pages/BusinessConsultant";
+import BusinessDashboard from "@/pages/BusinessDashboard";
+import UserProfile from "@/pages/UserProfile";
 
 function Router() {
   return (
@@ -38,6 +40,8 @@ function Router() {
         {/* Root paths */}
         <Route path="/" component={LeadGenLanding} />
         <Route path="/business-consultant" component={BusinessConsultant} />
+        <Route path="/dashboard" component={BusinessDashboard} />
+        <Route path="/user-profile" component={UserProfile} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/health" component={LeadGenLanding} />
         

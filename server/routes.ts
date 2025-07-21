@@ -183,6 +183,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Business consultant routes
   app.use('/api/business', businessRoutes);
+
+  // User profile and dashboard routes
+  const userRoutes = await import('./routes/userRoutes');
+  app.use('/api/user', userRoutes.default);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

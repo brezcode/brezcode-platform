@@ -1,0 +1,365 @@
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { 
+  BarChart3, Users, TrendingUp, MessageSquare, Mail, Phone, 
+  Calendar, Target, Zap, Settings, Brain, Store, CreditCard,
+  PlusCircle, Activity, CheckCircle, Clock, ArrowUpRight
+} from "lucide-react";
+
+export default function BusinessDashboard() {
+  const { data: profile } = useQuery({
+    queryKey: ["/api/user/profile"],
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ["/api/user/dashboard-stats"],
+  });
+
+  const { data: strategies } = useQuery({
+    queryKey: ["/api/business/strategies"],
+  });
+
+  const { data: toolUsage } = useQuery({
+    queryKey: ["/api/user/tool-usage"],
+  });
+
+  const quickActions = [
+    {
+      icon: Brain,
+      title: "AI Avatar Assistant",
+      description: "Configure your 24/7 virtual assistant",
+      action: "Setup Avatar",
+      href: "/avatar-setup",
+      color: "blue",
+      status: "available"
+    },
+    {
+      icon: Store,
+      title: "Landing Page Builder",
+      description: "Create stunning pages with AI content",
+      action: "Create Page",
+      href: "/landing-builder",
+      color: "purple",
+      status: "available"
+    },
+    {
+      icon: Target,
+      title: "Lead Generation",
+      description: "Capture and qualify leads automatically",
+      action: "Setup Leads",
+      href: "/lead-gen",
+      color: "green",
+      status: "available"
+    },
+    {
+      icon: CreditCard,
+      title: "Sales CRM",
+      description: "Manage pipeline and payments",
+      action: "Open CRM",
+      href: "/sales-crm",
+      color: "orange",
+      status: "available"
+    },
+    {
+      icon: Calendar,
+      title: "Booking System",
+      description: "Automated scheduling with reminders",
+      action: "Setup Booking",
+      href: "/booking",
+      color: "indigo",
+      status: "available"
+    },
+    {
+      icon: MessageSquare,
+      title: "Multi-Channel Engagement",
+      description: "Email, SMS, WhatsApp automation",
+      action: "Configure Channels",
+      href: "/engagement",
+      color: "pink",
+      status: "available"
+    }
+  ];
+
+  const recentStrategies = strategies?.slice(0, 3) || [];
+
+  return (
+    <div className="container mx-auto py-8 px-4 max-w-7xl">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Business Dashboard</h1>
+          <p className="text-gray-600 mt-1">
+            Welcome back! Here's how your business automation is performing.
+          </p>
+        </div>
+        <div className="flex space-x-3">
+          <Link href="/user-profile">
+            <Button variant="outline">
+              <Settings className="w-4 h-4 mr-2" />
+              Profile Settings
+            </Button>
+          </Link>
+          <Link href="/business-consultant">
+            <Button>
+              <Brain className="w-4 h-4 mr-2" />
+              Get New Strategy
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Total Strategies</CardTitle>
+            <Target className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.totalStrategies || 0}</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <ArrowUpRight className="w-3 h-3 mr-1" />
+              Active business plans
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Active Tools</CardTitle>
+            <Zap className="h-4 w-4 text-purple-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.activeTools || 0}</div>
+            <p className="text-xs text-blue-600 flex items-center mt-1">
+              <Activity className="w-3 h-3 mr-1" />
+              Automation running
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Leads Generated</CardTitle>
+            <Users className="h-4 w-4 text-green-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.leadsGenerated || 0}</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <TrendingUp className="w-3 h-3 mr-1" />
+              This month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Sales Closed</CardTitle>
+            <CreditCard className="h-4 w-4 text-orange-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">{stats?.salesClosed || 0}</div>
+            <p className="text-xs text-orange-600 flex items-center mt-1">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Revenue generated
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-8">
+        {/* Quick Actions */}
+        <div className="lg:col-span-2">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Zap className="w-5 h-5 text-blue-600" />
+                <span>Quick Actions</span>
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Set up and manage your business automation tools
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="grid md:grid-cols-2 gap-4">
+                {quickActions.map((action, index) => {
+                  const IconComponent = action.icon;
+                  return (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-lg border-2 hover:border-${action.color}-200 transition-colors cursor-pointer group`}
+                    >
+                      <div className="flex items-start space-x-3">
+                        <div className={`p-2 rounded-lg bg-${action.color}-100`}>
+                          <IconComponent className={`w-5 h-5 text-${action.color}-600`} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition-colors">
+                            {action.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 mt-1">
+                            {action.description}
+                          </p>
+                          <Link href={action.href}>
+                            <Button 
+                              size="sm" 
+                              className={`mt-3 bg-${action.color}-600 hover:bg-${action.color}-700`}
+                            >
+                              {action.action}
+                            </Button>
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Recent Strategies */}
+        <div>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Brain className="w-5 h-5 text-purple-600" />
+                <span>Recent Strategies</span>
+              </CardTitle>
+              <p className="text-sm text-gray-600">
+                Your latest AI-generated business strategies
+              </p>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentStrategies.length > 0 ? (
+                recentStrategies.map((strategy: any, index: number) => (
+                  <div key={index} className="p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant="outline" className="text-xs">
+                        {strategy.category}
+                      </Badge>
+                      <Badge 
+                        variant={strategy.priority === 'high' ? 'destructive' : 
+                                strategy.priority === 'medium' ? 'default' : 'secondary'}
+                        className="text-xs"
+                      >
+                        {strategy.priority}
+                      </Badge>
+                    </div>
+                    <h4 className="font-medium text-sm text-gray-900 mb-1">
+                      {strategy.title}
+                    </h4>
+                    <p className="text-xs text-gray-600 line-clamp-2">
+                      {strategy.description}
+                    </p>
+                    <div className="mt-2 flex items-center justify-between">
+                      <span className="text-xs text-gray-500">
+                        Impact: {strategy.estimatedImpact}
+                      </span>
+                      <Badge variant="outline" className="text-xs">
+                        {strategy.timeline}
+                      </Badge>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6">
+                  <Brain className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 mb-3">
+                    No strategies yet. Get started with AI business consulting!
+                  </p>
+                  <Link href="/business-consultant">
+                    <Button size="sm">
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      Generate Strategies
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Tool Usage Analytics */}
+      <div className="mt-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="w-5 h-5 text-green-600" />
+              <span>Tool Usage & Performance</span>
+            </CardTitle>
+            <p className="text-sm text-gray-600">
+              Track how your automation tools are performing
+            </p>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="engagement">Engagement</TabsTrigger>
+                <TabsTrigger value="sales">Sales</TabsTrigger>
+                <TabsTrigger value="automation">Automation</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>AI Avatar Interactions</span>
+                      <span className="font-medium">{stats?.customerInteractions || 0}</span>
+                    </div>
+                    <Progress value={Math.min(100, (stats?.customerInteractions || 0) * 2)} />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Completed Actions</span>
+                      <span className="font-medium">{stats?.completedActions || 0}</span>
+                    </div>
+                    <Progress value={Math.min(100, (stats?.completedActions || 0) * 5)} />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Tools Configured</span>
+                      <span className="font-medium">{stats?.activeTools || 0}/6</span>
+                    </div>
+                    <Progress value={((stats?.activeTools || 0) / 6) * 100} />
+                  </div>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="engagement" className="space-y-4">
+                <div className="text-center py-8 text-gray-500">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p>Engagement analytics will appear here once you configure your communication channels.</p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="sales" className="space-y-4">
+                <div className="text-center py-8 text-gray-500">
+                  <CreditCard className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p>Sales performance will be tracked here once you set up your CRM and payment processing.</p>
+                </div>
+              </TabsContent>
+              
+              <TabsContent value="automation" className="space-y-4">
+                <div className="text-center py-8 text-gray-500">
+                  <Zap className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                  <p>Automation metrics will be displayed once your tools are active and processing data.</p>
+                </div>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
