@@ -32,6 +32,7 @@ import BusinessConsultant from "@/pages/BusinessConsultant";
 import BusinessDashboard from "@/pages/BusinessDashboard";
 import UserProfile from "@/pages/UserProfile";
 import LoginPage from "@/pages/LoginPage";
+import KnowledgeCentre from "@/pages/KnowledgeCentre";
 
 function Router() {
   return (
@@ -44,6 +45,7 @@ function Router() {
         <Route path="/business-consultant" component={BusinessConsultant} />
         <Route path="/dashboard" component={BusinessDashboard} />
         <Route path="/user-profile" component={UserProfile} />
+        <Route path="/knowledge-centre" component={KnowledgeCentre} />
         <Route path="/admin" component={AdminPage} />
         <Route path="/health" component={LeadGenLanding} />
         

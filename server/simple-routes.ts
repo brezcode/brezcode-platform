@@ -403,6 +403,107 @@ Format your response as JSON with the exact structure:
     }
   });
 
+  // Knowledge Centre API Routes
+  app.get("/api/knowledge/entries", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const brandId = req.query.brandId as string;
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      const entries = await KnowledgeCentreService.getKnowledgeEntries(userId, brandId);
+      
+      res.json(entries);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/knowledge/entries", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const entry = { ...req.body, userId };
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      const newEntry = await KnowledgeCentreService.createKnowledgeEntry(entry);
+      
+      res.json(newEntry);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/knowledge/assistants", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const brandId = req.query.brandId as string;
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      const assistants = await KnowledgeCentreService.getAiAssistants(userId, brandId);
+      
+      res.json(assistants);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/knowledge/assistants", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const assistant = { ...req.body, userId };
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      const newAssistant = await KnowledgeCentreService.createAiAssistant(assistant);
+      
+      res.json(newAssistant);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.post("/api/knowledge/chat", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const { message, assistantId, includeKnowledge = true } = req.body;
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      
+      let context = {};
+      if (includeKnowledge) {
+        const entries = await KnowledgeCentreService.getKnowledgeEntries(userId);
+        context = { knowledgeEntries: entries };
+      }
+      
+      const response = await KnowledgeCentreService.generateResponse(
+        message, 
+        assistantId, 
+        userId, 
+        context
+      );
+      
+      res.json({ 
+        response,
+        assistantId,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.get("/api/knowledge/analytics", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const assistantId = req.query.assistantId ? parseInt(req.query.assistantId as string) : undefined;
+      
+      const { KnowledgeCentreService } = await import('./knowledgeCentreService');
+      const analytics = await KnowledgeCentreService.getTrainingAnalytics(userId, assistantId);
+      
+      res.json(analytics);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Simple API routes for testing
   app.get("/api/test", (req, res) => {
     res.json({ message: "API is working!" });
