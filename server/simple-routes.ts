@@ -188,21 +188,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ error: "All fields are required" });
     }
     
-    // For now, accept any signup for development
-    const user = {
+    // Store user data for verification but DO NOT authenticate yet
+    const pendingUser = {
       id: Date.now(), // Simple ID generation
       email,
       firstName,
       lastName,
       subscriptionTier: "basic",
-      isEmailVerified: false
+      isEmailVerified: false,
+      verificationCode: Math.floor(100000 + Math.random() * 900000).toString()
     };
     
-    // Set session
-    (req as any).session.userId = user.id;
-    (req as any).session.isAuthenticated = true;
+    // Store pending user in session for verification
+    (req as any).session.pendingUser = pendingUser;
     
-    res.json({ user, message: "Account created successfully" });
+    // Send verification code (for now, just log it)
+    console.log(`Verification code for ${email}: ${pendingUser.verificationCode}`);
+    
+    res.json({ 
+      message: "Account created successfully. Please verify your email.",
+      requiresVerification: true,
+      email: email
+    });
+  });
+
+  // Email verification endpoint
+  app.post("/api/auth/verify-email", (req, res) => {
+    const { email, code } = req.body;
+    
+    if (!email || !code) {
+      return res.status(400).json({ error: "Email and verification code are required" });
+    }
+    
+    const pendingUser = (req as any).session.pendingUser;
+    
+    if (!pendingUser || pendingUser.email !== email) {
+      return res.status(400).json({ error: "No pending verification found for this email" });
+    }
+    
+    if (pendingUser.verificationCode !== code) {
+      return res.status(400).json({ error: "Invalid verification code" });
+    }
+    
+    // Email verified successfully - now authenticate the user
+    const verifiedUser = {
+      ...pendingUser,
+      isEmailVerified: true
+    };
+    
+    // Set authenticated session
+    (req as any).session.userId = verifiedUser.id;
+    (req as any).session.isAuthenticated = true;
+    (req as any).session.pendingUser = null; // Clear pending user
+    
+    res.json({ 
+      user: verifiedUser, 
+      message: "Email verified successfully" 
+    });
+  });
+
+  // Resend verification code endpoint
+  app.post("/api/auth/resend-verification", (req, res) => {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: "Email is required" });
+    }
+    
+    const pendingUser = (req as any).session.pendingUser;
+    
+    if (!pendingUser || pendingUser.email !== email) {
+      return res.status(400).json({ error: "No pending verification found for this email" });
+    }
+    
+    // Generate new verification code
+    const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+    pendingUser.verificationCode = newCode;
+    (req as any).session.pendingUser = pendingUser;
+    
+    // Send new verification code (for now, just log it)
+    console.log(`New verification code for ${email}: ${newCode}`);
+    
+    res.json({ message: "Verification code resent successfully" });
   });
 
   app.post("/api/auth/logout", (req, res) => {

@@ -32,9 +32,9 @@ export default function LoginPage() {
   const [showEmailVerification, setShowEmailVerification] = useState(false);
   const [registrationEmail, setRegistrationEmail] = useState("");
 
-  // Redirect if already logged in
-  if (user) {
-    setLocation("/dashboard");
+  // Redirect if already logged in - but don't trigger during render
+  if (user && !showEmailVerification) {
+    setTimeout(() => setLocation("/dashboard"), 0);
     return null;
   }
 
@@ -78,8 +78,27 @@ export default function LoginPage() {
     }
     
     try {
-      await register(registerForm.firstName, registerForm.lastName, registerForm.email, registerForm.password);
-      // Set up email verification flow using existing BrezCode system
+      // Call new signup endpoint that doesn't authenticate immediately
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: registerForm.firstName,
+          lastName: registerForm.lastName,
+          email: registerForm.email,
+          password: registerForm.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      // Show email verification step
       setRegistrationEmail(registerForm.email);
       setShowEmailVerification(true);
       toast({
@@ -95,13 +114,10 @@ export default function LoginPage() {
     }
   };
 
-  const handleEmailVerificationComplete = () => {
+  const handleEmailVerificationComplete = (user: any) => {
     setShowEmailVerification(false);
-    toast({
-      title: "Email Verified!",
-      description: "Welcome to LeadGen.to - your business automation platform",
-    });
-    setLocation("/dashboard");
+    // Refresh the auth context to get the authenticated user
+    window.location.reload(); // Simple way to refresh and get authenticated state
   };
 
   const handleBackFromVerification = () => {
