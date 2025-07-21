@@ -23,7 +23,10 @@ import {
   AlertCircle,
   Loader2,
   Plus,
-  X
+  X,
+  Camera,
+  Image,
+  Upload
 } from 'lucide-react';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
@@ -94,6 +97,9 @@ export default function DietaryRecommendations() {
   const [newGoal, setNewGoal] = useState('');
   const [newRestriction, setNewRestriction] = useState('');
   const [newAllergy, setNewAllergy] = useState('');
+  const [photoIntegrations, setPhotoIntegrations] = useState<any[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedMealType, setSelectedMealType] = useState<string>('lunch');
 
   // Generate daily meal plan
   const generateMealPlanMutation = useMutation({
@@ -107,6 +113,30 @@ export default function DietaryRecommendations() {
   const generateMealMutation = useMutation({
     mutationFn: async (data: { userProfile: UserProfile; mealType: string; previousMeals?: MealRecommendation[] }) => {
       const response = await apiRequest('POST', '/api/dietary/meal-recommendation', data);
+      return response.json();
+    }
+  });
+
+  // Analyze food photo and integrate with dietary plan
+  const analyzePhotoMutation = useMutation({
+    mutationFn: async (imageData: string) => {
+      const response = await apiRequest('POST', '/api/food/analyze', { imageData });
+      return response.json();
+    }
+  });
+
+  // Integrate photo analysis with dietary recommendations
+  const integratePhotoMutation = useMutation({
+    mutationFn: async (data: { photoAnalysis: any; userProfile: UserProfile; mealType: string }) => {
+      const response = await apiRequest('POST', '/api/dietary/integrate-photo', data);
+      return response.json();
+    }
+  });
+
+  // Generate enhanced meal plan with photo integrations
+  const generateEnhancedMealPlanMutation = useMutation({
+    mutationFn: async (data: { userProfile: UserProfile; date: string; photoMeals: any[] }) => {
+      const response = await apiRequest('POST', '/api/dietary/meal-plan-with-photos', data);
       return response.json();
     }
   });
@@ -138,7 +168,57 @@ export default function DietaryRecommendations() {
   });
 
   const handleGenerateMealPlan = () => {
-    generateMealPlanMutation.mutate({ userProfile, date: selectedDate });
+    if (photoIntegrations.length > 0) {
+      generateEnhancedMealPlanMutation.mutate({ 
+        userProfile, 
+        date: selectedDate, 
+        photoMeals: photoIntegrations 
+      });
+    } else {
+      generateMealPlanMutation.mutate({ userProfile, date: selectedDate });
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageData = e.target?.result as string;
+        setSelectedImage(imageData);
+        
+        // Auto-analyze the photo
+        const base64Data = imageData.split(',')[1];
+        analyzePhotoMutation.mutate(base64Data);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleIntegratePhoto = async () => {
+    if (analyzePhotoMutation.data?.analysis && selectedMealType) {
+      const integration = await integratePhotoMutation.mutateAsync({
+        photoAnalysis: analyzePhotoMutation.data.analysis,
+        userProfile,
+        mealType: selectedMealType as any
+      });
+
+      // Add to photo integrations
+      setPhotoIntegrations(prev => [
+        ...prev.filter(p => p.mealType !== selectedMealType),
+        {
+          mealType: selectedMealType,
+          mealRecommendation: integration.mealRecommendation,
+          nutritionalComparison: integration.nutritionalComparison,
+          suggestions: integration.suggestions,
+          photoUrl: selectedImage
+        }
+      ]);
+
+      // Clear selection
+      setSelectedImage(null);
+      analyzePhotoMutation.reset();
+    }
   };
 
   const handleGenerateMeal = (mealType: string) => {
@@ -261,9 +341,10 @@ export default function DietaryRecommendations() {
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="profile" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="profile">Profile</TabsTrigger>
               <TabsTrigger value="needs">Nutritional Needs</TabsTrigger>
+              <TabsTrigger value="photos">Photo Integration</TabsTrigger>
               <TabsTrigger value="meals">Meal Plans</TabsTrigger>
               <TabsTrigger value="suggestions">Food Ideas</TabsTrigger>
             </TabsList>
@@ -531,6 +612,200 @@ export default function DietaryRecommendations() {
               )}
             </TabsContent>
 
+            {/* Photo Integration Tab */}
+            <TabsContent value="photos" className="space-y-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Camera className="h-5 w-5 text-blue-600" />
+                    Food Photo Analysis Integration
+                  </CardTitle>
+                  <p className="text-sm text-muted-foreground">
+                    Take photos of your meals to integrate them into your personalized meal plans
+                  </p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Photo Upload */}
+                  <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6">
+                    {selectedImage ? (
+                      <div className="space-y-4">
+                        <img 
+                          src={selectedImage} 
+                          alt="Selected food" 
+                          className="max-w-full h-48 object-cover rounded-lg mx-auto"
+                        />
+                        {analyzePhotoMutation.isPending && (
+                          <div className="text-center">
+                            <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">Analyzing photo...</p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center">
+                        <Camera className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <p className="text-muted-foreground mb-4">Take a photo or upload an image of your meal</p>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          capture="environment"
+                          onChange={handleImageUpload}
+                          className="hidden"
+                          id="photo-upload"
+                        />
+                        <label htmlFor="photo-upload">
+                          <Button className="cursor-pointer" asChild>
+                            <span>
+                              <Upload className="h-4 w-4 mr-2" />
+                              Upload Photo
+                            </span>
+                          </Button>
+                        </label>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Analysis Results */}
+                  {analyzePhotoMutation.data?.analysis && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-base">Photo Analysis Results</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                          <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded">
+                            <div className="text-lg font-bold text-blue-600">
+                              {analyzePhotoMutation.data.analysis.nutritionalBreakdown?.calories || 0}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Calories</div>
+                          </div>
+                          <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded">
+                            <div className="text-lg font-bold text-green-600">
+                              {analyzePhotoMutation.data.analysis.nutritionalBreakdown?.protein || 0}g
+                            </div>
+                            <div className="text-sm text-muted-foreground">Protein</div>
+                          </div>
+                          <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                            <div className="text-lg font-bold text-yellow-600">
+                              {analyzePhotoMutation.data.analysis.nutritionalBreakdown?.carbohydrates || 0}g
+                            </div>
+                            <div className="text-sm text-muted-foreground">Carbs</div>
+                          </div>
+                          <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded">
+                            <div className="text-lg font-bold text-purple-600">
+                              {analyzePhotoMutation.data.analysis.healthScore || 0}/100
+                            </div>
+                            <div className="text-sm text-muted-foreground">Health Score</div>
+                          </div>
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label>Assign to Meal Type</Label>
+                          <Select value={selectedMealType} onValueChange={setSelectedMealType}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="breakfast">Breakfast</SelectItem>
+                              <SelectItem value="lunch">Lunch</SelectItem>
+                              <SelectItem value="dinner">Dinner</SelectItem>
+                              <SelectItem value="snack">Snack</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <Button 
+                          onClick={handleIntegratePhoto}
+                          disabled={integratePhotoMutation.isPending}
+                          className="w-full"
+                        >
+                          {integratePhotoMutation.isPending ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          ) : (
+                            <Target className="h-4 w-4 mr-2" />
+                          )}
+                          Integrate into Meal Plan
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {/* Photo Integrations */}
+                  {photoIntegrations.length > 0 && (
+                    <div className="space-y-4">
+                      <h4 className="font-medium">Integrated Photo Meals</h4>
+                      {photoIntegrations.map((integration, index) => (
+                        <Card key={index}>
+                          <CardContent className="pt-4">
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="flex items-center gap-2">
+                                <img 
+                                  src={integration.photoUrl} 
+                                  alt="Meal photo" 
+                                  className="w-12 h-12 object-cover rounded"
+                                />
+                                <div>
+                                  <div className="font-medium capitalize">{integration.mealType}</div>
+                                  <div className="text-sm text-muted-foreground">
+                                    {integration.mealRecommendation.totalCalories} cal
+                                  </div>
+                                </div>
+                              </div>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => setPhotoIntegrations(prev => 
+                                  prev.filter((_, i) => i !== index)
+                                )}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+
+                            {/* Nutritional Comparison */}
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              {Object.entries(integration.nutritionalComparison).map(([nutrient, data]: [string, any]) => (
+                                <div key={nutrient} className="flex justify-between">
+                                  <span className="capitalize">{nutrient}:</span>
+                                  <span className={
+                                    data.percentage >= 80 && data.percentage <= 120 
+                                      ? 'text-green-600' 
+                                      : 'text-yellow-600'
+                                  }>
+                                    {data.actual}/{data.target} ({data.percentage}%)
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+
+                            {/* Suggestions */}
+                            {integration.suggestions.length > 0 && (
+                              <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-sm">
+                                {integration.suggestions[0]}
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  )}
+
+                  {selectedImage && (
+                    <Button 
+                      variant="outline" 
+                      onClick={() => {
+                        setSelectedImage(null);
+                        analyzePhotoMutation.reset();
+                      }}
+                      className="w-full"
+                    >
+                      Clear Photo
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             {/* Meal Plans Tab */}
             <TabsContent value="meals" className="space-y-4">
               <div className="flex items-center gap-4 mb-4">
@@ -554,56 +829,69 @@ export default function DietaryRecommendations() {
                 </Button>
               </div>
 
-              {generateMealPlanMutation.data?.mealPlan && (
-                <div className="space-y-4">
-                  {/* Daily Overview */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Daily Overview</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-blue-600">
-                            {generateMealPlanMutation.data.mealPlan.totalCalories}
-                          </div>
-                          <div className="text-sm text-muted-foreground">Total Calories</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-green-600">
-                            {generateMealPlanMutation.data.mealPlan.nutritionalGoalsNet}%
-                          </div>
-                          <div className="text-sm text-muted-foreground">Goals Met</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="text-2xl font-bold text-purple-600">
-                            {generateMealPlanMutation.data.mealPlan.meals.length}
-                          </div>
-                          <div className="text-sm text-muted-foreground">Meals Planned</div>
-                        </div>
-                      </div>
+              {(() => {
+                const mealPlan = generateEnhancedMealPlanMutation.data?.mealPlan || generateMealPlanMutation.data?.mealPlan;
+                if (!mealPlan) return null;
 
-                      {/* Personalized Insights */}
-                      {generateMealPlanMutation.data.mealPlan.personalizedInsights && (
-                        <div className="space-y-2">
-                          <h4 className="font-medium">Personalized Insights:</h4>
-                          {generateMealPlanMutation.data.mealPlan.personalizedInsights.map((insight: string, index: number) => (
-                            <div key={index} className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
-                              <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5" />
-                              <span className="text-sm">{insight}</span>
+                return (
+                  <div className="space-y-4">
+                    {/* Daily Overview */}
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Daily Overview</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-blue-600">
+                              {mealPlan.totalCalories}
                             </div>
-                          ))}
+                            <div className="text-sm text-muted-foreground">Total Calories</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-green-600">
+                              {mealPlan.nutritionalGoalsNet}%
+                            </div>
+                            <div className="text-sm text-muted-foreground">Goals Met</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="text-2xl font-bold text-purple-600">
+                              {mealPlan.meals.length}
+                            </div>
+                            <div className="text-sm text-muted-foreground">Meals Planned</div>
+                          </div>
+                          {mealPlan.photoIntegrations && (
+                            <div className="text-center">
+                              <div className="text-2xl font-bold text-orange-600">
+                                {mealPlan.photoIntegrations}
+                              </div>
+                              <div className="text-sm text-muted-foreground">Photo Meals</div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </CardContent>
-                  </Card>
 
-                  {/* Individual Meals */}
-                  {generateMealPlanMutation.data.mealPlan.meals.map((meal: MealRecommendation) => 
-                    renderMealCard(meal)
-                  )}
-                </div>
-              )}
+                        {/* Personalized Insights */}
+                        {mealPlan.personalizedInsights && (
+                          <div className="space-y-2">
+                            <h4 className="font-medium">Personalized Insights:</h4>
+                            {mealPlan.personalizedInsights.map((insight: string, index: number) => (
+                              <div key={index} className="flex items-start gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded">
+                                <TrendingUp className="h-4 w-4 text-blue-500 mt-0.5" />
+                                <span className="text-sm">{insight}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+
+                    {/* Individual Meals */}
+                    {mealPlan.meals.map((meal: MealRecommendation) => 
+                      renderMealCard(meal)
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Individual Meal Generation */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

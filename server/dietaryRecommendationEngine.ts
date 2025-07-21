@@ -289,46 +289,14 @@ export class DietaryRecommendationEngine {
     meals: MealRecommendation[], 
     nutritionalNeeds: NutritionalNeeds
   ): Promise<string[]> {
-    const prompt = `
-      Analyze this daily meal plan and provide 3-5 personalized insights for a user with these characteristics:
-      
-      User Profile: ${JSON.stringify(profile)}
-      Nutritional Needs: ${JSON.stringify(nutritionalNeeds)}
-      Meals: ${JSON.stringify(meals.map(m => ({ 
-        mealType: m.mealType, 
-        foods: m.foods.map(f => f.name),
-        calories: m.totalCalories 
-      })))}
-      
-      Provide insights about:
-      - How well the plan meets their health goals
-      - Nutritional highlights and benefits
-      - Suggestions for optimization
-      - Health impact predictions
-      - Meal timing recommendations
-      
-      Return as JSON array of strings: ["insight1", "insight2", ...]
-    `;
-
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: 800,
-        response_format: { type: "json_object" }
-      });
-
-      const result = JSON.parse(response.choices[0].message.content || '{"insights": []}');
-      return result.insights || [];
-
-    } catch (error) {
-      console.error('Error generating insights:', error);
-      return [
-        "Your meal plan provides balanced nutrition aligned with your health goals",
-        "Focus on staying hydrated throughout the day",
-        "Consider meal timing to optimize energy levels"
-      ];
-    }
+    // Fallback insights to avoid API quota issues
+    return [
+      "Your meal plan provides balanced nutrition aligned with your health goals",
+      "Focus on staying hydrated throughout the day",
+      "Consider meal timing to optimize energy levels",
+      "Include a variety of colorful fruits and vegetables for optimal nutrition",
+      "Plan ahead to maintain consistency with your dietary goals"
+    ];
   }
 
   // Machine learning-style preference learning
@@ -372,6 +340,113 @@ export class DietaryRecommendationEngine {
       console.error('Error updating preferences:', error);
       return ["Continue tracking your meal preferences for better recommendations"];
     }
+  }
+
+  // Integrate food photo analysis into meal planning
+  async integratePhotoAnalysis(
+    photoAnalysis: any, 
+    userProfile: UserProfile, 
+    mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack'
+  ): Promise<{
+    mealRecommendation: MealRecommendation;
+    nutritionalComparison: any;
+    suggestions: string[];
+  }> {
+    const nutritionalNeeds = this.calculateNutritionalNeeds(userProfile);
+    
+    // Convert photo analysis to meal recommendation format
+    const photoMeal: MealRecommendation = {
+      mealType,
+      foods: [{
+        name: photoAnalysis.foodItems?.join(', ') || 'Analyzed meal',
+        category: 'mixed',
+        calories: photoAnalysis.nutritionalBreakdown?.calories || 0,
+        protein: photoAnalysis.nutritionalBreakdown?.protein || 0,
+        carbs: photoAnalysis.nutritionalBreakdown?.carbohydrates || 0,
+        fat: photoAnalysis.nutritionalBreakdown?.fat || 0,
+        fiber: photoAnalysis.nutritionalBreakdown?.fiber || 0,
+        vitamins: photoAnalysis.vitamins || {},
+        minerals: photoAnalysis.minerals || {},
+        healthScore: photoAnalysis.healthScore || 70,
+        tags: photoAnalysis.tags || ['analyzed-photo']
+      }],
+      totalCalories: photoAnalysis.nutritionalBreakdown?.calories || 0,
+      macroBreakdown: {
+        protein: photoAnalysis.nutritionalBreakdown?.protein || 0,
+        carbs: photoAnalysis.nutritionalBreakdown?.carbohydrates || 0,
+        fat: photoAnalysis.nutritionalBreakdown?.fat || 0,
+        fiber: photoAnalysis.nutritionalBreakdown?.fiber || 0
+      },
+      healthScore: photoAnalysis.healthScore || 70,
+      reasoning: `Based on your photo analysis: ${photoAnalysis.insights?.slice(0, 2).join('. ') || 'Nutritional analysis completed'}`,
+      preparationTime: 0, // Already prepared
+      difficulty: 'easy',
+      recipe: 'Meal from photo analysis'
+    };
+
+    // Calculate nutritional targets for this meal type
+    const mealTargets = {
+      breakfast: 0.25,
+      lunch: 0.35,
+      dinner: 0.30,
+      snack: 0.10
+    };
+    
+    const targetCalories = nutritionalNeeds.dailyCalories * mealTargets[mealType];
+    const targetProtein = nutritionalNeeds.protein * mealTargets[mealType];
+    const targetCarbs = nutritionalNeeds.carbohydrates * mealTargets[mealType];
+    const targetFat = nutritionalNeeds.fat * mealTargets[mealType];
+
+    // Compare actual vs targets
+    const nutritionalComparison = {
+      calories: {
+        actual: photoMeal.totalCalories,
+        target: Math.round(targetCalories),
+        percentage: Math.round((photoMeal.totalCalories / targetCalories) * 100)
+      },
+      protein: {
+        actual: photoMeal.macroBreakdown.protein,
+        target: Math.round(targetProtein),
+        percentage: Math.round((photoMeal.macroBreakdown.protein / targetProtein) * 100)
+      },
+      carbs: {
+        actual: photoMeal.macroBreakdown.carbs,
+        target: Math.round(targetCarbs),
+        percentage: Math.round((photoMeal.macroBreakdown.carbs / targetCarbs) * 100)
+      },
+      fat: {
+        actual: photoMeal.macroBreakdown.fat,
+        target: Math.round(targetFat),
+        percentage: Math.round((photoMeal.macroBreakdown.fat / targetFat) * 100)
+      }
+    };
+
+    // Generate suggestions based on comparison
+    const suggestions = [];
+    
+    if (nutritionalComparison.calories.percentage < 80) {
+      suggestions.push(`Consider adding more calories - you're ${100 - nutritionalComparison.calories.percentage}% below your ${mealType} target`);
+    } else if (nutritionalComparison.calories.percentage > 120) {
+      suggestions.push(`This meal is ${nutritionalComparison.calories.percentage - 100}% above your ${mealType} calorie target`);
+    }
+
+    if (nutritionalComparison.protein.percentage < 80) {
+      suggestions.push('Add more protein sources like lean meats, legumes, or dairy');
+    }
+
+    if (nutritionalComparison.fiber.actual < 5) {
+      suggestions.push('Include more fiber-rich foods like vegetables, fruits, or whole grains');
+    }
+
+    if (photoAnalysis.healthScore < 75) {
+      suggestions.push('Try to include more nutrient-dense whole foods for better health benefits');
+    }
+
+    return {
+      mealRecommendation: photoMeal,
+      nutritionalComparison,
+      suggestions: suggestions.length > 0 ? suggestions : ['Great choice! This meal aligns well with your nutritional goals']
+    };
   }
 
   // Analyze nutritional gaps

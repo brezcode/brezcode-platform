@@ -261,4 +261,93 @@ router.post('/dietary/food-suggestions', async (req, res) => {
   }
 });
 
+// Integrate food photo analysis with dietary recommendations
+router.post('/dietary/integrate-photo', async (req, res) => {
+  try {
+    const { photoAnalysis, userProfile, mealType } = req.body;
+
+    if (!photoAnalysis || !userProfile || !mealType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Photo analysis, user profile, and meal type are required'
+      });
+    }
+
+    const integration = await dietaryRecommendationEngine.integratePhotoAnalysis(
+      photoAnalysis,
+      userProfile,
+      mealType
+    );
+
+    res.json({
+      success: true,
+      ...integration,
+      message: 'Photo analysis integrated with dietary recommendations'
+    });
+
+  } catch (error) {
+    console.error('Photo integration error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to integrate photo analysis'
+    });
+  }
+});
+
+// Generate meal plan including photo-analyzed meals
+router.post('/dietary/meal-plan-with-photos', async (req, res) => {
+  try {
+    const { userProfile, date, photoMeals = [] } = req.body;
+
+    if (!userProfile || !date) {
+      return res.status(400).json({
+        success: false,
+        message: 'User profile and date are required'
+      });
+    }
+
+    // Generate base meal plan
+    const baseMealPlan = await dietaryRecommendationEngine.generateDailyMealPlan(userProfile, date);
+    
+    // Replace meals with photo-analyzed ones where available
+    const integratedMeals = baseMealPlan.meals.map(meal => {
+      const photoMeal = photoMeals.find((pm: any) => pm.mealType === meal.mealType);
+      if (photoMeal) {
+        return photoMeal.mealRecommendation;
+      }
+      return meal;
+    });
+
+    // Recalculate totals
+    const totalCalories = integratedMeals.reduce((sum, meal) => sum + meal.totalCalories, 0);
+    const nutritionalNeeds = dietaryRecommendationEngine.calculateNutritionalNeeds(userProfile);
+    const nutritionalGoalsNet = Math.round((totalCalories / nutritionalNeeds.dailyCalories) * 100);
+
+    const enhancedMealPlan = {
+      ...baseMealPlan,
+      meals: integratedMeals,
+      totalCalories,
+      nutritionalGoalsNet,
+      photoIntegrations: photoMeals.length,
+      personalizedInsights: [
+        ...baseMealPlan.personalizedInsights,
+        ...(photoMeals.length > 0 ? [`Integrated ${photoMeals.length} photo-analyzed meal(s) into your plan`] : [])
+      ]
+    };
+
+    res.json({
+      success: true,
+      mealPlan: enhancedMealPlan,
+      nutritionalNeeds
+    });
+
+  } catch (error) {
+    console.error('Enhanced meal plan generation error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to generate enhanced meal plan'
+    });
+  }
+});
+
 export default router;
