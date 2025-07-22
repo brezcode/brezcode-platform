@@ -1,150 +1,108 @@
-# BrezCode - Breast Health Assessment Platform
+# LeadGen.to - AI Business Automation Platform
 
-A comprehensive, multilingual breast health assessment application with AI-powered coaching and personalized risk analysis.
+## 🚀 Comprehensive Business AI Platform
 
-## 🌍 Global Features
+leadgen.to provides complete business automation tools starting with personal productivity and expanding to full business automation. Originally developed while building BrezCode (health assessment client), the platform has evolved into a complete business automation ecosystem.
 
-- **9 Languages Supported**: English, Chinese (Simplified/Traditional), Spanish, French, German, Japanese, Korean, Vietnamese
-- **Custom Domain**: www.brezcode.com
-- **Evidence-Based Medical Content**: Powered by OpenAI GPT-4o with medical reference validation
-- **6-Section Health Assessment**: Comprehensive breast health risk evaluation
-- **Daily AI Coaching**: Personalized health tips and follow-up engagement
+## ✨ Core Features
 
-## 🏗️ Architecture
+### Personal-First Platform Tools
+- **AI Avatar Assistant**: Claude-powered virtual assistant for customer service and sales
+- **Landing Page Builder**: AI-powered page creation with custom branding
+- **Lead Generation System**: Automated capture, qualification, and nurturing
+- **Sales CRM**: Complete pipeline management with automated follow-ups
+- **Booking Service**: Automated scheduling with calendar integration
+- **Multi-Channel Engagement**: Email, SMS, WhatsApp, LinkedIn automation
+- **AI Content Creation**: Daily content generation with image creation
+- **Health & Wellness Tools**: Assessment forms, dietary recommendations, food analysis
 
-- **Frontend**: React 18 + TypeScript + Tailwind CSS
-- **Backend**: Express.js + Node.js
-- **Database**: PostgreSQL (Neon Serverless)
-- **AI**: OpenAI GPT-4o for coaching and content generation
-- **Authentication**: Session-based with email verification
-- **Internationalization**: Database-driven translation system
+### Business Applications
+- **BrezCode**: Health assessment and coaching platform (leadgen.to/brezcode)
+- **Modular Profile System**: International support for 195+ countries
+- **Business Landing Creator**: 4-step wizard with template selection
+- **AI Training System**: Role-playing scenario testing for assistant training
 
-## 🚀 Quick Start
+## 🏗️ Technical Architecture
 
-### Development
+### Frontend
+- **React 18** with TypeScript
+- **Wouter** for client-side routing with brand context
+- **Radix UI** primitives with shadcn/ui styling
+- **Tailwind CSS** with brand-specific customization
+- **TanStack Query** for state management
+
+### Backend
+- **Node.js** with Express.js server
+- **PostgreSQL** multi-tenant database with Drizzle ORM
+- **Brand Middleware** for automatic brand resolution
+- **RESTful API** design with session-based authentication
+
+### AI Integration
+- **Claude Sonnet-4** as primary AI engine
+- **OpenAI GPT-4o** as fallback system
+- **Advanced memory systems** with conversation context
+- **Knowledge base integration** with search capabilities
+
+## 🌍 International Support
+
+- **Languages**: English, Chinese (Simplified/Traditional), Spanish, French, German, Japanese, Korean
+- **Global Profile System**: 195+ countries with phone codes and address formatting
+- **Multi-timezone Support**: Automated timezone detection and handling
+- **Cultural Localization**: Content adaptation for different regions
+
+## 🚀 Deployment
+
+### Production URLs
+- **Main Platform**: https://leadgen.to
+- **Profile Editor**: https://leadgen.to/profile  
+- **Business Creator**: https://leadgen.to/business-landing-creator
+- **BrezCode Health**: https://leadgen.to/brezcode
+- **Admin Interface**: https://leadgen.to/admin
+- **Subdomain Support**: https://brezcode.leadgen.to
+
+### Build Commands
 ```bash
 npm install
+npm run build
 npm run dev
 ```
 
-### Production Deployment
-1. Deploy to Vercel (free tier)
-2. Configure custom domain: www.brezcode.com
-3. Set environment variables (see DEPLOYMENT_GUIDE.md)
-4. Connect Neon database
-
-## 📁 Project Structure
-
+### Environment Variables
 ```
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # UI components
-│   │   ├── pages/         # Application pages
-│   │   └── hooks/         # Custom React hooks
-├── server/                # Express backend
-│   ├── routes.ts          # API endpoints
-│   ├── enhancedAI.ts      # AI coaching system
-│   └── internationalization.ts # Multi-language support
-├── shared/
-│   └── schema.ts          # Database schema & types
-└── docs/
-    └── DEPLOYMENT_GUIDE.md # Production deployment guide
+OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key  
+DATABASE_URL=your_postgres_url
+SENDGRID_API_KEY=your_sendgrid_key
+FROM_EMAIL=your_verified_email
 ```
 
-## 🎯 Key Components
+## 📊 Performance
+- **Server Bundle**: 69.8KB optimized
+- **Client Assets**: 1.09MB with 102KB CSS
+- **Global CDN**: Vercel edge functions
+- **Database**: Neon serverless PostgreSQL
 
-### Health Assessment System
-- **Comprehensive Quiz**: 26 questions across 6 health sections
-- **Dual Scoring**: Controllable vs Uncontrollable risk factors
-- **Risk Categories**: Excellent, Good, Fair, Poor health classifications
-- **Personalized Reports**: AI-generated recommendations and daily plans
+## 🎯 Business Model
 
-### Internationalization
-- **Language Detection**: Browser, URL parameter, user preference
-- **Database Translations**: Cached translation system
-- **Timezone Support**: Location-aware coaching delivery
-- **Cultural Adaptation**: Region-specific health recommendations
+LeadGen.to operates as a comprehensive business automation platform where:
+- **Users start with personal tools** (profile, productivity, health tracking)
+- **Business features are optional additions** (CRM, landing pages, AI assistants)
+- **BrezCode demonstrates platform capabilities** in health/wellness vertical
+- **All tools are available to any business** for their specific industry needs
 
-### AI Coaching Engine
-- **Daily Engagement**: Personalized tips based on user profile
-- **Evidence-Based Content**: Medical reference validation
-- **Streak Tracking**: User engagement and progress monitoring
-- **Multi-Modal Delivery**: Email, SMS, in-app notifications
+## 📈 Recent Achievements
 
-## 🔧 Environment Variables
+- **January 2025**: Complete authentication system with email verification
+- **Multi-business AI assistant creation** with industry categorization
+- **International profile system** supporting 195+ countries
+- **Business landing creator** with 4 professional templates
+- **AI training platform** with role-playing scenarios
+- **Domain deployment ready** with optimized Vercel configuration
 
-```bash
-# Database
-DATABASE_URL=postgresql://...
+## 🛠️ Development
 
-# AI Services  
-OPENAI_API_KEY=sk-...
-
-# Email Service
-SENDGRID_API_KEY=SG...
-FROM_EMAIL=health@brezcode.com
-
-# Security
-SESSION_SECRET=your-64-char-secret
-
-# SMS (Optional)
-TWILIO_ACCOUNT_SID=AC...
-TWILIO_AUTH_TOKEN=...
-TWILIO_PHONE_NUMBER=+1...
-```
-
-## 📊 Database Schema
-
-- **Users**: Authentication and profile data
-- **Languages**: Supported language configurations  
-- **Translations**: Multi-language content storage
-- **User Preferences**: Language, timezone, notification settings
-- **Coaching Data**: Daily tips, interaction tracking, progress analytics
-
-## 🌐 Production Deployment
-
-**Free Hosting Stack:**
-- **Vercel**: Frontend and API hosting (free tier)
-- **Neon**: PostgreSQL database (free tier)  
-- **Custom Domain**: www.brezcode.com
-
-**Scalability:**
-- Global CDN with 100+ edge locations
-- Automatic SSL and security headers
-- Database connection pooling
-- Serverless function architecture
-
-## 📈 Analytics & Monitoring
-
-- **User Engagement**: Daily interaction tracking
-- **Health Progress**: Risk score improvements over time
-- **Language Usage**: Multi-language adoption metrics
-- **Error Tracking**: Comprehensive logging and monitoring
-
-## 🎨 Design System
-
-- **Color Palette**: Sunnyside.co inspired (bright, welcoming)
-- **Typography**: Clean, accessible font hierarchy
-- **Components**: shadcn/ui + Radix UI primitives
-- **Responsive**: Mobile-first design approach
-- **Accessibility**: WCAG 2.1 AA compliance
-
-## 🔒 Security Features
-
-- **Session Security**: Secure cookie configuration
-- **Rate Limiting**: API endpoint protection
-- **Input Validation**: Comprehensive data sanitization
-- **HTTPS Only**: Force secure connections
-- **CORS Protection**: Cross-origin request security
-
-## 📚 Medical Accuracy
-
-- **Reference Material**: "Code Chapter 1 to 14" medical textbook integration
-- **Evidence-Based**: All health content validated against medical literature
-- **Disclaimer System**: Appropriate medical disclaimers and guidance
-- **Professional Review**: Content reviewed by healthcare professionals
+Built with modern full-stack JavaScript patterns, emphasizing frontend-heavy architecture with backend focused on data persistence and API calls. Designed for scalability with multi-tenant database architecture and comprehensive error handling.
 
 ---
 
-**Live Demo**: https://www.brezcode.com  
-**Documentation**: See DEPLOYMENT_GUIDE.md for detailed setup instructions
+**Platform Status**: FULLY OPERATIONAL - Ready for live deployment at leadgen.to
