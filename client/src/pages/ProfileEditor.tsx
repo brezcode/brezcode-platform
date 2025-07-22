@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { User, Camera, Save, ArrowLeft, Phone, MapPin, Mail, Edit2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { User, Camera, Save, ArrowLeft, Phone, MapPin, Mail, Edit2, Globe } from "lucide-react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -25,6 +26,38 @@ interface UserProfile {
   createdAt?: string;
 }
 
+interface PhoneData {
+  countryCode: string;
+  areaCode: string;
+  number: string;
+}
+
+interface AddressData {
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
+const COUNTRY_CODES = [
+  { code: "+1", country: "US/Canada", flag: "🇺🇸" },
+  { code: "+44", country: "United Kingdom", flag: "🇬🇧" },
+  { code: "+61", country: "Australia", flag: "🇦🇺" },
+  { code: "+33", country: "France", flag: "🇫🇷" },
+  { code: "+49", country: "Germany", flag: "🇩🇪" },
+  { code: "+81", country: "Japan", flag: "🇯🇵" },
+  { code: "+86", country: "China", flag: "🇨🇳" },
+  { code: "+852", country: "Hong Kong", flag: "🇭🇰" },
+  { code: "+65", country: "Singapore", flag: "🇸🇬" },
+  { code: "+91", country: "India", flag: "🇮🇳" },
+];
+
+const COUNTRIES = [
+  "United States", "Canada", "United Kingdom", "Australia", "France", "Germany", 
+  "Japan", "China", "Hong Kong", "Singapore", "India", "Other"
+];
+
 export default function ProfileEditor() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -34,6 +67,22 @@ export default function ProfileEditor() {
   const [formData, setFormData] = useState<Partial<UserProfile>>({});
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
+  
+  // Structured phone data
+  const [phoneData, setPhoneData] = useState<PhoneData>({
+    countryCode: "+1",
+    areaCode: "",
+    number: ""
+  });
+  
+  // Structured address data
+  const [addressData, setAddressData] = useState<AddressData>({
+    street: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: "United States"
+  });
 
   // Fetch current user data
   const { data: currentUser, isLoading } = useQuery({
@@ -45,16 +94,78 @@ export default function ProfileEditor() {
     }
   });
 
+  // Parse phone number from stored format
+  const parsePhoneNumber = (phone: string): PhoneData => {
+    if (!phone) return { countryCode: "+1", areaCode: "", number: "" };
+    
+    // Try to parse format like "+1 (555) 123-4567" or "+1-555-123-4567"
+    const match = phone.match(/^(\+\d{1,4})\s*[\(\-\s]*(\d{3})\s*[\)\-\s]*(\d{3})\s*[\-\s]*(\d{4})$/);
+    if (match) {
+      return {
+        countryCode: match[1],
+        areaCode: match[2],
+        number: `${match[3]}-${match[4]}`
+      };
+    }
+    
+    // Fallback for other formats
+    const codeMatch = phone.match(/^(\+\d{1,4})/);
+    const countryCode = codeMatch ? codeMatch[1] : "+1";
+    const remaining = phone.replace(countryCode, '').replace(/\D/g, '');
+    
+    if (remaining.length >= 7) {
+      return {
+        countryCode,
+        areaCode: remaining.slice(0, 3),
+        number: `${remaining.slice(3, 6)}-${remaining.slice(6)}`
+      };
+    }
+    
+    return { countryCode, areaCode: "", number: remaining };
+  };
+
+  // Parse address from stored format
+  const parseAddress = (address: string): AddressData => {
+    if (!address) return { street: "", city: "", state: "", postalCode: "", country: "United States" };
+    
+    // Try to parse format like "123 Main St, City, State 12345, Country"
+    const parts = address.split(',').map(part => part.trim());
+    if (parts.length >= 3) {
+      const street = parts[0];
+      const city = parts[1];
+      const stateZip = parts[2];
+      const country = parts[3] || "United States";
+      
+      // Extract state and postal code
+      const stateZipMatch = stateZip.match(/^(.+?)\s+(\d+[\w\-\s]*)$/);
+      const state = stateZipMatch ? stateZipMatch[1] : stateZip;
+      const postalCode = stateZipMatch ? stateZipMatch[2] : "";
+      
+      return { street, city, state, postalCode, country };
+    }
+    
+    return { street: address, city: "", state: "", postalCode: "", country: "United States" };
+  };
+
   // Set form data when user data loads
   React.useEffect(() => {
     if (currentUser) {
       setFormData({
         firstName: currentUser.firstName || '',
         lastName: currentUser.lastName || '',
-        phone: currentUser.phone || '',
-        address: currentUser.address || '',
         bio: currentUser.bio || ''
       });
+      
+      // Parse and set phone data
+      if (currentUser.phone) {
+        setPhoneData(parsePhoneNumber(currentUser.phone));
+      }
+      
+      // Parse and set address data
+      if (currentUser.address) {
+        setAddressData(parseAddress(currentUser.address));
+      }
+      
       if (currentUser.profilePhoto) {
         setPreviewUrl(currentUser.profilePhoto);
       }
@@ -121,9 +232,27 @@ export default function ProfileEditor() {
     }
   };
 
+  const formatPhoneNumber = (data: PhoneData): string => {
+    if (!data.areaCode || !data.number) return '';
+    return `${data.countryCode} (${data.areaCode}) ${data.number}`;
+  };
+
+  const formatAddress = (data: AddressData): string => {
+    const parts = [data.street, data.city, `${data.state} ${data.postalCode}`.trim(), data.country]
+      .filter(part => part && part.trim() !== '');
+    return parts.join(', ');
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    updateProfileMutation.mutate(formData);
+    
+    const submitData = {
+      ...formData,
+      phone: formatPhoneNumber(phoneData),
+      address: formatAddress(addressData)
+    };
+    
+    updateProfileMutation.mutate(submitData);
   };
 
   const triggerFileInput = () => {
@@ -280,40 +409,138 @@ export default function ProfileEditor() {
                   id="email"
                   type="email"
                   value={currentUser?.email || ''}
-                  disabled
-                  className="bg-gray-50 text-gray-500"
+                  className="bg-white border-gray-300"
+                  readOnly
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Email address cannot be changed
+                  Email address cannot be changed for security reasons
                 </p>
               </div>
 
               <div>
-                <Label htmlFor="phone" className="flex items-center space-x-2">
+                <Label className="flex items-center space-x-2 mb-3">
                   <Phone className="h-4 w-4" />
                   <span>Phone Number</span>
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={formData.phone || ''}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="Enter your phone number"
-                />
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Label htmlFor="countryCode" className="text-xs text-gray-600">Country Code</Label>
+                    <Select 
+                      value={phoneData.countryCode} 
+                      onValueChange={(value) => setPhoneData({...phoneData, countryCode: value})}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Code" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COUNTRY_CODES.map((country) => (
+                          <SelectItem key={country.code} value={country.code}>
+                            {country.flag} {country.code}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="areaCode" className="text-xs text-gray-600">Area Code</Label>
+                    <Input
+                      id="areaCode"
+                      type="tel"
+                      value={phoneData.areaCode}
+                      onChange={(e) => setPhoneData({...phoneData, areaCode: e.target.value.replace(/\D/g, '').slice(0, 3)})}
+                      placeholder="555"
+                      maxLength={3}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phoneNumber" className="text-xs text-gray-600">Phone Number</Label>
+                    <Input
+                      id="phoneNumber"
+                      type="tel"
+                      value={phoneData.number}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, '');
+                        const formatted = value.length > 3 ? `${value.slice(0, 3)}-${value.slice(3, 7)}` : value;
+                        setPhoneData({...phoneData, number: formatted});
+                      }}
+                      placeholder="123-4567"
+                      maxLength={8}
+                    />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Format: {phoneData.countryCode} ({phoneData.areaCode}) {phoneData.number}
+                </p>
               </div>
 
               <div>
-                <Label htmlFor="address" className="flex items-center space-x-2">
+                <Label className="flex items-center space-x-2 mb-3">
                   <MapPin className="h-4 w-4" />
                   <span>Address</span>
                 </Label>
-                <Textarea
-                  id="address"
-                  value={formData.address || ''}
-                  onChange={(e) => handleInputChange('address', e.target.value)}
-                  placeholder="Enter your address"
-                  rows={3}
-                />
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="street" className="text-xs text-gray-600">Street Address</Label>
+                    <Input
+                      id="street"
+                      value={addressData.street}
+                      onChange={(e) => setAddressData({...addressData, street: e.target.value})}
+                      placeholder="123 Main Street"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="city" className="text-xs text-gray-600">City</Label>
+                      <Input
+                        id="city"
+                        value={addressData.city}
+                        onChange={(e) => setAddressData({...addressData, city: e.target.value})}
+                        placeholder="San Francisco"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="state" className="text-xs text-gray-600">State/Province</Label>
+                      <Input
+                        id="state"
+                        value={addressData.state}
+                        onChange={(e) => setAddressData({...addressData, state: e.target.value})}
+                        placeholder="CA"
+                      />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label htmlFor="postalCode" className="text-xs text-gray-600">Postal Code</Label>
+                      <Input
+                        id="postalCode"
+                        value={addressData.postalCode}
+                        onChange={(e) => setAddressData({...addressData, postalCode: e.target.value})}
+                        placeholder="94105"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="country" className="text-xs text-gray-600">Country</Label>
+                      <Select 
+                        value={addressData.country} 
+                        onValueChange={(value) => setAddressData({...addressData, country: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select country" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {COUNTRIES.map((country) => (
+                            <SelectItem key={country} value={country}>
+                              {country}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Full address: {formatAddress(addressData) || "Complete all fields above"}
+                </p>
               </div>
 
               <div>
