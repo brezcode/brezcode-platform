@@ -10,6 +10,7 @@ import BusinessSelector from "@/components/BusinessSelector";
 import BrezCodeDashboard from "@/pages/BrezCodeDashboard";
 import UserHomepage from "@/pages/user-homepage";
 import ProfileEditor from "@/pages/ProfileEditor";
+import BusinessLandingCreator from "@/pages/BusinessLandingCreator";
 import QuizPage from "@/pages/quiz";
 import QuizTransition from "@/components/quiz-transition";
 import ReportViewer from "@/pages/report";
@@ -54,6 +55,7 @@ function App() {
           </Route>
           <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
           <Route path="/profile" component={ProfileEditor} />
+          <Route path="/business-landing-creator" component={BusinessLandingCreator} />
           <Route path="/business-consultant" component={BusinessConsultant} />
           <Route path="/subscription" component={SubscribePage} />
           <Route path="/email-verification" component={EmailVerificationModule} />
