@@ -61,6 +61,8 @@ export function AITrainingSetup() {
       leadGeneration: 'beginner',
       customerService: 'beginner', 
       salesConversion: 'beginner',
+      businessConsulting: 'beginner',
+      coaching: 'beginner',
       technicalSupport: 'beginner'
     }
   });
@@ -166,6 +168,14 @@ export function AITrainingSetup() {
               <Label htmlFor="sales_assistant">Sales Assistant & Deal Closer</Label>
             </div>
             <div className="flex items-center space-x-2">
+              <RadioGroupItem value="business_consultant" id="business_consultant" />
+              <Label htmlFor="business_consultant">Business Consultant & Advisor</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="coach" id="coach" />
+              <Label htmlFor="coach">Coach & Mentor</Label>
+            </div>
+            <div className="flex items-center space-x-2">
               <RadioGroupItem value="technical_support" id="technical_support" />
               <Label htmlFor="technical_support">Technical Support Specialist</Label>
             </div>
@@ -189,7 +199,13 @@ export function AITrainingSetup() {
               'Cross-sell/upsell products',
               'Collect customer feedback',
               'Follow up on proposals',
-              'Manage customer onboarding'
+              'Manage customer onboarding',
+              'Provide business consultation',
+              'Offer strategic advice',
+              'Conduct coaching sessions',
+              'Guide skill development',
+              'Assess business needs',
+              'Create action plans'
             ].map((func) => (
               <div key={func} className="flex items-center space-x-2">
                 <Checkbox
@@ -256,7 +272,13 @@ export function AITrainingSetup() {
               'Enhance empathy and emotional intelligence',
               'Master technical product knowledge',
               'Handle difficult/angry customers',
-              'Streamline appointment scheduling'
+              'Streamline appointment scheduling',
+              'Develop consulting and advisory skills',
+              'Master coaching conversation techniques',
+              'Improve strategic thinking abilities',
+              'Enhance problem-solving capabilities',
+              'Build trust and rapport with clients',
+              'Guide effective goal-setting processes'
             ].map((goal) => (
               <div key={goal} className="flex items-center space-x-2">
                 <Checkbox
@@ -304,6 +326,8 @@ export function AITrainingSetup() {
               { key: 'leadGeneration', label: 'Lead Generation & Qualification' },
               { key: 'customerService', label: 'Customer Service & Support' },
               { key: 'salesConversion', label: 'Sales Conversion & Closing' },
+              { key: 'businessConsulting', label: 'Business Consulting & Advisory' },
+              { key: 'coaching', label: 'Coaching & Mentoring' },
               { key: 'technicalSupport', label: 'Technical Support & Knowledge' }
             ].map(({ key, label }) => (
               <div key={key}>
@@ -366,7 +390,13 @@ export function AITrainingSetup() {
               'Upselling to existing customers',
               'Handling cancellation requests',
               'Angry/frustrated customer situations',
-              'Complex enterprise sales scenarios'
+              'Complex enterprise sales scenarios',
+              'Business strategy consultation sessions',
+              'Goal-setting and planning conversations',
+              'Performance coaching discussions',
+              'Problem-solving advisory meetings',
+              'Skills development coaching',
+              'Stakeholder consultation scenarios'
             ].map((scenario) => (
               <div key={scenario} className="flex items-center space-x-2">
                 <Checkbox
@@ -409,7 +439,13 @@ export function AITrainingSetup() {
               'Quick decision maker',
               'Analytical/data-driven buyer',
               'Relationship-focused buyer',
-              'Price-sensitive consumer'
+              'Price-sensitive consumer',
+              'Executive seeking strategic guidance',
+              'Entrepreneur needing business advice',
+              'Team leader requiring coaching',
+              'Professional seeking skill development',
+              'Manager facing performance challenges',
+              'Business owner planning growth'
             ].map((persona) => (
               <div key={persona} className="flex items-center space-x-2">
                 <Checkbox
