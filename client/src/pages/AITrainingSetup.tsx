@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
   Brain, 
@@ -22,41 +23,64 @@ import {
 interface TrainingRequirements {
   // Business Context
   businessType: string;
+  businessTypeOther: string;
   industry: string;
+  industryOther: string;
   targetAudience: string;
   valueProposition: string;
   
   // Assistant Role & Responsibilities
   assistantRole: string;
+  assistantRoleOther: string;
   primaryFunctions: string[];
+  primaryFunctionsOther: string;
   communicationChannels: string[];
+  communicationChannelsOther: string;
   
   // Training Focus Areas
   trainingGoals: string[];
+  trainingGoalsOther: string;
   currentChallenges: string[];
+  currentChallengesOther: string;
   skillLevels: {
     leadGeneration: string;
     customerService: string;
     salesConversion: string;
+    businessConsulting: string;
+    coaching: string;
     technicalSupport: string;
   };
   
   // Specific Scenarios Needed
   priorityScenarios: string[];
+  priorityScenariosOther: string;
   difficultyLevels: string[];
   customerPersonas: string[];
+  customerPersonasOther: string;
 }
 
 export function AITrainingSetup() {
   const [step, setStep] = useState(1);
   const [requirements, setRequirements] = useState<Partial<TrainingRequirements>>({
+    businessType: '',
+    businessTypeOther: '',
+    industry: '',
+    industryOther: '',
+    assistantRole: '',
+    assistantRoleOther: '',
     primaryFunctions: [],
+    primaryFunctionsOther: '',
     communicationChannels: [],
+    communicationChannelsOther: '',
     trainingGoals: [],
+    trainingGoalsOther: '',
     currentChallenges: [],
+    currentChallengesOther: '',
     priorityScenarios: [],
+    priorityScenariosOther: '',
     difficultyLevels: [],
     customerPersonas: [],
+    customerPersonasOther: '',
     skillLevels: {
       leadGeneration: 'beginner',
       customerService: 'beginner', 
@@ -94,21 +118,65 @@ export function AITrainingSetup() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="businessType">What type of business do you run?</Label>
-            <Input
-              id="businessType"
-              placeholder="e.g., Digital Marketing Agency, SaaS Company, E-commerce"
-              value={requirements.businessType || ''}
-              onChange={(e) => updateRequirements('businessType', e.target.value)}
-            />
+            <Select value={requirements.businessType || ''} onValueChange={(value) => updateRequirements('businessType', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select business type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="digital_marketing_agency">Digital Marketing Agency</SelectItem>
+                <SelectItem value="saas_company">SaaS Company</SelectItem>
+                <SelectItem value="ecommerce">E-commerce Store</SelectItem>
+                <SelectItem value="consulting">Consulting Firm</SelectItem>
+                <SelectItem value="coaching">Coaching Business</SelectItem>
+                <SelectItem value="real_estate">Real Estate</SelectItem>
+                <SelectItem value="healthcare">Healthcare Services</SelectItem>
+                <SelectItem value="education">Education/Training</SelectItem>
+                <SelectItem value="finance">Financial Services</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                <SelectItem value="retail">Retail Business</SelectItem>
+                <SelectItem value="food_beverage">Food & Beverage</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            {requirements.businessType === 'other' && (
+              <Input
+                className="mt-2"
+                placeholder="Please specify your business type"
+                value={requirements.businessTypeOther || ''}
+                onChange={(e) => updateRequirements('businessTypeOther', e.target.value)}
+              />
+            )}
           </div>
           <div>
             <Label htmlFor="industry">Industry/Vertical</Label>
-            <Input
-              id="industry"
-              placeholder="e.g., Healthcare, Finance, Education, Technology"
-              value={requirements.industry || ''}
-              onChange={(e) => updateRequirements('industry', e.target.value)}
-            />
+            <Select value={requirements.industry || ''} onValueChange={(value) => updateRequirements('industry', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select industry" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="technology">Technology</SelectItem>
+                <SelectItem value="healthcare">Healthcare</SelectItem>
+                <SelectItem value="finance">Finance & Banking</SelectItem>
+                <SelectItem value="education">Education</SelectItem>
+                <SelectItem value="retail">Retail & E-commerce</SelectItem>
+                <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                <SelectItem value="real_estate">Real Estate</SelectItem>
+                <SelectItem value="legal">Legal Services</SelectItem>
+                <SelectItem value="marketing">Marketing & Advertising</SelectItem>
+                <SelectItem value="hospitality">Hospitality & Tourism</SelectItem>
+                <SelectItem value="transportation">Transportation & Logistics</SelectItem>
+                <SelectItem value="nonprofit">Non-profit</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+            {requirements.industry === 'other' && (
+              <Input
+                className="mt-2"
+                placeholder="Please specify your industry"
+                value={requirements.industryOther || ''}
+                onChange={(e) => updateRequirements('industryOther', e.target.value)}
+              />
+            )}
           </div>
         </div>
 
@@ -151,39 +219,29 @@ export function AITrainingSetup() {
       <CardContent className="space-y-6">
         <div>
           <Label htmlFor="assistantRole">What is the primary role of your AI assistant?</Label>
-          <RadioGroup 
-            value={requirements.assistantRole || ''} 
-            onValueChange={(value) => updateRequirements('assistantRole', value)}
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="lead_qualifier" id="lead_qualifier" />
-              <Label htmlFor="lead_qualifier">Lead Qualifier & Initial Contact</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="customer_service" id="customer_service" />
-              <Label htmlFor="customer_service">Customer Service Representative</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="sales_assistant" id="sales_assistant" />
-              <Label htmlFor="sales_assistant">Sales Assistant & Deal Closer</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="business_consultant" id="business_consultant" />
-              <Label htmlFor="business_consultant">Business Consultant & Advisor</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="coach" id="coach" />
-              <Label htmlFor="coach">Coach & Mentor</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="technical_support" id="technical_support" />
-              <Label htmlFor="technical_support">Technical Support Specialist</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="multi_role" id="multi_role" />
-              <Label htmlFor="multi_role">Multi-Role Assistant (All of the above)</Label>
-            </div>
-          </RadioGroup>
+          <Select value={requirements.assistantRole || ''} onValueChange={(value) => updateRequirements('assistantRole', value)}>
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Select assistant role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="lead_qualifier">Lead Qualifier & Initial Contact</SelectItem>
+              <SelectItem value="customer_service">Customer Service Representative</SelectItem>
+              <SelectItem value="sales_assistant">Sales Assistant & Deal Closer</SelectItem>
+              <SelectItem value="business_consultant">Business Consultant & Advisor</SelectItem>
+              <SelectItem value="coach">Coach & Mentor</SelectItem>
+              <SelectItem value="technical_support">Technical Support Specialist</SelectItem>
+              <SelectItem value="multi_role">Multi-Role Assistant (All of the above)</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+          {requirements.assistantRole === 'other' && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify the assistant role"
+              value={requirements.assistantRoleOther || ''}
+              onChange={(e) => updateRequirements('assistantRoleOther', e.target.value)}
+            />
+          )}
         </div>
 
         <div>
@@ -227,7 +285,9 @@ export function AITrainingSetup() {
               { id: 'phone_calls', label: 'Phone Calls', icon: Phone },
               { id: 'email', label: 'Email', icon: Mail },
               { id: 'sms', label: 'SMS/Text', icon: MessageCircle },
-              { id: 'social_media', label: 'Social Media', icon: Users }
+              { id: 'social_media', label: 'Social Media', icon: Users },
+              { id: 'video_calls', label: 'Video Calls', icon: MessageCircle },
+              { id: 'live_chat', label: 'Live Chat Support', icon: MessageCircle }
             ].map(({ id, label, icon: Icon }) => (
               <div key={id} className="flex items-center space-x-2">
                 <Checkbox
@@ -241,7 +301,23 @@ export function AITrainingSetup() {
                 </Label>
               </div>
             ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="other_channels"
+                checked={requirements.communicationChannels?.includes('other')}
+                onCheckedChange={() => toggleArrayField('communicationChannels', 'other')}
+              />
+              <Label htmlFor="other_channels" className="text-sm">Other</Label>
+            </div>
           </div>
+          {requirements.communicationChannels?.includes('other') && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify other communication channels"
+              value={requirements.communicationChannelsOther || ''}
+              onChange={(e) => updateRequirements('communicationChannelsOther', e.target.value)}
+            />
+          )}
         </div>
       </CardContent>
     </Card>
@@ -289,7 +365,23 @@ export function AITrainingSetup() {
                 <Label htmlFor={goal} className="text-sm">{goal}</Label>
               </div>
             ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="other_goals"
+                checked={requirements.trainingGoals?.includes('other')}
+                onCheckedChange={() => toggleArrayField('trainingGoals', 'other')}
+              />
+              <Label htmlFor="other_goals" className="text-sm">Other</Label>
+            </div>
           </div>
+          {requirements.trainingGoals?.includes('other') && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify other training goals"
+              value={requirements.trainingGoalsOther || ''}
+              onChange={(e) => updateRequirements('trainingGoalsOther', e.target.value)}
+            />
+          )}
         </div>
 
         <div>
@@ -316,7 +408,23 @@ export function AITrainingSetup() {
                 <Label htmlFor={challenge} className="text-sm">{challenge}</Label>
               </div>
             ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="other_challenges"
+                checked={requirements.currentChallenges?.includes('other')}
+                onCheckedChange={() => toggleArrayField('currentChallenges', 'other')}
+              />
+              <Label htmlFor="other_challenges" className="text-sm">Other</Label>
+            </div>
           </div>
+          {requirements.currentChallenges?.includes('other') && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify other challenges"
+              value={requirements.currentChallengesOther || ''}
+              onChange={(e) => updateRequirements('currentChallengesOther', e.target.value)}
+            />
+          )}
         </div>
 
         <div>
@@ -407,7 +515,23 @@ export function AITrainingSetup() {
                 <Label htmlFor={scenario} className="text-sm">{scenario}</Label>
               </div>
             ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="other_scenarios"
+                checked={requirements.priorityScenarios?.includes('other')}
+                onCheckedChange={() => toggleArrayField('priorityScenarios', 'other')}
+              />
+              <Label htmlFor="other_scenarios" className="text-sm">Other</Label>
+            </div>
           </div>
+          {requirements.priorityScenarios?.includes('other') && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify other priority scenarios"
+              value={requirements.priorityScenariosOther || ''}
+              onChange={(e) => updateRequirements('priorityScenariosOther', e.target.value)}
+            />
+          )}
         </div>
 
         <div>
@@ -456,7 +580,23 @@ export function AITrainingSetup() {
                 <Label htmlFor={persona} className="text-sm">{persona}</Label>
               </div>
             ))}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="other_personas"
+                checked={requirements.customerPersonas?.includes('other')}
+                onCheckedChange={() => toggleArrayField('customerPersonas', 'other')}
+              />
+              <Label htmlFor="other_personas" className="text-sm">Other</Label>
+            </div>
           </div>
+          {requirements.customerPersonas?.includes('other') && (
+            <Input
+              className="mt-2"
+              placeholder="Please specify other customer personas"
+              value={requirements.customerPersonasOther || ''}
+              onChange={(e) => updateRequirements('customerPersonasOther', e.target.value)}
+            />
+          )}
         </div>
       </CardContent>
     </Card>
@@ -478,9 +618,9 @@ export function AITrainingSetup() {
           <div>
             <h4 className="font-semibold mb-2">Business Context</h4>
             <div className="space-y-1 text-sm">
-              <p><strong>Type:</strong> {requirements.businessType}</p>
-              <p><strong>Industry:</strong> {requirements.industry}</p>
-              <p><strong>Assistant Role:</strong> {requirements.assistantRole?.replace('_', ' ')}</p>
+              <p><strong>Type:</strong> {requirements.businessType === 'other' ? requirements.businessTypeOther : requirements.businessType?.replace('_', ' ')}</p>
+              <p><strong>Industry:</strong> {requirements.industry === 'other' ? requirements.industryOther : requirements.industry?.replace('_', ' ')}</p>
+              <p><strong>Assistant Role:</strong> {requirements.assistantRole === 'other' ? requirements.assistantRoleOther : requirements.assistantRole?.replace('_', ' ')}</p>
             </div>
           </div>
           
