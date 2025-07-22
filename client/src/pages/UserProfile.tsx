@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -91,10 +91,7 @@ export default function UserProfile() {
   });
 
   const { mutate: saveProfile, isPending } = useMutation({
-    mutationFn: (data: ProfileFormData) => apiRequest("/api/user/profile", {
-      method: "POST",
-      body: data,
-    }),
+    mutationFn: (data: ProfileFormData) => apiRequest("POST", "/api/user/profile", data),
     onSuccess: () => {
       toast({
         title: "Profile Updated",
@@ -114,36 +111,68 @@ export default function UserProfile() {
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
-    defaultValues: profile || {
+    defaultValues: {
       // Personal Information
-      fullName: "",
-      location: "",
-      timezone: "",
-      phoneNumber: "",
-      personalGoals: [],
-      workStyle: "",
-      communicationPreference: "",
-      availabilityHours: "",
-      personalChallenges: [],
+      fullName: profile?.fullName || "",
+      location: profile?.location || "",
+      timezone: profile?.timezone || "",
+      phoneNumber: profile?.phoneNumber || "",
+      personalGoals: profile?.personalGoals || [],
+      workStyle: profile?.workStyle || "",
+      communicationPreference: profile?.communicationPreference || "",
+      availabilityHours: profile?.availabilityHours || "",
+      personalChallenges: profile?.personalChallenges || [],
       
       // Business Information (Optional)
-      businessName: "",
-      industry: "",
-      businessModel: "",
-      targetAudience: "",
-      monthlyRevenue: "",
-      teamSize: "",
-      marketingChannels: [],
-      businessChallenges: [],
-      businessGoals: [],
-      growthTimeline: "",
-      marketingBudget: "",
-      businessTools: [],
-      uniqueValue: "",
-      customerAcquisition: "",
-      customerServiceNeeds: "",
+      businessName: profile?.businessName || "",
+      industry: profile?.industry || "",
+      businessModel: profile?.businessModel || "",
+      targetAudience: profile?.targetAudience || "",
+      monthlyRevenue: profile?.monthlyRevenue || "",
+      teamSize: profile?.teamSize || "",
+      marketingChannels: profile?.marketingChannels || [],
+      businessChallenges: profile?.businessChallenges || [],
+      businessGoals: profile?.businessGoals || [],
+      growthTimeline: profile?.growthTimeline || "",
+      marketingBudget: profile?.marketingBudget || "",
+      businessTools: profile?.businessTools || [],
+      uniqueValue: profile?.uniqueValue || "",
+      customerAcquisition: profile?.customerAcquisition || "",
+      customerServiceNeeds: profile?.customerServiceNeeds || "",
     },
   });
+
+  // Update form when profile data is loaded
+  useEffect(() => {
+    if (profile) {
+      form.reset({
+        fullName: profile.fullName || "",
+        location: profile.location || "",
+        timezone: profile.timezone || "",
+        phoneNumber: profile.phoneNumber || "",
+        personalGoals: profile.personalGoals || [],
+        workStyle: profile.workStyle || "",
+        communicationPreference: profile.communicationPreference || "",
+        availabilityHours: profile.availabilityHours || "",
+        personalChallenges: profile.personalChallenges || [],
+        businessName: profile.businessName || "",
+        industry: profile.industry || "",
+        businessModel: profile.businessModel || "",
+        targetAudience: profile.targetAudience || "",
+        monthlyRevenue: profile.monthlyRevenue || "",
+        teamSize: profile.teamSize || "",
+        marketingChannels: profile.marketingChannels || [],
+        businessChallenges: profile.businessChallenges || [],
+        businessGoals: profile.businessGoals || [],
+        growthTimeline: profile.growthTimeline || "",
+        marketingBudget: profile.marketingBudget || "",
+        businessTools: profile.businessTools || [],
+        uniqueValue: profile.uniqueValue || "",
+        customerAcquisition: profile.customerAcquisition || "",
+        customerServiceNeeds: profile.customerServiceNeeds || "",
+      });
+    }
+  }, [profile, form]);
 
   const onSubmit = (data: ProfileFormData) => {
     saveProfile(data);
