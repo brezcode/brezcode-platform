@@ -16,6 +16,7 @@ import QuizTransition from "@/components/quiz-transition";
 import ReportViewer from "@/pages/report";
 import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AITrainer from "@/pages/AITrainer";
+import AITrainerDashboard from "@/pages/AITrainerDashboard";
 import RoleplayTraining from "@/pages/RoleplayTraining";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -61,6 +62,7 @@ function App() {
           <Route path="/email-verification" component={EmailVerificationModule} />
           <Route path="/knowledge-centre" component={KnowledgeCentre} />
           <Route path="/ai-trainer" component={AITrainer} />
+          <Route path="/ai-trainer-dashboard" component={AITrainerDashboard} />
           <Route path="/roleplay-training" component={RoleplayTraining} />
           <Route path="/avatar-setup" component={AvatarSetup} />
           

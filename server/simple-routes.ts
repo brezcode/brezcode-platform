@@ -711,6 +711,253 @@ Format your response as JSON with the exact structure:
     }
   });
 
+  // ===== ROLEPLAY TRAINING API ROUTES =====
+  
+  // Get roleplay scenarios
+  app.get("/api/roleplay/scenarios", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const assistantId = req.query.assistantId ? parseInt(req.query.assistantId as string) : undefined;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const scenarios = await RoleplayService.getScenarios(userId, assistantId);
+      
+      res.json(scenarios);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create roleplay scenario
+  app.post("/api/roleplay/scenarios", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const scenarioData = { ...req.body, userId };
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const scenario = await RoleplayService.createScenario(scenarioData);
+      
+      res.json(scenario);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Delete roleplay scenario
+  app.delete("/api/roleplay/scenarios/:scenarioId", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const scenarioId = parseInt(req.params.scenarioId);
+      
+      const { RoleplayService } = await import('./roleplayService');
+      await RoleplayService.deleteScenario(scenarioId, userId);
+      
+      res.json({ success: true });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get roleplay sessions
+  app.get("/api/roleplay/sessions", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const scenarioId = req.query.scenarioId ? parseInt(req.query.scenarioId as string) : undefined;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const sessions = await RoleplayService.getSessions(userId, scenarioId);
+      
+      res.json(sessions);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Start roleplay session
+  app.post("/api/roleplay/sessions/start", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const sessionData = { ...req.body, userId };
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const session = await RoleplayService.startSession(sessionData);
+      
+      res.json(session);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get session details with messages
+  app.get("/api/roleplay/sessions/:sessionId", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const sessionId = parseInt(req.params.sessionId);
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const sessionDetails = await RoleplayService.getSessionWithMessages(sessionId, userId);
+      
+      res.json(sessionDetails);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Add message to session
+  app.post("/api/roleplay/sessions/message", async (req, res) => {
+    try {
+      const messageData = req.body;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const message = await RoleplayService.addMessage(messageData);
+      
+      res.json(message);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Complete roleplay session
+  app.post("/api/roleplay/sessions/:sessionId/complete", async (req, res) => {
+    try {
+      const sessionId = parseInt(req.params.sessionId);
+      const { score, notes } = req.body;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const session = await RoleplayService.completeSession(sessionId, score, notes);
+      
+      res.json(session);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Add feedback to message
+  app.post("/api/roleplay/feedback", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const feedbackData = { ...req.body, userId };
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const feedback = await RoleplayService.addFeedback(feedbackData);
+      
+      res.json(feedback);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Generate customer AI response
+  app.post("/api/roleplay/generate-customer", async (req, res) => {
+    try {
+      const { customerPersona, scenario, conversationHistory, objectives } = req.body;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const response = await RoleplayService.generateCustomerResponse(
+        customerPersona, 
+        scenario, 
+        conversationHistory, 
+        objectives
+      );
+      
+      res.json({ response });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Generate assistant AI response
+  app.post("/api/roleplay/generate-assistant", async (req, res) => {
+    try {
+      const { assistantId, customerMessage, conversationHistory } = req.body;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const response = await RoleplayService.generateAssistantResponse(
+        assistantId, 
+        customerMessage, 
+        conversationHistory
+      );
+      
+      res.json({ response });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get session statistics
+  app.get("/api/roleplay/stats", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      
+      const { RoleplayService } = await import('./roleplayService');
+      const stats = await RoleplayService.getSessionStats(userId);
+      
+      res.json(stats);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get default scenarios
+  app.get("/api/roleplay/default-scenarios", async (req, res) => {
+    try {
+      const { RoleplayService } = await import('./roleplayService');
+      const scenarios = RoleplayService.getDefaultScenarios();
+      
+      res.json(scenarios);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // ===== ADVANCED AI TRAINER API ROUTES =====
+
+  // Get performance analysis
+  app.get("/api/ai-trainer/performance/:assistantId", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const assistantId = parseInt(req.params.assistantId);
+      
+      const { AITrainerAdvanced } = await import('./aiTrainerAdvanced');
+      const analysis = await AITrainerAdvanced.analyzePerformance(assistantId, userId);
+      
+      res.json(analysis);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Get comprehensive training analytics
+  app.get("/api/ai-trainer/analytics/:assistantId", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const assistantId = parseInt(req.params.assistantId);
+      const timeRange = (req.query.timeRange as string) || '30d';
+      
+      const { AITrainerAdvanced } = await import('./aiTrainerAdvanced');
+      const analytics = await AITrainerAdvanced.getTrainingAnalytics(assistantId, userId, timeRange);
+      
+      res.json(analytics);
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Create custom training scenarios
+  app.post("/api/ai-trainer/custom-scenarios", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId || 1;
+      const { assistantId, improvementAreas } = req.body;
+      
+      const { AITrainerAdvanced } = await import('./aiTrainerAdvanced');
+      const scenarios = await AITrainerAdvanced.createCustomTrainingScenarios(assistantId, userId, improvementAreas);
+      
+      res.json({ scenarios, count: scenarios.length });
+    } catch (error: any) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
   // Create HTTP server
   const server = createServer(app);
 

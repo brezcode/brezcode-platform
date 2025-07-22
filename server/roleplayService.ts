@@ -19,7 +19,11 @@ const openai = new OpenAI({
 export class RoleplayService {
   // Create a new roleplay scenario
   static async createScenario(scenario: InsertRoleplayScenario) {
-    const [newScenario] = await db.insert(roleplayScenarios).values([scenario]).returning();
+    const scenarioData = {
+      ...scenario,
+      objectives: Array.isArray(scenario.objectives) ? scenario.objectives as string[] : [String(scenario.objectives)]
+    };
+    const [newScenario] = await db.insert(roleplayScenarios).values([scenarioData]).returning();
     return newScenario;
   }
 
@@ -164,7 +168,15 @@ Provide a professional and helpful response:`;
 
   // Add message to session
   static async addMessage(messageData: InsertRoleplayMessage) {
-    const [newMessage] = await db.insert(roleplayMessages).values([messageData]).returning();
+    const messageWithMetadata = {
+      ...messageData,
+      metadata: messageData.metadata ? {
+        confidence: typeof messageData.metadata.confidence === 'number' ? messageData.metadata.confidence : undefined,
+        intent: typeof messageData.metadata.intent === 'string' ? messageData.metadata.intent : undefined,
+        emotion: typeof messageData.metadata.emotion === 'string' ? messageData.metadata.emotion : undefined,
+      } : null
+    };
+    const [newMessage] = await db.insert(roleplayMessages).values([messageWithMetadata]).returning();
     return newMessage;
   }
 
