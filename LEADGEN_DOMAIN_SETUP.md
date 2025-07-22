@@ -107,10 +107,54 @@ The codebase already supports:
 - ✅ `leadgen.to/login` - User authentication
 - ✅ `brezcode.leadgen.to` - Subdomain routing (once DNS is configured)
 
+## Step 2: Deploy to Vercel
+
+### 1. Install Vercel CLI (if not already installed)
+```bash
+npm i -g vercel
+```
+
+### 2. Login to Vercel
+```bash
+vercel login
+```
+
+### 3. Deploy from Replit
+In your Replit terminal, run:
+```bash
+vercel --prod
+```
+
+When prompted:
+- Set up and deploy? **Y**
+- Which scope? Choose your account
+- Link to existing project? **N** 
+- Project name: **leadgen-platform**
+- Directory: **.**
+- Override settings? **N**
+
+### 4. Add Custom Domain in Vercel Dashboard
+
+1. Go to https://vercel.com/dashboard
+2. Click on your **leadgen-platform** project
+3. Go to **Settings** → **Domains**
+4. Add domain: **leadgen.to**
+5. Add domain: **www.leadgen.to**
+
+Vercel will show you the DNS records to verify - they should match what you already set up in Namecheap.
+
+### 5. Environment Variables
+
+In Vercel Dashboard → Settings → Environment Variables, add:
+- `DATABASE_URL` (your PostgreSQL connection string)
+- `OPENAI_API_KEY` (if using AI features)
+- `ANTHROPIC_API_KEY` (for Claude AI)
+- `SENDGRID_API_KEY` (for email verification)
+- `FROM_EMAIL` (your verified sender email)
+
 ### Next Steps
 
-After DNS is configured, we'll proceed to:
-- Step 2: Deploy to Vercel with custom domain
-- Step 3: Configure SSL certificates
-- Step 4: Test all routing scenarios
-- Step 5: Update application for production
+After Vercel deployment:
+- Step 3: Test domain routing (leadgen.to, www.leadgen.to)
+- Step 4: Verify SSL certificates (automatic)
+- Step 5: Test all application features on production domain

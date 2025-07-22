@@ -2,46 +2,26 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["shared/**", "server/**"]
-      }
-    },
-    {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "client/dist"
+        "distDir": "dist"
       }
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/server/index.ts"
+      "dest": "/dist/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/dist/$1"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/server/index.ts"
+      "dest": "/dist/index.html"
     }
   ],
   "functions": {
-    "server/index.ts": {
+    "dist/index.js": {
       "maxDuration": 30
     }
-  },
-  "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
-  "installCommand": "npm install",
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "regions": ["iad1", "hkg1", "fra1", "sfo1"]
+  }
 }
