@@ -81,6 +81,16 @@ export default function UserHomepage() {
   const queryClient = useQueryClient();
   const [, setLocation] = useLocation();
 
+  // Fetch user information
+  const { data: currentUser } = useQuery({
+    queryKey: ['/api/me'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/me');
+      const data = await response.json();
+      return data.user;
+    }
+  });
+
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -255,9 +265,14 @@ export default function UserHomepage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Welcome Back!
+              Welcome Back{currentUser ? `, ${currentUser.firstName}!` : '!'}
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
+              {currentUser?.email && (
+                <span className="text-sm text-blue-600 dark:text-blue-400 block">
+                  {currentUser.email}
+                </span>
+              )}
               Your personalized dashboard
             </p>
           </div>
