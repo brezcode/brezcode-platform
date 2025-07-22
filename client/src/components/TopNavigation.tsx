@@ -84,30 +84,50 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
 
           {/* Right: User Actions */}
           <div className="flex items-center space-x-1 md:space-x-4">
-            {/* Business Switcher - Hidden on mobile */}
-            {!businessContext && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setLocation('/business-selector')}
-                className="hidden md:flex"
-              >
-                <Building2 className="h-4 w-4 mr-1" />
-                Select Business
-              </Button>
-            )}
-
-            {businessContext && (
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setLocation('/dashboard')}
-                className="hidden md:flex"
-              >
-                <User className="h-4 w-4 mr-1" />
-                Personal
-              </Button>
-            )}
+            {/* Business/Personal Switcher - Always visible */}
+            <div className="flex items-center space-x-1">
+              {!businessContext ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setLocation('/business-selector')}
+                    className="flex items-center"
+                  >
+                    <Building2 className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Business</span>
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex items-center bg-blue-600 hover:bg-blue-700"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Personal</span>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex items-center bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Building2 className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Business</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setLocation('/dashboard')}
+                    className="flex items-center"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Personal</span>
+                  </Button>
+                </>
+              )}
+            </div>
 
             {/* User Menu */}
             <div className="flex items-center space-x-1 md:space-x-2">
