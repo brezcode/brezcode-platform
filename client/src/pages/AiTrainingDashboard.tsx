@@ -309,10 +309,10 @@ export function AiTrainingDashboard() {
                             <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 mb-2">
                               <h3 className="font-semibold text-base sm:text-lg truncate">{scenario.title}</h3>
                               <div className="flex gap-2">
-                                <Badge className={getDifficultyColor(scenario.difficulty)} size="sm">
+                                <Badge className={getDifficultyColor(scenario.difficulty)}>
                                   {scenario.difficulty}
                                 </Badge>
-                                <Badge variant="outline" size="sm">
+                                <Badge variant="outline">
                                   {scenario.scenarioType.replace('_', ' ')}
                                 </Badge>
                               </div>
@@ -371,15 +371,15 @@ export function AiTrainingDashboard() {
         </TabsContent>
 
         {/* Training Sessions Tab */}
-        <TabsContent value="sessions" className="space-y-6">
+        <TabsContent value="sessions" className="space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
                 Training Sessions History
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               {loadingSessions ? (
                 <div className="text-center py-8">Loading sessions...</div>
               ) : sessions.length === 0 ? (
@@ -392,37 +392,41 @@ export function AiTrainingDashboard() {
                 <div className="space-y-4">
                   {sessions.map((session: TrainingSession) => (
                     <Card key={session.id} className="border-l-4 border-l-green-500">
-                      <CardContent className="p-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-semibold">{session.sessionName}</h3>
-                              <Badge className={getStatusColor(session.status)}>
-                                {session.status.replace('_', ' ')}
-                              </Badge>
-                              <Badge variant="outline">{session.aiAssistantRole}</Badge>
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 mb-2">
+                              <h3 className="font-semibold text-base sm:text-lg truncate">{session.sessionName}</h3>
+                              <div className="flex gap-2">
+                                <Badge className={getStatusColor(session.status)}>
+                                  {session.status.replace('_', ' ')}
+                                </Badge>
+                                <Badge variant="outline">{session.aiAssistantRole}</Badge>
+                              </div>
                             </div>
-                            <p className="text-gray-600 mb-2">{session.scenario.title}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <p className="text-gray-600 mb-2 text-sm sm:text-base">{session.scenario.title}</p>
+                            <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:gap-4 sm:space-y-0 text-xs sm:text-sm text-gray-500">
                               <span>Started: {new Date(session.startedAt).toLocaleDateString()}</span>
                               {session.completedAt && (
                                 <span>Completed: {new Date(session.completedAt).toLocaleDateString()}</span>
                               )}
                               {session.performanceScore && (
                                 <span className="flex items-center gap-1">
-                                  <Award className="w-4 h-4" />
+                                  <Award className="w-3 h-3 sm:w-4 sm:h-4" />
                                   Score: {session.performanceScore}%
                                 </span>
                               )}
                             </div>
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-2 w-full sm:w-auto sm:ml-4">
                             <Button 
                               variant="outline" 
                               size="sm"
                               onClick={() => window.location.href = `/ai-training/session/${session.id}`}
+                              className="flex-1 sm:flex-none text-xs sm:text-sm px-3 sm:px-4"
                             >
-                              View Session
+                              <span className="hidden sm:inline">View Session</span>
+                              <span className="sm:hidden">View</span>
                             </Button>
                           </div>
                         </div>
@@ -436,13 +440,13 @@ export function AiTrainingDashboard() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
+        <TabsContent value="analytics" className="space-y-4 sm:space-y-6">
+          <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Performance Scores</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Performance Scores</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Empathy Score</span>
@@ -475,16 +479,16 @@ export function AiTrainingDashboard() {
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Improvement Areas</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Improvement Areas</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 {analytics?.analytics?.improvementAreas?.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.analytics.improvementAreas.map((area: string, index: number) => (
-                      <div key={index} className="flex items-center gap-3">
-                        <AlertCircle className="w-5 h-5 text-orange-500" />
-                        <span className="capitalize">{area.replace('_', ' ')}</span>
+                      <div key={index} className="flex items-center gap-2 sm:gap-3">
+                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
+                        <span className="capitalize text-sm sm:text-base">{area.replace('_', ' ')}</span>
                       </div>
                     ))}
                   </div>
@@ -497,20 +501,20 @@ export function AiTrainingDashboard() {
 
           {analytics?.analytics?.recommendations && (
             <Card>
-              <CardHeader>
-                <CardTitle>Training Recommendations</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Training Recommendations</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-4 sm:p-6">
                 <div className="space-y-4">
                   {analytics.analytics.recommendations.map((rec: any, index: number) => (
-                    <div key={index} className="border-l-4 border-l-blue-500 pl-4">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium capitalize">{rec.area}</span>
+                    <div key={index} className="border-l-4 border-l-blue-500 pl-3 sm:pl-4">
+                      <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:gap-2 sm:space-y-0 mb-2">
+                        <span className="font-medium capitalize text-sm sm:text-base">{rec.area}</span>
                         <Badge variant={rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'default' : 'secondary'}>
                           {rec.priority} priority
                         </Badge>
                       </div>
-                      <p className="text-sm text-gray-600">{rec.recommendation}</p>
+                      <p className="text-xs sm:text-sm text-gray-600">{rec.recommendation}</p>
                     </div>
                   ))}
                 </div>
