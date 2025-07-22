@@ -108,7 +108,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     cookie: {
       secure: false, // Set to true in production with HTTPS
       httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: 'lax' // Allow cross-origin cookies for development
     }
   }));
 
@@ -159,6 +160,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log('Login attempt for:', email);
       
       // Basic validation
       if (!email || !password) {
@@ -173,6 +175,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const user = await storage.getUserByEmail(email);
       
       if (!user) {
+        console.log('User not found:', email);
         return res.status(401).json({ error: "Invalid email or password" });
       }
       
@@ -180,6 +183,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const passwordMatch = await bcrypt.compare(password, user.password);
       
       if (!passwordMatch) {
+        console.log('Password mismatch for:', email);
         return res.status(401).json({ error: "Invalid email or password" });
       }
       
@@ -191,6 +195,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set session
       (req as any).session.userId = user.id;
       (req as any).session.isAuthenticated = true;
+      console.log('Login successful, session set for user:', user.id);
       
       // Return user without sensitive data
       const { password: _, ...userWithoutPassword } = user;
@@ -271,6 +276,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/me", async (req, res) => {
     try {
       const userId = (req as any).session.userId;
+      
+      // Debug session info
+      console.log('Session debug - userId:', userId, 'sessionID:', (req as any).sessionID);
       
       if (!userId) {
         return res.status(401).json({ error: "Not authenticated" });
