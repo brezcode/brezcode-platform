@@ -284,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       // Return user without sensitive data
-      const { passwordHash, ...userWithoutPassword } = user;
+      const { password, ...userWithoutPassword } = user;
       res.json(userWithoutPassword);
     } catch (error: any) {
       console.error('Get user error:', error);
