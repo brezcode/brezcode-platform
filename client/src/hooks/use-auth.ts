@@ -36,8 +36,8 @@ export function useAuth() {
       const response = await apiRequest("POST", "/api/login", { email, password });
       return response.json();
     },
-    onSuccess: (userData) => {
-      queryClient.setQueryData(["/api/me"], userData);
+    onSuccess: (response) => {
+      queryClient.setQueryData(["/api/me"], response.user);
     },
   });
 
@@ -46,8 +46,9 @@ export function useAuth() {
       const response = await apiRequest("POST", "/api/auth/signup", { firstName, lastName, email, password });
       return response.json();
     },
-    onSuccess: (userData) => {
-      queryClient.setQueryData(["/api/me"], userData);
+    onSuccess: (response) => {
+      // Registration doesn't return user data immediately, user needs email verification
+      // Don't set user data until verification is complete
     },
   });
 

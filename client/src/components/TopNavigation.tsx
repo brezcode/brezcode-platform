@@ -18,13 +18,17 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
   const [, setLocation] = useLocation();
 
   // Fetch user information
-  const { data: currentUser } = useQuery({
+  const { data: currentUser, isError } = useQuery({
     queryKey: ['/api/me'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/me');
+      if (!response.ok) {
+        return null; // Return null instead of throwing error for unauthenticated users
+      }
       const data = await response.json();
-      return data.user;
-    }
+      return data;
+    },
+    retry: false, // Don't retry authentication requests
   });
 
   const handleLogout = async () => {
