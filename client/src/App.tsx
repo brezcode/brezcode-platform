@@ -6,6 +6,9 @@ import BusinessDashboard from "@/pages/BusinessDashboard";
 import BusinessConsultant from "@/pages/BusinessConsultant";
 import SubscribePage from "@/pages/subscribe";
 import EmailVerificationModule from "@/components/EmailVerificationModule";
+import BusinessSelector from "@/components/BusinessSelector";
+import BrezCodeDashboard from "@/pages/BrezCodeDashboard";
+import UserHomepage from "@/pages/user-homepage";
 import QuizPage from "@/pages/quiz";
 import QuizTransition from "@/components/quiz-transition";
 import ReportViewer from "@/pages/report";
@@ -43,7 +46,12 @@ function App() {
           <Route path="/" component={LandingPage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
-          <Route path="/dashboard" component={BusinessDashboard} />
+          <Route path="/dashboard" component={UserHomepage} />
+          <Route path="/business-dashboard" component={BusinessDashboard} />
+          <Route path="/business-selector">
+            {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
+          </Route>
+          <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
           <Route path="/business-consultant" component={BusinessConsultant} />
           <Route path="/subscription" component={SubscribePage} />
           <Route path="/email-verification" component={EmailVerificationModule} />

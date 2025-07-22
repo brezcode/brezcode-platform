@@ -35,7 +35,8 @@ import {
   Bell,
   ArrowLeft,
   Apple,
-  Brain
+  Brain,
+  Building2
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -257,7 +258,7 @@ export default function UserHomepage() {
               Welcome Back!
             </h1>
             <p className="text-gray-600 dark:text-gray-300">
-              Your personalized health dashboard
+              Your personalized dashboard
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -332,6 +333,39 @@ export default function UserHomepage() {
                       </div>
                       <div className="text-xs text-muted-foreground">
                         Based on your activities and consistency
+                      </div>
+                    </div>
+
+                    {/* Business Selection */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Building2 className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium">Your Businesses</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div 
+                          className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+                          onClick={() => setLocation('/business/brezcode/dashboard')}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Heart className="h-4 w-4 text-pink-500" />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">BrezCode</div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">Health & Wellness</div>
+                            </div>
+                          </div>
+                          <Badge className="mt-2 bg-green-100 text-green-800 text-xs">Admin</Badge>
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setLocation('/business-selector')}
+                        >
+                          View All Businesses
+                        </Button>
                       </div>
                     </div>
 
