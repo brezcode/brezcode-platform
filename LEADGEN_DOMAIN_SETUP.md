@@ -152,9 +152,46 @@ In Vercel Dashboard → Settings → Environment Variables, add:
 - `SENDGRID_API_KEY` (for email verification)
 - `FROM_EMAIL` (your verified sender email)
 
-### Next Steps
+## Step 3: Final Deployment
 
-After Vercel deployment:
-- Step 3: Test domain routing (leadgen.to, www.leadgen.to)
-- Step 4: Verify SSL certificates (automatic)
-- Step 5: Test all application features on production domain
+### Deploy Now
+Click the **Deploy** button in Replit or run in terminal:
+```bash
+npx vercel --prod
+```
+
+### Post-Deployment Verification (30-60 minutes after DNS propagation)
+
+**Test these URLs:**
+- https://leadgen.to - Main platform landing page
+- https://www.leadgen.to - Should redirect to main domain
+- https://leadgen.to/login - User authentication
+- https://leadgen.to/profile - Profile editor with modular system
+- https://leadgen.to/business-landing-creator - Business landing wizard
+- https://leadgen.to/brezcode - BrezCode health platform
+- https://leadgen.to/admin - Admin interface
+- https://brezcode.leadgen.to - Subdomain routing
+
+**Verify Features:**
+- ✅ Profile editor with international support (195+ countries)
+- ✅ Business landing creator with 4 templates
+- ✅ AI training system and roleplay scenarios
+- ✅ Health assessment tools and reports
+- ✅ Multi-brand routing and authentication
+
+### Environment Variables to Set in Vercel
+
+After deployment, add these in Vercel Dashboard → Settings → Environment Variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `OPENAI_API_KEY` - For AI features  
+- `ANTHROPIC_API_KEY` - For Claude AI
+- `SENDGRID_API_KEY` - Email verification
+- `FROM_EMAIL` - Verified sender email
+
+### Success Indicators
+- SSL certificates automatically provisioned
+- All routes responding correctly
+- Domain routing working for brands and subdomains
+- Application features fully functional on production domain
+
+**Status: READY FOR DEPLOYMENT** 🚀
