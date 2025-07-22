@@ -304,11 +304,11 @@ export function AiTrainingDashboard() {
                   {scenarios.map((scenario: TrainingScenario) => (
                     <Card key={scenario.id} className="border-l-4 border-l-blue-500">
                       <CardContent className="p-4 sm:p-6">
-                        <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 mb-2">
-                              <h3 className="font-semibold text-base sm:text-lg truncate">{scenario.title}</h3>
-                              <div className="flex gap-2">
+                        <div className="space-y-4">
+                          <div className="w-full">
+                            <div className="flex flex-col space-y-2 mb-3">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="font-semibold text-base sm:text-lg">{scenario.title}</h3>
                                 <Badge className={getDifficultyColor(scenario.difficulty)}>
                                   {scenario.difficulty}
                                 </Badge>
@@ -317,25 +317,25 @@ export function AiTrainingDashboard() {
                                 </Badge>
                               </div>
                             </div>
-                            <p className="text-gray-600 mb-4 text-sm sm:text-base">{scenario.description}</p>
+                            <p className="text-gray-600 mb-4 text-sm">{scenario.description}</p>
                             
-                            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                            <div className="space-y-3 mb-4">
                               <div>
-                                <h4 className="font-medium mb-2 text-sm sm:text-base">Customer Persona</h4>
-                                <p className="text-xs sm:text-sm text-gray-600">
+                                <h4 className="font-medium mb-1 text-sm">Customer Persona</h4>
+                                <p className="text-xs text-gray-600">
                                   {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
                                 </p>
-                                <p className="text-xs sm:text-sm text-gray-500">
+                                <p className="text-xs text-gray-500">
                                   {scenario.customerPersona?.company}
                                 </p>
                               </div>
                               <div>
-                                <h4 className="font-medium mb-2 text-sm sm:text-base">Objectives</h4>
-                                <ul className="text-xs sm:text-sm text-gray-600 space-y-1">
+                                <h4 className="font-medium mb-1 text-sm">Objectives</h4>
+                                <ul className="text-xs text-gray-600 space-y-1">
                                   {scenario.objectives?.slice(0, 2).map((objective, index) => (
                                     <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                      <span className="break-words">{objective}</span>
+                                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                      <span>{objective}</span>
                                     </li>
                                   ))}
                                   {scenario.objectives?.length > 2 && (
@@ -348,16 +348,15 @@ export function AiTrainingDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex w-full sm:w-auto sm:ml-4 mobile-force-contain">
+                          <div className="w-full">
                             <Button 
                               onClick={() => startTrainingSession(scenario)}
                               disabled={startSessionMutation.isPending}
-                              className="flex items-center justify-center gap-2 text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
+                              className="w-full min-h-[48px] text-sm"
                               size="default"
                             >
-                              <Play className="w-4 h-4 flex-shrink-0" />
-                              <span className="hidden sm:inline truncate">Start Training</span>
-                              <span className="sm:hidden truncate">Start</span>
+                              <Play className="w-4 h-4 mr-2" />
+                              Start Training
                             </Button>
                           </div>
                         </div>
@@ -393,40 +392,40 @@ export function AiTrainingDashboard() {
                   {sessions.map((session: TrainingSession) => (
                     <Card key={session.id} className="border-l-4 border-l-green-500">
                       <CardContent className="p-4 sm:p-6">
-                        <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 mb-2">
-                              <h3 className="font-semibold text-base sm:text-lg truncate">{session.sessionName}</h3>
-                              <div className="flex gap-2">
+                        <div className="space-y-4">
+                          <div className="w-full">
+                            <div className="flex flex-col space-y-2 mb-3">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <h3 className="font-semibold text-base">{session.sessionName}</h3>
                                 <Badge className={getStatusColor(session.status)}>
                                   {session.status.replace('_', ' ')}
                                 </Badge>
                                 <Badge variant="outline">{session.aiAssistantRole}</Badge>
                               </div>
                             </div>
-                            <p className="text-gray-600 mb-2 text-sm sm:text-base">{session.scenario.title}</p>
-                            <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:gap-4 sm:space-y-0 text-xs sm:text-sm text-gray-500">
+                            <p className="text-gray-600 mb-3 text-sm">{session.scenario.title}</p>
+                            <div className="space-y-1 text-xs text-gray-500">
                               <span>Started: {new Date(session.startedAt).toLocaleDateString()}</span>
                               {session.completedAt && (
-                                <span>Completed: {new Date(session.completedAt).toLocaleDateString()}</span>
+                                <div>Completed: {new Date(session.completedAt).toLocaleDateString()}</div>
                               )}
                               {session.performanceScore && (
-                                <span className="flex items-center gap-1">
-                                  <Award className="w-3 h-3 sm:w-4 sm:h-4" />
+                                <div className="flex items-center gap-1">
+                                  <Award className="w-3 h-3" />
                                   Score: {session.performanceScore}%
-                                </span>
+                                </div>
                               )}
                             </div>
                           </div>
-                          <div className="flex w-full sm:w-auto sm:ml-4 mobile-force-contain">
+                          
+                          <div className="w-full">
                             <Button 
                               variant="outline" 
                               size="default"
                               onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                              className="flex items-center justify-center gap-2 text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
+                              className="w-full min-h-[48px] text-sm"
                             >
-                              <span className="hidden sm:inline truncate">View Session</span>
-                              <span className="sm:hidden truncate">View</span>
+                              View Session
                             </Button>
                           </div>
                         </div>
