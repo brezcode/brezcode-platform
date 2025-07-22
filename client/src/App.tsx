@@ -1,5 +1,5 @@
 import { Route, Switch } from "wouter";
-import LandingPage from "@/pages/landing";
+import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
 import UserProfile from "@/pages/UserProfile";
 import BusinessDashboard from "@/pages/BusinessDashboard";
@@ -46,7 +46,7 @@ function App() {
       <div className="min-h-screen bg-background">
         <Switch>
           {/* Main platform routes */}
-          <Route path="/" component={LandingPage} />
+          <Route path="/" component={LeadGenLanding} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
           <Route path="/dashboard" component={UserHomepage} />
@@ -80,7 +80,7 @@ function App() {
           <Route path="/brezcode/notifications" component={NotificationDemo} />
           
           {/* Default fallback */}
-          <Route component={LandingPage} />
+          <Route component={LeadGenLanding} />
         </Switch>
         
         <Toaster />

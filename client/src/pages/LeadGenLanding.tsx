@@ -25,8 +25,8 @@ export function LeadGenLanding() {
             <Link href="/login">
               <Button variant="outline">Login</Button>
             </Link>
-            <Link href="/brezcode">
-              <Button variant="outline">Demo Platform</Button>
+            <Link href="/dashboard">
+              <Button variant="outline">Dashboard</Button>
             </Link>
           </nav>
         </div>
@@ -53,9 +53,9 @@ export function LeadGenLanding() {
                 Get Started Free
               </Button>
             </Link>
-            <Link href="/brezcode">
+            <Link href="/ai-trainer-dashboard">
               <Button variant="outline" size="lg" className="px-8">
-                Try Live Demo
+                View AI Training
               </Button>
             </Link>
           </div>
