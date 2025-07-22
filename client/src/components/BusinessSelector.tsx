@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, ChevronRight, Users, Briefcase, Heart } from "lucide-react";
 import { useLocation } from "wouter";
+import TopNavigation from "@/components/TopNavigation";
 
 interface Business {
   id: string;
@@ -39,9 +40,20 @@ export default function BusinessSelector({ userId, userEmail }: BusinessSelector
   ];
 
   const handleBusinessSelect = (businessId: string) => {
-    // Store selected business in session/localStorage
-    localStorage.setItem('selectedBusiness', businessId);
-    localStorage.setItem('businessContext', JSON.stringify(userBusinesses.find(b => b.id === businessId)));
+    // Store selected business in session/localStorage without React components
+    const business = userBusinesses.find(b => b.id === businessId);
+    if (business) {
+      localStorage.setItem('selectedBusiness', businessId);
+      localStorage.setItem('businessContext', JSON.stringify({
+        id: business.id,
+        name: business.name,
+        industry: business.industry,
+        role: business.role,
+        description: business.description,
+        status: business.status,
+        employeeCount: business.employeeCount
+      }));
+    }
     
     // Navigate to business dashboard
     setLocation(`/business/${businessId}/dashboard`);
@@ -57,7 +69,11 @@ export default function BusinessSelector({ userId, userEmail }: BusinessSelector
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
+      <div className="container mx-auto py-8 px-4 max-w-4xl">
       <div className="mb-8">
         <div className="flex items-center space-x-3 mb-4">
           <Building2 className="w-8 h-8 text-blue-600" />
@@ -150,6 +166,7 @@ export default function BusinessSelector({ userId, userEmail }: BusinessSelector
             </p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );
