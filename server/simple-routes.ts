@@ -2,6 +2,25 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import session from "express-session";
 import MemoryStore from "memorystore";
+import { 
+  requireAuth, 
+  validateInput, 
+  validateEmail, 
+  validatePassword,
+  loginRateLimit,
+  apiRateLimit,
+  sessionConfig,
+  errorHandler,
+  auditLog
+} from './securityMiddleware';
+import { 
+  createSecureUser, 
+  authenticateUser, 
+  getSecureUserData,
+  updateSecureUserData,
+  checkDatabaseHealth
+} from './databaseSecurity';
+import { storage } from './storage';
 import OpenAI from "openai";
 
 // Create memory store for sessions
@@ -97,21 +116,20 @@ function generateRuleBasedReport(quizAnswers: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Session configuration
+  // Apply security middleware first
+  // Note: CORS will be added when needed for production
+  
+  // Session configuration with security
   app.use(session({
+    ...sessionConfig,
     store: new MemStore({
       checkPeriod: 86400000 // prune expired entries every 24h
-    }),
-    secret: process.env.SESSION_SECRET || 'fallback-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: false, // Set to true in production with HTTPS
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: 'lax' // Allow cross-origin cookies for development
-    }
+    })
   }));
+
+  // Apply rate limiting after session
+  app.use('/api/login', loginRateLimit);
+  app.use('/api', apiRateLimit);
 
   // Basic health check endpoint
   app.get("/api/health", (req, res) => {
