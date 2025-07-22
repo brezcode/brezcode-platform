@@ -32,7 +32,9 @@ import {
   Clock,
   Award
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
+import { BackButton } from "@/components/BackButton";
+import { ScrollToTop } from "@/components/ScrollToTop";
 
 interface TrainingStrategy {
   id: string;
@@ -72,6 +74,7 @@ interface TrainingRecommendation {
 }
 
 export default function AITrainer() {
+  const [, setLocation] = useLocation();
   const [selectedAssistant, setSelectedAssistant] = useState<number>(1);
   const [trainingMode, setTrainingMode] = useState<'auto' | 'manual'>('auto');
   const [analysisDepth, setAnalysisDepth] = useState<'basic' | 'detailed'>('detailed');
@@ -462,13 +465,66 @@ export default function AITrainer() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center space-x-2">
-        <Brain className="h-8 w-8 text-purple-600" />
-        <div>
-          <h1 className="text-3xl font-bold">LeadGen AI Trainer</h1>
-          <p className="text-gray-600">Intelligent training system to optimize AI assistant performance</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4">
+          <BackButton to="/dashboard" />
+          <div className="flex items-center space-x-2">
+            <Brain className="h-8 w-8 text-purple-600" />
+            <div>
+              <h1 className="text-3xl font-bold">LeadGen AI Trainer</h1>
+              <p className="text-gray-600">Intelligent training system to optimize AI assistant performance</p>
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Quick Actions for Role-play Training */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Training Methods</CardTitle>
+          <CardDescription>Choose your training approach</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all bg-gradient-to-br from-blue-50 to-sky-100 border-blue-200"
+            >
+              <CardContent className="p-6 text-center">
+                <div className="bg-blue-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Brain className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-blue-800 mb-2">AI Analysis</h3>
+                <p className="text-blue-600 text-sm">Automated performance analysis and recommendations</p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all bg-gradient-to-br from-purple-50 to-indigo-100 border-purple-200"
+              onClick={() => setLocation("/roleplay-training")}
+            >
+              <CardContent className="p-6 text-center">
+                <div className="bg-purple-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <Play className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-purple-800 mb-2">Roleplay Training</h3>
+                <p className="text-purple-600 text-sm">Test with realistic customer scenarios</p>
+              </CardContent>
+            </Card>
+
+            <Card 
+              className="cursor-pointer hover:shadow-lg transition-all bg-gradient-to-br from-green-50 to-emerald-100 border-green-200"
+            >
+              <CardContent className="p-6 text-center">
+                <div className="bg-green-100 rounded-full p-4 w-16 h-16 mx-auto mb-4 flex items-center justify-center">
+                  <BarChart3 className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-green-800 mb-2">Performance Analytics</h3>
+                <p className="text-green-600 text-sm">Detailed conversation analysis and metrics</p>
+              </CardContent>
+            </Card>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Assistant Selection & Controls */}
       <Card>
@@ -661,6 +717,7 @@ export default function AITrainer() {
           </Card>
         </TabsContent>
       </Tabs>
+      <ScrollToTop />
     </div>
   );
 }

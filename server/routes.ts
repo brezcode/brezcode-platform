@@ -9,6 +9,7 @@ import notificationRoutes from "./routes/notificationRoutes";
 import { businessRoutes } from "./businessRoutes";
 import { TwilioVoiceService } from "./twilioVoiceService";
 import { notificationService } from "./notificationService";
+import { RoleplayService } from "./roleplayService";
 import { brandMiddleware, defaultBrandMiddleware } from "./brandMiddleware";
 import session from "express-session";
 import Stripe from "stripe";
@@ -1266,6 +1267,122 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Internal server error',
         error: error.message 
       });
+    }
+  });
+
+  // Roleplay training routes
+  app.get("/api/roleplay/scenarios", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const scenarios = await RoleplayService.getScenarios(userId);
+      res.json(scenarios);
+    } catch (error) {
+      console.error("Error fetching scenarios:", error);
+      res.status(500).json({ error: "Failed to fetch scenarios" });
+    }
+  });
+
+  app.post("/api/roleplay/scenarios", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const scenario = await RoleplayService.createScenario({
+        ...req.body,
+        userId,
+        assistantId: 1 // Default assistant
+      });
+      res.json(scenario);
+    } catch (error) {
+      console.error("Error creating scenario:", error);
+      res.status(500).json({ error: "Failed to create scenario" });
+    }
+  });
+
+  app.get("/api/roleplay/sessions", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const sessions = await RoleplayService.getSessions(userId);
+      res.json(sessions);
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
+      res.status(500).json({ error: "Failed to fetch sessions" });
+    }
+  });
+
+  app.post("/api/roleplay/sessions/start", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const session = await RoleplayService.startSession({
+        ...req.body,
+        userId,
+        assistantId: 1 // Default assistant
+      });
+      res.json(session);
+    } catch (error) {
+      console.error("Error starting session:", error);
+      res.status(500).json({ error: "Failed to start session" });
+    }
+  });
+
+  app.get("/api/roleplay/sessions/:sessionId", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const sessionId = parseInt(req.params.sessionId);
+      const sessionDetails = await RoleplayService.getSessionWithMessages(sessionId, userId);
+      res.json(sessionDetails);
+    } catch (error) {
+      console.error("Error fetching session details:", error);
+      res.status(500).json({ error: "Failed to fetch session details" });
+    }
+  });
+
+  app.post("/api/roleplay/sessions/message", isAuthenticated, async (req, res) => {
+    try {
+      const message = await RoleplayService.addMessage(req.body);
+      res.json(message);
+    } catch (error) {
+      console.error("Error adding message:", error);
+      res.status(500).json({ error: "Failed to add message" });
+    }
+  });
+
+  app.post("/api/roleplay/sessions/:sessionId/complete", isAuthenticated, async (req, res) => {
+    try {
+      const sessionId = parseInt(req.params.sessionId);
+      const session = await RoleplayService.completeSession(sessionId, req.body.score, req.body.notes);
+      res.json(session);
+    } catch (error) {
+      console.error("Error completing session:", error);
+      res.status(500).json({ error: "Failed to complete session" });
+    }
+  });
+
+  app.post("/api/roleplay/feedback", isAuthenticated, async (req, res) => {
+    try {
+      const userId = req.session.userId!;
+      const feedback = await RoleplayService.addFeedback({
+        ...req.body,
+        userId
+      });
+      res.json(feedback);
+    } catch (error) {
+      console.error("Error adding feedback:", error);
+      res.status(500).json({ error: "Failed to add feedback" });
+    }
+  });
+
+  app.post("/api/roleplay/generate-customer", isAuthenticated, async (req, res) => {
+    try {
+      const { conversationHistory } = req.body;
+      const response = await RoleplayService.generateCustomerResponse(
+        "frustrated customer",
+        "product issue",
+        conversationHistory,
+        ["resolve issue", "get refund"]
+      );
+      res.json({ message: response });
+    } catch (error) {
+      console.error("Error generating customer response:", error);
+      res.status(500).json({ error: "Failed to generate response" });
     }
   });
 

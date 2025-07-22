@@ -11,6 +11,9 @@ export * from "./health-schedule-schema";
 // Import business schema for business automation
 export * from "./business-schema";
 
+// Import roleplay schema for training scenarios
+export * from "./roleplay-schema";
+
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   firstName: text("first_name").notNull(),
@@ -363,7 +366,6 @@ export const userFeedbackSchema = z.object({
   userComment: z.string(),
 });
 
-export type InsertUser = typeof users.$inferInsert;
 export type LoginData = z.infer<typeof loginSchema>;
 export type SignupData = z.infer<typeof signupSchema>;
 export type KnowledgeBase = typeof knowledgeBase.$inferSelect;
