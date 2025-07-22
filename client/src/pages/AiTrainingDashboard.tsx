@@ -17,8 +17,11 @@ import {
   Brain,
   CheckCircle,
   AlertCircle,
-  Plus
+  Plus,
+  Settings,
+  Zap
 } from 'lucide-react';
+import { Link } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 interface TrainingScenario {
@@ -182,9 +185,18 @@ export function AiTrainingDashboard() {
           <p className="text-gray-600 mt-2">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
         <div className="flex gap-3">
+          <Link href="/ai-training/setup">
+            <Button 
+              className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Zap className="w-4 h-4" />
+              AI Training Setup
+            </Button>
+          </Link>
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
+            variant="outline"
             className="flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
