@@ -19,6 +19,8 @@ import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AITrainer from "@/pages/AITrainer";
 import AITrainerDashboard from "@/pages/AITrainerDashboard";
 import RoleplayTraining from "@/pages/RoleplayTraining";
+import { AiTrainingDashboard } from "@/pages/AiTrainingDashboard";
+import { AiTrainingSession } from "@/pages/AiTrainingSession";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { BackToTopButton, BackButton } from "@/components/MobileNavigation";
@@ -68,6 +70,8 @@ function App() {
           <Route path="/ai-trainer" component={AITrainer} />
           <Route path="/ai-trainer-dashboard" component={AITrainerDashboard} />
           <Route path="/roleplay-training" component={RoleplayTraining} />
+          <Route path="/ai-training" component={AiTrainingDashboard} />
+          <Route path="/ai-training/session/:sessionId" component={AiTrainingSession} />
           <Route path="/avatar-setup" component={AvatarSetup} />
           <Route path="/feature-showcase" component={FeatureShowcase} />
           

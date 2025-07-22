@@ -21,6 +21,7 @@ import {
   checkDatabaseHealth
 } from './databaseSecurity';
 import { storage } from './storage';
+import { registerAiTrainingRoutes } from './ai-training-routes';
 import OpenAI from "openai";
 
 // Create memory store for sessions
@@ -1197,6 +1198,9 @@ Format your response as JSON with the exact structure:
       res.status(500).json({ error: error.message });
     }
   });
+
+  // Register AI Training routes
+  registerAiTrainingRoutes(app);
 
   // Create HTTP server
   const server = createServer(app);

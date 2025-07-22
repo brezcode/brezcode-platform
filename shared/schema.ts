@@ -11,6 +11,7 @@ export * from "./brand-schema";      // Multi-tenant brand management
 export * from "./health-schedule-schema"; // Health scheduling (BrezCode specific)
 export * from "./business-schema";   // Business automation (LeadGen specific)
 export * from "./roleplay-schema";   // AI training scenarios
+export * from "./ai-training-schema"; // New AI training system
 
 // Legacy users table - keeping for compatibility during migration
 // NEW APPROACH: Use leadgenUsers and brezcodeUsers tables instead
