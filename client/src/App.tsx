@@ -9,6 +9,7 @@ import EmailVerificationModule from "@/components/EmailVerificationModule";
 import BusinessSelector from "@/components/BusinessSelector";
 import BrezCodeDashboard from "@/pages/BrezCodeDashboard";
 import UserHomepage from "@/pages/user-homepage";
+import LeadGenDashboard from "@/pages/LeadGenDashboard";
 import ProfileEditor from "@/pages/ProfileEditor";
 import BusinessLandingCreator from "@/pages/BusinessLandingCreator";
 import QuizPage from "@/pages/quiz";
@@ -51,6 +52,7 @@ function App() {
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
           <Route path="/dashboard" component={UserHomepage} />
+          <Route path="/leadgen-dashboard" component={LeadGenDashboard} />
           <Route path="/business-dashboard" component={BusinessDashboard} />
           <Route path="/business-selector">
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}

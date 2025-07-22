@@ -2,18 +2,18 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, var
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Import brand schema for multi-tenancy
-export * from "./brand-schema";
+// Import separate platform schemas
+export * from "./leadgen-schema";    // LeadGen.to platform users & business tools
+export * from "./brezcode-schema";   // BrezCode health platform users & health data
 
-// Import health schedule schema for health planning
-export * from "./health-schedule-schema";
+// Import shared schemas for multi-tenant features
+export * from "./brand-schema";      // Multi-tenant brand management
+export * from "./health-schedule-schema"; // Health scheduling (BrezCode specific)
+export * from "./business-schema";   // Business automation (LeadGen specific)
+export * from "./roleplay-schema";   // AI training scenarios
 
-// Import business schema for business automation
-export * from "./business-schema";
-
-// Import roleplay schema for training scenarios
-export * from "./roleplay-schema";
-
+// Legacy users table - keeping for compatibility during migration
+// NEW APPROACH: Use leadgenUsers and brezcodeUsers tables instead
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   firstName: text("first_name").notNull(),
@@ -21,15 +21,18 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
   isEmailVerified: boolean("is_email_verified").default(false),
-  quizAnswers: jsonb("quiz_answers"),
+  quizAnswers: jsonb("quiz_answers"), // This belongs to BrezCode now
   subscriptionTier: text("subscription_tier").$type<"basic" | "pro" | "premium" | null>().default(null),
   stripeCustomerId: text("stripe_customer_id"),
   stripeSubscriptionId: text("stripe_subscription_id"),
   isSubscriptionActive: boolean("is_subscription_active").default(false),
   createdAt: timestamp("created_at").defaultNow(),
+  
+  // Platform identifier - which platform does this user belong to
+  platform: text("platform").notNull().default('leadgen'), // 'leadgen' or 'brezcode'
 });
 
-// User Profile and Business Information
+// Legacy profile table - keeping for compatibility during migration
 export const userProfiles = pgTable("user_profiles", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -39,11 +42,11 @@ export const userProfiles = pgTable("user_profiles", {
   location: text("location"),
   timezone: text("timezone"),
   phoneNumber: text("phone_number"),
-  personalGoals: jsonb("personal_goals"), // Array of personal goals
+  personalGoals: jsonb("personal_goals"),
   workStyle: text("work_style"),
   communicationPreference: text("communication_preference"),
   availabilityHours: text("availability_hours"),
-  personalChallenges: jsonb("personal_challenges"), // Array of personal challenges
+  personalChallenges: jsonb("personal_challenges"),
   
   // Business Information (Optional/Secondary)
   businessName: text("business_name"),
@@ -52,21 +55,21 @@ export const userProfiles = pgTable("user_profiles", {
   targetAudience: text("target_audience"),
   monthlyRevenue: text("monthly_revenue"),
   teamSize: text("team_size"),
-  marketingChannels: jsonb("marketing_channels"), // Array of channels
-  businessChallenges: jsonb("business_challenges"), // Array of challenges
-  businessGoals: jsonb("business_goals"), // Array of goals
+  marketingChannels: jsonb("marketing_channels"),
+  businessChallenges: jsonb("business_challenges"),
+  businessGoals: jsonb("business_goals"),
   growthTimeline: text("growth_timeline"),
   marketingBudget: text("marketing_budget"),
-  businessTools: jsonb("business_tools"), // Array of tools
+  businessTools: jsonb("business_tools"),
   uniqueValue: text("unique_value"),
   customerAcquisition: text("customer_acquisition"),
   customerServiceNeeds: text("customer_service_needs"),
-  preferences: jsonb("preferences"), // User preferences and settings
+  preferences: jsonb("preferences"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Dashboard and Tools Usage Tracking
+// Legacy dashboard stats - keeping for compatibility during migration
 export const userDashboardStats = pgTable("user_dashboard_stats", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
@@ -80,15 +83,15 @@ export const userDashboardStats = pgTable("user_dashboard_stats", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Tool and Assistant Usage
+// Legacy tool usage - keeping for compatibility during migration
 export const userToolUsage = pgTable("user_tool_usage", {
   id: serial("id").primaryKey(),
   userId: integer("user_id").references(() => users.id).notNull(),
-  toolName: text("tool_name").notNull(), // 'ai_avatar', 'landing_page', 'lead_gen', 'crm', 'email', 'sms', etc.
+  toolName: text("tool_name").notNull(),
   usageCount: integer("usage_count").default(0),
   lastUsed: timestamp("last_used"),
   isActive: boolean("is_active").default(true),
-  configuration: jsonb("configuration"), // Tool-specific settings
+  configuration: jsonb("configuration"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

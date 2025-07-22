@@ -34,9 +34,7 @@ import {
   Award,
   DollarSign,
   Phone,
-  Smartphone,
-  Heart,
-  Brain
+  Smartphone
 } from 'lucide-react';
 
 interface ChatMessage {
@@ -45,16 +43,21 @@ interface ChatMessage {
   timestamp: string;
 }
 
-interface LeadGenStats {
+interface LeadGenDashboardStats {
   totalStrategies: number;
   activeTools: number;
   completedActions: number;
+  customerInteractions: number;
   leadsGenerated: number;
   salesClosed: number;
-  customerInteractions: number;
+  aiConversations: number;
+  avatarTrainingMinutes: number;
+  landingPagesCreated: number;
+  emailCampaignsSent: number;
+  smsCampaignsSent: number;
 }
 
-export default function UserHomepage() {
+export default function LeadGenDashboard() {
   const [, setLocation] = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
@@ -74,8 +77,8 @@ export default function UserHomepage() {
   });
 
   // Get LeadGen dashboard stats (different from health stats)
-  const { data: dashboardStats, isLoading: statsLoading } = useQuery<LeadGenStats>({
-    queryKey: ['/api/leadgen/stats'],
+  const { data: dashboardStats, isLoading: statsLoading } = useQuery<LeadGenDashboardStats>({
+    queryKey: ['/api/leadgen/dashboard-stats'],
     enabled: !!currentUser,
   });
 
@@ -250,7 +253,7 @@ export default function UserHomepage() {
               <CardContent className="space-y-4">
                 {statsLoading ? (
                   <div className="animate-pulse space-y-3">
-                    {Array.from({ length: 4 }).map((_, i) => (
+                    {Array.from({ length: 6 }).map((_, i) => (
                       <div key={i} className="h-12 bg-gray-200 rounded"></div>
                     ))}
                   </div>
@@ -290,15 +293,37 @@ export default function UserHomepage() {
                       </div>
                     </div>
 
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Mail className="h-3 w-3 text-purple-500" />
+                          <span className="font-medium">Emails</span>
+                        </div>
+                        <div className="text-sm font-bold text-purple-600">
+                          {dashboardStats?.emailCampaignsSent || 0}
+                        </div>
+                      </div>
+
+                      <div className="bg-pink-50 dark:bg-pink-900/20 p-2 rounded">
+                        <div className="flex items-center gap-1 mb-1">
+                          <Phone className="h-3 w-3 text-pink-500" />
+                          <span className="font-medium">SMS</span>
+                        </div>
+                        <div className="text-sm font-bold text-pink-600">
+                          {dashboardStats?.smsCampaignsSent || 0}
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <div className="flex justify-between items-center">
-                        <span className="text-sm font-medium">Customer Interactions</span>
+                        <span className="text-sm font-medium">AI Conversations</span>
                         <span className="text-sm font-bold text-primary">
-                          {dashboardStats?.customerInteractions || 0}
+                          {dashboardStats?.aiConversations || 0}
                         </span>
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        Total conversations and engagements
+                        Total customer interactions
                       </div>
                     </div>
                   </>
@@ -306,69 +331,29 @@ export default function UserHomepage() {
               </CardContent>
             </Card>
 
-            {/* Business Tools Section */}
+            {/* Business Management Section */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-sm">
                   <Building2 className="h-4 w-4 text-blue-500" />
-                  Quick Tools
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-xs"
-                  onClick={() => setLocation('/avatar-setup')}
-                >
-                  <Bot className="h-3 w-3 mr-2" />
-                  AI Assistant Setup
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-xs"
-                  onClick={() => setLocation('/business-landing-creator')}
-                >
-                  <Laptop className="h-3 w-3 mr-2" />
-                  Landing Pages
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full justify-start text-xs"
-                  onClick={() => setLocation('/ai-trainer')}
-                >
-                  <Brain className="h-3 w-3 mr-2" />
-                  AI Training
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Businesses Management */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2 text-sm">
-                  <Heart className="h-4 w-4 text-pink-500" />
                   Your Businesses
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="space-y-3">
                 <div 
-                  className="p-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+                  className="p-3 bg-pink-50 dark:bg-pink-900/20 rounded-lg cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
                   onClick={() => setLocation('/business/brezcode/dashboard')}
                 >
                   <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-pink-500 rounded text-white text-xs font-bold flex items-center justify-center">
+                    <div className="w-8 h-8 bg-pink-500 rounded flex items-center justify-center text-white text-sm font-bold">
                       B
                     </div>
                     <div>
-                      <div className="text-xs font-medium text-gray-900 dark:text-white">BrezCode</div>
-                      <div className="text-xs text-gray-600 dark:text-gray-400">Health Platform</div>
+                      <div className="text-sm font-medium text-gray-900 dark:text-white">BrezCode</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Health & Wellness</div>
                     </div>
                   </div>
+                  <Badge className="mt-2 bg-green-100 text-green-800 text-xs">Admin</Badge>
                 </div>
                 
                 <Button 
@@ -377,7 +362,7 @@ export default function UserHomepage() {
                   className="w-full text-xs"
                   onClick={() => setLocation('/business-selector')}
                 >
-                  + Add Business
+                  + Add New Business
                 </Button>
               </CardContent>
             </Card>
@@ -396,7 +381,7 @@ export default function UserHomepage() {
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Bot className="h-5 w-5 text-blue-500" />
-                      LeadGen AI Assistant
+                      AI Business Assistant
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="h-full flex flex-col p-0">
@@ -455,7 +440,6 @@ export default function UserHomepage() {
                           onChange={(e) => setCurrentMessage(e.target.value)}
                           placeholder="Ask me about lead generation, sales automation, or business strategies..."
                           disabled={isSending}
-                          className="min-h-[44px]"
                         />
                         <Button type="submit" disabled={isSending || !currentMessage.trim()}>
                           <Send className="h-4 w-4" />
