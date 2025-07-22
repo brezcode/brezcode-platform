@@ -5,29 +5,20 @@ import { useLocation } from "wouter";
 interface BackButtonProps {
   to?: string;
   label?: string;
-  className?: string;
 }
 
-export function BackButton({ to, label = "Back", className = "" }: BackButtonProps) {
+export function BackButton({ to = "/dashboard", label = "Back" }: BackButtonProps) {
   const [, setLocation] = useLocation();
 
-  const handleBack = () => {
-    if (to) {
-      setLocation(to);
-    } else {
-      window.history.back();
-    }
-  };
-
   return (
-    <Button 
-      variant="outline" 
+    <Button
+      variant="outline"
       size="sm"
-      onClick={handleBack}
-      className={`flex items-center space-x-2 ${className}`}
+      onClick={() => setLocation(to)}
+      className="flex items-center gap-2"
     >
       <ArrowLeft className="h-4 w-4" />
-      <span>{label}</span>
+      {label}
     </Button>
   );
 }

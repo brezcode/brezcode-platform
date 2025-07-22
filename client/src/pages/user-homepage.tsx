@@ -709,6 +709,24 @@ export default function UserHomepage() {
                   <Brain className="h-4 w-4 mr-2" />
                   Meal Plans (AI)
                 </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/ai-trainer-dashboard')}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  AI Training Analytics
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/roleplay-training')}
+                >
+                  <Bot className="h-4 w-4 mr-2" />
+                  Roleplay Training
+                </Button>
               </CardContent>
             </Card>
           </div>
