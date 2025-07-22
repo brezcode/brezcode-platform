@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Building2, User, LogOut, Settings } from "lucide-react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -52,12 +52,12 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
       <div className="container mx-auto px-2 md:px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left: LeadGen.To Brand */}
-          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
+          <div className="flex items-center space-x-3 flex-shrink-0">
             <div 
-              className="flex items-center space-x-1 md:space-x-2 cursor-pointer hover:opacity-80"
+              className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
               onClick={() => window.open('https://leadgen.to', '_blank')}
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-sm flex items-center justify-center">
                 <span className="text-white font-bold text-sm">L</span>
               </div>
               <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
@@ -86,8 +86,23 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
             </div>
           </div>
 
-          {/* Right: User Actions */}
-          <div className="flex items-center space-x-1 md:space-x-4">
+          {/* Right: Login/Dashboard and User Actions */}
+          <div className="flex items-center space-x-2 md:space-x-4">
+            {/* Login/Dashboard Links - Always visible when not authenticated */}
+            {!currentUser && (
+              <>
+                <Link href="/login">
+                  <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/dashboard">
+                  <Button variant="outline" size="sm" className="text-xs md:text-sm">
+                    Dashboard
+                  </Button>
+                </Link>
+              </>
+            )}
             {/* Business/Personal Switcher - Always visible */}
             <div className="flex items-center space-x-1">
               {!businessContext ? (
