@@ -9,28 +9,30 @@ export function LeadGenLanding() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-md flex items-center justify-center">
+                <Heart className="w-5 h-5 text-white" />
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                LeadGen.to
+              </span>
             </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              LeadGen.to
-            </span>
-          </div>
-          <nav className="flex items-center space-x-2 md:space-x-6">
+            <nav className="flex items-center space-x-2 md:space-x-6">
             <div className="hidden md:flex items-center space-x-6">
               <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
               <a href="#platforms" className="text-gray-600 hover:text-blue-600 transition-colors">Platforms</a>
               <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
             </div>
-            <Link href="/login">
-              <Button variant="outline" size="sm" className="text-xs md:text-sm">Login</Button>
-            </Link>
-            <Link href="/dashboard">
-              <Button variant="outline" size="sm" className="text-xs md:text-sm">Dashboard</Button>
-            </Link>
-          </nav>
+              <Link href="/login">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm">Login</Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" size="sm" className="text-xs md:text-sm">Dashboard</Button>
+              </Link>
+            </nav>
+          </div>
         </div>
       </header>
 

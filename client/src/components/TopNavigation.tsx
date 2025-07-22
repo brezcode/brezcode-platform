@@ -57,8 +57,8 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
               className="flex items-center space-x-1 md:space-x-2 cursor-pointer hover:opacity-80"
               onClick={() => window.open('https://leadgen.to', '_blank')}
             >
-              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-xs md:text-sm">L</span>
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-md flex items-center justify-center">
+                <span className="text-white font-bold text-sm">L</span>
               </div>
               <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 LeadGen.To
