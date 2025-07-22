@@ -207,7 +207,7 @@ export function AiTrainingSession() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto mobile-safe-padding mobile-spacing contain-layout">
+    <div className="w-full max-w-6xl mx-auto mobile-safe-padding mobile-spacing contain-layout mobile-force-contain">
       {/* Session Header */}
       <Card>
         <CardHeader className="p-4 sm:p-6">
@@ -224,17 +224,17 @@ export function AiTrainingSession() {
                 Role-playing as: <strong>{session?.aiAssistantRole || 'AI Assistant'}</strong>
               </p>
             </div>
-            <div className="flex w-full sm:w-auto">
+            <div className="flex w-full sm:w-auto mobile-force-contain">
               <Button 
                 onClick={() => completeSessionMutation.mutate()}
                 disabled={completeSessionMutation.isPending}
                 variant="outline"
                 size="default"
-                className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
+                className="flex items-center justify-center gap-2 text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
               >
-                <CheckCircle className="w-4 h-4" />
-                <span className="hidden sm:inline">Complete Session</span>
-                <span className="sm:hidden">Complete</span>
+                <CheckCircle className="w-4 h-4 flex-shrink-0" />
+                <span className="hidden sm:inline truncate">Complete Session</span>
+                <span className="sm:hidden truncate">Complete</span>
               </Button>
             </div>
           </div>

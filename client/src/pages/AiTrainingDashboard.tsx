@@ -175,33 +175,33 @@ export function AiTrainingDashboard() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto mobile-safe-padding mobile-spacing contain-layout">
+    <div className="w-full max-w-7xl mx-auto mobile-safe-padding mobile-spacing contain-layout mobile-force-contain">
       <div className="flex flex-col space-y-3 sm:space-y-4">
         <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">AI Assistant Training</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full">
+        <div className="flex flex-col sm:flex-row gap-2 w-full mobile-force-contain">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="flex items-center gap-2 justify-center text-sm px-4 py-2 min-h-[44px]"
+            className="flex items-center gap-2 justify-center text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
             size="default"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Generate Lead Gen Scenario</span>
-            <span className="sm:hidden">Lead Gen</span>
+            <Plus className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Generate Lead Gen Scenario</span>
+            <span className="sm:hidden truncate">Lead Gen</span>
           </Button>
           <Button 
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="flex items-center gap-2 justify-center text-sm px-4 py-2 min-h-[44px]"
+            className="flex items-center gap-2 justify-center text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
             size="default"
           >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Generate Support Scenario</span>
-            <span className="sm:hidden">Support</span>
+            <Plus className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline truncate">Generate Support Scenario</span>
+            <span className="sm:hidden truncate">Support</span>
           </Button>
         </div>
       </div>
@@ -348,16 +348,16 @@ export function AiTrainingDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex w-full sm:w-auto sm:ml-4">
+                          <div className="flex w-full sm:w-auto sm:ml-4 mobile-force-contain">
                             <Button 
                               onClick={() => startTrainingSession(scenario)}
                               disabled={startSessionMutation.isPending}
-                              className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
+                              className="flex items-center justify-center gap-2 text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
                               size="default"
                             >
-                              <Play className="w-4 h-4" />
-                              <span className="hidden sm:inline">Start Training</span>
-                              <span className="sm:hidden">Start</span>
+                              <Play className="w-4 h-4 flex-shrink-0" />
+                              <span className="hidden sm:inline truncate">Start Training</span>
+                              <span className="sm:hidden truncate">Start</span>
                             </Button>
                           </div>
                         </div>
@@ -418,15 +418,15 @@ export function AiTrainingDashboard() {
                               )}
                             </div>
                           </div>
-                          <div className="flex w-full sm:w-auto sm:ml-4">
+                          <div className="flex w-full sm:w-auto sm:ml-4 mobile-force-contain">
                             <Button 
                               variant="outline" 
                               size="default"
                               onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                              className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
+                              className="flex items-center justify-center gap-2 text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
                             >
-                              <span className="hidden sm:inline">View Session</span>
-                              <span className="sm:hidden">View</span>
+                              <span className="hidden sm:inline truncate">View Session</span>
+                              <span className="sm:hidden truncate">View</span>
                             </Button>
                           </div>
                         </div>
