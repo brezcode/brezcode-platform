@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 
 const token = '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';
-const repo = 'leedennyps/leadgen.to';
+const repo = 'xynargyhk/leadgen-platform';
 
 // Files to upload (excluding node_modules, .git, dist)
 const filesToUpload = [
