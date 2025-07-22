@@ -10,6 +10,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 import { useLocation } from 'wouter';
+import TopNavigation from "@/components/TopNavigation";
 import { 
   MessageCircle, 
   Send, 
@@ -260,6 +261,9 @@ export default function UserHomepage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
       <div className="container mx-auto py-6 px-4">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
