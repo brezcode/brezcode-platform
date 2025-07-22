@@ -19,7 +19,7 @@ import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AITrainer from "@/pages/AITrainer";
 import AITrainerDashboard from "@/pages/AITrainerDashboard";
 import RoleplayTraining from "@/pages/RoleplayTraining";
-import { AiTrainingDashboard } from "@/pages/AiTrainingDashboard";
+import { AiTrainingDashboard } from "@/pages/AiTrainingDashboardSimple";
 import { AiTrainingSession } from "@/pages/AiTrainingSession";
 import { MobileLayoutTest } from "@/pages/MobileLayoutTest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";

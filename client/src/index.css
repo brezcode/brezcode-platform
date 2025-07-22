@@ -1,5 +1,6 @@
 /* Import mobile responsive styles first */
 @import './styles/mobile.css';
+@import './styles/mobile-reset.css';
 
 @tailwind base;
 @tailwind components;
@@ -39,8 +40,8 @@
     button, .btn, [role="button"] {
       width: 100% !important;
       max-width: 100% !important;
-      min-height: 48px !important;
-      padding: 12px 16px !important;
+      min-height: 40px !important;
+      padding: 8px 12px !important;
       font-size: 14px !important;
       justify-content: center !important;
     }
@@ -71,8 +72,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 48px;
-    padding: 12px 16px;
+    min-height: 40px;
+    padding: 8px 12px;
     font-size: 14px;
     width: 100%;
     white-space: nowrap;
