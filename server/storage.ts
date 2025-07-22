@@ -22,6 +22,9 @@ export interface IStorage {
   createHealthReport(report: InsertHealthReport): Promise<HealthReport>;
   getHealthReports(userId: number): Promise<HealthReport[]>;
   getLatestHealthReport(userId: number): Promise<HealthReport | undefined>;
+  
+  // Profile updates
+  updateUser(id: number, userData: Partial<User>): Promise<User>;
 }
 
 export class MemStorage implements IStorage {
@@ -195,6 +198,22 @@ export class MemStorage implements IStorage {
   async getLatestHealthReport(userId: number): Promise<HealthReport | undefined> {
     const reports = await this.getHealthReports(userId);
     return reports[0]; // Most recent due to sorting
+  }
+
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const existingUser = this.users.get(id);
+    if (!existingUser) {
+      throw new Error('User not found');
+    }
+
+    const updatedUser: User = {
+      ...existingUser,
+      ...userData,
+      id, // Ensure ID doesn't change
+    };
+
+    this.users.set(id, updatedUser);
+    return updatedUser;
   }
 
   // Apple Health Data Management

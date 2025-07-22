@@ -117,13 +117,20 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
                 <LogOut className="h-4 w-4" />
               </Button>
 
-              <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
-                  {currentUser ? 
-                    `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}` : 
-                    'U'
-                  }
-                </AvatarFallback>
+              <Avatar 
+                className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-300"
+                onClick={() => setLocation('/profile')}
+              >
+                {currentUser?.profilePhoto ? (
+                  <AvatarImage src={currentUser.profilePhoto} alt="Profile" />
+                ) : (
+                  <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                    {currentUser ? 
+                      `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}` : 
+                      'U'
+                    }
+                  </AvatarFallback>
+                )}
               </Avatar>
             </div>
           </div>

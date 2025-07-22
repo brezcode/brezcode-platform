@@ -326,11 +326,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/me", requireAuth, (req: any, res) => {
     const user = req.user;
     res.json({ 
-      id: user.id, 
-      email: user.email,
-      subscriptionTier: user.subscriptionTier,
-      isSubscriptionActive: user.isSubscriptionActive,
+      user: {
+        id: user.id, 
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        address: user.address,
+        bio: user.bio,
+        profilePhoto: user.profilePhoto,
+        subscriptionTier: user.subscriptionTier,
+        isSubscriptionActive: user.isSubscriptionActive,
+        createdAt: user.createdAt
+      }
     });
+  });
+
+  // Update user profile
+  app.post("/api/profile/update", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const { firstName, lastName, phone, address, bio } = req.body;
+
+      const updatedUser = await storage.updateUser(userId, {
+        firstName,
+        lastName,
+        phone,
+        address,
+        bio
+      });
+
+      res.json({
+        success: true,
+        user: {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          firstName: updatedUser.firstName,
+          lastName: updatedUser.lastName,
+          phone: updatedUser.phone,
+          address: updatedUser.address,
+          bio: updatedUser.bio,
+          profilePhoto: updatedUser.profilePhoto
+        }
+      });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
   });
 
   // Health Report Generation (Test Mode - No Auth Required)
