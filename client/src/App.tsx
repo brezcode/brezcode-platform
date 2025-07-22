@@ -66,7 +66,14 @@ function App() {
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />
           <Route path="/business-consultant" component={BusinessConsultant} />
           <Route path="/subscription" component={SubscribePage} />
-          <Route path="/email-verification" component={EmailVerificationModule} />
+          <Route path="/email-verification">
+            {() => <EmailVerificationModule 
+              email="leedennyps@gmail.com" 
+              onVerificationComplete={() => {}} 
+              onBack={() => {}} 
+              config={{}} 
+            />}
+          </Route>
           <Route path="/knowledge-centre" component={KnowledgeCentre} />
           <Route path="/ai-trainer" component={AITrainer} />
           <Route path="/ai-trainer-dashboard" component={AITrainerDashboard} />
@@ -79,14 +86,18 @@ function App() {
           
           {/* Health platform routes (BrezCode) */}
           <Route path="/brezcode/quiz" component={QuizPage} />
-          <Route path="/brezcode/quiz-transition" component={QuizTransition} />
+          <Route path="/brezcode/quiz-transition">
+            {() => <QuizTransition onContinue={() => {}} />}
+          </Route>
           <Route path="/brezcode/report" component={ReportViewer} />
           <Route path="/brezcode/health-preferences" component={HealthPreferences} />
           <Route path="/brezcode/health-calendar" component={HealthCalendar} />
           <Route path="/brezcode/avatar-demo" component={AvatarDemo} />
           <Route path="/brezcode/food-analyzer" component={FoodAnalyzer} />
           <Route path="/brezcode/dietary-recommendations" component={DietaryRecommendations} />
-          <Route path="/brezcode/apple-watch" component={AppleWatchIntegration} />
+          <Route path="/brezcode/apple-watch">
+            {() => <AppleWatchIntegration onHealthDataUpdate={() => {}} />}
+          </Route>
           <Route path="/brezcode/iphone-widget" component={IPhoneWidgetGuide} />
           <Route path="/brezcode/notifications" component={NotificationDemo} />
           
