@@ -1,4 +1,6 @@
-import { users, emailVerifications, healthReports, type User, type InsertUser, type SubscriptionTier, type EmailVerification, type HealthReport, type InsertHealthReport, type CreateUserData } from "@shared/schema";
+import { users, emailVerifications, healthReports, userProfiles, type User, type InsertUser, type SubscriptionTier, type EmailVerification, type HealthReport, type InsertHealthReport, type CreateUserData } from "@shared/schema";
+import { db } from "./db";
+import { eq, and, desc } from "drizzle-orm";
 
 export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
@@ -25,6 +27,9 @@ export interface IStorage {
   
   // Profile updates
   updateUser(id: number, userData: Partial<User>): Promise<User>;
+  getUserProfile(userId: number): Promise<any>;
+  updateUserProfile(userId: number, profileData: any): Promise<any>;
+  createUserProfile(userId: number, profileData: any): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -260,4 +265,153 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// Switch from MemStorage to DatabaseStorage for persistent data
+export class DatabaseStorage implements IStorage {
+  async getUser(id: number): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: CreateUserData): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async deleteUser(email: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.email, email));
+    return result.rowCount > 0;
+  }
+
+  async updateUserSubscription(
+    id: number, 
+    tier: SubscriptionTier, 
+    stripeCustomerId?: string, 
+    stripeSubscriptionId?: string
+  ): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ 
+        subscriptionTier: tier, 
+        stripeCustomerId, 
+        stripeSubscriptionId,
+        isSubscriptionActive: true
+      })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async updateStripeCustomerId(id: number, customerId: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ stripeCustomerId: customerId })
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async createEmailVerification(email: string, code: string): Promise<EmailVerification> {
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+    
+    const [verification] = await db
+      .insert(emailVerifications)
+      .values({ email, code, expiresAt })
+      .returning();
+    return verification;
+  }
+
+  async getEmailVerification(email: string, code: string): Promise<EmailVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(emailVerifications)
+      .where(and(eq(emailVerifications.email, email), eq(emailVerifications.code, code)))
+      .limit(1);
+    return verification || undefined;
+  }
+
+  async verifyEmail(email: string): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set({ isEmailVerified: true })
+      .where(eq(users.email, email))
+      .returning();
+    return user || undefined;
+  }
+
+  async createHealthReport(report: InsertHealthReport): Promise<HealthReport> {
+    const [healthReport] = await db
+      .insert(healthReports)
+      .values(report)
+      .returning();
+    return healthReport;
+  }
+
+  async getHealthReports(userId: number): Promise<HealthReport[]> {
+    return await db
+      .select()
+      .from(healthReports)
+      .where(eq(healthReports.userId, userId));
+  }
+
+  async getLatestHealthReport(userId: number): Promise<HealthReport | undefined> {
+    const [report] = await db
+      .select()
+      .from(healthReports)
+      .where(eq(healthReports.userId, userId))
+      .orderBy(desc(healthReports.createdAt))
+      .limit(1);
+    return report || undefined;
+  }
+
+  async updateUser(id: number, userData: Partial<User>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async getUserProfile(userId: number): Promise<any> {
+    const [profile] = await db
+      .select()
+      .from(userProfiles)
+      .where(eq(userProfiles.userId, userId))
+      .limit(1);
+    return profile || null;
+  }
+
+  async updateUserProfile(userId: number, profileData: any): Promise<any> {
+    const existingProfile = await this.getUserProfile(userId);
+    
+    if (existingProfile) {
+      const [updatedProfile] = await db
+        .update(userProfiles)
+        .set({ ...profileData, updatedAt: new Date() })
+        .where(eq(userProfiles.userId, userId))
+        .returning();
+      return updatedProfile;
+    } else {
+      return this.createUserProfile(userId, profileData);
+    }
+  }
+
+  async createUserProfile(userId: number, profileData: any): Promise<any> {
+    const [profile] = await db
+      .insert(userProfiles)
+      .values({ userId, ...profileData })
+      .returning();
+    return profile;
+  }
+}
+
+export const storage = new DatabaseStorage();
