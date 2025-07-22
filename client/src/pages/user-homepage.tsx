@@ -659,55 +659,55 @@ export default function UserHomepage() {
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/health-calendar')}
+                  onClick={() => setLocation('/leadgen/health-planner')}
                 >
                   <Calendar className="h-4 w-4 mr-2" />
-                  Health Calendar
+                  AI Health Planner
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/notifications')}
+                  onClick={() => setLocation('/leadgen/notifications')}
                 >
                   <Bell className="h-4 w-4 mr-2" />
-                  Push Notifications
+                  Smart Notifications
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/notifications?tab=iphone')}
+                  onClick={() => setLocation('/leadgen/widget-guide')}
                 >
                   <Smartphone className="h-4 w-4 mr-2" />
-                  Create iPhone Widget
+                  Mobile Widgets
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/notifications?tab=watch')}
+                  onClick={() => setLocation('/leadgen/integrations')}
                 >
                   <Activity className="h-4 w-4 mr-2" />
-                  Connect Apple Watch
+                  Device Integrations
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/food-analysis')}
+                  onClick={() => setLocation('/leadgen/food-analyzer')}
                 >
                   <Apple className="h-4 w-4 mr-2" />
-                  Analyze Food
+                  AI Food Analysis
                 </Button>
                 <Button 
                   variant="outline" 
                   className="w-full justify-start" 
                   size="sm"
-                  onClick={() => setLocation('/brezcode/dietary-recommendations')}
+                  onClick={() => setLocation('/leadgen/meal-planner')}
                 >
                   <Brain className="h-4 w-4 mr-2" />
-                  Meal Plans (AI)
+                  AI Meal Planner
                 </Button>
                 <Button 
                   variant="outline" 
