@@ -181,27 +181,25 @@ export function AiTrainingDashboard() {
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">AI Assistant Training</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 w-full mobile-force-contain">
+        <div className="mobile-button-grid">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="flex items-center gap-2 justify-center text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
+            className="mobile-primary-button"
             size="default"
           >
-            <Plus className="w-4 h-4 flex-shrink-0" />
-            <span className="hidden sm:inline truncate">Generate Lead Gen Scenario</span>
-            <span className="sm:hidden truncate">Lead Gen</span>
+            <Plus className="w-4 h-4 mr-2" />
+            Generate Lead Gen Scenario
           </Button>
           <Button 
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="flex items-center gap-2 justify-center text-sm px-3 py-2 min-h-[44px] mobile-btn-fix"
+            className="mobile-secondary-button"
             size="default"
           >
-            <Plus className="w-4 h-4 flex-shrink-0" />
-            <span className="hidden sm:inline truncate">Generate Support Scenario</span>
-            <span className="sm:hidden truncate">Support</span>
+            <Plus className="w-4 h-4 mr-2" />
+            Generate Support Scenario
           </Button>
         </div>
       </div>
@@ -303,62 +301,58 @@ export function AiTrainingDashboard() {
                 <div className="grid gap-4">
                   {scenarios.map((scenario: TrainingScenario) => (
                     <Card key={scenario.id} className="border-l-4 border-l-blue-500">
-                      <CardContent className="p-4 sm:p-6">
-                        <div className="space-y-4">
-                          <div className="w-full">
-                            <div className="flex flex-col space-y-2 mb-3">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-semibold text-base sm:text-lg">{scenario.title}</h3>
-                                <Badge className={getDifficultyColor(scenario.difficulty)}>
-                                  {scenario.difficulty}
-                                </Badge>
-                                <Badge variant="outline">
-                                  {scenario.scenarioType.replace('_', ' ')}
-                                </Badge>
-                              </div>
-                            </div>
-                            <p className="text-gray-600 mb-4 text-sm">{scenario.description}</p>
-                            
-                            <div className="space-y-3 mb-4">
-                              <div>
-                                <h4 className="font-medium mb-1 text-sm">Customer Persona</h4>
-                                <p className="text-xs text-gray-600">
-                                  {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
-                                </p>
-                                <p className="text-xs text-gray-500">
-                                  {scenario.customerPersona?.company}
-                                </p>
-                              </div>
-                              <div>
-                                <h4 className="font-medium mb-1 text-sm">Objectives</h4>
-                                <ul className="text-xs text-gray-600 space-y-1">
-                                  {scenario.objectives?.slice(0, 2).map((objective, index) => (
-                                    <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                      <span>{objective}</span>
-                                    </li>
-                                  ))}
-                                  {scenario.objectives?.length > 2 && (
-                                    <li className="text-gray-500 text-xs">
-                                      +{scenario.objectives.length - 2} more objectives
-                                    </li>
-                                  )}
-                                </ul>
-                              </div>
-                            </div>
+                      <CardContent className="mobile-card-content">
+                        <div className="mobile-card-header">
+                          <div className="flex flex-wrap gap-2">
+                            <h3 className="font-semibold text-base">{scenario.title}</h3>
+                            <Badge className={getDifficultyColor(scenario.difficulty)}>
+                              {scenario.difficulty}
+                            </Badge>
+                            <Badge variant="outline">
+                              {scenario.scenarioType.replace('_', ' ')}
+                            </Badge>
                           </div>
-                          
-                          <div className="w-full">
-                            <Button 
-                              onClick={() => startTrainingSession(scenario)}
-                              disabled={startSessionMutation.isPending}
-                              className="w-full min-h-[48px] text-sm"
-                              size="default"
-                            >
-                              <Play className="w-4 h-4 mr-2" />
-                              Start Training
-                            </Button>
+                          <p className="text-gray-600 text-sm">{scenario.description}</p>
+                        </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <h4 className="font-medium mb-1 text-sm">Customer Persona</h4>
+                            <p className="text-xs text-gray-600">
+                              {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {scenario.customerPersona?.company}
+                            </p>
                           </div>
+                          <div>
+                            <h4 className="font-medium mb-1 text-sm">Objectives</h4>
+                            <ul className="text-xs text-gray-600 space-y-1">
+                              {scenario.objectives?.slice(0, 2).map((objective, index) => (
+                                <li key={index} className="flex items-start gap-2">
+                                  <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
+                                  <span>{objective}</span>
+                                </li>
+                              ))}
+                              {scenario.objectives?.length > 2 && (
+                                <li className="text-gray-500 text-xs">
+                                  +{scenario.objectives.length - 2} more objectives
+                                </li>
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                        
+                        <div className="mobile-card-actions">
+                          <Button 
+                            onClick={() => startTrainingSession(scenario)}
+                            disabled={startSessionMutation.isPending}
+                            className="mobile-primary-button"
+                            size="default"
+                          >
+                            <Play className="w-4 h-4 mr-2" />
+                            Start Training
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -391,43 +385,40 @@ export function AiTrainingDashboard() {
                 <div className="space-y-4">
                   {sessions.map((session: TrainingSession) => (
                     <Card key={session.id} className="border-l-4 border-l-green-500">
-                      <CardContent className="p-4 sm:p-6">
-                        <div className="space-y-4">
-                          <div className="w-full">
-                            <div className="flex flex-col space-y-2 mb-3">
-                              <div className="flex flex-wrap items-center gap-2">
-                                <h3 className="font-semibold text-base">{session.sessionName}</h3>
-                                <Badge className={getStatusColor(session.status)}>
-                                  {session.status.replace('_', ' ')}
-                                </Badge>
-                                <Badge variant="outline">{session.aiAssistantRole}</Badge>
-                              </div>
-                            </div>
-                            <p className="text-gray-600 mb-3 text-sm">{session.scenario.title}</p>
-                            <div className="space-y-1 text-xs text-gray-500">
-                              <span>Started: {new Date(session.startedAt).toLocaleDateString()}</span>
-                              {session.completedAt && (
-                                <div>Completed: {new Date(session.completedAt).toLocaleDateString()}</div>
-                              )}
-                              {session.performanceScore && (
-                                <div className="flex items-center gap-1">
-                                  <Award className="w-3 h-3" />
-                                  Score: {session.performanceScore}%
-                                </div>
-                              )}
-                            </div>
+                      <CardContent className="mobile-card-content">
+                        <div className="mobile-card-header">
+                          <div className="flex flex-wrap gap-2">
+                            <h3 className="font-semibold text-base">{session.sessionName}</h3>
+                            <Badge className={getStatusColor(session.status)}>
+                              {session.status.replace('_', ' ')}
+                            </Badge>
+                            <Badge variant="outline">{session.aiAssistantRole}</Badge>
                           </div>
-                          
-                          <div className="w-full">
-                            <Button 
-                              variant="outline" 
-                              size="default"
-                              onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                              className="w-full min-h-[48px] text-sm"
-                            >
-                              View Session
-                            </Button>
-                          </div>
+                          <p className="text-gray-600 text-sm">{session.scenario.title}</p>
+                        </div>
+                        
+                        <div className="space-y-1 text-xs text-gray-500">
+                          <div>Started: {new Date(session.startedAt).toLocaleDateString()}</div>
+                          {session.completedAt && (
+                            <div>Completed: {new Date(session.completedAt).toLocaleDateString()}</div>
+                          )}
+                          {session.performanceScore && (
+                            <div className="flex items-center gap-1">
+                              <Award className="w-3 h-3" />
+                              Score: {session.performanceScore}%
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="mobile-card-actions">
+                          <Button 
+                            variant="outline" 
+                            size="default"
+                            onClick={() => window.location.href = `/ai-training/session/${session.id}`}
+                            className="mobile-secondary-button"
+                          >
+                            View Session
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
