@@ -1207,14 +1207,6 @@ Format your response as JSON with the exact structure:
     console.error('Failed to load AI training routes:', error);
   }
 
-  // Register Onboarding routes
-  try {
-    const onboardingRoutes = await import('./onboarding-routes');
-    app.use("/api/onboarding", requireAuth, onboardingRoutes.default);
-  } catch (error) {
-    console.error('Failed to load onboarding routes:', error);
-  }
-
   // Create HTTP server
   const server = createServer(app);
 

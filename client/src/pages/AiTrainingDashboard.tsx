@@ -20,7 +20,6 @@ import {
   Plus
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { OnboardingTour } from '@/components/OnboardingTour';
 
 interface TrainingScenario {
   id: number;
@@ -177,9 +176,8 @@ export function AiTrainingDashboard() {
 
   return (
     <div className="w-full max-w-7xl mx-auto mobile-safe-padding mobile-spacing contain-layout mobile-force-contain">
-      <OnboardingTour />
       <div className="flex flex-col space-y-3 sm:space-y-4">
-        <div className="min-w-0 dashboard-header">
+        <div className="min-w-0">
           <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">AI Assistant Training</h1>
           <p className="text-gray-600 mt-1 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
@@ -300,7 +298,7 @@ export function AiTrainingDashboard() {
                   <p className="text-sm text-gray-500">Click "Generate Scenario" to create your first training scenario</p>
                 </div>
               ) : (
-                <div className="grid gap-4 scenario-cards">
+                <div className="grid gap-4">
                   {scenarios.map((scenario: TrainingScenario) => (
                     <Card key={scenario.id} className="border-l-4 border-l-blue-500">
                       <CardContent className="mobile-card-content">
@@ -351,7 +349,6 @@ export function AiTrainingDashboard() {
                             disabled={startSessionMutation.isPending}
                             className="mobile-primary-button"
                             size="default"
-                            data-testid="start-training-button"
                           >
                             <Play className="w-4 h-4 mr-2" />
                             Start Training
