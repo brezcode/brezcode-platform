@@ -210,6 +210,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/login", async (req, res) => {
     try {
       const { email, password } = req.body;
+      console.log('Login attempt via /api/login for:', email);
       
       // Basic validation
       if (!email || !password) {
@@ -222,13 +223,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Check if user exists in database
       const user = await storage.getUserByEmail(email);
+      console.log('User lookup result:', user ? 'Found' : 'Not found');
       
       if (!user) {
         return res.status(401).json({ error: "Invalid email or password" });
       }
       
       // Verify password
+      console.log('Testing password for user:', user.email);
       const passwordMatch = await bcrypt.compare(password, user.password);
+      console.log('Password match result:', passwordMatch);
       
       if (!passwordMatch) {
         return res.status(401).json({ error: "Invalid email or password" });
@@ -242,6 +246,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Set session
       (req as any).session.userId = user.id;
       (req as any).session.isAuthenticated = true;
+      console.log('Login successful via /api/login, session set for user:', user.id);
       
       // Return user without sensitive data
       const { password: _, ...userWithoutPassword } = user;
