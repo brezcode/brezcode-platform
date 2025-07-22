@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Building2, ChevronRight, Users, Briefcase, Heart } from "lucide-react";
-import { useRouter } from "wouter";
+import { useLocation } from "wouter";
 
 interface Business {
   id: string;
@@ -22,7 +22,7 @@ interface BusinessSelectorProps {
 }
 
 export default function BusinessSelector({ userId, userEmail }: BusinessSelectorProps) {
-  const [, setLocation] = useRouter();
+  const [, setLocation] = useLocation();
   
   // User's associated businesses
   const userBusinesses: Business[] = [

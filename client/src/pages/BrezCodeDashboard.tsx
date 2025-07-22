@@ -4,10 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Heart, Brain, Users, TrendingUp, MessageSquare, Calendar, BookOpen, Settings } from "lucide-react";
-import { useRouter } from "wouter";
+import { useLocation } from "wouter";
 
 export default function BrezCodeDashboard() {
-  const [, setLocation] = useRouter();
+  const [, setLocation] = useLocation();
 
   // BrezCode business metrics
   const brezCodeStats = {
