@@ -172,11 +172,24 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
       const { firstName, lastName, email, password, subscriptionTier } = req.body;
       
       if (!firstName || !lastName || !email || !password) {
-        return res.status(400).json({ error: "All fields are required" });
+        return res.status(400).json({ error: "Please fill in all required fields" });
       }
       
       try {
-        // Create pending user
+        // CRITICAL: Check if user already exists before creating pending user
+        const { storage } = await import('./storage');
+        const existingUser = await storage.getUserByEmail(email);
+        
+        console.log('Signup duplicate check for:', email, 'Found existing user:', !!existingUser);
+        
+        if (existingUser) {
+          console.log('Blocking duplicate signup for:', email);
+          return res.status(409).json({ 
+            error: "An account with this email address already exists. Please sign in instead." 
+          });
+        }
+        
+        // Create pending user only after confirming email is available
         const pendingUser = emailModule.createPendingUser({
           email,
           firstName,
@@ -196,7 +209,8 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           email: email
         });
       } catch (error: any) {
-        res.status(500).json({ error: error.message || "Registration failed" });
+        console.error('Signup error:', error);
+        res.status(500).json({ error: "Something went wrong during registration. Please try again." });
       }
     },
 
