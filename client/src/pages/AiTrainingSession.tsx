@@ -207,7 +207,7 @@ export function AiTrainingSession() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+    <div className="w-full max-w-6xl mx-auto mobile-safe-padding mobile-spacing contain-layout">
       {/* Session Header */}
       <Card>
         <CardHeader className="p-4 sm:p-6">
@@ -224,15 +224,15 @@ export function AiTrainingSession() {
                 Role-playing as: <strong>{session?.aiAssistantRole || 'AI Assistant'}</strong>
               </p>
             </div>
-            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+            <div className="flex w-full sm:w-auto">
               <Button 
                 onClick={() => completeSessionMutation.mutate()}
                 disabled={completeSessionMutation.isPending}
                 variant="outline"
-                size="sm"
-                className="flex-1 sm:flex-none text-sm"
+                size="default"
+                className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
               >
-                <CheckCircle className="w-4 h-4 mr-1 sm:mr-2" />
+                <CheckCircle className="w-4 h-4" />
                 <span className="hidden sm:inline">Complete Session</span>
                 <span className="sm:hidden">Complete</span>
               </Button>
@@ -467,15 +467,15 @@ export function AiTrainingSession() {
                   <Button 
                     onClick={submitFeedback}
                     disabled={addFeedbackMutation.isPending}
-                    className="flex-1 text-sm sm:text-base"
-                    size="sm"
+                    className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:flex-1"
+                    size="default"
                   >
                     Save Feedback
                   </Button>
                   <Button 
                     variant="outline"
-                    size="sm"
-                    className="text-sm sm:text-base"
+                    size="default"
+                    className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
                     onClick={() => setFeedbackDialogueId(null)}
                   >
                     Cancel

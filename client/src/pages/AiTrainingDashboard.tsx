@@ -175,18 +175,18 @@ export function AiTrainingDashboard() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
-      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">AI Assistant Training</h1>
-          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
+    <div className="w-full max-w-7xl mx-auto mobile-safe-padding mobile-spacing contain-layout">
+      <div className="flex flex-col space-y-3 sm:space-y-4">
+        <div className="min-w-0">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">AI Assistant Training</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex flex-col sm:flex-row gap-2 w-full">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="flex items-center gap-2 justify-center text-sm sm:text-base px-3 sm:px-4"
-            size="sm"
+            className="flex items-center gap-2 justify-center text-sm px-4 py-2 min-h-[44px]"
+            size="default"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Generate Lead Gen Scenario</span>
@@ -196,8 +196,8 @@ export function AiTrainingDashboard() {
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="flex items-center gap-2 justify-center text-sm sm:text-base px-3 sm:px-4"
-            size="sm"
+            className="flex items-center gap-2 justify-center text-sm px-4 py-2 min-h-[44px]"
+            size="default"
           >
             <Plus className="w-4 h-4" />
             <span className="hidden sm:inline">Generate Support Scenario</span>
@@ -207,58 +207,58 @@ export function AiTrainingDashboard() {
       </div>
 
       {/* Training Analytics Overview */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        <Card>
-          <CardContent className="p-3 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
-                <Brain className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
+      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <Card className="overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Total Sessions</p>
-                <p className="text-lg sm:text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
+                <p className="text-sm text-gray-600 truncate">Total Sessions</p>
+                <p className="text-xl sm:text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="p-3 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
+        <Card className="overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Completed</p>
-                <p className="text-lg sm:text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
+                <p className="text-sm text-gray-600 truncate">Completed</p>
+                <p className="text-xl sm:text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="p-3 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
-                <Award className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
+        <Card className="overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
+                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Avg Score</p>
-                <p className="text-lg sm:text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
+                <p className="text-sm text-gray-600 truncate">Avg Score</p>
+                <p className="text-xl sm:text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card>
-          <CardContent className="p-3 sm:p-6">
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" />
+        <Card className="overflow-hidden">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0">
+                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm text-gray-600 truncate">Skill Level</p>
-                <p className="text-lg sm:text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
+                <p className="text-sm text-gray-600 truncate">Skill Level</p>
+                <p className="text-xl sm:text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
               </div>
             </div>
           </CardContent>
@@ -348,12 +348,12 @@ export function AiTrainingDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex flex-col gap-2 sm:ml-6 w-full sm:w-auto">
+                          <div className="flex w-full sm:w-auto sm:ml-4">
                             <Button 
                               onClick={() => startTrainingSession(scenario)}
                               disabled={startSessionMutation.isPending}
-                              className="flex items-center justify-center gap-2 text-sm sm:text-base px-4"
-                              size="sm"
+                              className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
+                              size="default"
                             >
                               <Play className="w-4 h-4" />
                               <span className="hidden sm:inline">Start Training</span>
@@ -418,12 +418,12 @@ export function AiTrainingDashboard() {
                               )}
                             </div>
                           </div>
-                          <div className="flex gap-2 w-full sm:w-auto sm:ml-4">
+                          <div className="flex w-full sm:w-auto sm:ml-4">
                             <Button 
                               variant="outline" 
-                              size="sm"
+                              size="default"
                               onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                              className="flex-1 sm:flex-none text-xs sm:text-sm px-3 sm:px-4"
+                              className="flex items-center justify-center gap-2 text-sm px-4 py-2 min-h-[44px] w-full sm:w-auto"
                             >
                               <span className="hidden sm:inline">View Session</span>
                               <span className="sm:hidden">View</span>
