@@ -175,120 +175,109 @@ export function AiTrainingDashboard() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto mobile-safe-padding mobile-spacing contain-layout mobile-force-contain">
-      <div className="flex flex-col space-y-3 sm:space-y-4">
-        <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">AI Assistant Training</h1>
-          <p className="text-gray-600 mt-1 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
+    <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">AI Assistant Training</h1>
+          <p className="text-gray-600 mt-2">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
-        <div className="mobile-button-grid">
+        <div className="flex gap-3">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="mobile-primary-button"
-            size="default"
+            className="flex items-center gap-2"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Generate Lead Gen Scenario
           </Button>
           <Button 
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="mobile-secondary-button"
-            size="default"
+            className="flex items-center gap-2"
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-4 h-4" />
             Generate Support Scenario
           </Button>
         </div>
       </div>
 
       {/* Training Analytics Overview */}
-      <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
-        <Card className="overflow-hidden">
-          <CardContent className="p-4 sm:p-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
-                <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Brain className="w-6 h-6 text-blue-600" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-600 truncate">Total Sessions</p>
-                <p className="text-xl sm:text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
+              <div>
+                <p className="text-sm text-gray-600">Total Sessions</p>
+                <p className="text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="overflow-hidden">
-          <CardContent className="p-4 sm:p-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
-                <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-600 truncate">Completed</p>
-                <p className="text-xl sm:text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
+              <div>
+                <p className="text-sm text-gray-600">Completed</p>
+                <p className="text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="overflow-hidden">
-          <CardContent className="p-4 sm:p-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
-                <Award className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Award className="w-6 h-6 text-purple-600" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-600 truncate">Avg Score</p>
-                <p className="text-xl sm:text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
+              <div>
+                <p className="text-sm text-gray-600">Avg Score</p>
+                <p className="text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
-        <Card className="overflow-hidden">
-          <CardContent className="p-4 sm:p-6">
+        <Card>
+          <CardContent className="p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg flex-shrink-0">
-                <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600" />
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="w-6 h-6 text-orange-600" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-600 truncate">Skill Level</p>
-                <p className="text-xl sm:text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
+              <div>
+                <p className="text-sm text-gray-600">Skill Level</p>
+                <p className="text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="scenarios" className="space-y-4 sm:space-y-6">
-        <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
-          <TabsTrigger value="scenarios" className="text-xs sm:text-sm">
-            <span className="hidden sm:inline">Training Scenarios</span>
-            <span className="sm:hidden">Scenarios</span>
-          </TabsTrigger>
-          <TabsTrigger value="sessions" className="text-xs sm:text-sm">
-            <span className="hidden sm:inline">Training Sessions</span>
-            <span className="sm:hidden">Sessions</span>
-          </TabsTrigger>
-          <TabsTrigger value="analytics" className="text-xs sm:text-sm">
-            <span className="hidden sm:inline">Performance Analytics</span>
-            <span className="sm:hidden">Analytics</span>
-          </TabsTrigger>
+      <Tabs defaultValue="scenarios" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="scenarios">Training Scenarios</TabsTrigger>
+          <TabsTrigger value="sessions">Training Sessions</TabsTrigger>
+          <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
         </TabsList>
 
         {/* Training Scenarios Tab */}
-        <TabsContent value="scenarios" className="space-y-4 sm:space-y-6">
+        <TabsContent value="scenarios" className="space-y-6">
           <Card>
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="w-5 h-5" />
                 Available Training Scenarios
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent>
               {loadingScenarios ? (
                 <div className="text-center py-8">Loading scenarios...</div>
               ) : scenarios.length === 0 ? (
@@ -301,58 +290,59 @@ export function AiTrainingDashboard() {
                 <div className="grid gap-4">
                   {scenarios.map((scenario: TrainingScenario) => (
                     <Card key={scenario.id} className="border-l-4 border-l-blue-500">
-                      <CardContent className="mobile-card-content">
-                        <div className="mobile-card-header">
-                          <div className="flex flex-wrap gap-2">
-                            <h3 className="font-semibold text-base">{scenario.title}</h3>
-                            <Badge className={getDifficultyColor(scenario.difficulty)}>
-                              {scenario.difficulty}
-                            </Badge>
-                            <Badge variant="outline">
-                              {scenario.scenarioType.replace('_', ' ')}
-                            </Badge>
+                      <CardContent className="p-6">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold text-lg">{scenario.title}</h3>
+                              <Badge className={getDifficultyColor(scenario.difficulty)}>
+                                {scenario.difficulty}
+                              </Badge>
+                              <Badge variant="outline">
+                                {scenario.scenarioType.replace('_', ' ')}
+                              </Badge>
+                            </div>
+                            <p className="text-gray-600 mb-4">{scenario.description}</p>
+                            
+                            <div className="grid md:grid-cols-2 gap-4">
+                              <div>
+                                <h4 className="font-medium mb-2">Customer Persona</h4>
+                                <p className="text-sm text-gray-600">
+                                  {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
+                                </p>
+                                <p className="text-sm text-gray-500">
+                                  {scenario.customerPersona?.company}
+                                </p>
+                              </div>
+                              <div>
+                                <h4 className="font-medium mb-2">Objectives</h4>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {scenario.objectives?.slice(0, 2).map((objective, index) => (
+                                    <li key={index} className="flex items-start gap-2">
+                                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                      {objective}
+                                    </li>
+                                  ))}
+                                  {scenario.objectives?.length > 2 && (
+                                    <li className="text-gray-500">
+                                      +{scenario.objectives.length - 2} more objectives
+                                    </li>
+                                  )}
+                                </ul>
+                              </div>
+                            </div>
                           </div>
-                          <p className="text-gray-600 text-sm">{scenario.description}</p>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <div>
-                            <h4 className="font-medium mb-1 text-sm">Customer Persona</h4>
-                            <p className="text-xs text-gray-600">
-                              {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {scenario.customerPersona?.company}
-                            </p>
+                          
+                          <div className="flex flex-col gap-2 ml-6">
+                            <Button 
+                              onClick={() => startTrainingSession(scenario)}
+                              disabled={startSessionMutation.isPending}
+                              className="flex items-center gap-2"
+                            >
+                              <Play className="w-4 h-4" />
+                              Start Training
+                            </Button>
                           </div>
-                          <div>
-                            <h4 className="font-medium mb-1 text-sm">Objectives</h4>
-                            <ul className="text-xs text-gray-600 space-y-1">
-                              {scenario.objectives?.slice(0, 2).map((objective, index) => (
-                                <li key={index} className="flex items-start gap-2">
-                                  <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 flex-shrink-0" />
-                                  <span>{objective}</span>
-                                </li>
-                              ))}
-                              {scenario.objectives?.length > 2 && (
-                                <li className="text-gray-500 text-xs">
-                                  +{scenario.objectives.length - 2} more objectives
-                                </li>
-                              )}
-                            </ul>
-                          </div>
-                        </div>
-                        
-                        <div className="mobile-card-actions">
-                          <Button 
-                            onClick={() => startTrainingSession(scenario)}
-                            disabled={startSessionMutation.isPending}
-                            className="mobile-primary-button"
-                            size="default"
-                          >
-                            <Play className="w-4 h-4 mr-2" />
-                            Start Training
-                          </Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -364,15 +354,15 @@ export function AiTrainingDashboard() {
         </TabsContent>
 
         {/* Training Sessions Tab */}
-        <TabsContent value="sessions" className="space-y-4 sm:space-y-6">
+        <TabsContent value="sessions" className="space-y-6">
           <Card>
-            <CardHeader className="p-4 sm:p-6">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5" />
                 Training Sessions History
               </CardTitle>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent>
               {loadingSessions ? (
                 <div className="text-center py-8">Loading sessions...</div>
               ) : sessions.length === 0 ? (
@@ -385,40 +375,39 @@ export function AiTrainingDashboard() {
                 <div className="space-y-4">
                   {sessions.map((session: TrainingSession) => (
                     <Card key={session.id} className="border-l-4 border-l-green-500">
-                      <CardContent className="mobile-card-content">
-                        <div className="mobile-card-header">
-                          <div className="flex flex-wrap gap-2">
-                            <h3 className="font-semibold text-base">{session.sessionName}</h3>
-                            <Badge className={getStatusColor(session.status)}>
-                              {session.status.replace('_', ' ')}
-                            </Badge>
-                            <Badge variant="outline">{session.aiAssistantRole}</Badge>
-                          </div>
-                          <p className="text-gray-600 text-sm">{session.scenario.title}</p>
-                        </div>
-                        
-                        <div className="space-y-1 text-xs text-gray-500">
-                          <div>Started: {new Date(session.startedAt).toLocaleDateString()}</div>
-                          {session.completedAt && (
-                            <div>Completed: {new Date(session.completedAt).toLocaleDateString()}</div>
-                          )}
-                          {session.performanceScore && (
-                            <div className="flex items-center gap-1">
-                              <Award className="w-3 h-3" />
-                              Score: {session.performanceScore}%
+                      <CardContent className="p-6">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold">{session.sessionName}</h3>
+                              <Badge className={getStatusColor(session.status)}>
+                                {session.status.replace('_', ' ')}
+                              </Badge>
+                              <Badge variant="outline">{session.aiAssistantRole}</Badge>
                             </div>
-                          )}
-                        </div>
-                        
-                        <div className="mobile-card-actions">
-                          <Button 
-                            variant="outline" 
-                            size="default"
-                            onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                            className="mobile-secondary-button"
-                          >
-                            View Session
-                          </Button>
+                            <p className="text-gray-600 mb-2">{session.scenario.title}</p>
+                            <div className="flex items-center gap-4 text-sm text-gray-500">
+                              <span>Started: {new Date(session.startedAt).toLocaleDateString()}</span>
+                              {session.completedAt && (
+                                <span>Completed: {new Date(session.completedAt).toLocaleDateString()}</span>
+                              )}
+                              {session.performanceScore && (
+                                <span className="flex items-center gap-1">
+                                  <Award className="w-4 h-4" />
+                                  Score: {session.performanceScore}%
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.location.href = `/ai-training/session/${session.id}`}
+                            >
+                              View Session
+                            </Button>
+                          </div>
                         </div>
                       </CardContent>
                     </Card>
@@ -430,13 +419,13 @@ export function AiTrainingDashboard() {
         </TabsContent>
 
         {/* Analytics Tab */}
-        <TabsContent value="analytics" className="space-y-4 sm:space-y-6">
-          <div className="grid sm:grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <TabsContent value="analytics" className="space-y-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base sm:text-lg">Performance Scores</CardTitle>
+              <CardHeader>
+                <CardTitle>Performance Scores</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
+              <CardContent className="space-y-4">
                 <div>
                   <div className="flex justify-between mb-2">
                     <span className="text-sm font-medium">Empathy Score</span>
@@ -469,16 +458,16 @@ export function AiTrainingDashboard() {
             </Card>
 
             <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base sm:text-lg">Improvement Areas</CardTitle>
+              <CardHeader>
+                <CardTitle>Improvement Areas</CardTitle>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6">
+              <CardContent>
                 {analytics?.analytics?.improvementAreas?.length > 0 ? (
                   <div className="space-y-3">
                     {analytics.analytics.improvementAreas.map((area: string, index: number) => (
-                      <div key={index} className="flex items-center gap-2 sm:gap-3">
-                        <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
-                        <span className="capitalize text-sm sm:text-base">{area.replace('_', ' ')}</span>
+                      <div key={index} className="flex items-center gap-3">
+                        <AlertCircle className="w-5 h-5 text-orange-500" />
+                        <span className="capitalize">{area.replace('_', ' ')}</span>
                       </div>
                     ))}
                   </div>
@@ -491,20 +480,20 @@ export function AiTrainingDashboard() {
 
           {analytics?.analytics?.recommendations && (
             <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="text-base sm:text-lg">Training Recommendations</CardTitle>
+              <CardHeader>
+                <CardTitle>Training Recommendations</CardTitle>
               </CardHeader>
-              <CardContent className="p-4 sm:p-6">
+              <CardContent>
                 <div className="space-y-4">
                   {analytics.analytics.recommendations.map((rec: any, index: number) => (
-                    <div key={index} className="border-l-4 border-l-blue-500 pl-3 sm:pl-4">
-                      <div className="flex flex-col space-y-1 sm:flex-row sm:items-center sm:gap-2 sm:space-y-0 mb-2">
-                        <span className="font-medium capitalize text-sm sm:text-base">{rec.area}</span>
+                    <div key={index} className="border-l-4 border-l-blue-500 pl-4">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-medium capitalize">{rec.area}</span>
                         <Badge variant={rec.priority === 'high' ? 'destructive' : rec.priority === 'medium' ? 'default' : 'secondary'}>
                           {rec.priority} priority
                         </Badge>
                       </div>
-                      <p className="text-xs sm:text-sm text-gray-600">{rec.recommendation}</p>
+                      <p className="text-sm text-gray-600">{rec.recommendation}</p>
                     </div>
                   ))}
                 </div>

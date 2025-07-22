@@ -1200,12 +1200,7 @@ Format your response as JSON with the exact structure:
   });
 
   // Register AI Training routes
-  try {
-    const { registerAiTrainingRoutes } = await import('./ai-training-routes');
-    registerAiTrainingRoutes(app);
-  } catch (error) {
-    console.error('Failed to load AI training routes:', error);
-  }
+  registerAiTrainingRoutes(app);
 
   // Create HTTP server
   const server = createServer(app);
