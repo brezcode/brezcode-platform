@@ -117,6 +117,9 @@ function generateRuleBasedReport(quizAnswers: any) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Trust proxy for rate limiting to work properly in Replit
+  app.set('trust proxy', 1);
+  
   // Apply security middleware first
   // Note: CORS will be added when needed for production
   
