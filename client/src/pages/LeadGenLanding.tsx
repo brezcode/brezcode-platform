@@ -18,15 +18,17 @@ export function LeadGenLanding() {
               LeadGen.to
             </span>
           </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
-            <a href="#platforms" className="text-gray-600 hover:text-blue-600 transition-colors">Platforms</a>
-            <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
+          <nav className="flex items-center space-x-2 md:space-x-6">
+            <div className="hidden md:flex items-center space-x-6">
+              <a href="#features" className="text-gray-600 hover:text-blue-600 transition-colors">Features</a>
+              <a href="#platforms" className="text-gray-600 hover:text-blue-600 transition-colors">Platforms</a>
+              <a href="#pricing" className="text-gray-600 hover:text-blue-600 transition-colors">Pricing</a>
+            </div>
             <Link href="/login">
-              <Button variant="outline">Login</Button>
+              <Button variant="outline" size="sm" className="text-xs md:text-sm">Login</Button>
             </Link>
             <Link href="/dashboard">
-              <Button variant="outline">Dashboard</Button>
+              <Button variant="outline" size="sm" className="text-xs md:text-sm">Dashboard</Button>
             </Link>
           </nav>
         </div>

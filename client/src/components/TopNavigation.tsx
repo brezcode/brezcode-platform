@@ -45,27 +45,27 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
 
   return (
     <nav className="bg-white border-b border-gray-200 shadow-sm">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-2 md:px-4">
         <div className="flex items-center justify-between h-16">
           {/* Left: LeadGen.To Brand */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 md:space-x-4 flex-shrink-0">
             <div 
-              className="flex items-center space-x-2 cursor-pointer hover:opacity-80"
+              className="flex items-center space-x-1 md:space-x-2 cursor-pointer hover:opacity-80"
               onClick={() => window.open('https://leadgen.to', '_blank')}
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">L</span>
+              <div className="w-6 h-6 md:w-8 md:h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-xs md:text-sm">L</span>
               </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 LeadGen.To
               </span>
             </div>
 
-            {/* Context Separator */}
-            <div className="h-6 w-px bg-gray-300"></div>
+            {/* Context Separator - Hidden on mobile */}
+            <div className="h-6 w-px bg-gray-300 hidden md:block"></div>
 
-            {/* Current Context */}
-            <div className="flex items-center space-x-2">
+            {/* Current Context - Simplified on mobile */}
+            <div className="hidden md:flex items-center space-x-2">
               {businessContext ? (
                 <>
                   {businessContext.icon || <Building2 className="h-5 w-5 text-gray-600" />}
@@ -83,13 +83,14 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
           </div>
 
           {/* Right: User Actions */}
-          <div className="flex items-center space-x-4">
-            {/* Business Switcher */}
+          <div className="flex items-center space-x-1 md:space-x-4">
+            {/* Business Switcher - Hidden on mobile */}
             {!businessContext && (
               <Button 
                 variant="outline" 
                 size="sm"
                 onClick={() => setLocation('/business-selector')}
+                className="hidden md:flex"
               >
                 <Building2 className="h-4 w-4 mr-1" />
                 Select Business
@@ -101,6 +102,7 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
                 variant="outline" 
                 size="sm"
                 onClick={() => setLocation('/dashboard')}
+                className="hidden md:flex"
               >
                 <User className="h-4 w-4 mr-1" />
                 Personal
@@ -108,18 +110,18 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
             )}
 
             {/* User Menu */}
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm">
+            <div className="flex items-center space-x-1 md:space-x-2">
+              <Button variant="ghost" size="sm" className="hidden md:flex">
                 <Settings className="h-4 w-4" />
               </Button>
               
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
+              <Button variant="ghost" size="sm" onClick={handleLogout} className="hidden md:flex">
                 <LogOut className="h-4 w-4" />
               </Button>
 
               <Avatar 
                 className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-300"
-                onClick={() => setLocation('/profile')}
+                onClick={() => setLocation('/user-profile')}
               >
                 {currentUser?.profilePhoto ? (
                   <AvatarImage src={currentUser.profilePhoto} alt="Profile" />
