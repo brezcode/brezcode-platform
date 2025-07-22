@@ -20,6 +20,7 @@ import AITrainerDashboard from "@/pages/AITrainerDashboard";
 import RoleplayTraining from "@/pages/RoleplayTraining";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { BackToTopButton, BackButton } from "@/components/MobileNavigation";
 
 // Health-related pages
 import HealthPreferences from "@/pages/health-preferences";
@@ -83,6 +84,9 @@ function App() {
           <Route component={LeadGenLanding} />
         </Switch>
         
+        {/* Mobile navigation components */}
+        <BackButton />
+        <BackToTopButton />
         <Toaster />
       </div>
     </QueryClientProvider>
