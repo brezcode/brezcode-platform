@@ -2,7 +2,18 @@
 
 ## Overview
 
-This is the ultimate business AI platform (leadgen.to) that provides comprehensive automation tools starting with personal productivity and expanding to business automation. **Current Status: FULLY OPERATIONAL** - Successfully debugged and restored all core functionality with enhanced error handling and fallback systems. The platform takes a personal-first approach where users begin with personal tools and information collection, then optionally add business features. Originally developed while building BrezCode (a health assessment client), the platform has evolved into a complete business automation ecosystem. BrezCode is now just one of many businesses using the leadgen platform. The platform features AI avatar assistants, landing page builders, lead generation, sales CRM, customer service automation, and multi-channel engagement. All tools developed (dietary recommendations, food analysis, health coaching, image generation) are available to any leadgen user for their business needs. The business consultant is now an optional tool rather than the primary onboarding experience.
+This is the ultimate business AI platform (leadgen.to) that provides comprehensive automation tools for any business vertical. **Current Status: FULLY OPERATIONAL** - Authentication and platform separation completed successfully. The platform offers reusable AI-powered business tools that can be customized for different industries and use cases.
+
+**BrezCode Integration**: BrezCode health coaching is now a specialized feature/tool under LeadGen.to, demonstrating how the platform's AI capabilities can be applied to the health & wellness vertical. All health features (dietary recommendations, food analysis, health coaching, assessment forms) are LeadGen tools customized for health businesses.
+
+**Architecture Philosophy**: Any new feature we build becomes part of the LeadGen toolkit that can be used by:
+- Health & wellness businesses (like BrezCode)
+- E-commerce businesses  
+- Service providers
+- Consultants and coaches
+- Any business vertical
+
+The platform features AI avatar assistants, landing page builders, lead generation, sales CRM, customer service automation, multi-channel engagement, and specialized vertical tools like health coaching.
 
 ## System Architecture
 
@@ -36,16 +47,21 @@ This is the ultimate business AI platform (leadgen.to) that provides comprehensi
 
 ## Key Components
 
-### Platform Tools (Available to All Users)
-- **AI Avatar Assistant**: Claude-powered virtual assistant for customer service and sales ✅ READY
-- **Landing Page Builder**: AI-powered page creation with custom branding and content generation
+### Universal Business Tools (Available to All Users)
+- **AI Avatar Assistant**: Claude-powered virtual assistant adaptable to any business vertical ✅ READY
+- **Landing Page Builder**: AI-powered page creation with industry-specific templates
 - **Lead Generation System**: Automated capture, qualification, and nurturing workflows
 - **Sales CRM**: Complete pipeline management with automated follow-ups and payment processing
 - **Booking Service**: Automated scheduling with calendar integration and reminders
 - **Multi-Channel Engagement**: Email, SMS, WhatsApp, LinkedIn automation
 - **AI Content Creation**: Daily content generation with image creation capabilities
-- **Health & Wellness Tools**: Assessment forms, dietary recommendations, food analysis (used by BrezCode)
 - **Image Generation**: AI-powered visual content creation for marketing and branding
+
+### Vertical-Specific Tools
+- **Health & Wellness Suite** (BrezCode features): Assessment forms, dietary recommendations, food analysis, health coaching, activity planning
+- **E-commerce Tools**: Product catalogs, inventory management, order processing
+- **Service Provider Tools**: Appointment scheduling, service packages, client management
+- **Consultant Tools**: Knowledge base management, client assessments, progress tracking
 
 ### Authentication System
 - **Simple Login System**: Clean login page with existing authentication infrastructure ✅ WORKING
@@ -195,7 +211,7 @@ This is the ultimate business AI platform (leadgen.to) that provides comprehensi
 
 ## Recent Changes
 
-- **January 22, 2025 - SEPARATE DATABASE ARCHITECTURE FOR LEADGEN VS BREZCODE**: Successfully restructured database architecture to properly separate LeadGen.to users from BrezCode users as requested. Created separate schemas (leadgen-schema.ts, brezcode-schema.ts) with distinct user tables, dashboard stats, and platform-specific features. LeadGen users now have business-focused metrics (leads, sales, AI conversations, tools usage) while BrezCode users maintain health-focused data (assessments, activities, health metrics). Updated user homepage to focus on business automation tools rather than health features, with proper separation between LeadGen dashboard and BrezCode business management. Mobile optimization completed with back-to-top button, universal back button, and responsive design ensuring all buttons stay within screen frame with 44px touch targets.
+- **January 22, 2025 - BREZCODE INTEGRATED AS LEADGEN FEATURE**: Successfully integrated BrezCode as a specialized health & wellness tool under the LeadGen.to platform. Created platform separation with leadgen-schema.ts (business tools) and brezcode-schema.ts (health data) while maintaining shared functionality. Authentication system fully operational with database schema updated. BrezCode is now a vertical-specific feature demonstrating how LeadGen tools can be customized for health businesses. All new features developed will be part of the universal LeadGen toolkit, available for customization across different business verticals. Database architecture supports both universal business tools and vertical-specific features with proper data separation.
 
 - **January 22, 2025 - AUTHENTICATION SYSTEM FULLY DEBUGGED AND OPERATIONAL**: Completed comprehensive authentication system debugging and verification. Backend API authentication working perfectly with database storage:
   - ✅ Database authentication: Real user validation with bcrypt password hashing  

@@ -33,6 +33,7 @@ import AppleWatchIntegration from "@/components/AppleWatchIntegration";
 import IPhoneWidgetGuide from "@/components/IPhoneWidgetGuide";
 import NotificationDemo from "@/components/NotificationDemo";
 import AvatarSetup from "@/pages/AvatarSetup";
+import { FeatureShowcase } from "@/pages/FeatureShowcase";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,6 +69,7 @@ function App() {
           <Route path="/ai-trainer-dashboard" component={AITrainerDashboard} />
           <Route path="/roleplay-training" component={RoleplayTraining} />
           <Route path="/avatar-setup" component={AvatarSetup} />
+          <Route path="/feature-showcase" component={FeatureShowcase} />
           
           {/* Health platform routes (BrezCode) */}
           <Route path="/brezcode/quiz" component={QuizPage} />
