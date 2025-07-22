@@ -175,109 +175,122 @@ export function AiTrainingDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">AI Assistant Training</h1>
-          <p className="text-gray-600 mt-2">Train your AI assistant with role-playing scenarios and detailed feedback</p>
+    <div className="w-full max-w-7xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col space-y-4 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">AI Assistant Training</h1>
+          <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">Train your AI assistant with role-playing scenarios and detailed feedback</p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 justify-center text-sm sm:text-base px-3 sm:px-4"
+            size="sm"
           >
             <Plus className="w-4 h-4" />
-            Generate Lead Gen Scenario
+            <span className="hidden sm:inline">Generate Lead Gen Scenario</span>
+            <span className="sm:hidden">Lead Gen</span>
           </Button>
           <Button 
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 justify-center text-sm sm:text-base px-3 sm:px-4"
+            size="sm"
           >
             <Plus className="w-4 h-4" />
-            Generate Support Scenario
+            <span className="hidden sm:inline">Generate Support Scenario</span>
+            <span className="sm:hidden">Support</span>
           </Button>
         </div>
       </div>
 
       {/* Training Analytics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Brain className="w-6 h-6 text-blue-600" />
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-blue-100 rounded-lg">
+                <Brain className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Total Sessions</p>
-                <p className="text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 truncate">Total Sessions</p>
+                <p className="text-lg sm:text-2xl font-bold">{analytics?.sessionStats.total || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
+                <CheckCircle className="w-4 h-4 sm:w-6 sm:h-6 text-green-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Completed</p>
-                <p className="text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Award className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Avg Score</p>
-                <p className="text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 truncate">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold">{analytics?.sessionStats.completed || 0}</p>
               </div>
             </div>
           </CardContent>
         </Card>
         
         <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-orange-600" />
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-purple-100 rounded-lg">
+                <Award className="w-4 h-4 sm:w-6 sm:h-6 text-purple-600" />
               </div>
-              <div>
-                <p className="text-sm text-gray-600">Skill Level</p>
-                <p className="text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 truncate">Avg Score</p>
+                <p className="text-lg sm:text-2xl font-bold">{Math.round(analytics?.sessionStats.avgScore || 0)}%</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-3 sm:p-6">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="p-1.5 sm:p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm text-gray-600 truncate">Skill Level</p>
+                <p className="text-lg sm:text-2xl font-bold capitalize">{analytics?.analytics?.skillLevel || 'Beginner'}</p>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Tabs defaultValue="scenarios" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="scenarios">Training Scenarios</TabsTrigger>
-          <TabsTrigger value="sessions">Training Sessions</TabsTrigger>
-          <TabsTrigger value="analytics">Performance Analytics</TabsTrigger>
+      <Tabs defaultValue="scenarios" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-3 text-xs sm:text-sm">
+          <TabsTrigger value="scenarios" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Training Scenarios</span>
+            <span className="sm:hidden">Scenarios</span>
+          </TabsTrigger>
+          <TabsTrigger value="sessions" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Training Sessions</span>
+            <span className="sm:hidden">Sessions</span>
+          </TabsTrigger>
+          <TabsTrigger value="analytics" className="text-xs sm:text-sm">
+            <span className="hidden sm:inline">Performance Analytics</span>
+            <span className="sm:hidden">Analytics</span>
+          </TabsTrigger>
         </TabsList>
 
         {/* Training Scenarios Tab */}
-        <TabsContent value="scenarios" className="space-y-6">
+        <TabsContent value="scenarios" className="space-y-4 sm:space-y-6">
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
                 Available Training Scenarios
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               {loadingScenarios ? (
                 <div className="text-center py-8">Loading scenarios...</div>
               ) : scenarios.length === 0 ? (
@@ -290,41 +303,43 @@ export function AiTrainingDashboard() {
                 <div className="grid gap-4">
                   {scenarios.map((scenario: TrainingScenario) => (
                     <Card key={scenario.id} className="border-l-4 border-l-blue-500">
-                      <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="font-semibold text-lg">{scenario.title}</h3>
-                              <Badge className={getDifficultyColor(scenario.difficulty)}>
-                                {scenario.difficulty}
-                              </Badge>
-                              <Badge variant="outline">
-                                {scenario.scenarioType.replace('_', ' ')}
-                              </Badge>
+                      <CardContent className="p-4 sm:p-6">
+                        <div className="flex flex-col space-y-4 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0 mb-2">
+                              <h3 className="font-semibold text-base sm:text-lg truncate">{scenario.title}</h3>
+                              <div className="flex gap-2">
+                                <Badge className={getDifficultyColor(scenario.difficulty)} size="sm">
+                                  {scenario.difficulty}
+                                </Badge>
+                                <Badge variant="outline" size="sm">
+                                  {scenario.scenarioType.replace('_', ' ')}
+                                </Badge>
+                              </div>
                             </div>
-                            <p className="text-gray-600 mb-4">{scenario.description}</p>
+                            <p className="text-gray-600 mb-4 text-sm sm:text-base">{scenario.description}</p>
                             
-                            <div className="grid md:grid-cols-2 gap-4">
+                            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
                               <div>
-                                <h4 className="font-medium mb-2">Customer Persona</h4>
-                                <p className="text-sm text-gray-600">
+                                <h4 className="font-medium mb-2 text-sm sm:text-base">Customer Persona</h4>
+                                <p className="text-xs sm:text-sm text-gray-600">
                                   {scenario.customerPersona?.name} - {scenario.customerPersona?.role}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-xs sm:text-sm text-gray-500">
                                   {scenario.customerPersona?.company}
                                 </p>
                               </div>
                               <div>
-                                <h4 className="font-medium mb-2">Objectives</h4>
-                                <ul className="text-sm text-gray-600 space-y-1">
+                                <h4 className="font-medium mb-2 text-sm sm:text-base">Objectives</h4>
+                                <ul className="text-xs sm:text-sm text-gray-600 space-y-1">
                                   {scenario.objectives?.slice(0, 2).map((objective, index) => (
                                     <li key={index} className="flex items-start gap-2">
-                                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                                      {objective}
+                                      <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                                      <span className="break-words">{objective}</span>
                                     </li>
                                   ))}
                                   {scenario.objectives?.length > 2 && (
-                                    <li className="text-gray-500">
+                                    <li className="text-gray-500 text-xs">
                                       +{scenario.objectives.length - 2} more objectives
                                     </li>
                                   )}
@@ -333,14 +348,16 @@ export function AiTrainingDashboard() {
                             </div>
                           </div>
                           
-                          <div className="flex flex-col gap-2 ml-6">
+                          <div className="flex flex-col gap-2 sm:ml-6 w-full sm:w-auto">
                             <Button 
                               onClick={() => startTrainingSession(scenario)}
                               disabled={startSessionMutation.isPending}
-                              className="flex items-center gap-2"
+                              className="flex items-center justify-center gap-2 text-sm sm:text-base px-4"
+                              size="sm"
                             >
                               <Play className="w-4 h-4" />
-                              Start Training
+                              <span className="hidden sm:inline">Start Training</span>
+                              <span className="sm:hidden">Start</span>
                             </Button>
                           </div>
                         </div>

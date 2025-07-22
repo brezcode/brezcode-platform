@@ -207,57 +207,62 @@ export function AiTrainingSession() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="w-full max-w-6xl mx-auto p-3 sm:p-6 space-y-4 sm:space-y-6">
       {/* Session Header */}
       <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-3">
-                <Bot className="w-6 h-6 text-blue-600" />
-                AI Training Session
-                <Badge variant="outline">Active</Badge>
+        <CardHeader className="p-4 sm:p-6">
+          <div className="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+            <div className="min-w-0 flex-1">
+              <CardTitle className="flex flex-col space-y-2 sm:flex-row sm:items-center sm:gap-3 sm:space-y-0">
+                <div className="flex items-center gap-2">
+                  <Bot className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                  <span className="text-lg sm:text-xl">AI Training Session</span>
+                  <Badge variant="outline" className="text-xs">Active</Badge>
+                </div>
               </CardTitle>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-2 text-sm sm:text-base">
                 Role-playing as: <strong>{session?.aiAssistantRole || 'AI Assistant'}</strong>
               </p>
             </div>
-            <div className="flex gap-3">
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
               <Button 
                 onClick={() => completeSessionMutation.mutate()}
                 disabled={completeSessionMutation.isPending}
                 variant="outline"
+                size="sm"
+                className="flex-1 sm:flex-none text-sm"
               >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Complete Session
+                <CheckCircle className="w-4 h-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Complete Session</span>
+                <span className="sm:hidden">Complete</span>
               </Button>
             </div>
           </div>
         </CardHeader>
       </Card>
 
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-4 sm:gap-6">
         {/* Chat Interface */}
         <div className="lg:col-span-2">
-          <Card className="h-[700px] flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <MessageSquare className="w-5 h-5" />
+          <Card className="h-[600px] sm:h-[700px] flex flex-col">
+            <CardHeader className="p-3 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
                 Training Conversation
               </CardTitle>
             </CardHeader>
             
             {/* Messages Area */}
-            <CardContent className="flex-1 overflow-y-auto space-y-4 p-4">
+            <CardContent className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 p-3 sm:p-4">
               {dialogues.map((dialogue: TrainingDialogue) => (
-                <div key={dialogue.id} className={`p-4 rounded-lg border ${getSpeakerColor(dialogue.speaker)}`}>
+                <div key={dialogue.id} className={`p-3 sm:p-4 rounded-lg border ${getSpeakerColor(dialogue.speaker)}`}>
                   <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 mb-2 min-w-0 flex-1">
                       {getSpeakerIcon(dialogue.speaker)}
-                      <span className="font-medium capitalize">
+                      <span className="font-medium capitalize text-sm sm:text-base truncate">
                         {dialogue.speaker.replace('_', ' ')}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 hidden sm:inline">
                         {new Date(dialogue.timestamp).toLocaleTimeString()}
                       </span>
                       {dialogue.isReviewed && (
@@ -268,7 +273,7 @@ export function AiTrainingSession() {
                     </div>
                     
                     {dialogue.speaker === 'ai_assistant' && (
-                      <div className="flex gap-1">
+                      <div className="flex gap-1 flex-shrink-0">
                         <Button
                           size="sm"
                           variant="ghost"
@@ -286,7 +291,7 @@ export function AiTrainingSession() {
                     )}
                   </div>
                   
-                  <p className="text-gray-900">{dialogue.message}</p>
+                  <p className="text-gray-900 text-sm sm:text-base break-words">{dialogue.message}</p>
                   
                   {dialogue.trainerFeedback && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -314,7 +319,7 @@ export function AiTrainingSession() {
             </CardContent>
             
             {/* Message Input */}
-            <div className="border-t p-4">
+            <div className="border-t p-3 sm:p-4">
               <div className="flex gap-2">
                 <Input
                   placeholder="Type your message as the customer..."
@@ -322,27 +327,31 @@ export function AiTrainingSession() {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage('customer')}
                   disabled={sendMessageMutation.isPending}
+                  className="text-sm sm:text-base"
                 />
                 <Button 
                   onClick={() => sendMessage('customer')}
                   disabled={sendMessageMutation.isPending || !newMessage.trim()}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4"
+                  size="sm"
                 >
                   <Send className="w-4 h-4" />
-                  Send as Customer
+                  <span className="hidden sm:inline">Send as Customer</span>
+                  <span className="sm:hidden">Send</span>
                 </Button>
               </div>
-              <div className="flex justify-between mt-2">
+              <div className="flex flex-col sm:flex-row sm:justify-between mt-2 gap-2">
                 <Button 
                   variant="outline"
                   size="sm"
                   onClick={() => sendMessage('trainer')}
                   disabled={sendMessageMutation.isPending || !newMessage.trim()}
+                  className="text-xs sm:text-sm"
                 >
                   Send as Trainer
                 </Button>
-                <span className="text-xs text-gray-500">
-                  The AI will automatically respond to customer messages
+                <span className="text-xs text-gray-500 text-center sm:text-right">
+                  AI responds automatically to customer messages
                 </span>
               </div>
             </div>
@@ -350,16 +359,16 @@ export function AiTrainingSession() {
         </div>
 
         {/* Scenario Info & Feedback Panel */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Scenario Information */}
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="w-5 h-5" />
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
                 Scenario Details
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
               <div>
                 <h4 className="font-medium mb-2">Customer Persona</h4>
                 <p className="text-sm text-gray-600">
@@ -389,10 +398,10 @@ export function AiTrainingSession() {
           {/* Feedback Form */}
           {feedbackDialogueId && (
             <Card>
-              <CardHeader>
-                <CardTitle>Provide Training Feedback</CardTitle>
+              <CardHeader className="p-4 sm:p-6">
+                <CardTitle className="text-base sm:text-lg">Provide Training Feedback</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
                 <div>
                   <label className="flex items-center gap-2">
                     <input
@@ -454,16 +463,19 @@ export function AiTrainingSession() {
                   />
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Button 
                     onClick={submitFeedback}
                     disabled={addFeedbackMutation.isPending}
-                    className="flex-1"
+                    className="flex-1 text-sm sm:text-base"
+                    size="sm"
                   >
                     Save Feedback
                   </Button>
                   <Button 
                     variant="outline"
+                    size="sm"
+                    className="text-sm sm:text-base"
                     onClick={() => setFeedbackDialogueId(null)}
                   >
                     Cancel
