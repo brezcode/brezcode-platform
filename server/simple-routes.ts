@@ -156,53 +156,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User authentication routes
-  app.post("/api/auth/login", (req, res) => {
-    const { email, password } = req.body;
-    
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+  app.post("/api/auth/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      // Basic validation
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      // Import storage and bcrypt
+      const { storage } = await import('./storage');
+      const bcrypt = await import('bcrypt');
+      
+      // Check if user exists in database
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Verify password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Check if email is verified
+      if (!user.isEmailVerified) {
+        return res.status(403).json({ error: "Please verify your email before logging in" });
+      }
+      
+      // Set session
+      (req as any).session.userId = user.id;
+      (req as any).session.isAuthenticated = true;
+      
+      // Return user without sensitive data
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword, message: "Login successful" });
+    } catch (error: any) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: "Login failed" });
     }
-    
-    // For now, accept any login credentials for development
-    const user = {
-      id: 1,
-      email,
-      firstName: "Demo",
-      lastName: "User",
-      subscriptionTier: "basic"
-    };
-    
-    // Set session
-    (req as any).session.userId = user.id;
-    (req as any).session.isAuthenticated = true;
-    
-    res.json({ user, message: "Login successful" });
   });
 
   // Frontend expects /api/login endpoint
-  app.post("/api/login", (req, res) => {
-    const { email, password } = req.body;
-    
-    // Basic validation
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      // Basic validation
+      if (!email || !password) {
+        return res.status(400).json({ error: "Email and password are required" });
+      }
+      
+      // Import storage and bcrypt
+      const { storage } = await import('./storage');
+      const bcrypt = await import('bcrypt');
+      
+      // Check if user exists in database
+      const user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Verify password
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "Invalid email or password" });
+      }
+      
+      // Check if email is verified
+      if (!user.isEmailVerified) {
+        return res.status(403).json({ error: "Please verify your email before logging in" });
+      }
+      
+      // Set session
+      (req as any).session.userId = user.id;
+      (req as any).session.isAuthenticated = true;
+      
+      // Return user without sensitive data
+      const { password: _, ...userWithoutPassword } = user;
+      res.json({ user: userWithoutPassword, message: "Login successful" });
+    } catch (error: any) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: "Login failed" });
     }
-    
-    // For now, accept any login credentials for development
-    const user = {
-      id: 1,
-      email,
-      firstName: "Demo",
-      lastName: "User",
-      subscriptionTier: "basic"
-    };
-    
-    // Set session
-    (req as any).session.userId = user.id;
-    (req as any).session.isAuthenticated = true;
-    
-    res.json({ user, message: "Login successful" });
   });
 
   // Import the email verification module
@@ -223,6 +265,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       res.json({ message: "Logged out successfully" });
     });
+  });
+
+  // Get current user endpoint
+  app.get("/api/me", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { storage } = await import('./storage');
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Return user without sensitive data
+      const { passwordHash, ...userWithoutPassword } = user;
+      res.json(userWithoutPassword);
+    } catch (error: any) {
+      console.error('Get user error:', error);
+      res.status(500).json({ error: "Failed to get user" });
+    }
+  });
+
+  // Get user profile endpoint
+  app.get("/api/user/profile", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { storage } = await import('./storage');
+      const profile = await storage.getUserProfile(userId);
+      
+      res.json(profile || {});
+    } catch (error: any) {
+      console.error('Get profile error:', error);
+      res.status(500).json({ error: "Failed to get profile" });
+    }
+  });
+
+  // Update user profile endpoint
+  app.post("/api/user/profile", async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+      
+      const { storage } = await import('./storage');
+      const updatedProfile = await storage.updateUserProfile(userId, req.body);
+      
+      res.json(updatedProfile);
+    } catch (error: any) {
+      console.error('Update profile error:', error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
   });
 
   // Health reports endpoints

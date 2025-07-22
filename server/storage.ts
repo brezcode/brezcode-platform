@@ -287,7 +287,7 @@ export class DatabaseStorage implements IStorage {
 
   async deleteUser(email: string): Promise<boolean> {
     const result = await db.delete(users).where(eq(users.email, email));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async updateUserSubscription(
