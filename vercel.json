@@ -12,11 +12,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/dist/index.js"
+      "dest": "dist/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/index.html"
+      "dest": "dist/index.html"
     }
   ],
   "functions": {
