@@ -99,24 +99,27 @@ export default function AITrainerDashboard() {
   const queryClient = useQueryClient();
 
   // Fetch performance analysis
-  const { data: performance, isLoading: performanceLoading } = useQuery({
+  const { data: performance, isLoading: performanceLoading } = useQuery<PerformanceAnalysis>({
     queryKey: ['/api/ai-trainer/performance', selectedAssistant],
     enabled: selectedAssistant > 0
   });
 
   // Fetch training analytics
-  const { data: analytics, isLoading: analyticsLoading } = useQuery({
+  const { data: analytics, isLoading: analyticsLoading } = useQuery<TrainingAnalytics>({
     queryKey: ['/api/ai-trainer/analytics', selectedAssistant, timeRange],
     enabled: selectedAssistant > 0
   });
 
   // Create custom scenarios mutation
   const createScenariosM = useMutation({
-    mutationFn: async (data: { assistantId: number; improvementAreas: any[] }) =>
-      apiRequest('/api/ai-trainer/custom-scenarios', {
+    mutationFn: async (data: { assistantId: number; improvementAreas: any[] }) => {
+      const response = await fetch('/api/ai-trainer/custom-scenarios', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
-      }),
+      });
+      return response.json();
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/roleplay/scenarios'] });
     }
@@ -212,9 +215,9 @@ export default function AITrainerDashboard() {
                 <SelectValue placeholder="Select Assistant" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">Primary Assistant</SelectItem>
-                <SelectItem value="2">BrezCode Health Bot</SelectItem>
-                <SelectItem value="3">Sales Assistant</SelectItem>
+                <SelectItem value="1">LeadGen AI Assistant</SelectItem>
+                <SelectItem value="2">Sales Assistant</SelectItem>
+                <SelectItem value="3">Customer Service Bot</SelectItem>
               </SelectContent>
             </Select>
           </div>
