@@ -123,11 +123,11 @@ export function AiTrainingDashboard() {
         <p className="text-gray-600 mobile-text">Train your AI assistant with role-playing scenarios</p>
         
         {/* Action Buttons */}
-        <div className="mobile-stack">
+        <div className="flex flex-wrap gap-3">
           <Button 
             onClick={() => generateScenario('lead_generation')}
             disabled={isGeneratingScenario}
-            className="w-full h-10 text-sm"
+            className="h-10 text-sm"
           >
             <Plus className="w-4 h-4 mr-2" />
             Generate Lead Gen Scenario
@@ -136,7 +136,7 @@ export function AiTrainingDashboard() {
             onClick={() => generateScenario('customer_service')}
             disabled={isGeneratingScenario}
             variant="outline"
-            className="w-full h-10 text-sm"
+            className="h-10 text-sm"
           >
             <Plus className="w-4 h-4 mr-2" />
             Generate Support Scenario
@@ -205,7 +205,7 @@ export function AiTrainingDashboard() {
                         <div className="mobile-stack">
                           <div className="mobile-stack">
                             <h3 className="font-semibold text-lg mobile-text">{scenario.title}</h3>
-                            <div className="mobile-stack">
+                            <div className="flex flex-wrap gap-2">
                               <Badge className={getDifficultyColor(scenario.difficulty)}>
                                 {scenario.difficulty}
                               </Badge>
@@ -229,7 +229,7 @@ export function AiTrainingDashboard() {
                           <Button 
                             onClick={() => startTrainingSession(scenario)}
                             disabled={startSessionMutation.isPending}
-                            className="w-full h-10 text-sm"
+                            className="h-10 text-sm"
                           >
                             <Play className="w-4 h-4 mr-2" />
                             Start Training
@@ -266,7 +266,7 @@ export function AiTrainingDashboard() {
                         <div className="mobile-stack">
                           <div className="mobile-stack">
                             <h3 className="font-semibold text-base mobile-text">{session.sessionName}</h3>
-                            <div className="mobile-stack">
+                            <div className="flex flex-wrap gap-2">
                               <Badge className={getStatusColor(session.status)}>
                                 {session.status.replace('_', ' ')}
                               </Badge>
@@ -282,7 +282,7 @@ export function AiTrainingDashboard() {
                           <Button 
                             variant="outline" 
                             onClick={() => window.location.href = `/ai-training/session/${session.id}`}
-                            className="w-full h-10 text-sm"
+                            className="h-10 text-sm"
                           >
                             View Session
                           </Button>
