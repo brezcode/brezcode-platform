@@ -21,57 +21,28 @@ import {
 } from 'lucide-react';
 
 interface TrainingRequirements {
-  // Business Context
-  businessType: string;
-  businessTypeOther: string;
-  industry: string;
-  industryOther: string;
-  targetAudience: string;
-  valueProposition: string;
-  
   // Assistant Role & Responsibilities
   assistantRole: string;
   assistantRoleOther: string;
-  primaryFunctions: string[];
-  primaryFunctionsOther: string;
-  communicationChannels: string[];
-  communicationChannelsOther: string;
   
   // Training Focus Areas
   trainingGoals: string[];
   trainingGoalsOther: string;
   currentChallenges: string[];
   currentChallengesOther: string;
-  skillLevels: {
-    leadGeneration: string;
-    customerService: string;
-    salesConversion: string;
-    businessConsulting: string;
-    coaching: string;
-    technicalSupport: string;
-  };
+  skillLevel: string;
   
   // Specific Scenarios Needed
   priorityScenarios: string[];
   priorityScenariosOther: string;
   difficultyLevels: string[];
-  customerPersonas: string[];
-  customerPersonasOther: string;
 }
 
 export function AITrainingSetup() {
   const [step, setStep] = useState(1);
   const [requirements, setRequirements] = useState<Partial<TrainingRequirements>>({
-    businessType: '',
-    businessTypeOther: '',
-    industry: '',
-    industryOther: '',
     assistantRole: '',
     assistantRoleOther: '',
-    primaryFunctions: [],
-    primaryFunctionsOther: '',
-    communicationChannels: [],
-    communicationChannelsOther: '',
     trainingGoals: [],
     trainingGoalsOther: '',
     currentChallenges: [],
@@ -79,16 +50,7 @@ export function AITrainingSetup() {
     priorityScenarios: [],
     priorityScenariosOther: '',
     difficultyLevels: [],
-    customerPersonas: [],
-    customerPersonasOther: '',
-    skillLevels: {
-      leadGeneration: 'beginner',
-      customerService: 'beginner', 
-      salesConversion: 'beginner',
-      businessConsulting: 'beginner',
-      coaching: 'beginner',
-      technicalSupport: 'beginner'
-    }
+    skillLevel: 'beginner'
   });
 
   const updateRequirements = (field: string, value: any) => {
@@ -107,130 +69,28 @@ export function AITrainingSetup() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Users className="h-5 w-5" />
-          Business Context & Industry
-        </CardTitle>
-        <CardDescription>
-          Help me understand your business so I can create relevant training scenarios
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="businessType">What type of business do you run?</Label>
-            <Select value={requirements.businessType || ''} onValueChange={(value) => updateRequirements('businessType', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select business type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="digital_marketing_agency">Digital Marketing Agency</SelectItem>
-                <SelectItem value="saas_company">SaaS Company</SelectItem>
-                <SelectItem value="ecommerce">E-commerce Store</SelectItem>
-                <SelectItem value="consulting">Consulting Firm</SelectItem>
-                <SelectItem value="coaching">Coaching Business</SelectItem>
-                <SelectItem value="real_estate">Real Estate</SelectItem>
-                <SelectItem value="healthcare">Healthcare Services</SelectItem>
-                <SelectItem value="education">Education/Training</SelectItem>
-                <SelectItem value="finance">Financial Services</SelectItem>
-                <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                <SelectItem value="retail">Retail Business</SelectItem>
-                <SelectItem value="food_beverage">Food & Beverage</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            {requirements.businessType === 'other' && (
-              <Input
-                className="mt-2"
-                placeholder="Please specify your business type"
-                value={requirements.businessTypeOther || ''}
-                onChange={(e) => updateRequirements('businessTypeOther', e.target.value)}
-              />
-            )}
-          </div>
-          <div>
-            <Label htmlFor="industry">Industry/Vertical</Label>
-            <Select value={requirements.industry || ''} onValueChange={(value) => updateRequirements('industry', value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select industry" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="technology">Technology</SelectItem>
-                <SelectItem value="healthcare">Healthcare</SelectItem>
-                <SelectItem value="finance">Finance & Banking</SelectItem>
-                <SelectItem value="education">Education</SelectItem>
-                <SelectItem value="retail">Retail & E-commerce</SelectItem>
-                <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                <SelectItem value="real_estate">Real Estate</SelectItem>
-                <SelectItem value="legal">Legal Services</SelectItem>
-                <SelectItem value="marketing">Marketing & Advertising</SelectItem>
-                <SelectItem value="hospitality">Hospitality & Tourism</SelectItem>
-                <SelectItem value="transportation">Transportation & Logistics</SelectItem>
-                <SelectItem value="nonprofit">Non-profit</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-            {requirements.industry === 'other' && (
-              <Input
-                className="mt-2"
-                placeholder="Please specify your industry"
-                value={requirements.industryOther || ''}
-                onChange={(e) => updateRequirements('industryOther', e.target.value)}
-              />
-            )}
-          </div>
-        </div>
-
-        <div>
-          <Label htmlFor="targetAudience">Who are your primary customers?</Label>
-          <Textarea
-            id="targetAudience"
-            placeholder="Describe your target audience: demographics, pain points, decision-making process..."
-            value={requirements.targetAudience || ''}
-            onChange={(e) => updateRequirements('targetAudience', e.target.value)}
-            rows={3}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="valueProposition">What's your unique value proposition?</Label>
-          <Textarea
-            id="valueProposition"
-            placeholder="What makes your business different? What specific benefits do you provide?"
-            value={requirements.valueProposition || ''}
-            onChange={(e) => updateRequirements('valueProposition', e.target.value)}
-            rows={3}
-          />
-        </div>
-      </CardContent>
-    </Card>
-  );
-
-  const renderStep2 = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
           <Brain className="h-5 w-5" />
-          AI Assistant Role & Functions
+          AI Assistant Role Selection
         </CardTitle>
         <CardDescription>
-          Define what your AI assistant will do and how it will interact with customers
+          What type of AI assistant do you want to train for your business?
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
-          <Label htmlFor="assistantRole">What is the primary role of your AI assistant?</Label>
+          <Label htmlFor="assistantRole">Select the primary role for your AI assistant:</Label>
           <Select value={requirements.assistantRole || ''} onValueChange={(value) => updateRequirements('assistantRole', value)}>
             <SelectTrigger className="mt-2">
-              <SelectValue placeholder="Select assistant role" />
+              <SelectValue placeholder="Choose assistant role" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="lead_qualifier">Lead Qualifier & Initial Contact</SelectItem>
-              <SelectItem value="customer_service">Customer Service Representative</SelectItem>
-              <SelectItem value="sales_assistant">Sales Assistant & Deal Closer</SelectItem>
-              <SelectItem value="business_consultant">Business Consultant & Advisor</SelectItem>
+              <SelectItem value="sales_representative">Sales Representative</SelectItem>
+              <SelectItem value="customer_service">Customer Service Agent</SelectItem>
+              <SelectItem value="technical_specialist">Technical Specialist</SelectItem>
+              <SelectItem value="engineer">Engineer/Technical Expert</SelectItem>
+              <SelectItem value="consultant">Business Consultant</SelectItem>
+              <SelectItem value="expert">Subject Matter Expert</SelectItem>
               <SelectItem value="coach">Coach & Mentor</SelectItem>
-              <SelectItem value="technical_support">Technical Support Specialist</SelectItem>
-              <SelectItem value="multi_role">Multi-Role Assistant (All of the above)</SelectItem>
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
@@ -244,80 +104,57 @@ export function AITrainingSetup() {
           )}
         </div>
 
-        <div>
-          <Label>What functions should your assistant perform? (Select all that apply)</Label>
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            {[
-              'Qualify incoming leads',
-              'Schedule appointments', 
-              'Answer product questions',
-              'Handle billing inquiries',
-              'Process refunds/cancellations',
-              'Provide technical support',
-              'Cross-sell/upsell products',
-              'Collect customer feedback',
-              'Follow up on proposals',
-              'Manage customer onboarding',
-              'Provide business consultation',
-              'Offer strategic advice',
-              'Conduct coaching sessions',
-              'Guide skill development',
-              'Assess business needs',
-              'Create action plans'
-            ].map((func) => (
-              <div key={func} className="flex items-center space-x-2">
-                <Checkbox
-                  id={func}
-                  checked={requirements.primaryFunctions?.includes(func)}
-                  onCheckedChange={() => toggleArrayField('primaryFunctions', func)}
-                />
-                <Label htmlFor={func} className="text-sm">{func}</Label>
-              </div>
-            ))}
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-blue-900 mb-2">Role Descriptions:</h4>
+          <div className="text-sm text-blue-800 space-y-2">
+            <p><strong>Sales Representative:</strong> Focuses on lead qualification, product demos, handling objections, and closing deals</p>
+            <p><strong>Customer Service:</strong> Handles support inquiries, troubleshooting, billing questions, and customer satisfaction</p>
+            <p><strong>Technical Specialist:</strong> Provides technical support, product knowledge, and complex problem-solving</p>
+            <p><strong>Engineer:</strong> Deep technical expertise, system architecture, and engineering consultation</p>
+            <p><strong>Consultant:</strong> Strategic advice, business analysis, and professional recommendations</p>
+            <p><strong>Expert:</strong> Specialized knowledge in your field, industry insights, and expert guidance</p>
+            <p><strong>Coach:</strong> Personal development, skill building, and mentoring conversations</p>
           </div>
         </div>
+      </CardContent>
+    </Card>
+  );
 
+  const renderStep2 = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Target className="h-5 w-5" />
+          Current Skill Level Assessment
+        </CardTitle>
+        <CardDescription>
+          What's your current skill level in this role so I can create appropriate training?
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
         <div>
-          <Label>Communication channels your assistant will use:</Label>
-          <div className="flex flex-wrap gap-3 mt-2">
-            {[
-              { id: 'website_chat', label: 'Website Chat', icon: MessageCircle },
-              { id: 'phone_calls', label: 'Phone Calls', icon: Phone },
-              { id: 'email', label: 'Email', icon: Mail },
-              { id: 'sms', label: 'SMS/Text', icon: MessageCircle },
-              { id: 'social_media', label: 'Social Media', icon: Users },
-              { id: 'video_calls', label: 'Video Calls', icon: MessageCircle },
-              { id: 'live_chat', label: 'Live Chat Support', icon: MessageCircle }
-            ].map(({ id, label, icon: Icon }) => (
-              <div key={id} className="flex items-center space-x-2">
-                <Checkbox
-                  id={id}
-                  checked={requirements.communicationChannels?.includes(id)}
-                  onCheckedChange={() => toggleArrayField('communicationChannels', id)}
-                />
-                <Label htmlFor={id} className="flex items-center gap-1 text-sm">
-                  <Icon className="h-4 w-4" />
-                  {label}
-                </Label>
-              </div>
-            ))}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="other_channels"
-                checked={requirements.communicationChannels?.includes('other')}
-                onCheckedChange={() => toggleArrayField('communicationChannels', 'other')}
-              />
-              <Label htmlFor="other_channels" className="text-sm">Other</Label>
-            </div>
+          <Label>Current skill level for {requirements.assistantRole === 'other' ? requirements.assistantRoleOther : requirements.assistantRole?.replace('_', ' ')} role:</Label>
+          <Select value={requirements.skillLevel || 'beginner'} onValueChange={(value) => updateRequirements('skillLevel', value)}>
+            <SelectTrigger className="mt-2">
+              <SelectValue placeholder="Select skill level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="beginner">Beginner - New to this role</SelectItem>
+              <SelectItem value="intermediate">Intermediate - Some experience</SelectItem>
+              <SelectItem value="advanced">Advanced - Experienced practitioner</SelectItem>
+              <SelectItem value="expert">Expert - Highly skilled professional</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="bg-green-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-green-900 mb-2">Skill Level Guide:</h4>
+          <div className="text-sm text-green-800 space-y-2">
+            <p><strong>Beginner:</strong> Just starting out, need basic training and simple scenarios</p>
+            <p><strong>Intermediate:</strong> Some experience, ready for moderate complexity and real-world challenges</p>
+            <p><strong>Advanced:</strong> Experienced professional, need complex scenarios and edge cases</p>
+            <p><strong>Expert:</strong> Highly skilled, need advanced techniques and leadership scenarios</p>
           </div>
-          {requirements.communicationChannels?.includes('other') && (
-            <Input
-              className="mt-2"
-              placeholder="Please specify other communication channels"
-              value={requirements.communicationChannelsOther || ''}
-              onChange={(e) => updateRequirements('communicationChannelsOther', e.target.value)}
-            />
-          )}
         </div>
       </CardContent>
     </Card>
@@ -327,35 +164,18 @@ export function AITrainingSetup() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Target className="h-5 w-5" />
-          Training Goals & Current Challenges
+          <TrendingUp className="h-5 w-5" />
+          Training Goals & Challenges
         </CardTitle>
         <CardDescription>
-          What specific skills do you want to improve and what challenges are you facing?
+          What specific skills do you want to improve in your {requirements.assistantRole?.replace('_', ' ')} role?
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div>
           <Label>What are your main training goals? (Select all that apply)</Label>
           <div className="grid grid-cols-1 gap-3 mt-2">
-            {[
-              'Improve lead qualification accuracy',
-              'Increase conversion rates from leads to sales',
-              'Reduce customer service response time',
-              'Handle objections more effectively',
-              'Better understand customer pain points',
-              'Improve cross-selling and upselling',
-              'Enhance empathy and emotional intelligence',
-              'Master technical product knowledge',
-              'Handle difficult/angry customers',
-              'Streamline appointment scheduling',
-              'Develop consulting and advisory skills',
-              'Master coaching conversation techniques',
-              'Improve strategic thinking abilities',
-              'Enhance problem-solving capabilities',
-              'Build trust and rapport with clients',
-              'Guide effective goal-setting processes'
-            ].map((goal) => (
+            {getTrainingGoalsForRole(requirements.assistantRole || '').map((goal) => (
               <div key={goal} className="flex items-center space-x-2">
                 <Checkbox
                   id={goal}
@@ -387,18 +207,7 @@ export function AITrainingSetup() {
         <div>
           <Label>What challenges are you currently facing? (Select all that apply)</Label>
           <div className="grid grid-cols-1 gap-3 mt-2">
-            {[
-              'Low lead-to-customer conversion rates',
-              'Inconsistent messaging across team',
-              'Difficulty handling price objections',
-              'Long response times to customer inquiries',
-              'High customer churn/cancellation rates',
-              'Lack of product knowledge among staff',
-              'Poor follow-up on warm leads',
-              'Difficulty qualifying serious prospects',
-              'Struggling with complex technical questions',
-              'Need better discovery/needs assessment'
-            ].map((challenge) => (
+            {getChallengesForRole(requirements.assistantRole || '').map((challenge) => (
               <div key={challenge} className="flex items-center space-x-2">
                 <Checkbox
                   id={challenge}
@@ -426,52 +235,209 @@ export function AITrainingSetup() {
             />
           )}
         </div>
-
-        <div>
-          <Label>Current skill levels in key areas:</Label>
-          <div className="space-y-4 mt-3">
-            {[
-              { key: 'leadGeneration', label: 'Lead Generation & Qualification' },
-              { key: 'customerService', label: 'Customer Service & Support' },
-              { key: 'salesConversion', label: 'Sales Conversion & Closing' },
-              { key: 'businessConsulting', label: 'Business Consulting & Advisory' },
-              { key: 'coaching', label: 'Coaching & Mentoring' },
-              { key: 'technicalSupport', label: 'Technical Support & Knowledge' }
-            ].map(({ key, label }) => (
-              <div key={key}>
-                <Label className="text-sm font-medium">{label}</Label>
-                <RadioGroup 
-                  value={requirements.skillLevels?.[key as keyof typeof requirements.skillLevels] || 'beginner'} 
-                  onValueChange={(value) => updateRequirements('skillLevels', { 
-                    ...requirements.skillLevels, 
-                    [key]: value 
-                  })}
-                  className="flex gap-6 mt-1"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="beginner" id={`${key}_beginner`} />
-                    <Label htmlFor={`${key}_beginner`} className="text-sm">Beginner</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="intermediate" id={`${key}_intermediate`} />
-                    <Label htmlFor={`${key}_intermediate`} className="text-sm">Intermediate</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="advanced" id={`${key}_advanced`} />
-                    <Label htmlFor={`${key}_advanced`} className="text-sm">Advanced</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="expert" id={`${key}_expert`} />
-                    <Label htmlFor={`${key}_expert`} className="text-sm">Expert</Label>
-                  </div>
-                </RadioGroup>
-              </div>
-            ))}
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
+
+  // Helper functions for role-specific content
+  const getTrainingGoalsForRole = (role: string) => {
+    const commonGoals = [
+      'Improve communication skills',
+      'Handle difficult situations better',
+      'Build trust and rapport with clients',
+      'Enhance problem-solving abilities'
+    ];
+
+    switch (role) {
+      case 'sales_representative':
+        return [
+          'Improve lead qualification accuracy',
+          'Increase conversion rates',
+          'Handle objections more effectively',
+          'Master closing techniques',
+          'Better understand customer pain points',
+          'Improve cross-selling and upselling',
+          ...commonGoals
+        ];
+      case 'customer_service':
+        return [
+          'Reduce response times',
+          'Handle angry customers professionally',
+          'Improve first-call resolution rates',
+          'Master de-escalation techniques',
+          'Enhance empathy and emotional intelligence',
+          'Streamline process efficiency',
+          ...commonGoals
+        ];
+      case 'technical_specialist':
+        return [
+          'Master technical product knowledge',
+          'Improve troubleshooting skills',
+          'Explain complex concepts simply',
+          'Enhance diagnostic abilities',
+          'Better technical documentation',
+          'Improve system integration knowledge',
+          ...commonGoals
+        ];
+      case 'consultant':
+        return [
+          'Develop strategic thinking abilities',
+          'Master needs assessment techniques',
+          'Improve analytical and advisory skills',
+          'Enhance business acumen',
+          'Better stakeholder management',
+          'Guide effective goal-setting processes',
+          ...commonGoals
+        ];
+      case 'coach':
+        return [
+          'Master coaching conversation techniques',
+          'Improve active listening skills',
+          'Enhance motivational abilities',
+          'Better goal-setting facilitation',
+          'Develop feedback delivery skills',
+          'Guide skill development effectively',
+          ...commonGoals
+        ];
+      default:
+        return [
+          'Improve professional skills',
+          'Enhance subject matter expertise',
+          'Better client interaction',
+          'Improve knowledge delivery',
+          ...commonGoals
+        ];
+    }
+  };
+
+  const getChallengesForRole = (role: string) => {
+    const commonChallenges = [
+      'Inconsistent performance',
+      'Difficulty with complex situations',
+      'Need better communication skills',
+      'Time management issues'
+    ];
+
+    switch (role) {
+      case 'sales_representative':
+        return [
+          'Low lead-to-customer conversion rates',
+          'Difficulty handling price objections',
+          'Poor follow-up on warm leads',
+          'Struggling with discovery questions',
+          'Need better closing techniques',
+          'Difficulty qualifying serious prospects',
+          ...commonChallenges
+        ];
+      case 'customer_service':
+        return [
+          'Long response times to inquiries',
+          'High customer churn rates',
+          'Difficulty with angry customers',
+          'Inconsistent service quality',
+          'Poor first-call resolution',
+          'Need better de-escalation skills',
+          ...commonChallenges
+        ];
+      case 'technical_specialist':
+        return [
+          'Struggling with complex technical questions',
+          'Difficulty explaining technical concepts',
+          'Incomplete product knowledge',
+          'Poor diagnostic procedures',
+          'Integration challenges',
+          'Documentation gaps',
+          ...commonChallenges
+        ];
+      case 'consultant':
+        return [
+          'Need better strategic thinking',
+          'Difficulty with needs assessment',
+          'Poor stakeholder management',
+          'Inconsistent recommendations',
+          'Analytical skill gaps',
+          'Challenge with change management',
+          ...commonChallenges
+        ];
+      case 'coach':
+        return [
+          'Difficulty with coaching conversations',
+          'Poor active listening skills',
+          'Struggling with motivation techniques',
+          'Ineffective feedback delivery',
+          'Goal-setting challenges',
+          'Building trust issues',
+          ...commonChallenges
+        ];
+      default:
+        return [
+          'General skill development needs',
+          'Professional growth challenges',
+          'Client interaction difficulties',
+          'Knowledge gaps in field',
+          ...commonChallenges
+        ];
+    }
+  };
+
+  const getScenariosForRole = (role: string) => {
+    switch (role) {
+      case 'sales_representative':
+        return [
+          'Cold lead qualification calls',
+          'Warm lead follow-up conversations',
+          'Product demo and presentation',
+          'Handling price/budget objections',
+          'Closing deals and negotiations',
+          'Upselling to existing customers'
+        ];
+      case 'customer_service':
+        return [
+          'Handling billing inquiries',
+          'Processing refunds/cancellations',
+          'Angry/frustrated customer situations',
+          'Technical support requests',
+          'Account management questions',
+          'Service escalation scenarios'
+        ];
+      case 'technical_specialist':
+        return [
+          'Complex technical troubleshooting',
+          'System integration support',
+          'Product configuration assistance',
+          'Technical documentation review',
+          'Engineering consultation calls',
+          'Advanced diagnostic scenarios'
+        ];
+      case 'consultant':
+        return [
+          'Business strategy consultation sessions',
+          'Needs assessment meetings',
+          'Stakeholder consultation scenarios',
+          'Change management discussions',
+          'Performance improvement planning',
+          'Strategic planning workshops'
+        ];
+      case 'coach':
+        return [
+          'Goal-setting and planning conversations',
+          'Performance coaching discussions',
+          'Skills development coaching',
+          'Motivational coaching sessions',
+          'Feedback delivery scenarios',
+          'Career development mentoring'
+        ];
+      default:
+        return [
+          'Professional consultation sessions',
+          'Expert advice scenarios',
+          'Knowledge sharing meetings',
+          'Problem-solving discussions',
+          'Client advisory calls',
+          'Specialized expertise scenarios'
+        ];
+    }
+  };
 
   const renderStep4 = () => (
     <Card>
@@ -488,24 +454,7 @@ export function AITrainingSetup() {
         <div>
           <Label>What types of scenarios do you want to prioritize?</Label>
           <div className="grid grid-cols-1 gap-3 mt-2">
-            {[
-              'Cold lead qualification calls',
-              'Warm lead follow-up conversations', 
-              'Product demo and presentation',
-              'Handling price/budget objections',
-              'Technical support and troubleshooting',
-              'Billing and account management',
-              'Upselling to existing customers',
-              'Handling cancellation requests',
-              'Angry/frustrated customer situations',
-              'Complex enterprise sales scenarios',
-              'Business strategy consultation sessions',
-              'Goal-setting and planning conversations',
-              'Performance coaching discussions',
-              'Problem-solving advisory meetings',
-              'Skills development coaching',
-              'Stakeholder consultation scenarios'
-            ].map((scenario) => (
+            {getScenariosForRole(requirements.assistantRole || '').map((scenario) => (
               <div key={scenario} className="flex items-center space-x-2">
                 <Checkbox
                   id={scenario}
@@ -549,55 +498,6 @@ export function AITrainingSetup() {
             ))}
           </div>
         </div>
-
-        <div>
-          <Label>Customer personas you typically deal with:</Label>
-          <div className="grid grid-cols-2 gap-3 mt-2">
-            {[
-              'Budget-conscious small business owner',
-              'Enterprise decision maker',
-              'Technical/IT professional', 
-              'Marketing manager/director',
-              'Startup founder',
-              'Conservative/risk-averse buyer',
-              'Quick decision maker',
-              'Analytical/data-driven buyer',
-              'Relationship-focused buyer',
-              'Price-sensitive consumer',
-              'Executive seeking strategic guidance',
-              'Entrepreneur needing business advice',
-              'Team leader requiring coaching',
-              'Professional seeking skill development',
-              'Manager facing performance challenges',
-              'Business owner planning growth'
-            ].map((persona) => (
-              <div key={persona} className="flex items-center space-x-2">
-                <Checkbox
-                  id={persona}
-                  checked={requirements.customerPersonas?.includes(persona)}
-                  onCheckedChange={() => toggleArrayField('customerPersonas', persona)}
-                />
-                <Label htmlFor={persona} className="text-sm">{persona}</Label>
-              </div>
-            ))}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="other_personas"
-                checked={requirements.customerPersonas?.includes('other')}
-                onCheckedChange={() => toggleArrayField('customerPersonas', 'other')}
-              />
-              <Label htmlFor="other_personas" className="text-sm">Other</Label>
-            </div>
-          </div>
-          {requirements.customerPersonas?.includes('other') && (
-            <Input
-              className="mt-2"
-              placeholder="Please specify other customer personas"
-              value={requirements.customerPersonasOther || ''}
-              onChange={(e) => updateRequirements('customerPersonasOther', e.target.value)}
-            />
-          )}
-        </div>
       </CardContent>
     </Card>
   );
@@ -616,23 +516,23 @@ export function AITrainingSetup() {
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-semibold mb-2">Business Context</h4>
+            <h4 className="font-semibold mb-2">AI Assistant Configuration</h4>
             <div className="space-y-1 text-sm">
-              <p><strong>Type:</strong> {requirements.businessType === 'other' ? requirements.businessTypeOther : requirements.businessType?.replace('_', ' ')}</p>
-              <p><strong>Industry:</strong> {requirements.industry === 'other' ? requirements.industryOther : requirements.industry?.replace('_', ' ')}</p>
-              <p><strong>Assistant Role:</strong> {requirements.assistantRole === 'other' ? requirements.assistantRoleOther : requirements.assistantRole?.replace('_', ' ')}</p>
+              <p><strong>Role:</strong> {requirements.assistantRole === 'other' ? requirements.assistantRoleOther : requirements.assistantRole?.replace('_', ' ')}</p>
+              <p><strong>Skill Level:</strong> {requirements.skillLevel || 'Not specified'}</p>
+              <p><strong>Difficulty Levels:</strong> {requirements.difficultyLevels?.join(', ') || 'Not specified'}</p>
             </div>
           </div>
           
           <div>
-            <h4 className="font-semibold mb-2">Key Functions</h4>
+            <h4 className="font-semibold mb-2">Current Challenges</h4>
             <div className="flex flex-wrap gap-1">
-              {requirements.primaryFunctions?.slice(0, 4).map((func) => (
-                <Badge key={func} variant="secondary" className="text-xs">{func}</Badge>
+              {requirements.currentChallenges?.slice(0, 3).map((challenge) => (
+                <Badge key={challenge} variant="secondary" className="text-xs">{challenge}</Badge>
               ))}
-              {(requirements.primaryFunctions?.length || 0) > 4 && (
+              {(requirements.currentChallenges?.length || 0) > 3 && (
                 <Badge variant="outline" className="text-xs">
-                  +{(requirements.primaryFunctions?.length || 0) - 4} more
+                  +{(requirements.currentChallenges?.length || 0) - 3} more
                 </Badge>
               )}
             </div>
@@ -699,7 +599,7 @@ export function AITrainingSetup() {
           {/* Progress Steps */}
           <div className="flex justify-center mt-6">
             <div className="flex items-center space-x-4">
-              {[1, 2, 3, 4, 5].map((stepNum) => (
+              {[1, 2, 3, 4].map((stepNum) => (
                 <div key={stepNum} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
                     stepNum <= step 
@@ -708,7 +608,7 @@ export function AITrainingSetup() {
                   }`}>
                     {stepNum}
                   </div>
-                  {stepNum < 5 && (
+                  {stepNum < 4 && (
                     <div className={`w-8 h-1 ${
                       stepNum < step ? 'bg-blue-600' : 'bg-gray-200'
                     }`} />
@@ -722,8 +622,7 @@ export function AITrainingSetup() {
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
-        {step === 5 && renderSummary()}
+        {step === 4 && renderSummary()}
 
         <div className="flex justify-between mt-8">
           <Button 
@@ -734,14 +633,13 @@ export function AITrainingSetup() {
             Previous
           </Button>
           
-          {step < 5 ? (
+          {step < 4 ? (
             <Button 
               onClick={() => setStep(step + 1)}
               disabled={
-                (step === 1 && (!requirements.businessType || !requirements.industry)) ||
-                (step === 2 && !requirements.assistantRole) ||
-                (step === 3 && (!requirements.trainingGoals?.length || !requirements.currentChallenges?.length)) ||
-                (step === 4 && !requirements.priorityScenarios?.length)
+                (step === 1 && !requirements.assistantRole) ||
+                (step === 2 && !requirements.skillLevel) ||
+                (step === 3 && (!requirements.trainingGoals?.length || !requirements.priorityScenarios?.length))
               }
             >
               Next Step
