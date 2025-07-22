@@ -48,9 +48,10 @@ export default function LoginPage() {
       });
       setLocation("/dashboard");
     } catch (error: any) {
+      console.log('Login error caught:', error);
       toast({
-        title: "Sign In Failed",
-        description: error.message || "Invalid email or password. Don't have an account? Click Sign Up to register.",
+        title: "Sign In Failed", 
+        description: error.message || "Please check your email and password and try again. Don't have an account? Click Sign Up to register.",
         variant: "destructive",
       });
     }

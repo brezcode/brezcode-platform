@@ -164,7 +164,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Basic validation
       if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({ error: "Please enter both your email and password" });
       }
       
       // Import storage and bcrypt
@@ -176,7 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!user) {
         console.log('User not found:', email);
-        return res.status(401).json({ error: "Invalid email or password" });
+        return res.status(401).json({ error: "We couldn't find an account with that email address" });
       }
       
       // Verify password
@@ -184,7 +184,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       if (!passwordMatch) {
         console.log('Password mismatch for:', email);
-        return res.status(401).json({ error: "Invalid email or password" });
+        return res.status(401).json({ error: "The password you entered is incorrect" });
       }
       
       // Check if email is verified
@@ -199,10 +199,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Return user without sensitive data
       const { password: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword, message: "Login successful" });
+      res.json({ user: userWithoutPassword, message: "Welcome back! Login successful" });
     } catch (error: any) {
       console.error('Login error:', error);
-      res.status(500).json({ error: "Login failed" });
+      res.status(500).json({ error: "Something went wrong during login. Please try again" });
     }
   });
 
@@ -214,7 +214,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Basic validation
       if (!email || !password) {
-        return res.status(400).json({ error: "Email and password are required" });
+        return res.status(400).json({ error: "Please enter both your email and password" });
       }
       
       // Import storage and bcrypt
@@ -226,7 +226,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('User lookup result:', user ? 'Found' : 'Not found');
       
       if (!user) {
-        return res.status(401).json({ error: "Invalid email or password" });
+        return res.status(401).json({ error: "We couldn't find an account with that email address" });
       }
       
       // Verify password
@@ -235,7 +235,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Password match result:', passwordMatch);
       
       if (!passwordMatch) {
-        return res.status(401).json({ error: "Invalid email or password" });
+        return res.status(401).json({ error: "The password you entered is incorrect" });
       }
       
       // Check if email is verified
@@ -250,10 +250,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Return user without sensitive data
       const { password: _, ...userWithoutPassword } = user;
-      res.json({ user: userWithoutPassword, message: "Login successful" });
+      res.json({ user: userWithoutPassword, message: "Welcome back! Login successful" });
     } catch (error: any) {
       console.error('Login error:', error);
-      res.status(500).json({ error: "Login failed" });
+      res.status(500).json({ error: "Something went wrong during login. Please try again" });
     }
   });
 
@@ -286,7 +286,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Session debug - userId:', userId, 'sessionID:', (req as any).sessionID);
       
       if (!userId) {
-        return res.status(401).json({ error: "Not authenticated" });
+        return res.status(401).json({ error: "Please log in to continue" });
       }
       
       const { storage } = await import('./storage');
