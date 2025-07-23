@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Authentication Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+        .pass { color: #28a745; font-weight: bold; }
+        .fail { color: #dc3545; font-weight: bold; }
+        .info { color: #17a2b8; }
+        .warn { color: #ffc107; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #6c757d; cursor: not-allowed; }
+        .log {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Frontend Authentication & Profile Test Platform</h1>
+    
+    <div class="test-container">
+        <h2>Authentication Test</h2>
+        
+        <div class="test-section">
+            <h3>1. Login Test</h3>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" value="leedennyps@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="11111111">
+            </div>
+            <button onclick="testLogin()">Test Login</button>
+            <button onclick="testCurrentUser()">Check Current User</button>
+            <button onclick="testLogout()">Test Logout</button>
+            <div id="login-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Profile Data Test</h3>
+            <button onclick="testProfileFetch()">Fetch Profile Data</button>
+            <button onclick="testProfileUpdate()">Test Profile Update</button>
+            <div id="profile-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Session Persistence Test</h3>
+            <button onclick="testSessionPersistence()">Test Session Persistence</button>
+            <button onclick="clearSession()">Clear Session</button>
+            <div id="session-log" class="log"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Complete Integration Test</h3>
+            <button onclick="runCompleteTest()">Run Complete Test Suite</button>
+            <div id="complete-log" class="log"></div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        
+        function log(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'pass' ? 'pass' : type === 'fail' ? 'fail' : type === 'warn' ? 'warn' : 'info';
+            element.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            element.scrollTop = element.scrollHeight;
+        }
+
+        function clearLog(elementId) {
+            document.getElementById(elementId).innerHTML = '';
+        }
+
+        async function makeRequest(method, endpoint, data = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include'
+                };
+
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`${API_BASE}${endpoint}`, options);
+                const responseData = await response.json();
+                
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data: responseData
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    status: 0,
+                    data: { error: error.message }
+                };
+            }
+        }
+
+        async function testLogin() {
+            clearLog('login-log');
+            log('login-log', 'Testing login...');
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                log('login-log', 'Please enter email and password', 'fail');
+                return;
+            }
+
+            const result = await makeRequest('POST', '/api/login', { email, password });
+            
+            if (result.ok) {
+                log('login-log', 'Login successful!', 'pass');
+                log('login-log', `User: ${JSON.stringify(result.data.user, null, 2)}`);
+            } else {
+                log('login-log', `Login failed: ${JSON.stringify(result.data)}`, 'fail');
+            }
+        }
+
+        async function testCurrentUser() {
+            log('login-log', 'Checking current user...');
+            
+            const result = await makeRequest('GET', '/api/me');
+            
+            if (result.ok) {
+                log('login-log', 'User is authenticated!', 'pass');
+                log('login-log', `Current user: ${JSON.stringify(result.data, null, 2)}`);
+            } else {
+                log('login-log', `Not authenticated: ${JSON.stringify(result.data)}`, 'fail');
+            }
+        }
+
+        async function testLogout() {
+            log('login-log', 'Testing logout...');
+            
+            const result = await makeRequest('POST', '/api/auth/logout');
+            
+            if (result.ok) {
+                log('login-log', 'Logout successful!', 'pass');
+            } else {
+                log('login-log', `Logout failed: ${JSON.stringify(result.data)}`, 'fail');
+            }
+        }
+
+        async function testProfileFetch() {
+            clearLog('profile-log');
+            log('profile-log', 'Fetching profile data...');
+            
+            const result = await makeRequest('GET', '/api/user/profile');
+            
+            if (result.ok) {
+                log('profile-log', 'Profile fetch successful!', 'pass');
+                log('profile-log', `Profile data: ${JSON.stringify(result.data, null, 2)}`);
+                
+                // Check for expected fields
+                const expectedFields = ['firstName', 'lastName', 'streetAddress', 'city', 'state', 'postalCode', 'country', 'phoneNumber'];
+                const missingFields = expectedFields.filter(field => !(field in result.data));
+                
+                if (missingFields.length === 0) {
+                    log('profile-log', 'All expected profile fields present!', 'pass');
+                } else {
+                    log('profile-log', `Missing fields: ${missingFields.join(', ')}`, 'warn');
+                }
+            } else {
+                log('profile-log', `Profile fetch failed: ${JSON.stringify(result.data)}`, 'fail');
+            }
+        }
+
+        async function testProfileUpdate() {
+            log('profile-log', 'Testing profile update...');
+            
+            const testData = {
+                firstName: 'TestFirstName',
+                lastName: 'TestLastName',
+                streetAddress: '123 Test Street',
+                city: 'Test City',
+                state: 'Test State',
+                postalCode: '12345',
+                country: 'Test Country',
+                phoneNumber: '+1234567890'
+            };
+            
+            const result = await makeRequest('POST', '/api/user/profile', testData);
+            
+            if (result.ok) {
+                log('profile-log', 'Profile update successful!', 'pass');
+                log('profile-log', `Updated profile: ${JSON.stringify(result.data, null, 2)}`);
+            } else {
+                log('profile-log', `Profile update failed: ${JSON.stringify(result.data)}`, 'fail');
+            }
+        }
+
+        async function testSessionPersistence() {
+            clearLog('session-log');
+            log('session-log', 'Testing session persistence...');
+            
+            // First check if we're logged in
+            let result = await makeRequest('GET', '/api/me');
+            if (!result.ok) {
+                log('session-log', 'Not logged in, attempting login first...', 'warn');
+                const loginResult = await makeRequest('POST', '/api/login', {
+                    email: document.getElementById('email').value,
+                    password: document.getElementById('password').value
+                });
+                if (!loginResult.ok) {
+                    log('session-log', 'Login failed, cannot test session persistence', 'fail');
+                    return;
+                }
+            }
+            
+            log('session-log', 'Initial authentication confirmed', 'pass');
+            
+            // Wait a moment and check again
+            setTimeout(async () => {
+                const persistenceResult = await makeRequest('GET', '/api/me');
+                if (persistenceResult.ok) {
+                    log('session-log', 'Session persists correctly!', 'pass');
+                } else {
+                    log('session-log', 'Session does not persist', 'fail');
+                }
+            }, 2000);
+        }
+
+        async function clearSession() {
+            log('session-log', 'Clearing session...');
+            await makeRequest('POST', '/api/auth/logout');
+            log('session-log', 'Session cleared', 'info');
+        }
+
+        async function runCompleteTest() {
+            clearLog('complete-log');
+            log('complete-log', 'Starting complete integration test...');
+            
+            let testsPassed = 0;
+            let totalTests = 0;
+            
+            // Test 1: Login
+            totalTests++;
+            log('complete-log', '=== Test 1: Login ===');
+            const loginResult = await makeRequest('POST', '/api/login', {
+                email: document.getElementById('email').value,
+                password: document.getElementById('password').value
+            });
+            if (loginResult.ok) {
+                log('complete-log', '✓ Login test passed', 'pass');
+                testsPassed++;
+            } else {
+                log('complete-log', '✗ Login test failed', 'fail');
+            }
+            
+            // Test 2: Current User
+            totalTests++;
+            log('complete-log', '=== Test 2: Current User ===');
+            const userResult = await makeRequest('GET', '/api/me');
+            if (userResult.ok) {
+                log('complete-log', '✓ Current user test passed', 'pass');
+                testsPassed++;
+            } else {
+                log('complete-log', '✗ Current user test failed', 'fail');
+            }
+            
+            // Test 3: Profile Fetch
+            totalTests++;
+            log('complete-log', '=== Test 3: Profile Fetch ===');
+            const profileResult = await makeRequest('GET', '/api/user/profile');
+            if (profileResult.ok) {
+                log('complete-log', '✓ Profile fetch test passed', 'pass');
+                testsPassed++;
+            } else {
+                log('complete-log', '✗ Profile fetch test failed', 'fail');
+            }
+            
+            // Test 4: Profile Update
+            totalTests++;
+            log('complete-log', '=== Test 4: Profile Update ===');
+            const updateResult = await makeRequest('POST', '/api/user/profile', {
+                firstName: 'IntegrationTest',
+                lastName: 'User',
+                streetAddress: '456 Integration Ave',
+                city: 'Test City',
+                state: 'Test State',
+                postalCode: '54321',
+                country: 'Test Country',
+                phoneNumber: '+1987654321'
+            });
+            if (updateResult.ok) {
+                log('complete-log', '✓ Profile update test passed', 'pass');
+                testsPassed++;
+            } else {
+                log('complete-log', '✗ Profile update test failed', 'fail');
+            }
+            
+            // Final Results
+            log('complete-log', '=== TEST SUMMARY ===');
+            log('complete-log', `Passed: ${testsPassed}/${totalTests} (${((testsPassed/totalTests)*100).toFixed(1)}%)`);
+            
+            if (testsPassed === totalTests) {
+                log('complete-log', '🎉 ALL TESTS PASSED!', 'pass');
+            } else {
+                log('complete-log', '❌ SOME TESTS FAILED', 'fail');
+            }
+        }
+    </script>
+</body>
+</html>
