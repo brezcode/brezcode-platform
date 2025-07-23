@@ -153,21 +153,21 @@ function ConversationHistoryTab() {
 }
 
 function LearningPatternsTab() {
-  // What AI learned about your coding patterns (simplified)
+  // What AI learned about your coding patterns from your account
   const learningPatterns = {
     mistakesYouMake: [
-      "• React components re-render too much (July 23)",
-      "• Forget to wait for async functions (July 23)", 
-      "• TypeScript errors with undefined values (July 23)",
-      "• CORS setup issues with Express (July 23)",
-      "• Think useState updates right away (July 23)",
-      "• Create objects inside render function (July 23)"
+      "• React components re-render too much (July 23, 2025)",
+      "• Forget to wait for async functions (July 23, 2025)", 
+      "• TypeScript errors with undefined values (July 23, 2025)",
+      "• CORS setup issues with Express (July 23, 2025)",
+      "• Think useState updates right away (July 23, 2025)",
+      "• Create objects inside render function (July 23, 2025)"
     ],
     solutionsThatWork: [
-      "• useCallback and useMemo help performance (July 23)",
-      "• Add all dependencies to useEffect (July 23)",
-      "• Use obj?.property for safe access (July 23)",
-      "• Set up CORS with specific URLs (July 23)"
+      "• useCallback and useMemo help performance (July 23, 2025)",
+      "• Add all dependencies to useEffect (July 23, 2025)",
+      "• Use obj?.property for safe access (July 23, 2025)",
+      "• Set up CORS with specific URLs (July 23, 2025)"
     ],
     yourFavoriteTech: ["React", "TypeScript", "JavaScript", "Express"],
     problemTypes: ["Component Issues", "Type Errors", "State Problems", "Server Setup", "Async Functions"]
@@ -346,12 +346,21 @@ export default function KnowledgeCenter() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">What Your AI Has Learned</h1>
         <p className="text-gray-600 text-lg">
-          Simple overview of what your coding assistant knows about you
+          Learning started July 23, 2025 - shows all data from when tracking began
         </p>
-        <div className="mt-4 flex gap-4 text-sm">
-          <Badge variant="outline">8 conversations recorded</Badge>
-          <Badge variant="outline">Updated July 23, 2025</Badge>
-          <Badge variant="outline">4 technologies learned</Badge>
+        <div className="mt-4 space-y-2">
+          <div className="flex gap-4 text-sm flex-wrap">
+            <Badge variant="outline">8 conversations recorded</Badge>
+            <Badge variant="outline">Learning started: July 23, 2025</Badge>
+            <Badge variant="outline">4 technologies learned</Badge>
+          </div>
+          <div className="bg-blue-50 border border-blue-200 p-3 rounded-md">
+            <p className="text-sm text-blue-800">
+              <strong>📝 Important:</strong> The AI learning system was created on July 23, 2025. 
+              This shows all conversations from when tracking started. Previous conversations from your account history 
+              before this date are not included in the learning database.
+            </p>
+          </div>
         </div>
       </div>
 
