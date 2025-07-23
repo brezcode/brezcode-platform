@@ -18,7 +18,9 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
+import { db } from "./db";
+import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier, users } from "@shared/schema";
+import { eq } from "drizzle-orm";
 import twilio from "twilio";
 import sgMail from "@sendgrid/mail";
 
@@ -483,7 +485,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Profile update request for user:", userId, "with data:", profileData);
 
-      // Map profile form fields to user table columns
+      // Map profile form fields to user table columns with correct field names
       const userUpdateData = {
         firstName: profileData.firstName,
         lastName: profileData.lastName,
@@ -496,9 +498,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         profilePhoto: profileData.profilePhoto
       };
 
-      const updatedUser = await storage.updateUser(userId, userUpdateData);
+      // Filter out undefined values
+      const filteredData = Object.fromEntries(
+        Object.entries(userUpdateData).filter(([_, value]) => value !== undefined)
+      );
 
-      console.log("Profile updated successfully:", updatedUser);
+      console.log("Mapped data for users table:", filteredData);
+
+      // Update directly in database using db.update
+      const [updatedUser] = await db
+        .update(users)
+        .set(filteredData)
+        .where(eq(users.id, userId))
+        .returning();
+
+      console.log("Profile updated successfully in users table:", updatedUser);
 
       res.json({
         success: true,
