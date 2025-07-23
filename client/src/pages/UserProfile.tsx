@@ -176,6 +176,34 @@ export default function UserProfile() {
           </div>
         </div>
 
+        {/* Current Database Data Display */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-xl font-bold text-blue-600">Current Database Data</CardTitle>
+            <CardDescription>
+              This shows what's currently saved in the database for your profile
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {profile ? (
+              <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-lg">
+                <div><strong>First Name:</strong> <span className="text-blue-600">{profile.firstName || 'Not set'}</span></div>
+                <div><strong>Last Name:</strong> <span className="text-blue-600">{profile.lastName || 'Not set'}</span></div>
+                <div><strong>Email:</strong> <span className="text-blue-600">{profile.email || 'Not set'}</span></div>
+                <div><strong>Phone:</strong> <span className="text-blue-600">{profile.phoneNumber || 'Not set'}</span></div>
+                <div><strong>Street Address:</strong> <span className="text-blue-600">{profile.streetAddress || 'Not set'}</span></div>
+                <div><strong>City:</strong> <span className="text-blue-600">{profile.city || 'Not set'}</span></div>
+                <div><strong>State/Province:</strong> <span className="text-blue-600">{profile.state || 'Not set'}</span></div>
+                <div><strong>Postal Code:</strong> <span className="text-blue-600">{profile.postalCode || 'Not set'}</span></div>
+                <div><strong>Country:</strong> <span className="text-blue-600">{profile.country || 'Not set'}</span></div>
+                <div><strong>Profile Photo:</strong> <span className="text-blue-600">{profile.profilePhoto ? 'Set' : 'Not set'}</span></div>
+              </div>
+            ) : (
+              <div className="text-gray-500">Loading current data...</div>
+            )}
+          </CardContent>
+        </Card>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             
