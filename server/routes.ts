@@ -188,6 +188,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User profile and dashboard routes
   const userRoutes = await import('./routes/userRoutes');
   app.use('/api/user', userRoutes.default);
+
+  // Coding assistant routes
+  const codingAssistantRoutes = await import('./coding-assistant-routes');
+  app.use('/api/coding-assistant', codingAssistantRoutes.default);
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",

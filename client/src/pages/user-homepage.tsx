@@ -184,6 +184,13 @@ export default function UserHomepage() {
       color: "bg-yellow-500"
     },
     {
+      title: "Coding Assistant",
+      description: "Remember code patterns & debugging solutions",
+      icon: <Brain className="h-5 w-5" />,
+      action: () => setLocation('/coding-assistant'),
+      color: "bg-purple-500"
+    },
+    {
       title: "Profile Settings",
       description: "Manage your business profile",
       icon: <Settings className="h-5 w-5" />,
