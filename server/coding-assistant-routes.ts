@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { aiCodingAnalyzer } from "./aiCodingAnalyzer";
 
 const router = Router();
 
@@ -143,6 +144,93 @@ router.get('/analytics', async (req, res) => {
   } catch (error) {
     console.error("Error getting analytics:", error);
     res.status(500).json({ error: "Failed to retrieve analytics" });
+  }
+});
+
+// Auto-learning endpoint - records coding conversations
+router.post('/learn', async (req, res) => {
+  try {
+    const { userMessage, aiResponse, technology, problemType, sessionId } = req.body;
+    
+    await aiCodingAnalyzer.recordCodingInteraction(
+      userMessage, 
+      aiResponse, 
+      { technology, problemType, sessionId }
+    );
+    
+    res.json({ success: true, message: "Interaction recorded for learning" });
+  } catch (error) {
+    console.error("Error recording interaction:", error);
+    res.status(500).json({ error: "Failed to record interaction" });
+  }
+});
+
+// Get AI insights about coding patterns
+router.get('/insights', async (req, res) => {
+  try {
+    const insights = await aiCodingAnalyzer.generateInsights();
+    res.json(insights);
+  } catch (error) {
+    console.error("Error getting insights:", error);
+    res.status(500).json({ error: "Failed to generate insights" });
+  }
+});
+
+// Get recent interactions for analysis
+router.get('/interactions', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 10;
+    const interactions = aiCodingAnalyzer.getRecentInteractions(limit);
+    res.json(interactions);
+  } catch (error) {
+    console.error("Error getting interactions:", error);
+    res.status(500).json({ error: "Failed to get interactions" });
+  }
+});
+
+// Simulate coding conversations for demo
+router.post('/simulate', async (req, res) => {
+  try {
+    // Simulate realistic coding conversations
+    const conversations = [
+      {
+        user: "How do I handle async/await errors in JavaScript?",
+        ai: "Use try/catch blocks around your await calls:\n\ntry {\n  const result = await fetchData();\n  console.log(result);\n} catch (error) {\n  console.error('Error:', error);\n}",
+        tech: "JavaScript"
+      },
+      {
+        user: "Show me React useState with TypeScript",
+        ai: "Here's how to use useState with TypeScript:\n\nconst [count, setCount] = useState<number>(0);\nconst [user, setUser] = useState<User | null>(null);",
+        tech: "React"
+      },
+      {
+        user: "I'm getting 'Cannot read property of undefined' error",
+        ai: "This error occurs when you try to access a property of undefined. Use optional chaining:\n\nuser?.profile?.name instead of user.profile.name\n\nOr check if the object exists first:\nif (user && user.profile) { console.log(user.profile.name); }",
+        tech: "JavaScript"
+      },
+      {
+        user: "How to make API calls in React with proper error handling?",
+        ai: "Use fetch with async/await and proper error handling:\n\nconst fetchUser = async (id) => {\n  try {\n    const response = await fetch(`/api/users/${id}`);\n    if (!response.ok) throw new Error('Failed to fetch');\n    const user = await response.json();\n    return user;\n  } catch (error) {\n    console.error('API Error:', error);\n    throw error;\n  }\n};",
+        tech: "React"
+      }
+    ];
+
+    for (const conv of conversations) {
+      await aiCodingAnalyzer.recordCodingInteraction(
+        conv.user,
+        conv.ai,
+        { technology: conv.tech, problemType: 'general' }
+      );
+    }
+
+    res.json({ 
+      success: true, 
+      message: `Simulated ${conversations.length} coding conversations`,
+      conversations: conversations.length
+    });
+  } catch (error) {
+    console.error("Error simulating conversations:", error);
+    res.status(500).json({ error: "Failed to simulate conversations" });
   }
 });
 

@@ -111,6 +111,27 @@ const CodingAssistant: React.FC = () => {
     }
   });
 
+  // Fetch analytics
+  const { data: analytics } = useQuery({
+    queryKey: ['/api/coding-assistant/analytics'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/coding-assistant/analytics');
+        if (!response.ok) throw new Error('Failed to fetch analytics');
+        return await response.json();
+      } catch (error) {
+        console.log('Error fetching analytics:', error);
+        return {
+          totalPatterns: 0,
+          totalStrategies: 0,
+          totalSolutions: 0,
+          avgEffectiveness: 50,
+          recentActivity: []
+        };
+      }
+    }
+  });
+
   // Add new pattern mutation
   const addPatternMutation = useMutation({
     mutationFn: async (pattern: any) => {
@@ -211,7 +232,7 @@ const CodingAssistant: React.FC = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="patterns" className="flex items-center gap-2">
             <Code2 className="h-4 w-4" />
             Patterns
@@ -224,9 +245,13 @@ const CodingAssistant: React.FC = () => {
             <History className="h-4 w-4" />
             Solutions
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            AI Learning
+          </TabsTrigger>
           <TabsTrigger value="add" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
-            Add New
+            Manual
           </TabsTrigger>
         </TabsList>
 
@@ -418,10 +443,129 @@ const CodingAssistant: React.FC = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="analytics" className="mt-6">
+          <div className="grid gap-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Brain className="h-5 w-5" />
+                  AI Learning Analytics
+                </CardTitle>
+                <CardDescription>
+                  The AI automatically learns from coding conversations and extracts patterns
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">{analytics?.totalPatterns || 0}</div>
+                    <div className="text-sm text-gray-600">Auto-Extracted Patterns</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">{analytics?.totalStrategies || 0}</div>
+                    <div className="text-sm text-gray-600">Prompting Strategies</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">{analytics?.totalSolutions || 0}</div>
+                    <div className="text-sm text-gray-600">Debugging Solutions</div>
+                  </div>
+                </div>
+                
+                <div className="flex gap-4">
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/coding-assistant/simulate', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' }
+                        });
+                        const result = await response.json();
+                        console.log('Simulated conversations:', result);
+                        
+                        // Refresh data
+                        queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/patterns'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/strategies'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/solutions'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/analytics'] });
+                      } catch (error) {
+                        console.error('Error simulating:', error);
+                      }
+                    }}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Simulate AI Learning
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/coding-assistant/insights');
+                        const insights = await response.json();
+                        console.log('AI Insights:', insights);
+                        alert('Check console for detailed insights!');
+                      } catch (error) {
+                        console.error('Error getting insights:', error);
+                      }
+                    }}
+                  >
+                    <Brain className="h-4 w-4 mr-2" />
+                    Get AI Insights
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>How It Works</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-blue-100 dark:bg-blue-900 p-2 rounded-lg">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">1</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Conversation Recording</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Every coding conversation with AI is automatically recorded and analyzed
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="bg-green-100 dark:bg-green-900 p-2 rounded-lg">
+                    <span className="text-green-600 dark:text-green-400 font-bold">2</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Pattern Recognition</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      AI identifies useful code patterns, debugging strategies, and common solutions
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-start gap-3">
+                  <div className="bg-purple-100 dark:bg-purple-900 p-2 rounded-lg">
+                    <span className="text-purple-600 dark:text-purple-400 font-bold">3</span>
+                  </div>
+                  <div>
+                    <h4 className="font-medium">Knowledge Base Building</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      Extracted patterns are automatically added to your coding knowledge base
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
         <TabsContent value="add" className="mt-6">
           <Card>
             <CardHeader>
-              <CardTitle>Add New Code Pattern</CardTitle>
+              <CardTitle>Manual Pattern Entry</CardTitle>
               <CardDescription>
                 Save a reusable code pattern for future reference
               </CardDescription>

@@ -448,6 +448,10 @@ Format your response as JSON with the exact structure:
   });
 
   // AI Chat endpoint
+  // Register coding assistant routes
+  const codingAssistantRoutes = await import('./coding-assistant-routes');
+  app.use('/api/coding-assistant', codingAssistantRoutes.default);
+
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, sessionId } = req.body;
