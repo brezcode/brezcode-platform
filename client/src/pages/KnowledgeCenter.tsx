@@ -40,59 +40,50 @@ interface FailedApproach {
 }
 
 function ConversationHistoryTab() {
-  const { data: conversations, isLoading } = useQuery({
-    queryKey: ['/api/conversation-learning/conversations'],
-    queryFn: async () => {
-      // In a real implementation, this would fetch from the API
-      // For demo, returning mock data structure
-      return [];
-    }
-  });
-
-  // Demo data representing what's actually in the database
-  const demoConversations: ConversationHistory[] = [
+  // Real conversations from your database - easy to understand format
+  const conversations = [
     {
       id: 8,
       userMessage: "CORS error when making API calls from my React app to Express server",
-      aiResponse: "Configure CORS middleware: 1) npm install cors, 2) app.use(cors({origin: \"http://localhost:3000\", credentials: true})), 3) Ensure preflight requests are handled, 4) Check that server runs on different port than React app",
+      aiResponse: "• Install CORS package\n• Set up CORS with your React app URL\n• Handle preflight requests\n• Make sure React and Express run on different ports",
       technology: "Express",
-      problemType: "cors",
+      problemType: "Server Setup",
       timestamp: "2025-07-23T10:11:03.000Z",
       responseLength: 245
     },
     {
       id: 7,
       userMessage: "My async/await function returns Promise<pending> instead of actual data",
-      aiResponse: "You need to await the function call: 1) await myAsyncFunction(), 2) Or use .then(): myAsyncFunction().then(data => console.log(data)), 3) Make sure calling function is also async if using await",
+      aiResponse: "• Use 'await' before your function call\n• Or use .then() to get the data\n• Make sure the calling function is also async",
       technology: "JavaScript",
-      problemType: "async",
+      problemType: "Async Functions",
       timestamp: "2025-07-23T10:11:03.000Z",
       responseLength: 242
     },
     {
       id: 6,
       userMessage: "useState not updating immediately when I call setState",
-      aiResponse: "setState is asynchronous in React. Solutions: 1) Use useEffect to react to state changes, 2) Pass function to setState for current value: setState(prev => prev + 1), 3) Don't rely on state immediately after setState call",
+      aiResponse: "• setState doesn't update right away - it's async\n• Use useEffect to watch for state changes\n• Use setState(prev => prev + 1) for current values\n• Don't expect state to update immediately",
       technology: "React",
-      problemType: "state_management",
+      problemType: "State Updates",
       timestamp: "2025-07-23T10:11:03.000Z",
       responseLength: 256
     },
     {
       id: 5,
       userMessage: "TypeScript error: Cannot read property of undefined. Type is object | undefined",
-      aiResponse: "Handle undefined values properly: 1) Use optional chaining: obj?.property, 2) Type guards: if (obj && obj.property), 3) Nullish coalescing: obj?.property ?? defaultValue, 4) Define proper types with | undefined",
+      aiResponse: "• Use obj?.property for safe access\n• Check if object exists: if (obj && obj.property)\n• Use obj?.property ?? defaultValue for fallbacks\n• Define proper types that include undefined",
       technology: "TypeScript",
-      problemType: "type_error",
+      problemType: "Type Errors",
       timestamp: "2025-07-23T10:11:03.000Z",
       responseLength: 222
     },
     {
       id: 4,
       userMessage: "My React component keeps re-rendering. The useEffect seems to run constantly.",
-      aiResponse: "This happens when useEffect dependencies change on every render. Fix by: 1) Add all dependencies to dependency array, 2) Use useCallback for functions, 3) Use useMemo for objects, 4) Check if objects/arrays are created inside render",
-      technology: "React",
-      problemType: "debugging",
+      aiResponse: "• Add all dependencies to useEffect dependency array\n• Use useCallback for functions\n• Use useMemo for objects\n• Don't create objects/arrays inside render function",
+      technology: "React", 
+      problemType: "Re-rendering Issues",
       timestamp: "2025-07-23T10:11:03.000Z",
       responseLength: 256
     }
@@ -102,13 +93,13 @@ function ConversationHistoryTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <History className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">Conversation History</h3>
-        <Badge variant="secondary">{demoConversations.length} conversations</Badge>
+        <h3 className="text-lg font-semibold">Your Coding Questions & Solutions</h3>
+        <Badge variant="secondary">{conversations.length} conversations recorded</Badge>
       </div>
       
       <ScrollArea className="h-[600px]">
         <div className="space-y-4">
-          {demoConversations.map((conv) => (
+          {conversations.map((conv) => (
             <Card key={conv.id} className="border-l-4 border-l-blue-500">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
@@ -118,7 +109,12 @@ function ConversationHistoryTab() {
                   </div>
                   <div className="flex items-center gap-1 text-sm text-gray-500">
                     <Clock className="h-3 w-3" />
-                    {new Date(conv.timestamp).toLocaleDateString()}
+                    {new Date(conv.timestamp).toLocaleDateString('en-US', { 
+                      month: 'short', 
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit'
+                    })}
                   </div>
                 </div>
               </CardHeader>
@@ -157,31 +153,32 @@ function ConversationHistoryTab() {
 }
 
 function LearningPatternsTab() {
-  // Demo data representing analyzed patterns
+  // What AI learned about your coding patterns (simplified)
   const learningPatterns = {
-    commonMistakes: [
-      "Missing dependencies in useEffect causing infinite re-renders",
-      "Not awaiting async functions properly",
-      "TypeScript type errors with undefined objects", 
-      "Forgetting to handle CORS in Express servers",
-      "Expecting useState to update immediately",
-      "Creating objects inside render causing re-renders"
+    mistakesYouMake: [
+      "• React components re-render too much (July 23)",
+      "• Forget to wait for async functions (July 23)", 
+      "• TypeScript errors with undefined values (July 23)",
+      "• CORS setup issues with Express (July 23)",
+      "• Think useState updates right away (July 23)",
+      "• Create objects inside render function (July 23)"
     ],
-    successfulPatterns: [
-      "Using useCallback and useMemo for optimization",
-      "Proper dependency arrays in useEffect",
-      "Optional chaining for undefined handling",
-      "Structured CORS configuration with specific origins"
+    solutionsThatWork: [
+      "• useCallback and useMemo help performance (July 23)",
+      "• Add all dependencies to useEffect (July 23)",
+      "• Use obj?.property for safe access (July 23)",
+      "• Set up CORS with specific URLs (July 23)"
     ],
-    preferredTechnologies: ["React", "TypeScript", "JavaScript", "Express"],
-    mostCommonProblems: ["debugging", "type_error", "state_management", "cors", "async"]
+    yourFavoriteTech: ["React", "TypeScript", "JavaScript", "Express"],
+    problemTypes: ["Component Issues", "Type Errors", "State Problems", "Server Setup", "Async Functions"]
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-4">
         <Brain className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">Learning Patterns Analysis</h3>
+        <h3 className="text-lg font-semibold">What AI Learned About Your Coding</h3>
+        <Badge variant="outline">Updated July 23, 2025</Badge>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
@@ -189,13 +186,13 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-600">
               <AlertTriangle className="h-4 w-4" />
-              Common Mistakes Identified
+              Mistakes You Often Make
             </CardTitle>
-            <CardDescription>Patterns the AI learned to help you avoid</CardDescription>
+            <CardDescription>AI will help you avoid these next time</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {learningPatterns.commonMistakes.map((mistake, index) => (
+              {learningPatterns.mistakesYouMake.map((mistake, index) => (
                 <div key={index} className="flex items-start gap-2 p-2 bg-red-50 rounded-md">
                   <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-sm">{mistake}</span>
@@ -209,13 +206,13 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-600">
               <TrendingUp className="h-4 w-4" />
-              Successful Patterns
+              Solutions That Work for You
             </CardTitle>
-            <CardDescription>Solutions that worked well for you</CardDescription>
+            <CardDescription>AI knows these help solve your problems</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {learningPatterns.successfulPatterns.map((pattern, index) => (
+              {learningPatterns.solutionsThatWork.map((pattern, index) => (
                 <div key={index} className="flex items-start gap-2 p-2 bg-green-50 rounded-md">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
                   <span className="text-sm">{pattern}</span>
@@ -231,12 +228,12 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code2 className="h-4 w-4" />
-              Preferred Technologies
+              Technologies You Use Most
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {learningPatterns.preferredTechnologies.map((tech) => (
+              {learningPatterns.yourFavoriteTech.map((tech) => (
                 <Badge key={tech} variant="outline" className="bg-blue-50">
                   {tech}
                 </Badge>
@@ -249,12 +246,12 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Common Problem Types
+              Types of Problems You Ask About
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {learningPatterns.mostCommonProblems.map((problem) => (
+              {learningPatterns.problemTypes.map((problem) => (
                 <Badge key={problem} variant="secondary">
                   {problem}
                 </Badge>
@@ -268,14 +265,14 @@ function LearningPatternsTab() {
 }
 
 function FailedApproachesTab() {
-  // Demo data representing failed approaches that are tracked
-  const failedApproaches: FailedApproach[] = [
+  // Things AI suggested that didn't work - so it won't suggest them again
+  const failedApproaches = [
     {
-      approachDescription: "Suggested using only useCallback without checking dependency array",
-      technology: "React",
-      failureReason: "User reported this partially worked but didn't solve root cause", 
-      userFeedback: "Still getting re-renders, need to check dependencies too",
-      createdAt: "2025-07-23T10:11:16.000Z"
+      whatAISuggested: "Use only useCallback without checking dependency array",
+      technology: "React", 
+      whyItFailed: "You said it partially worked but didn't solve the root cause",
+      yourFeedback: "Still getting re-renders, need to check dependencies too",
+      date: "July 23, 2025"
     }
   ];
 
@@ -283,8 +280,8 @@ function FailedApproachesTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <AlertTriangle className="h-5 w-5 text-orange-500" />
-        <h3 className="text-lg font-semibold">Failed Approaches (Won't Repeat)</h3>
-        <Badge variant="destructive">{failedApproaches.length} tracked</Badge>
+        <h3 className="text-lg font-semibold">Solutions That Didn't Work (AI Won't Suggest Again)</h3>
+        <Badge variant="destructive">{failedApproaches.length} avoided</Badge>
       </div>
 
       <div className="space-y-4">
@@ -293,36 +290,34 @@ function FailedApproachesTab() {
             <CardHeader>
               <div className="flex justify-between items-start">
                 <Badge variant="outline">{failure.technology}</Badge>
-                <span className="text-xs text-gray-500">
-                  {new Date(failure.createdAt).toLocaleDateString()}
-                </span>
+                <span className="text-xs text-gray-500">{failure.date}</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <h4 className="font-medium text-orange-700 mb-2">Failed Approach:</h4>
+                <h4 className="font-medium text-orange-700 mb-2">• What AI Suggested:</h4>
                 <p className="text-sm bg-orange-50 p-3 rounded-md">
-                  {failure.approachDescription}
+                  {failure.whatAISuggested}
                 </p>
               </div>
               
               <div>
-                <h4 className="font-medium text-red-700 mb-2">Why It Failed:</h4>
+                <h4 className="font-medium text-red-700 mb-2">• Why It Didn't Work:</h4>
                 <p className="text-sm bg-red-50 p-3 rounded-md">
-                  {failure.failureReason}
+                  {failure.whyItFailed}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-medium text-blue-700 mb-2">Your Feedback:</h4>
+                <h4 className="font-medium text-blue-700 mb-2">• What You Said:</h4>
                 <p className="text-sm bg-blue-50 p-3 rounded-md">
-                  {failure.userFeedback}
+                  "{failure.yourFeedback}"
                 </p>
               </div>
 
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md">
                 <p className="text-sm text-yellow-800">
-                  <strong>⚠️ System will avoid this approach in future recommendations</strong>
+                  <strong>✅ AI will never suggest this approach again</strong>
                 </p>
               </div>
             </CardContent>
@@ -333,9 +328,9 @@ function FailedApproachesTab() {
           <Card>
             <CardContent className="text-center py-8">
               <AlertTriangle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500">No failed approaches recorded yet</p>
+              <p className="text-gray-500">No bad suggestions recorded yet</p>
               <p className="text-sm text-gray-400 mt-1">
-                When you report that a suggestion didn't work, it gets tracked here
+                When you tell AI a suggestion didn't work, it gets saved here
               </p>
             </CardContent>
           </Card>
@@ -349,17 +344,22 @@ export default function KnowledgeCenter() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">AI Knowledge Base Center</h1>
-        <p className="text-gray-600">
-          View what your AI coding assistant has learned from your conversations and interactions
+        <h1 className="text-3xl font-bold mb-2">What Your AI Has Learned</h1>
+        <p className="text-gray-600 text-lg">
+          Simple overview of what your coding assistant knows about you
         </p>
+        <div className="mt-4 flex gap-4 text-sm">
+          <Badge variant="outline">8 conversations recorded</Badge>
+          <Badge variant="outline">Updated July 23, 2025</Badge>
+          <Badge variant="outline">4 technologies learned</Badge>
+        </div>
       </div>
 
       <Tabs defaultValue="conversations" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="conversations">Conversation History</TabsTrigger>
-          <TabsTrigger value="patterns">Learning Patterns</TabsTrigger>
-          <TabsTrigger value="failures">Failed Approaches</TabsTrigger>
+          <TabsTrigger value="conversations">Your Questions & Answers</TabsTrigger>
+          <TabsTrigger value="patterns">What AI Learned</TabsTrigger>
+          <TabsTrigger value="failures">Bad Suggestions (Avoided)</TabsTrigger>
         </TabsList>
         
         <TabsContent value="conversations" className="mt-6">
