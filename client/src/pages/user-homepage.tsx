@@ -225,15 +225,37 @@ export default function UserHomepage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Badge variant="outline" className="bg-white">
               {format(new Date(), 'EEEE, MMM d')}
             </Badge>
-            <Avatar>
-              <AvatarFallback className="bg-primary text-primary-foreground">
-                <User className="h-4 w-4" />
-              </AvatarFallback>
-            </Avatar>
+            
+            {/* Profile Photo with Edit Profile */}
+            <div className="flex flex-col items-center gap-2">
+              <Avatar 
+                className="h-12 w-12 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all"
+                onClick={() => setLocation('/user-profile')}
+              >
+                {currentUser?.profilePhoto ? (
+                  <AvatarImage src={currentUser.profilePhoto} alt="Profile" />
+                ) : (
+                  <AvatarFallback className="bg-blue-100 text-blue-700 text-sm">
+                    {currentUser ? 
+                      `${currentUser.firstName?.[0] || ''}${currentUser.lastName?.[0] || ''}` : 
+                      'U'
+                    }
+                  </AvatarFallback>
+                )}
+              </Avatar>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-xs text-blue-600 hover:text-blue-800 h-auto p-1"
+                onClick={() => setLocation('/user-profile')}
+              >
+                Edit Profile
+              </Button>
+            </div>
           </div>
         </div>
 

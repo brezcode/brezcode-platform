@@ -143,10 +143,7 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
                 <LogOut className="h-4 w-4" />
               </Button>
 
-              <Avatar 
-                className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-300"
-                onClick={() => setLocation('/user-profile')}
-              >
+              <Avatar className="h-8 w-8">
                 {currentUser?.profilePhoto ? (
                   <AvatarImage src={currentUser.profilePhoto} alt="Profile" />
                 ) : (
