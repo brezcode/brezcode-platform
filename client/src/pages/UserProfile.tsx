@@ -116,7 +116,7 @@ export default function UserProfile() {
   const [profilePhoto, setProfilePhoto] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading } = useQuery<any>({
     queryKey: ["/api/user/profile"],
   });
 
@@ -389,7 +389,7 @@ export default function UserProfile() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger>
                               <SelectValue placeholder="Select your country" />
@@ -426,7 +426,7 @@ export default function UserProfile() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Country Code</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={field.onChange} value={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Code" />
