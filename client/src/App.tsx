@@ -2,6 +2,7 @@ import { Route, Switch } from "wouter";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
 import UserProfile from "@/pages/UserProfile";
+import UserProfileTest from "@/pages/UserProfileTest";
 import BusinessDashboard from "@/pages/BusinessDashboard";
 import BusinessConsultant from "@/pages/BusinessConsultant";
 import SubscribePage from "@/pages/subscribe";
@@ -55,6 +56,7 @@ function App() {
           <Route path="/" component={LeadGenLanding} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
+          <Route path="/profile-test" component={UserProfileTest} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/leadgen-dashboard" component={LeadGenDashboard} />
           <Route path="/business-dashboard" component={BusinessDashboard} />
