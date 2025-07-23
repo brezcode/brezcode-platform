@@ -57,6 +57,22 @@ router.patch("/sessions/:id", requireAuth, async (req: any, res: any) => {
 router.post("/patterns", requireAuth, async (req: any, res: any) => {
   try {
     const data = insertCodePatternSchema.omit({ userId: true }).parse(req.body);
+    
+    // Record the prompt that led to this pattern creation for best practice analysis
+    if (req.body.originalPrompt) {
+      await codingAssistantService.recordPromptInteraction(req.session.userId, {
+        type: 'pattern_creation',
+        prompt: req.body.originalPrompt,
+        response: data.codeExample,
+        effectiveness: 1,
+        context: {
+          technology: data.technology,
+          category: data.category,
+          tags: data.tags
+        }
+      });
+    }
+    
     const pattern = await codingAssistantService.saveCodePattern(req.session.userId, data);
     res.json(pattern);
   } catch (error) {

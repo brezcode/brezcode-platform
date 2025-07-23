@@ -4,6 +4,8 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Select from "react-select";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -27,9 +29,7 @@ const profileSchema = z.object({
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
   
-  // Phone number with country code
-  countryCode: z.string().min(1, "Country code is required"),
-  areaCode: z.string().min(1, "Area code is required"),
+  // Phone number in E.164 format
   phoneNumber: z.string().min(1, "Phone number is required"),
 });
 
@@ -48,10 +48,12 @@ const countryOptions = worldCountries
 const countryCodeOptions = worldCountries
   .filter(country => country.idd?.root && country.idd?.suffixes)
   .map(country => {
-    const code = country.idd.root + (country.idd.suffixes[0] || '');
+    const root = country.idd.root;
+    const suffix = country.idd.suffixes[0] || '';
+    const code = root + suffix;
     return {
       value: country.cca2.toLowerCase(),
-      label: `${code} (${country.name.common})`,
+      label: `${country.flag} ${code} ${country.name.common}`,
       code: code,
       flag: country.flag
     };
@@ -97,8 +99,6 @@ export default function UserProfile() {
       state: "",
       postalCode: "",
       country: "",
-      countryCode: "us",
-      areaCode: "",
       phoneNumber: "",
     },
   });
@@ -106,11 +106,6 @@ export default function UserProfile() {
   // Update form when profile data is loaded
   useEffect(() => {
     if (profile) {
-      // Convert stored country code back to country ID for form display
-      const storedCode = profile.countryCode || "+1";
-      const matchingCountry = countryCodeOptions.find(item => item.code === storedCode);
-      const countryCodeId = matchingCountry ? matchingCountry.value : "us";
-      
       form.reset({
         firstName: profile.firstName || "",
         lastName: profile.lastName || "",
@@ -120,8 +115,6 @@ export default function UserProfile() {
         state: profile.state || "",
         postalCode: profile.postalCode || "",
         country: profile.country || "",
-        countryCode: countryCodeId,
-        areaCode: profile.areaCode || "",
         phoneNumber: profile.phoneNumber || "",
       });
       setProfilePhoto(profile.profilePhoto || "");
@@ -369,49 +362,7 @@ export default function UserProfile() {
                   <span>Phone Number</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="grid md:grid-cols-3 gap-6">
-                <FormField
-                  control={form.control}
-                  name="countryCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Country Code</FormLabel>
-                      <FormControl>
-                        <Select
-                          options={countryCodeOptions}
-                          value={countryCodeOptions.find(option => option.value === field.value)}
-                          onChange={(selected) => field.onChange(selected?.value || "")}
-                          placeholder="Select code"
-                          isSearchable
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          formatOptionLabel={(option) => (
-                            <div className="flex items-center">
-                              <span className="mr-2">{option.flag}</span>
-                              {option.label}
-                            </div>
-                          )}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="areaCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Area Code</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Area code" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
+              <CardContent>
                 <FormField
                   control={form.control}
                   name="phoneNumber"
@@ -419,7 +370,13 @@ export default function UserProfile() {
                     <FormItem>
                       <FormLabel>Phone Number</FormLabel>
                       <FormControl>
-                        <Input placeholder="Phone number" {...field} />
+                        <PhoneInput
+                          placeholder="Enter phone number"
+                          value={field.value}
+                          onChange={field.onChange}
+                          defaultCountry="US"
+                          className="phone-input"
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -15,7 +15,70 @@ import {
 } from "@shared/coding-assistant-schema";
 import { eq, desc, and, sql } from "drizzle-orm";
 
+interface PromptInteraction {
+  type: 'pattern_creation' | 'debugging_session' | 'strategy_formation' | 'general_coding';
+  prompt: string;
+  response: string;
+  effectiveness: number;
+  context?: any;
+}
+
 export class CodingAssistantService {
+  // Prompt Interaction Recording for Best Practices Analysis
+  async recordPromptInteraction(userId: number, interaction: PromptInteraction) {
+    try {
+      // Store prompt interactions for analysis and best practice development
+      await db.insert(codingContext).values({
+        userId,
+        contextType: interaction.type,
+        contextData: {
+          prompt: interaction.prompt,
+          response: interaction.response,
+          effectiveness: interaction.effectiveness,
+          ...interaction.context
+        },
+        sessionId: null
+      });
+      
+      // Update metrics for tracking effectiveness
+      await this.updatePromptingMetrics(userId, interaction.type, interaction.effectiveness);
+    } catch (error) {
+      console.error("Error recording prompt interaction:", error);
+    }
+  }
+
+  async updatePromptingMetrics(userId: number, interactionType: string, effectiveness: number) {
+    try {
+      const existing = await db.select()
+        .from(codingMetrics)
+        .where(and(
+          eq(codingMetrics.userId, userId),
+          eq(codingMetrics.metricType, `prompting_${interactionType}`)
+        ));
+
+      if (existing.length > 0) {
+        const current = existing[0];
+        const newAverage = ((current.metricValue * current.sampleCount) + effectiveness) / (current.sampleCount + 1);
+        
+        await db.update(codingMetrics)
+          .set({
+            metricValue: newAverage,
+            sampleCount: current.sampleCount + 1,
+            updatedAt: new Date()
+          })
+          .where(eq(codingMetrics.id, current.id));
+      } else {
+        await db.insert(codingMetrics).values({
+          userId,
+          metricType: `prompting_${interactionType}`,
+          metricValue: effectiveness,
+          sampleCount: 1
+        });
+      }
+    } catch (error) {
+      console.error("Error updating prompting metrics:", error);
+    }
+  }
   // Session Management
   async createSession(userId: number, data: Omit<InsertCodingSession, "userId">) {
     const [session] = await db.insert(codingSessions)
