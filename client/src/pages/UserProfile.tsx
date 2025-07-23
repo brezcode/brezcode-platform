@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User, Camera, MapPin, Phone, Save } from "lucide-react";
+import { User, Camera, MapPin, Phone, Save, Edit2, Check, X } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
 import worldCountries from "world-countries";
 
@@ -44,21 +44,72 @@ const countryOptions = worldCountries
   }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
-// Generate country code options from world-countries library
-const countryCodeOptions = worldCountries
-  .filter(country => country.idd?.root && country.idd?.suffixes)
-  .map(country => {
-    const root = country.idd.root;
-    const suffix = country.idd.suffixes[0] || '';
-    const code = root + suffix;
-    return {
-      value: country.cca2.toLowerCase(),
-      label: `${country.flag} ${code} ${country.name.common}`,
-      code: code,
-      flag: country.flag
-    };
-  })
-  .sort((a, b) => a.label.localeCompare(b.label));
+// Inline Edit Component
+function InlineEditField({ label, value, placeholder, onSave }: {
+  label: string;
+  value: string;
+  placeholder: string;
+  onSave: (value: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
+
+  const handleSave = () => {
+    onSave(editValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditValue(value);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+      {isEditing ? (
+        <div className="flex items-center space-x-2">
+          <Input
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            placeholder={placeholder}
+            className="flex-1"
+            autoFocus
+            onKeyDown={handleKeyDown}
+          />
+          <Button size="sm" onClick={handleSave} className="px-2">
+            <Check className="w-4 h-4" />
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCancel} className="px-2">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      ) : (
+        <div 
+          className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-gray-50 transition-colors group"
+          onClick={() => setIsEditing(true)}
+        >
+          <span className={value ? "text-gray-900" : "text-gray-400"}>
+            {value || placeholder}
+          </span>
+          <Edit2 className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function UserProfile() {
   const { toast } = useToast();
@@ -176,36 +227,110 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* Current Database Data Display */}
+        {/* Profile Overview with Inline Editing */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-blue-600">Current Database Data</CardTitle>
+            <CardTitle className="text-2xl font-bold">Profile Information</CardTitle>
             <CardDescription>
-              This shows what's currently saved in the database for your profile
+              Click any field to edit. Changes are saved automatically.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            {profile ? (
-              <div className="grid grid-cols-2 gap-4 text-sm bg-gray-50 p-4 rounded-lg">
-                <div><strong>First Name:</strong> <span className="text-blue-600">{profile.firstName || 'Not set'}</span></div>
-                <div><strong>Last Name:</strong> <span className="text-blue-600">{profile.lastName || 'Not set'}</span></div>
-                <div><strong>Email:</strong> <span className="text-blue-600">{profile.email || 'Not set'}</span></div>
-                <div><strong>Phone:</strong> <span className="text-blue-600">{profile.phoneNumber || 'Not set'}</span></div>
-                <div><strong>Street Address:</strong> <span className="text-blue-600">{profile.streetAddress || 'Not set'}</span></div>
-                <div><strong>City:</strong> <span className="text-blue-600">{profile.city || 'Not set'}</span></div>
-                <div><strong>State/Province:</strong> <span className="text-blue-600">{profile.state || 'Not set'}</span></div>
-                <div><strong>Postal Code:</strong> <span className="text-blue-600">{profile.postalCode || 'Not set'}</span></div>
-                <div><strong>Country:</strong> <span className="text-blue-600">{profile.country || 'Not set'}</span></div>
-                <div><strong>Profile Photo:</strong> <span className="text-blue-600">{profile.profilePhoto ? 'Set' : 'Not set'}</span></div>
+          <CardContent className="space-y-6">
+            {/* Profile Photo Section */}
+            <div className="flex items-center space-x-6">
+              <div className="relative group">
+                <Avatar className="h-20 w-20 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
+                  {profilePhoto ? (
+                    <AvatarImage src={profilePhoto} alt="Profile" />
+                  ) : (
+                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
+                      {profile?.firstName?.[0] || ""}{profile?.lastName?.[0] || ""}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
               </div>
-            ) : (
-              <div className="text-gray-500">Loading current data...</div>
-            )}
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {profile?.firstName || 'First'} {profile?.lastName || 'Last'}
+                </h3>
+                <p className="text-gray-600">{profile?.email}</p>
+              </div>
+            </div>
+
+            {/* Inline Editable Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* First Name */}
+              <InlineEditField
+                label="First Name"
+                value={profile?.firstName || ''}
+                placeholder="Enter first name"
+                onSave={(value) => saveProfile({ firstName: value })}
+              />
+
+              {/* Last Name */}
+              <InlineEditField
+                label="Last Name"
+                value={profile?.lastName || ''}
+                placeholder="Enter last name"
+                onSave={(value) => saveProfile({ lastName: value })}
+              />
+
+              {/* Street Address */}
+              <InlineEditField
+                label="Street Address"
+                value={profile?.streetAddress || ''}
+                placeholder="Enter street address"
+                onSave={(value) => saveProfile({ streetAddress: value })}
+              />
+
+              {/* City */}
+              <InlineEditField
+                label="City"
+                value={profile?.city || ''}
+                placeholder="Enter city"
+                onSave={(value) => saveProfile({ city: value })}
+              />
+
+              {/* State */}
+              <InlineEditField
+                label="State/Province"
+                value={profile?.state || ''}
+                placeholder="Enter state or province"
+                onSave={(value) => saveProfile({ state: value })}
+              />
+
+              {/* Postal Code */}
+              <InlineEditField
+                label="Postal Code"
+                value={profile?.postalCode || ''}
+                placeholder="Enter postal code"
+                onSave={(value) => saveProfile({ postalCode: value })}
+              />
+
+              {/* Country */}
+              <InlineEditField
+                label="Country"
+                value={profile?.country || ''}
+                placeholder="Enter country"
+                onSave={(value) => saveProfile({ country: value })}
+              />
+
+              {/* Phone Number */}
+              <InlineEditField
+                label="Phone Number"
+                value={profile?.phoneNumber || ''}
+                placeholder="Enter phone number"
+                onSave={(value) => saveProfile({ phoneNumber: value })}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <div className="space-y-8">
             
             {/* Profile Photo Section */}
             <Card>
