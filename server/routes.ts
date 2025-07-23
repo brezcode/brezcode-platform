@@ -511,7 +511,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Health Report Generation (Test Mode - No Auth Required)
-  app.post('/api/reports/generate-test', async (req: any, res: Response) => {
+  app.post('/api/reports/generate-test', async (req: any, res) => {
     try {
       const { quizAnswers } = req.body;
 
@@ -537,7 +537,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Health Report Generation (Authenticated)
-  app.post('/api/reports/generate', requireAuth, async (req: any, res: Response) => {
+  app.post('/api/reports/generate', requireAuth, async (req: any, res) => {
     try {
       const { quizAnswers } = req.body;
 
@@ -795,7 +795,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Health Report Generation (Demo - No Auth Required)
-  app.post('/api/reports/generate-demo', async (req: Request, res: Response) => {
+  app.post('/api/reports/generate-demo', async (req: any, res) => {
     try {
       console.log('Demo report request received:', req.body);
       const { quizAnswers } = req.body;
@@ -1398,7 +1398,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Authenticated report generation (after signup)
-  app.post('/api/reports/generate', isAuthenticated, async (req: Request, res: Response) => {
+  app.post('/api/reports/generate', isAuthenticated, async (req: any, res) => {
     try {
       const { quizAnswers } = req.body;
       const userId = req.session.userId;

@@ -140,13 +140,8 @@ export default function UserProfile() {
   };
 
   const onSubmit = (data: ProfileFormData) => {
-    // Convert country code ID back to actual code for storage
-    const selectedCountryCode = countryCodeOptions.find(item => item.value === data.countryCode);
-    const actualCountryCode = selectedCountryCode ? selectedCountryCode.code : "+1";
-    
     saveProfile({ 
       ...data, 
-      countryCode: actualCountryCode,
       profilePhoto 
     });
   };

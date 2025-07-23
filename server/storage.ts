@@ -78,6 +78,17 @@ export class MemStorage implements IStorage {
       stripeSubscriptionId: null,
       isSubscriptionActive: false,
       createdAt: new Date(),
+      platform: "leadgen",
+      phone: null,
+      address: null,
+      bio: null,
+      profilePhoto: null,
+      streetAddress: null,
+      city: null,
+      state: null,
+      postalCode: null,
+      country: null,
+      phoneNumber: null,
     };
     this.users.set(id, user);
     return user;
@@ -101,7 +112,7 @@ export class MemStorage implements IStorage {
     
     // Clean up health reports for this user
     const reportsToDelete: number[] = [];
-    for (const [id, report] of this.healthReports.entries()) {
+    for (const [id, report] of Array.from(this.healthReports.entries())) {
       if (report.userId === user.id) {
         reportsToDelete.push(id);
       }
@@ -186,6 +197,7 @@ export class MemStorage implements IStorage {
     const healthReport: HealthReport = {
       ...report,
       id,
+      userId: report.userId || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -262,6 +274,37 @@ export class MemStorage implements IStorage {
 
   async getHealthDataSyncByUser(userId: number): Promise<any | null> {
     return Promise.resolve(this.healthDataSync.get(userId) || null);
+  }
+
+  // Profile methods required by interface
+  async getUserProfile(userId: number): Promise<any> {
+    const user = this.users.get(userId);
+    if (!user) return null;
+    
+    return {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phone: user.phone,
+      address: user.address,
+      bio: user.bio,
+      profilePhoto: user.profilePhoto,
+      streetAddress: user.streetAddress,
+      city: user.city,
+      state: user.state,
+      postalCode: user.postalCode,
+      country: user.country,
+      phoneNumber: user.phoneNumber,
+    };
+  }
+
+  async updateUserProfile(userId: number, profileData: any): Promise<any> {
+    return this.updateUser(userId, profileData);
+  }
+
+  async createUserProfile(userId: number, profileData: any): Promise<any> {
+    return this.updateUser(userId, profileData);
   }
 }
 

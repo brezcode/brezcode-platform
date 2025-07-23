@@ -33,6 +33,18 @@ export const users = pgTable("users", {
   
   // Platform identifier - which platform does this user belong to
   platform: text("platform").notNull().default('leadgen'), // 'leadgen' or 'brezcode'
+  
+  // Profile fields - moved from userProfiles table for simplified access
+  phone: text("phone"),
+  address: text("address"),
+  bio: text("bio"),
+  profilePhoto: text("profile_photo"),
+  streetAddress: text("street_address"),
+  city: text("city"),
+  state: text("state"),
+  postalCode: text("postal_code"),
+  country: text("country"),
+  phoneNumber: text("phone_number"),
 });
 
 // Legacy profile table - keeping for compatibility during migration
