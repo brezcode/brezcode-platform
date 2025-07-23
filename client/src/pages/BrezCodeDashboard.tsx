@@ -24,9 +24,9 @@ export default function BrezCodeDashboard() {
   const quickActions = [
     {
       title: "AI Training",
-      description: "Train AI assistants with roleplay scenarios",
+      description: "Train Dr. Sakura with breast health scenarios",
       icon: <Brain className="h-6 w-6" />,
-      action: () => setLocation('/ai-trainer'),
+      action: () => setLocation('/business/brezcode/avatar-training'),
       color: "bg-blue-500"
     },
     {
@@ -223,9 +223,9 @@ export default function BrezCodeDashboard() {
 
                 <Button 
                   className="w-full mt-4" 
-                  onClick={() => setLocation('/ai-trainer')}
+                  onClick={() => setLocation('/business/brezcode/avatar-training')}
                 >
-                  Start Training Session
+                  Start BrezCode AI Training
                 </Button>
               </div>
             </CardContent>
