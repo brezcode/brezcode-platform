@@ -462,9 +462,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
-        phone: user.phone,
-        address: user.address,
-        bio: user.bio,
         profilePhoto: user.profilePhoto,
         streetAddress: user.streetAddress,
         city: user.city,
@@ -486,7 +483,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Profile update request for user:", userId, "with data:", profileData);
 
-      const updatedUser = await storage.updateUser(userId, profileData);
+      // Map profile form fields to user table columns
+      const userUpdateData = {
+        firstName: profileData.firstName,
+        lastName: profileData.lastName,
+        streetAddress: profileData.streetAddress,
+        city: profileData.city,
+        state: profileData.state,
+        postalCode: profileData.postalCode,
+        country: profileData.country,
+        phoneNumber: profileData.phoneNumber,
+        profilePhoto: profileData.profilePhoto
+      };
+
+      const updatedUser = await storage.updateUser(userId, userUpdateData);
 
       console.log("Profile updated successfully:", updatedUser);
 
