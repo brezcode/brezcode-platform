@@ -188,49 +188,68 @@ router.get('/interactions', async (req, res) => {
   }
 });
 
-// Simulate coding conversations for demo
-router.post('/simulate', async (req, res) => {
+// Load and analyze real conversation history
+router.post('/analyze-history', async (req, res) => {
   try {
-    // Simulate realistic coding conversations
-    const conversations = [
-      {
-        user: "How do I handle async/await errors in JavaScript?",
-        ai: "Use try/catch blocks around your await calls:\n\ntry {\n  const result = await fetchData();\n  console.log(result);\n} catch (error) {\n  console.error('Error:', error);\n}",
-        tech: "JavaScript"
-      },
-      {
-        user: "Show me React useState with TypeScript",
-        ai: "Here's how to use useState with TypeScript:\n\nconst [count, setCount] = useState<number>(0);\nconst [user, setUser] = useState<User | null>(null);",
-        tech: "React"
-      },
-      {
-        user: "I'm getting 'Cannot read property of undefined' error",
-        ai: "This error occurs when you try to access a property of undefined. Use optional chaining:\n\nuser?.profile?.name instead of user.profile.name\n\nOr check if the object exists first:\nif (user && user.profile) { console.log(user.profile.name); }",
-        tech: "JavaScript"
-      },
-      {
-        user: "How to make API calls in React with proper error handling?",
-        ai: "Use fetch with async/await and proper error handling:\n\nconst fetchUser = async (id) => {\n  try {\n    const response = await fetch(`/api/users/${id}`);\n    if (!response.ok) throw new Error('Failed to fetch');\n    const user = await response.json();\n    return user;\n  } catch (error) {\n    console.error('API Error:', error);\n    throw error;\n  }\n};",
-        tech: "React"
-      }
-    ];
-
-    for (const conv of conversations) {
-      await aiCodingAnalyzer.recordCodingInteraction(
-        conv.user,
-        conv.ai,
-        { technology: conv.tech, problemType: 'general' }
-      );
-    }
-
+    console.log("Loading conversation history for analysis...");
+    const conversationLogs = await aiCodingAnalyzer.loadConversationHistory();
+    
+    // Force analysis of all loaded conversations
+    await aiCodingAnalyzer.analyzeAndExtractPatterns();
+    
     res.json({ 
       success: true, 
-      message: `Simulated ${conversations.length} coding conversations`,
-      conversations: conversations.length
+      message: `Analyzed ${conversationLogs.length} conversation logs`,
+      conversationsAnalyzed: conversationLogs.length,
+      conversationLogs: conversationLogs.map(log => ({
+        user: log.userMessage.substring(0, 150) + "...",
+        ai: log.aiResponse.substring(0, 150) + "...",
+        technology: log.technology,
+        timestamp: log.timestamp
+      }))
     });
   } catch (error) {
-    console.error("Error simulating conversations:", error);
-    res.status(500).json({ error: "Failed to simulate conversations" });
+    console.error("Error analyzing conversation history:", error);
+    res.status(500).json({ error: "Failed to analyze conversation history" });
+  }
+});
+
+// Get conversation logs for display
+router.get('/conversation-logs', async (req, res) => {
+  try {
+    const recentLogs = aiCodingAnalyzer.getRecentInteractions(20);
+    res.json({
+      logs: recentLogs.map((log, index) => ({
+        id: index,
+        userMessage: log.userMessage,
+        aiResponse: log.aiResponse,
+        technology: log.technology,
+        problemType: log.problemType,
+        timestamp: log.timestamp,
+        sessionId: log.sessionId
+      }))
+    });
+  } catch (error) {
+    console.error("Error getting conversation logs:", error);
+    res.status(500).json({ error: "Failed to get conversation logs" });
+  }
+});
+
+// Simulate coding conversations for demo (keeping for fallback)
+router.post('/simulate', async (req, res) => {
+  try {
+    // Load real conversation history instead of simulating
+    const conversationLogs = await aiCodingAnalyzer.loadConversationHistory();
+    
+    res.json({ 
+      success: true, 
+      message: `Loaded ${conversationLogs.length} real coding conversations from history`,
+      conversations: conversationLogs.length,
+      source: "conversation_history"
+    });
+  } catch (error) {
+    console.error("Error loading conversations:", error);
+    res.status(500).json({ error: "Failed to load conversations" });
   }
 });
 

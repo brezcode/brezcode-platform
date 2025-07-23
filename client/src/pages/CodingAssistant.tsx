@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Code2, Brain, History, Search, Plus, BookOpen, FileText, Tag, Clock } from "lucide-react";
+import { Code2, Brain, History, Search, Plus, BookOpen, FileText, Tag, Clock, MessageCircle } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
 
@@ -49,6 +49,84 @@ interface DebuggingSolution {
   effectivenessRating: number;
   createdAt: string;
   updatedAt: string;
+}
+
+// Component to display conversation logs
+function ConversationLogsViewer() {
+  const { data: conversationLogs, isLoading } = useQuery({
+    queryKey: ['/api/coding-assistant/conversation-logs'],
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/coding-assistant/conversation-logs');
+        if (!response.ok) throw new Error('Failed to fetch logs');
+        return await response.json();
+      } catch (error) {
+        console.log('Error fetching conversation logs:', error);
+        return { logs: [] };
+      }
+    }
+  });
+
+  if (isLoading) {
+    return <div className="text-center py-4">Loading conversation history...</div>;
+  }
+
+  const logs = conversationLogs?.logs || [];
+
+  if (logs.length === 0) {
+    return (
+      <div className="text-center py-8 text-gray-500">
+        <MessageCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+        <p>No conversation logs found</p>
+        <p className="text-sm">Click "Analyze Conversation History" to load and analyze coding conversations</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {logs.slice(0, 10).map((log: any) => (
+        <div key={log.id} className="border rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                {log.technology || 'General'}
+              </Badge>
+              <Badge variant="outline" className="text-xs">
+                {log.problemType || 'Question'}
+              </Badge>
+            </div>
+            <div className="flex items-center gap-1 text-xs text-gray-500">
+              <Clock className="h-3 w-3" />
+              {new Date(log.timestamp).toLocaleDateString()}
+            </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div>
+              <div className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">User Question:</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 bg-blue-50 dark:bg-blue-900/20 p-2 rounded">
+                {log.userMessage.length > 200 ? log.userMessage.substring(0, 200) + "..." : log.userMessage}
+              </div>
+            </div>
+            
+            <div>
+              <div className="text-sm font-medium text-green-600 dark:text-green-400 mb-1">AI Response:</div>
+              <div className="text-sm text-gray-700 dark:text-gray-300 bg-green-50 dark:bg-green-900/20 p-2 rounded">
+                {log.aiResponse.length > 300 ? log.aiResponse.substring(0, 300) + "..." : log.aiResponse}
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+      
+      {logs.length > 10 && (
+        <div className="text-center text-sm text-gray-500">
+          Showing first 10 of {logs.length} conversations
+        </div>
+      )}
+    </div>
+  );
 }
 
 const CodingAssistant: React.FC = () => {
@@ -471,30 +549,51 @@ const CodingAssistant: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="flex gap-4">
+                <div className="flex gap-4 flex-wrap">
                   <Button 
                     onClick={async () => {
                       try {
-                        const response = await fetch('/api/coding-assistant/simulate', {
+                        const response = await fetch('/api/coding-assistant/analyze-history', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' }
                         });
                         const result = await response.json();
-                        console.log('Simulated conversations:', result);
+                        console.log('Analyzed conversation history:', result);
                         
                         // Refresh data
                         queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/patterns'] });
                         queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/strategies'] });
                         queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/solutions'] });
                         queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/analytics'] });
+                        queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/conversation-logs'] });
+                        
+                        alert(`Successfully analyzed ${result.conversationsAnalyzed} conversation logs! Check patterns tab for extracted knowledge.`);
                       } catch (error) {
-                        console.error('Error simulating:', error);
+                        console.error('Error analyzing history:', error);
+                        alert('Error analyzing conversation history');
                       }
                     }}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Simulate AI Learning
+                    <Brain className="h-4 w-4 mr-2" />
+                    Analyze Conversation History
+                  </Button>
+                  
+                  <Button 
+                    variant="outline"
+                    onClick={async () => {
+                      try {
+                        const response = await fetch('/api/coding-assistant/conversation-logs');
+                        const logs = await response.json();
+                        console.log('Conversation Logs:', logs);
+                        alert(`Found ${logs.logs?.length || 0} conversation logs. Check console for details!`);
+                      } catch (error) {
+                        console.error('Error getting logs:', error);
+                      }
+                    }}
+                  >
+                    <History className="h-4 w-4 mr-2" />
+                    View Conversation Logs
                   </Button>
                   
                   <Button 
@@ -519,6 +618,15 @@ const CodingAssistant: React.FC = () => {
 
             <Card>
               <CardHeader>
+                <CardTitle>Conversation History Analysis</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ConversationLogsViewer />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
                 <CardTitle>How It Works</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -527,9 +635,9 @@ const CodingAssistant: React.FC = () => {
                     <span className="text-blue-600 dark:text-blue-400 font-bold">1</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Conversation Recording</h4>
+                    <h4 className="font-medium">Historical Data Loading</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Every coding conversation with AI is automatically recorded and analyzed
+                      System loads your actual coding conversations from chat history and logs
                     </p>
                   </div>
                 </div>
@@ -539,9 +647,9 @@ const CodingAssistant: React.FC = () => {
                     <span className="text-green-600 dark:text-green-400 font-bold">2</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Pattern Recognition</h4>
+                    <h4 className="font-medium">Intelligent Pattern Extraction</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      AI identifies useful code patterns, debugging strategies, and common solutions
+                      Claude AI analyzes conversations to identify coding patterns, solutions, and strategies
                     </p>
                   </div>
                 </div>
@@ -551,9 +659,9 @@ const CodingAssistant: React.FC = () => {
                     <span className="text-purple-600 dark:text-purple-400 font-bold">3</span>
                   </div>
                   <div>
-                    <h4 className="font-medium">Knowledge Base Building</h4>
+                    <h4 className="font-medium">Knowledge Base Population</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Extracted patterns are automatically added to your coding knowledge base
+                      Extracted findings are automatically added to your personal coding knowledge base
                     </p>
                   </div>
                 </div>
