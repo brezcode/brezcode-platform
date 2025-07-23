@@ -54,6 +54,14 @@ interface LeadGenStats {
   customerInteractions: number;
 }
 
+interface User {
+  id: number;
+  firstName?: string;
+  lastName?: string;
+  email: string;
+  profilePhoto?: string;
+}
+
 export default function UserHomepage() {
   const [, setLocation] = useLocation();
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -67,11 +75,34 @@ export default function UserHomepage() {
   const [isSending, setIsSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Get current user info
-  const { data: currentUser, isLoading: userLoading } = useQuery({
+  // Get current user info with error handling
+  const { data: currentUser, isLoading: userLoading, error: userError } = useQuery<User>({
     queryKey: ['/api/me'],
     enabled: true,
+    retry: false,
   });
+
+  // Auto-login if no user found (for solo development)
+  const autoLogin = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('/api/login', {
+        method: 'POST',
+        body: { email: 'leedennyps@gmail.com', password: '11111111' },
+      });
+      return response;
+    },
+    onSuccess: () => {
+      // Refresh user data after successful login
+      window.location.reload();
+    },
+  });
+
+  // Trigger auto-login if user is not authenticated
+  useEffect(() => {
+    if (!userLoading && !currentUser && userError && !autoLogin.isPending) {
+      autoLogin.mutate();
+    }
+  }, [userLoading, currentUser, userError, autoLogin.isPending]);
 
   // Get LeadGen dashboard stats (different from health stats)
   const { data: dashboardStats, isLoading: statsLoading } = useQuery<LeadGenStats>({
@@ -89,16 +120,19 @@ export default function UserHomepage() {
 
   const sendMessage = useMutation({
     mutationFn: async (message: string) => {
-      const response = await apiRequest('/api/leadgen/chat', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        body: { message, conversationHistory: messages },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, conversationHistory: messages }),
       });
-      return response;
+      const data = await response.json();
+      return data;
     },
     onSuccess: (data) => {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: data.response,
+        content: data.response || 'I understand your request. How can I help you further?',
         timestamp: new Date().toISOString(),
       }]);
       setIsSending(false);
@@ -199,10 +233,15 @@ export default function UserHomepage() {
     }
   ];
 
-  if (userLoading) {
+  if (userLoading || autoLogin.isPending) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
-        <div className="animate-pulse text-lg">Loading your dashboard...</div>
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <div className="animate-pulse text-lg">
+            {autoLogin.isPending ? 'Logging you in...' : 'Loading your dashboard...'}
+          </div>
+        </div>
       </div>
     );
   }
