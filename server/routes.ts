@@ -420,7 +420,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     });
   });
 
-  // Update user profile
+  // Update user profile (legacy endpoint)
   app.post("/api/profile/update", requireAuth, async (req: any, res) => {
     try {
       const userId = req.user.id;
@@ -446,6 +446,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
           bio: updatedUser.bio,
           profilePhoto: updatedUser.profilePhoto
         }
+      });
+    } catch (error) {
+      console.error("Profile update error:", error);
+      res.status(500).json({ message: "Failed to update profile" });
+    }
+  });
+
+  // User profile endpoints (new format)
+  app.get("/api/user/profile", requireAuth, async (req: any, res) => {
+    try {
+      const user = req.user;
+      res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        bio: user.bio,
+        profilePhoto: user.profilePhoto,
+        streetAddress: user.streetAddress,
+        city: user.city,
+        state: user.state,
+        postalCode: user.postalCode,
+        country: user.country,
+        phoneNumber: user.phoneNumber
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).json({ message: "Failed to fetch profile" });
+    }
+  });
+
+  app.post("/api/user/profile", requireAuth, async (req: any, res) => {
+    try {
+      const userId = req.user.id;
+      const profileData = req.body;
+
+      console.log("Profile update request for user:", userId, "with data:", profileData);
+
+      const updatedUser = await storage.updateUser(userId, profileData);
+
+      console.log("Profile updated successfully:", updatedUser);
+
+      res.json({
+        success: true,
+        user: updatedUser
       });
     } catch (error) {
       console.error("Profile update error:", error);
