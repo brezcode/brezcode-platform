@@ -39,6 +39,7 @@ import NotificationDemo from "@/components/NotificationDemo";
 import AvatarSetup from "@/pages/AvatarSetup";
 import { FeatureShowcase } from "@/pages/FeatureShowcase";
 import CodingAssistant from "@/pages/CodingAssistant";
+import KnowledgeCenter from "@/pages/KnowledgeCenter";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -87,6 +88,7 @@ function App() {
           <Route path="/avatar-setup" component={AvatarSetup} />
           <Route path="/feature-showcase" component={FeatureShowcase} />
           <Route path="/coding-assistant" component={CodingAssistant} />
+          <Route path="/knowledge-center" component={KnowledgeCenter} />
           
           {/* Health platform routes (BrezCode) */}
           <Route path="/brezcode/quiz" component={QuizPage} />
