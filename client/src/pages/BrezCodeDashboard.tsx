@@ -88,6 +88,18 @@ export default function BrezCodeDashboard() {
         </div>
       </div>
 
+      {/* Edit Profile Section */}
+      <div className="flex items-center justify-center mb-6">
+        <Button 
+          variant="outline" 
+          className="flex items-center space-x-2 hover:bg-pink-50 border-pink-200"
+          onClick={() => setLocation('/user-profile')}
+        >
+          <Settings className="h-4 w-4" />
+          <span>Edit Profile</span>
+        </Button>
+      </div>
+
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
