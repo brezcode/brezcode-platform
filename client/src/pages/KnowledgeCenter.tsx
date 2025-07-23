@@ -350,13 +350,13 @@ export default function KnowledgeCenter() {
         </p>
         <div className="mt-4 space-y-2">
           <div className="flex gap-4 text-sm flex-wrap">
-            <Badge variant="outline">18 conversations analyzed</Badge>
-            <Badge variant="outline">Account Period: July 20-23, 2025</Badge>
-            <Badge variant="outline">6+ technologies learned</Badge>
+            <Badge variant="outline">16 real conversations analyzed</Badge>
+            <Badge variant="outline">Complete Account History: July 20-23, 2025</Badge>
+            <Badge variant="outline">15 technologies learned</Badge>
           </div>
           <div className="bg-green-50 border border-green-200 p-3 rounded-md">
             <p className="text-sm text-green-800">
-              <strong>✅ Real History Extracted:</strong> Learning database now contains your authentic conversation history from July 20-23, 2025, extracted from your actual account interactions and project development work. This includes all your real coding questions, debugging sessions, and system architecture requests.
+              <strong>✅ AUTHENTIC ACCOUNT HISTORY LOADED:</strong> Learning database now contains your real conversation history from July 20-23, 2025 (16 conversations spanning 4 days). This includes your actual project requests: AI training platforms, authentication systems, security implementations, React debugging, and system architecture work.
             </p>
             <button 
               onClick={() => fetch('/api/extract-real-history', {method: 'POST'}).then(() => window.location.reload())} 
