@@ -26,6 +26,7 @@ import { AiTrainingSession } from "@/pages/AiTrainingSession";
 import { AITrainingSetup } from "@/pages/AITrainingSetup";
 import AvatarTrainingSetup from "@/pages/AvatarTrainingSetup";
 import BusinessAvatarManager from "@/pages/BusinessAvatarManager";
+import BusinessAvatarTraining from "@/pages/BusinessAvatarTraining";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { BackToTopButton, BackButton } from "@/components/MobileNavigation";
@@ -93,6 +94,7 @@ function App() {
           <Route path="/avatar-setup" component={AvatarSetup} />
           <Route path="/avatar-training-setup" component={AvatarTrainingSetup} />
           <Route path="/business-avatar-manager" component={BusinessAvatarManager} />
+          <Route path="/business-avatar-training" component={BusinessAvatarTraining} />
           <Route path="/feature-showcase" component={FeatureShowcase} />
           <Route path="/coding-assistant" component={CodingAssistant} />
           <Route path="/knowledge-center" component={KnowledgeCenter} />

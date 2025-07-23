@@ -28,7 +28,8 @@ import {
   ArrowRight,
   CheckCircle,
   AlertCircle,
-  Star
+  Star,
+  BarChart3
 } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
 
@@ -85,22 +86,37 @@ export default function AvatarTrainingSetup() {
   // Fetch avatar types
   const { data: avatarTypesData, isLoading: avatarTypesLoading } = useQuery({
     queryKey: ['/api/avatar-training/avatar-types'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/avatar-training/avatar-types');
+      if (!response.ok) throw new Error('Failed to fetch avatar types');
+      return response.json();
+    }
   });
 
   // Fetch scenarios for selected avatar type
   const { data: scenariosData } = useQuery({
     queryKey: ['/api/avatar-training/scenarios', selectedAvatarType],
     enabled: !!selectedAvatarType,
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/avatar-training/scenarios?avatarType=${selectedAvatarType}`);
+      if (!response.ok) throw new Error('Failed to fetch scenarios');
+      return response.json();
+    }
   });
 
   // Fetch training recommendations
   const { data: recommendationsData } = useQuery({
     queryKey: ['/api/avatar-training/recommendations', selectedAvatarType],
     enabled: !!selectedAvatarType,
+    queryFn: async () => {
+      const response = await apiRequest('GET', `/api/avatar-training/recommendations/${selectedAvatarType}`);
+      if (!response.ok) throw new Error('Failed to fetch recommendations');
+      return response.json();
+    }
   });
 
-  const avatarTypes: AvatarType[] = avatarTypesData?.avatarTypes || [];
-  const scenarios: TrainingScenario[] = scenariosData?.scenarios || [];
+  const avatarTypes: AvatarType[] = (avatarTypesData as any)?.avatarTypes || [];
+  const scenarios: TrainingScenario[] = (scenariosData as any)?.scenarios || [];
 
   const handleAvatarTypeSelect = (avatarType: string) => {
     setSelectedAvatarType(avatarType);

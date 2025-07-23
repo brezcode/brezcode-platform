@@ -86,10 +86,19 @@ export default function BusinessDashboard() {
     },
     {
       icon: Brain,
-      title: "AI Trainer",
-      description: "Train and optimize your AI assistants",
-      action: "Open Trainer",
-      href: "/ai-trainer",
+      title: "Business Avatars",
+      description: "Manage your AI business avatars",
+      action: "Manage Avatars",
+      href: "/business-avatar-manager",
+      color: "indigo",
+      status: "available"
+    },
+    {
+      icon: MessageSquare,
+      title: "Avatar Training",
+      description: "Train avatars with dialogue scenarios",
+      action: "Start Training",
+      href: "/business-avatar-training",
       color: "violet",
       status: "available"
     }
