@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Select from "react-select";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User, Camera, Save, MapPin, Phone } from "lucide-react";
+import { User, Camera, MapPin, Phone, Save } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
 import worldCountries from "world-countries";
 
@@ -19,21 +21,43 @@ const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   profilePhoto: z.string().optional(),
+  
+  // Address fields
   streetAddress: z.string().min(1, "Street address is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State/Province is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
+  
+  // Phone number in E.164 format
   phoneNumber: z.string().min(1, "Phone number is required"),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+// Generate country options from world-countries library
 const countryOptions = worldCountries
   .map(country => ({
     value: country.name.common,
     label: country.name.common,
+    flag: country.flag
   }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// Generate country code options from world-countries library
+const countryCodeOptions = worldCountries
+  .filter(country => country.idd?.root && country.idd?.suffixes)
+  .map(country => {
+    const root = country.idd.root;
+    const suffix = country.idd.suffixes[0] || '';
+    const code = root + suffix;
+    return {
+      value: country.cca2.toLowerCase(),
+      label: `${country.flag} ${code} ${country.name.common}`,
+      code: code,
+      flag: country.flag
+    };
+  })
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export default function UserProfile() {
@@ -79,6 +103,7 @@ export default function UserProfile() {
     },
   });
 
+  // Update form when profile data is loaded
   useEffect(() => {
     if (profile) {
       form.reset({
@@ -110,8 +135,13 @@ export default function UserProfile() {
   };
 
   const onSubmit = (data: ProfileFormData) => {
+    // Convert country code ID back to actual code for storage
+    const selectedCountryCode = countryCodeOptions.find(item => item.value === data.countryCode);
+    const actualCountryCode = selectedCountryCode ? selectedCountryCode.code : "+1";
+    
     saveProfile({ 
       ...data, 
+      countryCode: actualCountryCode,
       profilePhoto 
     });
   };
@@ -201,47 +231,114 @@ export default function UserProfile() {
           </CardHeader>
           <CardContent>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 
-                {/* Profile Photo */}
-                <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
-                    {profilePhoto ? (
-                      <AvatarImage src={profilePhoto} alt="Profile" />
-                    ) : (
-                      <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
-                        {form.getValues("firstName")?.[0] || ""}{form.getValues("lastName")?.[0] || ""}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center space-x-2"
-                  >
-                    <Camera className="w-4 h-4" />
-                    <span>Upload Photo</span>
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                </div>
+                {/* Profile Photo Section */}
+                <div className="space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <Camera className="w-5 h-5 text-gray-600" />
+                    <span className="font-medium text-gray-700">Profile Photo</span>
+                  </div>
+                  <div className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
+                  {profilePhoto ? (
+                    <AvatarImage src={profilePhoto} alt="Profile" />
+                  ) : (
+                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
+                      {form.getValues("firstName")?.[0] || ""}{form.getValues("lastName")?.[0] || ""}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center space-x-2"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Upload Photo</span>
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              </CardContent>
+            </Card>
 
-                {/* Name Fields */}
+            {/* Personal Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="w-5 h-5 text-blue-600" />
+                  <span>Personal Information</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your first name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your last name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Address Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <span>Address</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="streetAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Street Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your street address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="firstName"
+                    name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your first name" {...field} />
+                          <Input placeholder="Enter your city" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -250,12 +347,12 @@ export default function UserProfile() {
 
                   <FormField
                     control={form.control}
-                    name="lastName"
+                    name="state"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>State/Province</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your last name" {...field} />
+                          <Input placeholder="Enter your state or province" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -263,70 +360,20 @@ export default function UserProfile() {
                   />
                 </div>
 
-                {/* Address Fields */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <MapPin className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-700">Address Information</span>
-                  </div>
-                  
+                <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="streetAddress"
+                    name="postalCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Street Address</FormLabel>
+                        <FormLabel>Postal Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your street address" {...field} />
+                          <Input placeholder="Enter your postal code" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input placeholder="City" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State/Province</FormLabel>
-                          <FormControl>
-                            <Input placeholder="State or Province" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="postalCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Postal Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Postal Code" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
 
                   <FormField
                     control={form.control}
@@ -334,63 +381,75 @@ export default function UserProfile() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a country" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {countryOptions.map((country) => (
-                              <SelectItem key={country.value} value={country.value}>
-                                {country.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Phone className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-700">Contact Information</span>
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your phone number" {...field} />
+                          <Select
+                            options={countryOptions}
+                            value={countryOptions.find(option => option.value === field.value)}
+                            onChange={(selected) => field.onChange(selected?.value || "")}
+                            placeholder="Select your country"
+                            isSearchable
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center">
+                                <span className="mr-2">{option.flag}</span>
+                                {option.label}
+                              </div>
+                            )}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Save Button */}
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    disabled={isPending}
-                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>{isPending ? "Saving..." : "Save Profile"}</span>
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+            {/* Phone Number */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Phone className="w-5 h-5 text-blue-600" />
+                  <span>Phone Number</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <PhoneInput
+                          placeholder="Enter phone number"
+                          value={field.value}
+                          onChange={field.onChange}
+                          defaultCountry="US"
+                          className="phone-input"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <Button 
+                type="submit"
+                disabled={isPending}
+                className="flex items-center space-x-2"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isPending ? "Saving..." : "Save Profile"}</span>
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );
