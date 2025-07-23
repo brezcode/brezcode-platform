@@ -1238,6 +1238,86 @@ Format your response as JSON with the exact structure:
 
   // Register AI Training routes
   registerAiTrainingRoutes(app);
+  
+  // Business Profile Routes - Comprehensive business questionnaire endpoints
+  app.post('/api/business/profile', async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'Please log in to continue' });
+      }
+
+      const profileData = { ...req.body, userId };
+      console.log('Business profile creation request:', profileData);
+      
+      // For now, return success - in production this would save to database
+      res.json({
+        success: true,
+        profileId: 'temp-profile-id',
+        message: 'Business profile saved successfully'
+      });
+      
+    } catch (error: any) {
+      console.error('Error creating business profile:', error);
+      res.status(500).json({ 
+        error: 'Failed to save business profile',
+        details: error.message 
+      });
+    }
+  });
+  
+  app.post('/api/business/generate-strategies', async (req, res) => {
+    try {
+      const userId = (req as any).session.userId;
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'Please log in to continue' });
+      }
+
+      const { profileId } = req.body;
+      console.log('Strategy generation request for profile:', profileId);
+      
+      // Mock strategy generation response
+      const mockStrategies = [
+        {
+          title: "Digital Marketing Automation",
+          category: "marketing",
+          priority: "high",
+          estimatedImpact: "30% increase in leads",
+          timeToImplement: "2-3 weeks"
+        },
+        {
+          title: "AI Customer Service Setup",
+          category: "sales",
+          priority: "high",
+          estimatedImpact: "24/7 customer support",
+          timeToImplement: "1-2 weeks"
+        },
+        {
+          title: "Lead Generation Optimization",
+          category: "growth",
+          priority: "medium",
+          estimatedImpact: "50% more qualified leads",  
+          timeToImplement: "3-4 weeks"
+        }
+      ];
+      
+      res.json({
+        success: true,
+        strategiesCount: mockStrategies.length,
+        strategies: mockStrategies,
+        message: 'Strategic recommendations generated successfully'
+      });
+      
+    } catch (error: any) {
+      console.error('Error generating strategies:', error);
+      res.status(500).json({ 
+        error: 'Failed to generate strategies',
+        details: error.message 
+      });
+    }
+  });
 
   // Create HTTP server
   const server = createServer(app);

@@ -2,24 +2,62 @@ import { pgTable, text, uuid, timestamp, jsonb, integer, boolean } from "drizzle
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Business onboarding and analysis
+// Comprehensive business profiles for expert business consulting analysis
 export const businessProfiles = pgTable("business_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull(),
+  
+  // Company Fundamentals
   businessName: text("business_name").notNull(),
   industry: text("industry").notNull(),
-  businessType: text("business_type").notNull(), // B2B, B2C, B2B2C
+  businessType: text("business_type").notNull(),
+  companySize: text("company_size").notNull(),
+  businessStage: text("business_stage").notNull(),
+  
+  // Market & Competition
   targetAudience: text("target_audience").notNull(),
-  currentRevenue: text("current_revenue"), // ranges like 0-10k, 10k-50k, etc.
-  teamSize: integer("team_size"),
-  marketingChannels: jsonb("marketing_channels").$type<string[]>().default([]),
-  currentChallenges: jsonb("current_challenges").$type<string[]>().default([]),
-  goals: jsonb("goals").$type<string[]>().default([]),
-  timeline: text("timeline"), // 3 months, 6 months, 1 year
-  budget: text("budget"), // marketing budget ranges
+  uniqueValueProp: text("unique_value_prop").notNull(),
+  mainCompetitors: jsonb("main_competitors").$type<string[]>().default([]),
+  marketPosition: text("market_position").notNull(),
+  
+  // Financial Context
+  currentRevenue: text("current_revenue").notNull(),
+  revenueStreams: jsonb("revenue_streams").$type<string[]>().default([]),
+  profitMargins: text("profit_margins").notNull(),
+  cashFlowHealth: text("cash_flow_health").notNull(),
+  marketingBudget: text("marketing_budget").notNull(),
+  
+  // Operations & Team
+  teamSize: text("team_size").notNull(),
+  keyRoles: jsonb("key_roles").$type<string[]>().default([]),
+  operationalChallenges: jsonb("operational_challenges").$type<string[]>().default([]),
   currentTools: jsonb("current_tools").$type<string[]>().default([]),
-  competitorAnalysis: jsonb("competitor_analysis").$type<Record<string, any>>().default({}),
-  uniqueValueProp: text("unique_value_prop"),
+  systemsNeeded: jsonb("systems_needed").$type<string[]>().default([]),
+  
+  // Marketing & Sales
+  marketingChannels: jsonb("marketing_channels").$type<string[]>().default([]),
+  salesProcess: text("sales_process").notNull(),
+  customerAcquisitionCost: text("customer_acquisition_cost").notNull(),
+  customerLifetimeValue: text("customer_lifetime_value").notNull(),
+  conversionRates: text("conversion_rates").notNull(),
+  
+  // Goals & Vision
+  primaryGoals: jsonb("primary_goals").$type<string[]>().default([]),
+  timeline: text("timeline").notNull(),
+  successMetrics: jsonb("success_metrics").$type<string[]>().default([]),
+  growthTargets: text("growth_targets").notNull(),
+  
+  // Current Challenges & Pain Points
+  businessChallenges: jsonb("business_challenges").$type<string[]>().default([]),
+  urgentIssues: jsonb("urgent_issues").$type<string[]>().default([]),
+  resourceLimitations: jsonb("resource_limitations").$type<string[]>().default([]),
+  
+  // Strategic Context
+  riskTolerance: text("risk_tolerance").notNull(),
+  changeReadiness: text("change_readiness").notNull(),
+  innovationFocus: jsonb("innovation_focus").$type<string[]>().default([]),
+  futureVision: text("future_vision").notNull(),
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -83,11 +121,44 @@ export const onboardingResponses = pgTable("onboarding_responses", {
   completedAt: timestamp("completed_at").defaultNow(),
 });
 
-// Zod schemas for validation
-export const insertBusinessProfileSchema = createInsertSchema(businessProfiles);
+// Comprehensive Zod schemas with detailed validation
+export const insertBusinessProfileSchema = createInsertSchema(businessProfiles, {
+  // Company Fundamentals
+  businessName: z.string().min(1, "Business name is required"),
+  industry: z.string().min(1, "Industry is required"),
+  businessType: z.string().min(1, "Business type is required"),
+  companySize: z.string().min(1, "Company size is required"),
+  businessStage: z.string().min(1, "Business stage is required"),
+  
+  // Market & Competition
+  targetAudience: z.string().min(10, "Please provide detailed target audience description"),
+  uniqueValueProp: z.string().min(10, "Please describe your unique value proposition"),
+  marketPosition: z.string().min(1, "Market position is required"),
+  
+  // Financial Context
+  currentRevenue: z.string().min(1, "Revenue range is required"),
+  profitMargins: z.string().min(1, "Profit margin range is required"),
+  cashFlowHealth: z.string().min(1, "Cash flow assessment is required"),
+  marketingBudget: z.string().min(1, "Marketing budget is required"),
+  
+  // Operations & Team
+  teamSize: z.string().min(1, "Team size is required"),
+  salesProcess: z.string().min(10, "Please describe your sales process"),
+  customerAcquisitionCost: z.string().min(1, "Customer acquisition cost is required"),
+  customerLifetimeValue: z.string().min(1, "Customer lifetime value is required"),
+  conversionRates: z.string().min(1, "Conversion rate information is required"),
+  
+  // Goals & Vision
+  timeline: z.string().min(1, "Timeline is required"),
+  growthTargets: z.string().min(10, "Please describe growth targets"),
+  riskTolerance: z.string().min(1, "Risk tolerance is required"),
+  changeReadiness: z.string().min(1, "Change readiness assessment is required"),
+  futureVision: z.string().min(20, "Please describe your 3-year vision"),
+});
+
 export const insertBusinessStrategySchema = createInsertSchema(businessStrategies);
 export const insertStrategyExecutionSchema = createInsertSchema(strategyExecutions);
-export const insertOnboardingQuestionSchema = createInsertSchema(onboardingQuestions);
+export const insertOnboardingQuestionSchema = createInsertSchema(onboardingQuestions);  
 export const insertOnboardingResponseSchema = createInsertSchema(onboardingResponses);
 
 // Types

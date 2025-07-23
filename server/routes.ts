@@ -7,6 +7,7 @@ import avatarRoutes from "./routes/avatarRoutes";
 import healthScheduleRoutes from "./routes/healthScheduleRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import { businessRoutes } from "./businessRoutes";
+import { businessProfileRoutes } from "./businessProfileRoutes";
 import { TwilioVoiceService } from "./twilioVoiceService";
 import { notificationService } from "./notificationService";
 import { RoleplayService } from "./roleplayService";
