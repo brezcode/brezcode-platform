@@ -88,15 +88,15 @@ export default function BrezCodeDashboard() {
         </div>
       </div>
 
-      {/* Edit Profile Section */}
+      {/* Edit Business Profile Section */}
       <div className="flex items-center justify-center mb-6">
         <Button 
           variant="outline" 
           className="flex items-center space-x-2 hover:bg-pink-50 border-pink-200"
-          onClick={() => setLocation('/user-profile')}
+          onClick={() => setLocation('/business/brezcode/profile')}
         >
           <Settings className="h-4 w-4" />
-          <span>Edit Profile</span>
+          <span>Edit Business Profile</span>
         </Button>
       </div>
 

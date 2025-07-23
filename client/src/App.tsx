@@ -67,6 +67,12 @@ function App() {
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
           <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
+          <Route path="/business/brezcode/profile">
+            {() => {
+              const BrezCodeBusinessProfile = require('./pages/BrezCodeBusinessProfile').default;
+              return <BrezCodeBusinessProfile />;
+            }}
+          </Route>
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />
           <Route path="/business-consultant" component={BusinessConsultant} />
