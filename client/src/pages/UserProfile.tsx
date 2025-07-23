@@ -62,53 +62,53 @@ const countries = [
   "Zambia", "Zimbabwe"
 ];
 
-// Country codes with country names
+// Country codes with country names - using unique keys
 const countryCodes = [
-  { country: "United States", code: "+1" },
-  { country: "Canada", code: "+1" },
-  { country: "United Kingdom", code: "+44" },
-  { country: "Australia", code: "+61" },
-  { country: "Germany", code: "+49" },
-  { country: "France", code: "+33" },
-  { country: "Italy", code: "+39" },
-  { country: "Spain", code: "+34" },
-  { country: "Netherlands", code: "+31" },
-  { country: "Belgium", code: "+32" },
-  { country: "Switzerland", code: "+41" },
-  { country: "Austria", code: "+43" },
-  { country: "Sweden", code: "+46" },
-  { country: "Norway", code: "+47" },
-  { country: "Denmark", code: "+45" },
-  { country: "Finland", code: "+358" },
-  { country: "Ireland", code: "+353" },
-  { country: "Poland", code: "+48" },
-  { country: "Czech Republic", code: "+420" },
-  { country: "Hungary", code: "+36" },
-  { country: "Greece", code: "+30" },
-  { country: "Portugal", code: "+351" },
-  { country: "Russia", code: "+7" },
-  { country: "Ukraine", code: "+380" },
-  { country: "Japan", code: "+81" },
-  { country: "South Korea", code: "+82" },
-  { country: "China", code: "+86" },
-  { country: "India", code: "+91" },
-  { country: "Singapore", code: "+65" },
-  { country: "Malaysia", code: "+60" },
-  { country: "Thailand", code: "+66" },
-  { country: "Philippines", code: "+63" },
-  { country: "Indonesia", code: "+62" },
-  { country: "Vietnam", code: "+84" },
-  { country: "New Zealand", code: "+64" },
-  { country: "Brazil", code: "+55" },
-  { country: "Argentina", code: "+54" },
-  { country: "Chile", code: "+56" },
-  { country: "Mexico", code: "+52" },
-  { country: "South Africa", code: "+27" },
-  { country: "Egypt", code: "+20" },
-  { country: "Israel", code: "+972" },
-  { country: "United Arab Emirates", code: "+971" },
-  { country: "Saudi Arabia", code: "+966" },
-  { country: "Turkey", code: "+90" }
+  { country: "United States", code: "+1", id: "us" },
+  { country: "Canada", code: "+1", id: "ca" },
+  { country: "United Kingdom", code: "+44", id: "uk" },
+  { country: "Australia", code: "+61", id: "au" },
+  { country: "Germany", code: "+49", id: "de" },
+  { country: "France", code: "+33", id: "fr" },
+  { country: "Italy", code: "+39", id: "it" },
+  { country: "Spain", code: "+34", id: "es" },
+  { country: "Netherlands", code: "+31", id: "nl" },
+  { country: "Belgium", code: "+32", id: "be" },
+  { country: "Switzerland", code: "+41", id: "ch" },
+  { country: "Austria", code: "+43", id: "at" },
+  { country: "Sweden", code: "+46", id: "se" },
+  { country: "Norway", code: "+47", id: "no" },
+  { country: "Denmark", code: "+45", id: "dk" },
+  { country: "Finland", code: "+358", id: "fi" },
+  { country: "Ireland", code: "+353", id: "ie" },
+  { country: "Poland", code: "+48", id: "pl" },
+  { country: "Czech Republic", code: "+420", id: "cz" },
+  { country: "Hungary", code: "+36", id: "hu" },
+  { country: "Greece", code: "+30", id: "gr" },
+  { country: "Portugal", code: "+351", id: "pt" },
+  { country: "Russia", code: "+7", id: "ru" },
+  { country: "Ukraine", code: "+380", id: "ua" },
+  { country: "Japan", code: "+81", id: "jp" },
+  { country: "South Korea", code: "+82", id: "kr" },
+  { country: "China", code: "+86", id: "cn" },
+  { country: "India", code: "+91", id: "in" },
+  { country: "Singapore", code: "+65", id: "sg" },
+  { country: "Malaysia", code: "+60", id: "my" },
+  { country: "Thailand", code: "+66", id: "th" },
+  { country: "Philippines", code: "+63", id: "ph" },
+  { country: "Indonesia", code: "+62", id: "id" },
+  { country: "Vietnam", code: "+84", id: "vn" },
+  { country: "New Zealand", code: "+64", id: "nz" },
+  { country: "Brazil", code: "+55", id: "br" },
+  { country: "Argentina", code: "+54", id: "ar" },
+  { country: "Chile", code: "+56", id: "cl" },
+  { country: "Mexico", code: "+52", id: "mx" },
+  { country: "South Africa", code: "+27", id: "za" },
+  { country: "Egypt", code: "+20", id: "eg" },
+  { country: "Israel", code: "+972", id: "il" },
+  { country: "United Arab Emirates", code: "+971", id: "ae" },
+  { country: "Saudi Arabia", code: "+966", id: "sa" },
+  { country: "Turkey", code: "+90", id: "tr" }
 ].sort((a, b) => a.country.localeCompare(b.country));
 
 export default function UserProfile() {
@@ -421,7 +421,7 @@ export default function UserProfile() {
                         </FormControl>
                         <SelectContent>
                           {countryCodes.map((item) => (
-                            <SelectItem key={item.code} value={item.code}>
+                            <SelectItem key={item.id} value={item.code}>
                               {item.code} ({item.country})
                             </SelectItem>
                           ))}
