@@ -74,6 +74,27 @@ export default function UserProfile() {
   console.log("Profile data loaded:", profile);
   console.log("Profile loading error:", error);
   console.log("Profile loading status:", isLoading);
+  
+  // Debug: Test if we can fetch profile data manually
+  useEffect(() => {
+    const testProfileFetch = async () => {
+      try {
+        const response = await fetch('/api/user/profile', {
+          credentials: 'include'
+        });
+        console.log("Manual profile fetch response status:", response.status);
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Manual profile fetch data:", data);
+        } else {
+          console.log("Manual profile fetch error:", await response.text());
+        }
+      } catch (err) {
+        console.log("Manual profile fetch failed:", err);
+      }
+    };
+    testProfileFetch();
+  }, []);
 
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: (data: ProfileFormData) => apiRequest("POST", "/api/user/profile", data),
