@@ -69,6 +69,8 @@ export default function UserProfile() {
     queryKey: ["/api/user/profile"],
   });
 
+  console.log("Profile data loaded:", profile);
+
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: (data: ProfileFormData) => apiRequest("POST", "/api/user/profile", data),
     onSuccess: () => {
@@ -105,8 +107,9 @@ export default function UserProfile() {
 
   // Update form when profile data is loaded
   useEffect(() => {
+    console.log("Profile useEffect triggered, profile:", profile);
     if (profile) {
-      form.reset({
+      const formData = {
         firstName: profile.firstName || "",
         lastName: profile.lastName || "",
         profilePhoto: profile.profilePhoto || "",
@@ -116,7 +119,9 @@ export default function UserProfile() {
         postalCode: profile.postalCode || "",
         country: profile.country || "",
         phoneNumber: profile.phoneNumber || "",
-      });
+      };
+      console.log("Setting form data:", formData);
+      form.reset(formData);
       setProfilePhoto(profile.profilePhoto || "");
     }
   }, [profile, form]);

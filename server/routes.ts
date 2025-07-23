@@ -67,10 +67,11 @@ declare module "express-session" {
 
 // Authentication middleware
 const isAuthenticated = (req: any, res: any, next: any) => {
+  console.log("Session debug - userId:", req.session?.userId, "sessionID:", req.sessionID);
   if (req.session.userId && req.session.isAuthenticated) {
     return next();
   }
-  return res.status(401).json({ message: 'Authentication required' });
+  return res.status(401).json({ error: 'Not authenticated' });
 };
 
 // Helper functions for sending notifications
@@ -454,9 +455,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile endpoints (new format)
-  app.get("/api/user/profile", requireAuth, async (req: any, res) => {
+  app.get("/api/user/profile", isAuthenticated, async (req: any, res) => {
     try {
-      const user = req.user;
+      const userId = req.session.userId;
+      console.log("Fetching profile for user ID:", userId);
+      
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      console.log("User data found:", user);
+      
       res.json({
         id: user.id,
         firstName: user.firstName,
@@ -479,9 +489,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/user/profile", requireAuth, async (req: any, res) => {
+  app.post("/api/user/profile", isAuthenticated, async (req: any, res) => {
     try {
-      const userId = req.user.id;
+      const userId = req.session.userId;
       const profileData = req.body;
 
       console.log("Profile update request for user:", userId, "with data:", profileData);
