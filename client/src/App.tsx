@@ -54,9 +54,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Switch>
-          {/* Main platform routes - Direct to personal dashboard */}
-          <Route path="/" component={UserHomepage} />
-          <Route path="/landing" component={LeadGenLanding} />
+          {/* Main platform routes - LeadGen homepage first */}
+          <Route path="/" component={LeadGenLanding} />
+          <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
           <Route path="/profile-test" component={UserProfileTest} />
