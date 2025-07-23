@@ -88,6 +88,51 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
 
           {/* Right: User Actions */}
           <div className="flex items-center space-x-1 md:space-x-4">
+            {/* Business/Personal Switcher - Always visible */}
+            <div className="flex items-center space-x-1">
+              {!businessContext ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setLocation('/business-selector')}
+                    className="flex items-center"
+                  >
+                    <Building2 className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Business</span>
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex items-center bg-blue-600 hover:bg-blue-700"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Personal</span>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button 
+                    variant="default" 
+                    size="sm"
+                    className="flex items-center bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Building2 className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Business</span>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setLocation('/dashboard')}
+                    className="flex items-center"
+                  >
+                    <User className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Personal</span>
+                  </Button>
+                </>
+              )}
+            </div>
+
             {/* User Menu */}
             <div className="flex items-center space-x-1 md:space-x-2">
               <Button variant="ghost" size="sm" className="hidden md:flex">
@@ -100,6 +145,7 @@ export default function TopNavigation({ businessContext }: TopNavigationProps) {
 
               <Avatar 
                 className="h-8 w-8 cursor-pointer hover:ring-2 hover:ring-blue-300"
+                onClick={() => setLocation('/user-profile')}
               >
                 {currentUser?.profilePhoto ? (
                   <AvatarImage src={currentUser.profilePhoto} alt="Profile" />
