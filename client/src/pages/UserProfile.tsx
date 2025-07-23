@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Select from "react-select";
@@ -42,6 +42,22 @@ const countryOptions = worldCountries
     label: country.name.common,
     flag: country.flag
   }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
+// Generate country code options from world-countries library
+const countryCodeOptions = worldCountries
+  .filter(country => country.idd?.root && country.idd?.suffixes)
+  .map(country => {
+    const root = country.idd.root;
+    const suffix = country.idd.suffixes[0] || '';
+    const code = root + suffix;
+    return {
+      value: country.cca2.toLowerCase(),
+      label: `${country.flag} ${code} ${country.name.common}`,
+      code: code,
+      flag: country.flag
+    };
+  })
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export default function UserProfile() {
@@ -119,8 +135,13 @@ export default function UserProfile() {
   };
 
   const onSubmit = (data: ProfileFormData) => {
+    // Convert country code ID back to actual code for storage
+    const selectedCountryCode = countryCodeOptions.find(item => item.value === data.countryCode);
+    const actualCountryCode = selectedCountryCode ? selectedCountryCode.code : "+1";
+    
     saveProfile({ 
       ...data, 
+      countryCode: actualCountryCode,
       profilePhoto 
     });
   };

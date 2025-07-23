@@ -18,9 +18,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
 import { storage } from "./storage";
-import { db } from "./db";
-import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier, users } from "@shared/schema";
-import { eq } from "drizzle-orm";
+import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
 import twilio from "twilio";
 import sgMail from "@sendgrid/mail";
 
@@ -464,6 +462,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
+        phone: user.phone,
+        address: user.address,
+        bio: user.bio,
         profilePhoto: user.profilePhoto,
         streetAddress: user.streetAddress,
         city: user.city,
@@ -485,34 +486,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log("Profile update request for user:", userId, "with data:", profileData);
 
-      // Map profile form fields to user table columns with correct field names
-      const userUpdateData = {
-        firstName: profileData.firstName,
-        lastName: profileData.lastName,
-        streetAddress: profileData.streetAddress,
-        city: profileData.city,
-        state: profileData.state,
-        postalCode: profileData.postalCode,
-        country: profileData.country,
-        phoneNumber: profileData.phoneNumber,
-        profilePhoto: profileData.profilePhoto
-      };
+      const updatedUser = await storage.updateUser(userId, profileData);
 
-      // Filter out undefined values
-      const filteredData = Object.fromEntries(
-        Object.entries(userUpdateData).filter(([_, value]) => value !== undefined)
-      );
-
-      console.log("Mapped data for users table:", filteredData);
-
-      // Update directly in database using db.update
-      const [updatedUser] = await db
-        .update(users)
-        .set(filteredData)
-        .where(eq(users.id, userId))
-        .returning();
-
-      console.log("Profile updated successfully in users table:", updatedUser);
+      console.log("Profile updated successfully:", updatedUser);
 
       res.json({
         success: true,
