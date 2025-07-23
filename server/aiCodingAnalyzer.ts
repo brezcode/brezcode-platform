@@ -254,7 +254,15 @@ Only extract patterns that appear useful and reusable. Focus on quality over qua
         messages: [{ role: 'user', content: analysisPrompt }]
       });
 
-      const extractedData = JSON.parse(response.content[0].text);
+      // Clean up AI response - remove markdown code blocks if present
+      let cleanResponse = response.content[0].text.trim();
+      if (cleanResponse.startsWith('```json')) {
+        cleanResponse = cleanResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanResponse.startsWith('```')) {
+        cleanResponse = cleanResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      const extractedData = JSON.parse(cleanResponse);
       
       // Store the extracted patterns, strategies, and solutions
       await this.storeExtractedKnowledge(extractedData);
@@ -414,7 +422,15 @@ Provide insights in JSON format:
         messages: [{ role: 'user', content: insightPrompt }]
       });
 
-      const insights = JSON.parse(response.content[0].text);
+      // Clean up AI response - remove markdown code blocks if present
+      let cleanInsightResponse = response.content[0].text.trim();
+      if (cleanInsightResponse.startsWith('```json')) {
+        cleanInsightResponse = cleanInsightResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+      } else if (cleanInsightResponse.startsWith('```')) {
+        cleanInsightResponse = cleanInsightResponse.replace(/^```\s*/, '').replace(/\s*```$/, '');
+      }
+      
+      const insights = JSON.parse(cleanInsightResponse);
       
       return {
         totalInteractions: this.interactionHistory.length,
