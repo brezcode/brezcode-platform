@@ -5,6 +5,7 @@ import UserProfile from "@/pages/UserProfile";
 import UserProfileTest from "@/pages/UserProfileTest";
 import BusinessDashboard from "@/pages/BusinessDashboard";
 import BusinessConsultant from "@/pages/BusinessConsultant";
+import BrezCodeBusinessProfile from "@/pages/BrezCodeBusinessProfile";
 import SubscribePage from "@/pages/subscribe";
 import EmailVerificationModule from "@/components/EmailVerificationModule";
 import BusinessSelector from "@/components/BusinessSelector";
@@ -67,12 +68,7 @@ function App() {
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
           <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
-          <Route path="/business/brezcode/profile">
-            {() => {
-              const BrezCodeBusinessProfile = require('./pages/BrezCodeBusinessProfile').default;
-              return <BrezCodeBusinessProfile />;
-            }}
-          </Route>
+          <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />
           <Route path="/business-consultant" component={BusinessConsultant} />
