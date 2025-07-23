@@ -24,6 +24,7 @@ import RoleplayTraining from "@/pages/RoleplayTraining";
 import { AiTrainingDashboard } from "@/pages/AiTrainingDashboard";
 import { AiTrainingSession } from "@/pages/AiTrainingSession";
 import { AITrainingSetup } from "@/pages/AITrainingSetup";
+import AvatarTrainingSetup from "@/pages/AvatarTrainingSetup";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { BackToTopButton, BackButton } from "@/components/MobileNavigation";
@@ -89,6 +90,7 @@ function App() {
           <Route path="/ai-training/setup" component={AITrainingSetup} />
           <Route path="/ai-training/session/:sessionId" component={AiTrainingSession} />
           <Route path="/avatar-setup" component={AvatarSetup} />
+          <Route path="/avatar-training-setup" component={AvatarTrainingSetup} />
           <Route path="/feature-showcase" component={FeatureShowcase} />
           <Route path="/coding-assistant" component={CodingAssistant} />
           <Route path="/knowledge-center" component={KnowledgeCenter} />

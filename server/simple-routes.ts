@@ -1239,6 +1239,10 @@ Format your response as JSON with the exact structure:
   // Register AI Training routes
   registerAiTrainingRoutes(app);
   
+  // Register avatar training routes
+  const avatarTrainingRoutes = await import('./routes/avatarTrainingRoutes');
+  app.use('/api/avatar-training', avatarTrainingRoutes.default);
+  
   // Business Profile Routes - Comprehensive business questionnaire endpoints
   app.post('/api/business/profile', async (req, res) => {
     try {
