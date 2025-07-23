@@ -412,6 +412,16 @@ export default function UserHomepage() {
                   <Brain className="h-3 w-3 mr-2" />
                   AI Training
                 </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-xs"
+                  onClick={() => setLocation('/business-avatar-manager')}
+                >
+                  <Bot className="h-3 w-3 mr-2" />
+                  Business Avatars
+                </Button>
               </CardContent>
             </Card>
 
