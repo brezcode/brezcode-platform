@@ -337,9 +337,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { storage } = await import('./storage');
-      const profile = await storage.getUserProfile(userId);
+      const user = await storage.getUser(userId);
       
-      res.json(profile || {});
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Return user profile data without password, mapped to frontend expected format
+      const userProfile = {
+        firstName: user.firstName || "",
+        lastName: user.lastName || "",
+        profilePhoto: user.profilePhoto || "",
+        streetAddress: user.streetAddress || "",
+        city: user.city || "",
+        state: user.state || "",
+        postalCode: user.postalCode || "",
+        country: user.country || "",
+        phoneNumber: user.phoneNumber || "",
+        phone: user.phone || "",
+        address: user.address || "",
+        bio: user.bio || ""
+      };
+      
+      res.json(userProfile);
     } catch (error: any) {
       console.error('Get profile error:', error);
       res.status(500).json({ error: "Failed to get profile" });
@@ -356,9 +376,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { storage } = await import('./storage');
-      const updatedProfile = await storage.updateUserProfile(userId, req.body);
+      const updatedUser = await storage.updateUser(userId, req.body);
       
-      res.json(updatedProfile);
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Return updated user profile without password
+      const { password, ...userProfile } = updatedUser;
+      res.json(userProfile);
     } catch (error: any) {
       console.error('Update profile error:', error);
       res.status(500).json({ error: "Failed to update profile" });
