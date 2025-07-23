@@ -13,6 +13,7 @@ export * from "./business-schema";   // Business automation (LeadGen specific)
 export * from "./roleplay-schema";   // AI training scenarios
 export * from "./ai-training-schema"; // New AI training system
 export * from "./coding-assistant-schema"; // AI coding assistant
+export * from "./conversation-history-schema"; // Real conversation learning system
 
 // Legacy users table - keeping for compatibility during migration
 // NEW APPROACH: Use leadgenUsers and brezcodeUsers tables instead

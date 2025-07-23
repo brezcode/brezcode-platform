@@ -452,6 +452,10 @@ Format your response as JSON with the exact structure:
   const codingAssistantRoutes = await import('./coding-assistant-routes');
   app.use('/api/coding-assistant', codingAssistantRoutes.default);
 
+  // Register conversation learning system - Real learning from conversation history
+  const conversationLearningRoutes = await import('./routes/conversation-learning-routes');
+  app.use('/api/conversation-learning', conversationLearningRoutes.default);
+
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, sessionId } = req.body;
