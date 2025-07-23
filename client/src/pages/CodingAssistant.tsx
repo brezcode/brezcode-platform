@@ -69,30 +69,66 @@ const CodingAssistant: React.FC = () => {
   // Fetch code patterns
   const { data: patterns = [], isLoading: patternsLoading } = useQuery({
     queryKey: ['/api/coding-assistant/patterns'],
-    queryFn: () => apiRequest('/api/coding-assistant/patterns')
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/coding-assistant/patterns');
+        if (!response.ok) throw new Error('Failed to fetch patterns');
+        return await response.json();
+      } catch (error) {
+        console.log('Error fetching patterns:', error);
+        return [];
+      }
+    }
   });
 
   // Fetch prompt strategies
   const { data: strategies = [], isLoading: strategiesLoading } = useQuery({
     queryKey: ['/api/coding-assistant/strategies'],
-    queryFn: () => apiRequest('/api/coding-assistant/strategies')
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/coding-assistant/strategies');
+        if (!response.ok) throw new Error('Failed to fetch strategies');
+        return await response.json();
+      } catch (error) {
+        console.log('Error fetching strategies:', error);
+        return [];
+      }
+    }
   });
 
   // Fetch debugging solutions
   const { data: solutions = [], isLoading: solutionsLoading } = useQuery({
     queryKey: ['/api/coding-assistant/solutions'],
-    queryFn: () => apiRequest('/api/coding-assistant/solutions')
+    queryFn: async () => {
+      try {
+        const response = await fetch('/api/coding-assistant/solutions');
+        if (!response.ok) throw new Error('Failed to fetch solutions');
+        return await response.json();
+      } catch (error) {
+        console.log('Error fetching solutions:', error);
+        return [];
+      }
+    }
   });
 
   // Add new pattern mutation
   const addPatternMutation = useMutation({
-    mutationFn: (pattern: any) => apiRequest('/api/coding-assistant/patterns', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(pattern)
-    }),
+    mutationFn: async (pattern: any) => {
+      try {
+        const response = await fetch('/api/coding-assistant/patterns', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(pattern)
+        });
+        if (!response.ok) throw new Error('Failed to add pattern');
+        return await response.json();
+      } catch (error) {
+        console.error('Error adding pattern:', error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/coding-assistant/patterns'] });
       setNewPattern({
@@ -141,12 +177,12 @@ const CodingAssistant: React.FC = () => {
     }));
   };
 
-  const filteredPatterns = patterns.filter((pattern: CodePattern) =>
-    pattern.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pattern.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pattern.language.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    pattern.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredPatterns = Array.isArray(patterns) ? patterns.filter((pattern: any) =>
+    pattern.patternName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pattern.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    pattern.technology?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (pattern.tags && pattern.tags.some((tag: string) => tag.toLowerCase().includes(searchTerm.toLowerCase())))
+  ) : [];
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -217,18 +253,18 @@ const CodingAssistant: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              filteredPatterns.map((pattern: CodePattern) => (
+              filteredPatterns.map((pattern: any) => (
                 <Card key={pattern.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{pattern.title}</CardTitle>
+                        <CardTitle className="text-lg">{pattern.patternName}</CardTitle>
                         <CardDescription>{pattern.description}</CardDescription>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary">{pattern.language}</Badge>
-                        {pattern.framework && (
-                          <Badge variant="outline">{pattern.framework}</Badge>
+                        <Badge variant="secondary">{pattern.technology}</Badge>
+                        {pattern.category && pattern.category !== 'general' && (
+                          <Badge variant="outline">{pattern.category}</Badge>
                         )}
                       </div>
                     </div>
@@ -236,12 +272,12 @@ const CodingAssistant: React.FC = () => {
                   <CardContent>
                     <div className="bg-gray-50 dark:bg-gray-800 rounded-md p-3 mb-4">
                       <pre className="text-sm overflow-x-auto">
-                        <code>{pattern.codeSnippet}</code>
+                        <code>{pattern.codeExample}</code>
                       </pre>
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex gap-2">
-                        {pattern.tags.map((tag) => (
+                        {pattern.tags && pattern.tags.map((tag: string) => (
                           <Badge key={tag} variant="outline" className="text-xs">
                             <Tag className="h-3 w-3 mr-1" />
                             {tag}
@@ -249,7 +285,7 @@ const CodingAssistant: React.FC = () => {
                         ))}
                       </div>
                       <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span>Used {pattern.usageCount} times</span>
+                        <span>Used {pattern.useCount || 0} times</span>
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {new Date(pattern.createdAt).toLocaleDateString()}
@@ -286,15 +322,15 @@ const CodingAssistant: React.FC = () => {
                 </CardContent>
               </Card>
             ) : (
-              strategies.map((strategy: PromptStrategy) => (
+              strategies.map((strategy: any) => (
                 <Card key={strategy.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg">{strategy.title}</CardTitle>
+                        <CardTitle className="text-lg">{strategy.strategyName}</CardTitle>
                         <CardDescription>{strategy.description}</CardDescription>
                       </div>
-                      <Badge variant="secondary">{strategy.category}</Badge>
+                      <Badge variant="secondary">{strategy.useCase}</Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -305,7 +341,7 @@ const CodingAssistant: React.FC = () => {
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-500">
-                        Effectiveness: {strategy.effectiveness}/5 stars
+                        Effectiveness: {strategy.effectiveness || 50}%
                       </span>
                       <span className="text-sm text-gray-500">
                         Used {strategy.usageCount} times
