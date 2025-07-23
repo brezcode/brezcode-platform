@@ -65,11 +65,15 @@ export default function UserProfile() {
   const [profilePhoto, setProfilePhoto] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const { data: profile, isLoading } = useQuery<any>({
+  const { data: profile, isLoading, error } = useQuery<any>({
     queryKey: ["/api/user/profile"],
+    retry: 3,
+    retryDelay: 1000,
   });
 
   console.log("Profile data loaded:", profile);
+  console.log("Profile loading error:", error);
+  console.log("Profile loading status:", isLoading);
 
   const { mutate: saveProfile, isPending } = useMutation({
     mutationFn: (data: ProfileFormData) => apiRequest("POST", "/api/user/profile", data),
@@ -108,7 +112,8 @@ export default function UserProfile() {
   // Update form when profile data is loaded
   useEffect(() => {
     console.log("Profile useEffect triggered, profile:", profile);
-    if (profile) {
+    console.log("Profile loading status:", isLoading);
+    if (profile && !isLoading) {
       const formData = {
         firstName: profile.firstName || "",
         lastName: profile.lastName || "",
@@ -123,8 +128,14 @@ export default function UserProfile() {
       console.log("Setting form data:", formData);
       form.reset(formData);
       setProfilePhoto(profile.profilePhoto || "");
+      
+      // Force form update by setting values individually
+      Object.entries(formData).forEach(([key, value]) => {
+        form.setValue(key as keyof ProfileFormData, value);
+      });
+      console.log("Form values after reset:", form.getValues());
     }
-  }, [profile, form]);
+  }, [profile, isLoading, form]);
 
   const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -158,6 +169,21 @@ export default function UserProfile() {
                 <div key={i} className="h-32 bg-gray-200 rounded"></div>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50">
+        <TopNavigation />
+        <div className="container mx-auto py-8 px-4">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <h2 className="text-red-800 font-semibold mb-2">Error Loading Profile</h2>
+            <p className="text-red-600 mb-4">{error?.message || "Failed to load profile data"}</p>
+            <p className="text-sm text-red-500">Please try logging in again or contact support if the issue persists.</p>
           </div>
         </div>
       </div>
