@@ -343,7 +343,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(404).json({ error: "User not found" });
       }
       
-      // Return profile data from users table
+      // Return profile data from users table (convert snake_case to camelCase)
       res.json({
         id: user.id,
         firstName: user.firstName,
@@ -374,10 +374,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       const { storage } = await import('./storage');
       
-      // Map profile form fields to user table columns
+      // Map profile form fields to actual database column names (camelCase to snake_case)
       const userUpdateData = {
         firstName: req.body.firstName,
-        lastName: req.body.lastName,
+        lastName: req.body.lastName, 
         streetAddress: req.body.streetAddress,
         city: req.body.city,
         state: req.body.state,
