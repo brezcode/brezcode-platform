@@ -314,3 +314,4 @@ Changelog:
 Preferred communication style: Simple, everyday language.
 Platform approach: Personal-first tools with business features as optional additions.
 Authentication preference: Simple login using existing infrastructure, no complex onboarding.
+AI Learning Requirement: AI coding assistant must learn from actual conversation history across all projects and avoid repeating same errors and wrong logic.
