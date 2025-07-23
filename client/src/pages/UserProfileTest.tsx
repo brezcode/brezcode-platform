@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import TopNavigation from "@/components/TopNavigation";
 
@@ -40,36 +39,36 @@ export default function UserProfileTest() {
             {/* Country Dropdown Test */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Country</label>
-              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a country" />
-                </SelectTrigger>
-                <SelectContent>
-                  {testCountries.map((country) => (
-                    <SelectItem key={country} value={country}>
-                      {country}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select 
+                value={selectedCountry} 
+                onChange={(e) => setSelectedCountry(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md bg-white"
+              >
+                <option value="">Select a country</option>
+                {testCountries.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
               <p className="text-sm text-gray-600">Selected: {selectedCountry || "None"}</p>
             </div>
 
             {/* Country Code Dropdown Test */}
             <div className="space-y-2">
               <label className="text-sm font-medium">Country Code</label>
-              <Select value={selectedCountryCode} onValueChange={setSelectedCountryCode}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a code" />
-                </SelectTrigger>
-                <SelectContent>
-                  {testCountryCodes.map((item) => (
-                    <SelectItem key={item.id} value={item.id}>
-                      {item.display}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <select 
+                value={selectedCountryCode} 
+                onChange={(e) => setSelectedCountryCode(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md bg-white"
+              >
+                <option value="">Select a code</option>
+                {testCountryCodes.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.display}
+                  </option>
+                ))}
+              </select>
               <p className="text-sm text-gray-600">Selected: {selectedCountryCode || "None"}</p>
             </div>
             
