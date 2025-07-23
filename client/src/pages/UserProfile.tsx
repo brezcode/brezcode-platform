@@ -65,10 +65,17 @@ export default function UserProfile() {
   const [profilePhoto, setProfilePhoto] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Check authentication first
+  const { data: currentUser, isLoading: authLoading } = useQuery<any>({
+    queryKey: ["/api/me"],
+    retry: 1,
+  });
+
   const { data: profile, isLoading, error } = useQuery<any>({
     queryKey: ["/api/user/profile"],
     retry: 3,
     retryDelay: 1000,
+    enabled: !!currentUser, // Only fetch profile if user is authenticated
   });
 
   console.log("Profile data loaded:", profile);
@@ -177,6 +184,36 @@ export default function UserProfile() {
       profilePhoto 
     });
   };
+
+  // Show login redirect if not authenticated
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <User className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Authentication Required</h2>
+          <p className="text-gray-600 mb-6">You need to log in to access your profile.</p>
+          <a 
+            href="/login" 
+            className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Go to Login
+          </a>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
