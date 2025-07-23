@@ -99,25 +99,37 @@ export default function BusinessAvatarManager() {
   const { toast } = useToast();
 
   // Fetch all business avatars
-  const { data: avatarsData, isLoading: avatarsLoading } = useQuery({
+  const { data: avatarsData, isLoading: avatarsLoading, error: avatarsError } = useQuery({
     queryKey: ['/api/business-avatars/avatars'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/business-avatars/avatars');
+      if (!response.ok) throw new Error('Failed to fetch avatars');
+      return response.json();
+    }
   });
 
   // Fetch customization options
   const { data: optionsData } = useQuery({
     queryKey: ['/api/business-avatars/customization-options'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/business-avatars/customization-options');
+      if (!response.ok) throw new Error('Failed to fetch customization options');
+      return response.json();
+    }
   });
 
-  const avatars: BusinessAvatar[] = avatarsData?.avatars || [];
-  const customizationOptions = optionsData?.options || {};
+  const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
+  const customizationOptions = (optionsData as any)?.options || {};
+
+
 
   // Customize avatar mutation
   const customizeAvatarM = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest('/api/business-avatars/avatars/customize', {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
+      const response = await apiRequest('POST', '/api/business-avatars/avatars/customize', data);
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Customization failed');
+      return result;
     },
     onSuccess: (data) => {
       toast({
@@ -140,10 +152,10 @@ export default function BusinessAvatarManager() {
   // Deploy avatar mutation
   const deployAvatarM = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest(`/api/business-avatars/avatars/${data.avatarId}/deploy`, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      });
+      const response = await apiRequest('POST', `/api/business-avatars/avatars/${data.avatarId}/deploy`, data);
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || 'Deployment failed');
+      return result;
     },
     onSuccess: (data) => {
       toast({
