@@ -337,9 +337,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { storage } = await import('./storage');
-      const profile = await storage.getUserProfile(userId);
+      const user = await storage.getUser(userId);
       
-      res.json(profile || {});
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      
+      // Return profile data from users table
+      res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        profilePhoto: user.profilePhoto,
+        streetAddress: user.streetAddress,
+        city: user.city,
+        state: user.state,
+        postalCode: user.postalCode,
+        country: user.country,
+        phoneNumber: user.phoneNumber
+      });
     } catch (error: any) {
       console.error('Get profile error:', error);
       res.status(500).json({ error: "Failed to get profile" });
@@ -356,9 +373,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const { storage } = await import('./storage');
-      const updatedProfile = await storage.updateUserProfile(userId, req.body);
       
-      res.json(updatedProfile);
+      // Map profile form fields to user table columns
+      const userUpdateData = {
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
+        streetAddress: req.body.streetAddress,
+        city: req.body.city,
+        state: req.body.state,
+        postalCode: req.body.postalCode,
+        country: req.body.country,
+        phoneNumber: req.body.phoneNumber,
+        profilePhoto: req.body.profilePhoto
+      };
+
+      // Filter out undefined values
+      const filteredData = Object.fromEntries(
+        Object.entries(userUpdateData).filter(([_, value]) => value !== undefined)
+      );
+
+      console.log("Profile update request for user:", userId, "with data:", filteredData);
+
+      // Update user data in users table (not user_profiles)
+      const updatedUser = await storage.updateUser(userId, filteredData);
+      
+      console.log("Profile updated successfully in users table:", updatedUser);
+      
+      res.json({
+        success: true,
+        user: updatedUser
+      });
     } catch (error: any) {
       console.error('Update profile error:', error);
       res.status(500).json({ error: "Failed to update profile" });
