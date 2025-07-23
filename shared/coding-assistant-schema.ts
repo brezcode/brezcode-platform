@@ -68,8 +68,6 @@ export const promptingStrategies = pgTable("prompting_strategies", {
 // Context and memory for AI assistant
 export const codingContext = pgTable("coding_context", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  userId: integer("user_id").notNull(),
-  sessionId: integer("session_id"),
   contextType: varchar("context_type", { length: 30 }).notNull(), // project_state, user_preference, solution_history
   contextKey: text("context_key").notNull(),
   contextValue: jsonb("context_value").notNull(),
@@ -90,40 +88,11 @@ export const codingMetrics = pgTable("coding_metrics", {
   date: timestamp("date").defaultNow().notNull(),
 });
 
-// Relations
+// Relations - simplified to avoid conflicts
 export const codingSessionsRelations = relations(codingSessions, ({ many }) => ({
   patterns: many(codePatterns),
   solutions: many(debuggingSolutions),
-  context: many(codingContext),
   metrics: many(codingMetrics),
-}));
-
-export const codePatternsRelations = relations(codePatterns, ({ one }) => ({
-  session: one(codingSessions, {
-    fields: [codePatterns.sessionId],
-    references: [codingSessions.id],
-  }),
-}));
-
-export const debuggingSolutionsRelations = relations(debuggingSolutions, ({ one }) => ({
-  session: one(codingSessions, {
-    fields: [debuggingSolutions.sessionId],
-    references: [codingSessions.id],
-  }),
-}));
-
-export const codingContextRelations = relations(codingContext, ({ one }) => ({
-  session: one(codingSessions, {
-    fields: [codingContext.sessionId],
-    references: [codingSessions.id],
-  }),
-}));
-
-export const codingMetricsRelations = relations(codingMetrics, ({ one }) => ({
-  session: one(codingSessions, {
-    fields: [codingMetrics.sessionId],
-    references: [codingSessions.id],
-  }),
 }));
 
 // Zod schemas for validation

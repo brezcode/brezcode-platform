@@ -1,336 +1,320 @@
 import { db } from "./db";
 import { 
-  codingSessions, 
   codePatterns, 
   debuggingSolutions, 
   promptingStrategies,
   codingContext,
   codingMetrics,
-  type InsertCodingSession,
+  codingSessions,
   type InsertCodePattern,
   type InsertDebuggingSolution,
   type InsertPromptingStrategy,
   type InsertCodingContext,
-  type InsertCodingMetric
+  type InsertCodingMetric,
+  type InsertCodingSession
 } from "@shared/coding-assistant-schema";
-import { eq, desc, and, sql } from "drizzle-orm";
-
-interface PromptInteraction {
-  type: 'pattern_creation' | 'debugging_session' | 'strategy_formation' | 'general_coding';
-  prompt: string;
-  response: string;
-  effectiveness: number;
-  context?: any;
-}
+import { eq, desc, and } from "drizzle-orm";
 
 export class CodingAssistantService {
-  // Prompt Interaction Recording for Best Practices Analysis
-  async recordPromptInteraction(userId: number, interaction: PromptInteraction) {
+  
+  // Context and memory management
+  async storeContext(userId: number, contextType: string, contextKey: string, contextValue: any) {
     try {
-      // Store prompt interactions for analysis and best practice development
-      await db.insert(codingContext).values({
-        userId,
-        contextType: interaction.type,
-        contextData: {
-          prompt: interaction.prompt,
-          response: interaction.response,
-          effectiveness: interaction.effectiveness,
-          ...interaction.context
-        },
-        sessionId: null
-      });
+      const [contextEntry] = await db.insert(codingContext).values({
+        contextType,
+        contextKey,
+        contextValue,
+        priority: 1
+      }).returning();
       
-      // Update metrics for tracking effectiveness
-      await this.updatePromptingMetrics(userId, interaction.type, interaction.effectiveness);
+      return contextEntry;
     } catch (error) {
-      console.error("Error recording prompt interaction:", error);
+      console.error("Error storing context:", error);
+      throw error;
     }
   }
 
-  async updatePromptingMetrics(userId: number, interactionType: string, effectiveness: number) {
+  async getContext(userId: number, contextType?: string) {
     try {
-      const existing = await db.select()
-        .from(codingMetrics)
+      let query = db.select().from(codingContext);
+      
+      if (contextType) {
+        query = query.where(eq(codingContext.contextType, contextType));
+      }
+      
+      return await query.orderBy(desc(codingContext.updatedAt));
+    } catch (error) {
+      console.error("Error retrieving context:", error);
+      return [];
+    }
+  }
+
+  // Metrics tracking
+  async recordMetric(userId: number, metricType: string, metricValue: number, technology?: string) {
+    try {
+      const existingMetric = await db.select().from(codingMetrics)
         .where(and(
-          eq(codingMetrics.userId, userId),
-          eq(codingMetrics.metricType, `prompting_${interactionType}`)
+          eq(codingMetrics.metricType, metricType),
+          eq(codingMetrics.technology, technology || '')
         ));
 
-      if (existing.length > 0) {
-        const current = existing[0];
-        const newAverage = ((current.metricValue * current.sampleCount) + effectiveness) / (current.sampleCount + 1);
-        
-        await db.update(codingMetrics)
-          .set({
-            metricValue: newAverage,
-            sampleCount: current.sampleCount + 1,
-            updatedAt: new Date()
+      if (existingMetric.length > 0) {
+        // Update existing metric
+        return await db.update(codingMetrics)
+          .set({ 
+            metricValue,
+            date: new Date()
           })
-          .where(eq(codingMetrics.id, current.id));
+          .where(eq(codingMetrics.id, existingMetric[0].id))
+          .returning();
       } else {
-        await db.insert(codingMetrics).values({
-          userId,
-          metricType: `prompting_${interactionType}`,
-          metricValue: effectiveness,
-          sampleCount: 1
-        });
+        // Create new metric
+        return await db.insert(codingMetrics).values({
+          metricType,
+          metricValue,
+          technology,
+          date: new Date()
+        }).returning();
       }
     } catch (error) {
-      console.error("Error updating prompting metrics:", error);
+      console.error("Error recording metric:", error);
+      throw error;
     }
   }
-  // Session Management
-  async createSession(userId: number, data: Omit<InsertCodingSession, "userId">) {
-    const [session] = await db.insert(codingSessions)
-      .values({ ...data, userId })
-      .returning();
-    return session;
-  }
 
-  async getActiveSessions(userId: number) {
-    return await db.select()
-      .from(codingSessions)
-      .where(and(eq(codingSessions.userId, userId), eq(codingSessions.status, "active")))
-      .orderBy(desc(codingSessions.updatedAt));
+  // Session management
+  async createSession(userId: number, title: string, description?: string, technologies?: string[]) {
+    try {
+      const [session] = await db.insert(codingSessions).values({
+        title,
+        description,
+        technologies: technologies || [],
+        status: "active",
+        updatedAt: new Date()
+      }).returning();
+      
+      return session;
+    } catch (error) {
+      console.error("Error creating session:", error);
+      throw error;
+    }
   }
 
   async updateSession(sessionId: number, updates: Partial<InsertCodingSession>) {
-    await db.update(codingSessions)
-      .set({ ...updates, updatedAt: new Date() })
-      .where(eq(codingSessions.id, sessionId));
-  }
-
-  // Code Pattern Learning
-  async saveCodePattern(userId: number, pattern: Omit<InsertCodePattern, "userId">) {
-    // Check if similar pattern exists
-    const existing = await db.select()
-      .from(codePatterns)
-      .where(and(
-        eq(codePatterns.userId, userId),
-        eq(codePatterns.patternName, pattern.patternName),
-        eq(codePatterns.technology, pattern.technology)
-      ));
-
-    if (existing.length > 0) {
-      // Update existing pattern
-      await db.update(codePatterns)
-        .set({ 
-          useCount: sql`${codePatterns.useCount} + 1`,
-          codeExample: pattern.codeExample,
-          description: pattern.description
-        })
-        .where(eq(codePatterns.id, existing[0].id));
-      return existing[0];
-    } else {
-      // Create new pattern
-      const [newPattern] = await db.insert(codePatterns)
-        .values({ ...pattern, userId })
-        .returning();
-      return newPattern;
-    }
-  }
-
-  async getCodePatterns(userId: number, technology?: string, category?: string) {
-    let query = db.select().from(codePatterns).where(eq(codePatterns.userId, userId));
-    
-    if (technology) {
-      query = query.where(eq(codePatterns.technology, technology)) as any;
-    }
-    if (category) {
-      query = query.where(eq(codePatterns.category, category)) as any;
-    }
-    
-    return await query.orderBy(desc(codePatterns.useCount), desc(codePatterns.successRate));
-  }
-
-  async searchPatterns(userId: number, searchTerm: string) {
-    return await db.select()
-      .from(codePatterns)
-      .where(and(
-        eq(codePatterns.userId, userId),
-        sql`${codePatterns.description} ILIKE ${`%${searchTerm}%`} OR ${codePatterns.patternName} ILIKE ${`%${searchTerm}%`}`
-      ))
-      .orderBy(desc(codePatterns.useCount));
-  }
-
-  // Debugging Solutions
-  async saveDebuggingSolution(userId: number, solution: Omit<InsertDebuggingSolution, "userId">) {
-    const [saved] = await db.insert(debuggingSolutions)
-      .values({ ...solution, userId })
-      .returning();
-    return saved;
-  }
-
-  async getSimilarProblems(userId: number, problemDescription: string, technology: string) {
-    return await db.select()
-      .from(debuggingSolutions)
-      .where(and(
-        eq(debuggingSolutions.userId, userId),
-        eq(debuggingSolutions.technology, technology),
-        sql`${debuggingSolutions.problemDescription} ILIKE ${`%${problemDescription}%`}`
-      ))
-      .orderBy(desc(debuggingSolutions.createdAt));
-  }
-
-  async getDebuggingHistory(userId: number, limit = 20) {
-    return await db.select()
-      .from(debuggingSolutions)
-      .where(eq(debuggingSolutions.userId, userId))
-      .orderBy(desc(debuggingSolutions.createdAt))
-      .limit(limit);
-  }
-
-  // Prompting Strategies
-  async savePromptingStrategy(userId: number, strategy: Omit<InsertPromptingStrategy, "userId">) {
-    const [saved] = await db.insert(promptingStrategies)
-      .values({ ...strategy, userId })
-      .returning();
-    return saved;
-  }
-
-  async getPromptingStrategies(userId: number, useCase?: string) {
-    let query = db.select().from(promptingStrategies).where(eq(promptingStrategies.userId, userId));
-    
-    if (useCase) {
-      query = query.where(eq(promptingStrategies.useCase, useCase)) as any;
-    }
-    
-    return await query.orderBy(desc(promptingStrategies.effectiveness), desc(promptingStrategies.timesUsed));
-  }
-
-  async updateStrategyEffectiveness(strategyId: number, timeTaken: number, successful: boolean) {
-    const strategy = await db.select().from(promptingStrategies).where(eq(promptingStrategies.id, strategyId));
-    
-    if (strategy.length > 0) {
-      const current = strategy[0];
-      const newTimesUsed = current.timesUsed + 1;
-      const newEffectiveness = successful 
-        ? Math.min(100, current.effectiveness + 5)
-        : Math.max(0, current.effectiveness - 10);
-      
-      const newAvgTime = current.avgTimeToSolution
-        ? Math.round((current.avgTimeToSolution * current.timesUsed + timeTaken) / newTimesUsed)
-        : timeTaken;
-
-      await db.update(promptingStrategies)
+    try {
+      return await db.update(codingSessions)
         .set({
-          timesUsed: newTimesUsed,
-          effectiveness: newEffectiveness,
-          avgTimeToSolution: newAvgTime
+          ...updates,
+          updatedAt: new Date()
         })
-        .where(eq(promptingStrategies.id, strategyId));
+        .where(eq(codingSessions.id, sessionId))
+        .returning();
+    } catch (error) {
+      console.error("Error updating session:", error);
+      throw error;
     }
   }
 
-  // Context Management
-  async saveContext(userId: number, context: Omit<InsertCodingContext, "userId">) {
-    // Remove existing context with same key if it exists
-    await db.delete(codingContext)
-      .where(and(
-        eq(codingContext.userId, userId),
-        eq(codingContext.contextKey, context.contextKey),
-        eq(codingContext.contextType, context.contextType)
-      ));
-
-    const [saved] = await db.insert(codingContext)
-      .values({ ...context, userId })
-      .returning();
-    return saved;
-  }
-
-  async getContext(userId: number, contextType?: string, sessionId?: number) {
-    let query = db.select().from(codingContext).where(eq(codingContext.userId, userId));
-    
-    if (contextType) {
-      query = query.where(eq(codingContext.contextType, contextType)) as any;
+  // Code patterns
+  async addCodePattern(userId: number, pattern: Omit<InsertCodePattern, 'userId'>) {
+    try {
+      const [newPattern] = await db.insert(codePatterns).values({
+        patternName: pattern.patternName,
+        description: pattern.description,
+        codeExample: pattern.codeExample,
+        technology: pattern.technology,
+        category: pattern.category,
+        tags: pattern.tags || [],
+        useCount: 0,
+        successRate: 100
+      }).returning();
+      
+      // Record pattern creation metric
+      await this.recordMetric(userId, 'patterns_created', 1, pattern.technology);
+      
+      return newPattern;
+    } catch (error) {
+      console.error("Error adding code pattern:", error);
+      throw error;
     }
-    if (sessionId) {
-      query = query.where(eq(codingContext.sessionId, sessionId)) as any;
-    }
-    
-    return await query.orderBy(desc(codingContext.priority), desc(codingContext.updatedAt));
   }
 
-  // Analytics and Metrics
-  async recordMetric(userId: number, metric: Omit<InsertCodingMetric, "userId">) {
-    const [saved] = await db.insert(codingMetrics)
-      .values({ ...metric, userId })
-      .returning();
-    return saved;
-  }
-
-  async getCodingStats(userId: number, days = 30) {
-    const since = new Date();
-    since.setDate(since.getDate() - days);
-
-    const stats = await db.select({
-      totalSessions: sql<number>`count(distinct ${codingSessions.id})`,
-      totalPatterns: sql<number>`count(distinct ${codePatterns.id})`,
-      totalSolutions: sql<number>`count(distinct ${debuggingSolutions.id})`,
-      avgTimeToSolve: sql<number>`avg(${debuggingSolutions.timeToSolve})`,
-      successRate: sql<number>`avg(case when ${debuggingSolutions.isVerified} then 100 else 0 end)`
-    })
-    .from(codingSessions)
-    .leftJoin(codePatterns, eq(codePatterns.sessionId, codingSessions.id))
-    .leftJoin(debuggingSolutions, eq(debuggingSolutions.sessionId, codingSessions.id))
-    .where(and(
-      eq(codingSessions.userId, userId),
-      sql`${codingSessions.createdAt} >= ${since}`
-    ));
-
-    return stats[0];
-  }
-
-  // AI Assistant Intelligence
-  async getContextualSuggestions(userId: number, currentProblem: string, technology: string) {
-    // Get similar patterns
-    const patterns = await this.searchPatterns(userId, currentProblem);
-    
-    // Get similar debugging solutions
-    const solutions = await this.getSimilarProblems(userId, currentProblem, technology);
-    
-    // Get relevant prompting strategies
-    const strategies = await this.getPromptingStrategies(userId, "debugging");
-    
-    return {
-      suggestedPatterns: patterns.slice(0, 3),
-      similarSolutions: solutions.slice(0, 3),
-      recommendedStrategies: strategies.slice(0, 2)
-    };
-  }
-
-  async generateLearningInsights(userId: number) {
-    const patterns = await this.getCodePatterns(userId);
-    const solutions = await this.getDebuggingHistory(userId, 50);
-    const stats = await this.getCodingStats(userId);
-
-    // Analyze most effective patterns
-    const topPatterns = patterns
-      .filter(p => p.useCount > 1)
-      .sort((a, b) => (b.successRate * b.useCount) - (a.successRate * a.useCount))
-      .slice(0, 5);
-
-    // Analyze common problem areas
-    const problemAreas = solutions.reduce((acc, sol) => {
-      acc[sol.technology] = (acc[sol.technology] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Analyze improvement trends
-    const recentSolutions = solutions.slice(0, 10);
-    const averageRecentTime = recentSolutions.reduce((sum, sol) => sum + (sol.timeToSolve || 0), 0) / recentSolutions.length;
-
-    return {
-      stats,
-      topPatterns,
-      problemAreas,
-      averageRecentTime,
-      insights: {
-        mostProductiveTechnology: Object.keys(problemAreas).reduce((a, b) => problemAreas[a] > problemAreas[b] ? a : b, ''),
-        patternReuseRate: (patterns.filter(p => p.useCount > 1).length / patterns.length) * 100,
-        improvementTrend: averageRecentTime < 30 ? 'improving' : averageRecentTime > 60 ? 'declining' : 'stable'
+  async getCodePatterns(userId: number, technology?: string) {
+    try {
+      let query = db.select().from(codePatterns);
+      
+      if (technology) {
+        query = query.where(eq(codePatterns.technology, technology));
       }
-    };
+      
+      return await query.orderBy(desc(codePatterns.createdAt));
+    } catch (error) {
+      console.error("Error retrieving code patterns:", error);
+      return [];
+    }
+  }
+
+  // Debugging solutions
+  async addDebuggingSolution(userId: number, solution: Omit<InsertDebuggingSolution, 'userId'>) {
+    try {
+      const [newSolution] = await db.insert(debuggingSolutions).values({
+        problemDescription: solution.problemDescription,
+        errorMessage: solution.errorMessage,
+        solution: solution.solution,
+        codeBeforefix: solution.codeBeforefix,
+        codeAfterFix: solution.codeAfterFix,
+        technology: solution.technology,
+        timeToSolve: solution.timeToSolve,
+        difficulty: solution.difficulty || 'medium',
+        isVerified: false,
+        tags: solution.tags || []
+      }).returning();
+      
+      // Record solution metric
+      await this.recordMetric(userId, 'solutions_created', 1, solution.technology);
+      
+      return newSolution;
+    } catch (error) {
+      console.error("Error adding debugging solution:", error);
+      throw error;
+    }
+  }
+
+  async getDebuggingSolutions(userId: number, technology?: string) {
+    try {
+      let query = db.select().from(debuggingSolutions);
+      
+      if (technology) {
+        query = query.where(eq(debuggingSolutions.technology, technology));
+      }
+      
+      return await query.orderBy(desc(debuggingSolutions.createdAt));
+    } catch (error) {
+      console.error("Error retrieving debugging solutions:", error);
+      return [];
+    }
+  }
+
+  // Prompting strategies
+  async addPromptingStrategy(userId: number, strategy: Omit<InsertPromptingStrategy, 'userId'>) {
+    try {
+      const [newStrategy] = await db.insert(promptingStrategies).values({
+        strategyName: strategy.strategyName,
+        promptTemplate: strategy.promptTemplate,
+        description: strategy.description,
+        useCase: strategy.useCase,
+        successExamples: strategy.successExamples || [],
+        effectiveness: 50,
+        timesUsed: 0,
+        avgTimeToSolution: strategy.avgTimeToSolution,
+        tags: strategy.tags || []
+      }).returning();
+      
+      return newStrategy;
+    } catch (error) {
+      console.error("Error adding prompting strategy:", error);
+      throw error;
+    }
+  }
+
+  async getPromptingStrategies(userId: number) {
+    try {
+      return await db.select().from(promptingStrategies)
+        .orderBy(desc(promptingStrategies.createdAt));
+    } catch (error) {
+      console.error("Error retrieving prompting strategies:", error);
+      return [];
+    }
+  }
+
+  async updateStrategyEffectiveness(strategyId: number, wasEffective: boolean, timeToSolution?: number) {
+    try {
+      const current = await db.select().from(promptingStrategies)
+        .where(eq(promptingStrategies.id, strategyId));
+      
+      if (current.length === 0) return null;
+      
+      const strategy = current[0];
+      const timesUsed = (strategy.timesUsed || 0) + 1;
+      const currentEffectiveness = strategy.effectiveness || 50;
+      
+      // Calculate new effectiveness (weighted average)
+      const newEffectiveness = Math.round(
+        (currentEffectiveness * (strategy.timesUsed || 0) + (wasEffective ? 100 : 0)) / timesUsed
+      );
+      
+      const updates: any = {
+        timesUsed,
+        effectiveness: newEffectiveness
+      };
+      
+      if (timeToSolution) {
+        const currentAvgTime = strategy.avgTimeToSolution || 0;
+        updates.avgTimeToSolution = Math.round(
+          (currentAvgTime * (strategy.timesUsed || 0) + timeToSolution) / timesUsed
+        );
+      }
+      
+      return await db.update(promptingStrategies)
+        .set(updates)
+        .where(eq(promptingStrategies.id, strategyId))
+        .returning();
+    } catch (error) {
+      console.error("Error updating strategy effectiveness:", error);
+      throw error;
+    }
+  }
+
+  // Analytics and insights
+  async getPerformanceMetrics(userId: number) {
+    try {
+      const patterns = await db.select().from(codePatterns);
+      const solutions = await db.select().from(debuggingSolutions);
+      const strategies = await db.select().from(promptingStrategies);
+      const metrics = await db.select().from(codingMetrics);
+      
+      const totalPatterns = patterns.length;
+      const totalSolutions = solutions.length;
+      const totalStrategies = strategies.length;
+      
+      const avgEffectiveness = strategies.length > 0 
+        ? Math.round(strategies.reduce((sum, s) => sum + (s.effectiveness || 50), 0) / strategies.length)
+        : 50;
+      
+      const totalUseCount = patterns.reduce((sum, p) => sum + (p.useCount || 0), 0);
+      
+      return {
+        totalPatterns,
+        totalSolutions,
+        totalStrategies,
+        avgEffectiveness,
+        totalUseCount,
+        metrics
+      };
+    } catch (error) {
+      console.error("Error getting performance metrics:", error);
+      throw error;
+    }
+  }
+
+  async getBestPractices() {
+    try {
+      const topPatterns = await db.select().from(codePatterns)
+        .orderBy(desc(codePatterns.useCount))
+        .limit(5);
+      
+      const topStrategies = await db.select().from(promptingStrategies)
+        .orderBy(desc(promptingStrategies.effectiveness))
+        .limit(5);
+      
+      return {
+        topPatterns,
+        topStrategies
+      };
+    } catch (error) {
+      console.error("Error getting best practices:", error);
+      return { topPatterns: [], topStrategies: [] };
+    }
   }
 }
 

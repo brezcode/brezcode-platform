@@ -88,6 +88,9 @@ const CodingAssistant: React.FC = () => {
   const addPatternMutation = useMutation({
     mutationFn: (pattern: any) => apiRequest('/api/coding-assistant/patterns', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify(pattern)
     }),
     onSuccess: () => {
@@ -101,18 +104,22 @@ const CodingAssistant: React.FC = () => {
         tags: [],
         tagInput: ""
       });
+    },
+    onError: (error: any) => {
+      console.error("Error adding pattern:", error);
     }
   });
 
   const handleAddPattern = () => {
     if (newPattern.title && newPattern.codeSnippet) {
       addPatternMutation.mutate({
-        title: newPattern.title,
+        patternName: newPattern.title,
         description: newPattern.description,
-        codeSnippet: newPattern.codeSnippet,
-        language: newPattern.language,
-        framework: newPattern.framework,
-        tags: newPattern.tags
+        codeExample: newPattern.codeSnippet,
+        technology: newPattern.language,
+        category: newPattern.framework || 'general',
+        tags: newPattern.tags,
+        originalPrompt: `Create a ${newPattern.language} pattern for ${newPattern.title}`
       });
     }
   };
