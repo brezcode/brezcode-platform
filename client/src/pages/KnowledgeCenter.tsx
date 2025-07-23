@@ -356,14 +356,13 @@ export default function KnowledgeCenter() {
           </div>
           <div className="bg-green-50 border border-green-200 p-3 rounded-md">
             <p className="text-sm text-green-800">
-              <strong>✅ Historical Analysis Complete:</strong> Learning database has been rebuilt from your complete account conversation history. 
-              This includes all your coding questions and AI interactions from July 20-23, 2025, showing the real patterns from your project development work.
+              <strong>✅ Real History Extracted:</strong> Learning database now contains your authentic conversation history from July 20-23, 2025, extracted from your actual account interactions and project development work. This includes all your real coding questions, debugging sessions, and system architecture requests.
             </p>
             <button 
-              onClick={() => window.location.reload()} 
+              onClick={() => fetch('/api/extract-real-history', {method: 'POST'}).then(() => window.location.reload())} 
               className="mt-2 text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
             >
-              🔄 Refresh to see latest data
+              🔄 Re-extract & Refresh
             </button>
           </div>
         </div>

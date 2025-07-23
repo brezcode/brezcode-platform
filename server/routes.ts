@@ -229,6 +229,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
+
+  // Extract REAL conversation history from account
+  app.post('/api/extract-real-history', async (req, res) => {
+    try {
+      const { RealHistoryExtractor } = await import('./realHistoryExtractor');
+      const extractor = new RealHistoryExtractor(1);
+      
+      const result = await extractor.extractRealConversationHistory();
+      res.json({ 
+        success: true, 
+        message: "Real conversation history extracted from account data",
+        data: result 
+      });
+    } catch (error) {
+      console.error('Error extracting real history:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to extract real history' 
+      });
+    }
+  });
+
+  app.get('/api/real-data-summary', async (req, res) => {
+    try {
+      const { RealHistoryExtractor } = await import('./realHistoryExtractor');
+      const extractor = new RealHistoryExtractor(1);
+      
+      const summary = await extractor.getRealDataSummary();
+      res.json({ success: true, data: summary });
+    } catch (error) {
+      console.error('Error getting real data summary:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to get real data summary' 
+      });
+    }
+  });
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
