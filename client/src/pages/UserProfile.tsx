@@ -1,18 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Select from "react-select";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { User, Camera, MapPin, Phone, Save } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
+import worldCountries from "world-countries";
 
 const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
@@ -34,82 +35,28 @@ const profileSchema = z.object({
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
-// Countries list in alphabetical order
-const countries = [
-  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
-  "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
-  "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
-  "Denmark", "Djibouti", "Dominica", "Dominican Republic",
-  "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia",
-  "Fiji", "Finland", "France",
-  "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
-  "Haiti", "Honduras", "Hungary",
-  "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast",
-  "Jamaica", "Japan", "Jordan",
-  "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
-  "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
-  "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
-  "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway",
-  "Oman",
-  "Pakistan", "Palau", "Palestine", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
-  "Qatar",
-  "Romania", "Russia", "Rwanda",
-  "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
-  "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
-  "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
-  "Vanuatu", "Vatican City", "Venezuela", "Vietnam",
-  "Yemen",
-  "Zambia", "Zimbabwe"
-];
+// Generate country options from world-countries library
+const countryOptions = worldCountries
+  .map(country => ({
+    value: country.name.common,
+    label: country.name.common,
+    flag: country.flag
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
 
-// Country codes with country names - using unique keys and values
-const countryCodes = [
-  { country: "United States", code: "+1", display: "+1 (United States)", id: "us" },
-  { country: "Canada", code: "+1", display: "+1 (Canada)", id: "ca" },
-  { country: "United Kingdom", code: "+44", display: "+44 (United Kingdom)", id: "uk" },
-  { country: "Australia", code: "+61", display: "+61 (Australia)", id: "au" },
-  { country: "Germany", code: "+49", display: "+49 (Germany)", id: "de" },
-  { country: "France", code: "+33", display: "+33 (France)", id: "fr" },
-  { country: "Italy", code: "+39", display: "+39 (Italy)", id: "it" },
-  { country: "Spain", code: "+34", display: "+34 (Spain)", id: "es" },
-  { country: "Netherlands", code: "+31", display: "+31 (Netherlands)", id: "nl" },
-  { country: "Belgium", code: "+32", display: "+32 (Belgium)", id: "be" },
-  { country: "Switzerland", code: "+41", display: "+41 (Switzerland)", id: "ch" },
-  { country: "Austria", code: "+43", display: "+43 (Austria)", id: "at" },
-  { country: "Sweden", code: "+46", display: "+46 (Sweden)", id: "se" },
-  { country: "Norway", code: "+47", display: "+47 (Norway)", id: "no" },
-  { country: "Denmark", code: "+45", display: "+45 (Denmark)", id: "dk" },
-  { country: "Finland", code: "+358", display: "+358 (Finland)", id: "fi" },
-  { country: "Ireland", code: "+353", display: "+353 (Ireland)", id: "ie" },
-  { country: "Poland", code: "+48", display: "+48 (Poland)", id: "pl" },
-  { country: "Czech Republic", code: "+420", display: "+420 (Czech Republic)", id: "cz" },
-  { country: "Hungary", code: "+36", display: "+36 (Hungary)", id: "hu" },
-  { country: "Greece", code: "+30", display: "+30 (Greece)", id: "gr" },
-  { country: "Portugal", code: "+351", display: "+351 (Portugal)", id: "pt" },
-  { country: "Russia", code: "+7", display: "+7 (Russia)", id: "ru" },
-  { country: "Ukraine", code: "+380", display: "+380 (Ukraine)", id: "ua" },
-  { country: "Japan", code: "+81", display: "+81 (Japan)", id: "jp" },
-  { country: "South Korea", code: "+82", display: "+82 (South Korea)", id: "kr" },
-  { country: "China", code: "+86", display: "+86 (China)", id: "cn" },
-  { country: "India", code: "+91", display: "+91 (India)", id: "in" },
-  { country: "Singapore", code: "+65", display: "+65 (Singapore)", id: "sg" },
-  { country: "Malaysia", code: "+60", display: "+60 (Malaysia)", id: "my" },
-  { country: "Thailand", code: "+66", display: "+66 (Thailand)", id: "th" },
-  { country: "Philippines", code: "+63", display: "+63 (Philippines)", id: "ph" },
-  { country: "Indonesia", code: "+62", display: "+62 (Indonesia)", id: "id" },
-  { country: "Vietnam", code: "+84", display: "+84 (Vietnam)", id: "vn" },
-  { country: "New Zealand", code: "+64", display: "+64 (New Zealand)", id: "nz" },
-  { country: "Brazil", code: "+55", display: "+55 (Brazil)", id: "br" },
-  { country: "Argentina", code: "+54", display: "+54 (Argentina)", id: "ar" },
-  { country: "Chile", code: "+56", display: "+56 (Chile)", id: "cl" },
-  { country: "Mexico", code: "+52", display: "+52 (Mexico)", id: "mx" },
-  { country: "South Africa", code: "+27", display: "+27 (South Africa)", id: "za" },
-  { country: "Egypt", code: "+20", display: "+20 (Egypt)", id: "eg" },
-  { country: "Israel", code: "+972", display: "+972 (Israel)", id: "il" },
-  { country: "United Arab Emirates", code: "+971", display: "+971 (United Arab Emirates)", id: "ae" },
-  { country: "Saudi Arabia", code: "+966", display: "+966 (Saudi Arabia)", id: "sa" },
-  { country: "Turkey", code: "+90", display: "+90 (Turkey)", id: "tr" }
-].sort((a, b) => a.country.localeCompare(b.country));
+// Generate country code options from world-countries library
+const countryCodeOptions = worldCountries
+  .filter(country => country.idd?.root && country.idd?.suffixes)
+  .map(country => {
+    const code = country.idd.root + (country.idd.suffixes[0] || '');
+    return {
+      value: country.cca2.toLowerCase(),
+      label: `${code} (${country.name.common})`,
+      code: code,
+      flag: country.flag
+    };
+  })
+  .sort((a, b) => a.label.localeCompare(b.label));
 
 export default function UserProfile() {
   const { toast } = useToast();
@@ -159,10 +106,10 @@ export default function UserProfile() {
   // Update form when profile data is loaded
   useEffect(() => {
     if (profile) {
-      // Convert stored country code back to ID for form display
+      // Convert stored country code back to country ID for form display
       const storedCode = profile.countryCode || "+1";
-      const matchingCountry = countryCodes.find(item => item.code === storedCode);
-      const countryCodeId = matchingCountry ? matchingCountry.id : "us";
+      const matchingCountry = countryCodeOptions.find(item => item.code === storedCode);
+      const countryCodeId = matchingCountry ? matchingCountry.value : "us";
       
       form.reset({
         firstName: profile.firstName || "",
@@ -196,7 +143,7 @@ export default function UserProfile() {
 
   const onSubmit = (data: ProfileFormData) => {
     // Convert country code ID back to actual code for storage
-    const selectedCountryCode = countryCodes.find(item => item.id === data.countryCode);
+    const selectedCountryCode = countryCodeOptions.find(item => item.value === data.countryCode);
     const actualCountryCode = selectedCountryCode ? selectedCountryCode.code : "+1";
     
     saveProfile({ 
@@ -390,17 +337,21 @@ export default function UserProfile() {
                       <FormItem>
                         <FormLabel>Country</FormLabel>
                         <FormControl>
-                          <select 
-                            {...field}
-                            className="w-full p-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          >
-                            <option value="">Select your country</option>
-                            {countries.map((country) => (
-                              <option key={country} value={country}>
-                                {country}
-                              </option>
-                            ))}
-                          </select>
+                          <Select
+                            options={countryOptions}
+                            value={countryOptions.find(option => option.value === field.value)}
+                            onChange={(selected) => field.onChange(selected?.value || "")}
+                            placeholder="Select your country"
+                            isSearchable
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center">
+                                <span className="mr-2">{option.flag}</span>
+                                {option.label}
+                              </div>
+                            )}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -426,17 +377,21 @@ export default function UserProfile() {
                     <FormItem>
                       <FormLabel>Country Code</FormLabel>
                       <FormControl>
-                        <select 
-                          {...field}
-                          className="w-full p-3 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        >
-                          <option value="">Select code</option>
-                          {countryCodes.map((item) => (
-                            <option key={item.id} value={item.id}>
-                              {item.display}
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          options={countryCodeOptions}
+                          value={countryCodeOptions.find(option => option.value === field.value)}
+                          onChange={(selected) => field.onChange(selected?.value || "")}
+                          placeholder="Select code"
+                          isSearchable
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          formatOptionLabel={(option) => (
+                            <div className="flex items-center">
+                              <span className="mr-2">{option.flag}</span>
+                              {option.label}
+                            </div>
+                          )}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
