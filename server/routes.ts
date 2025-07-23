@@ -192,6 +192,43 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Coding assistant routes
   const codingAssistantRoutes = await import('./coding-assistant-routes');
   app.use('/api/coding-assistant', codingAssistantRoutes.default);
+
+  // Historical learning analysis
+  app.post('/api/rebuild-learning-history', async (req, res) => {
+    try {
+      const { HistoricalLearningAnalyzer } = await import('./historicalLearningAnalyzer');
+      const analyzer = new HistoricalLearningAnalyzer(1); // User ID 1
+      
+      const result = await analyzer.analyzeAccountHistory();
+      res.json({ 
+        success: true, 
+        message: "Learning database rebuilt from complete account history",
+        data: result 
+      });
+    } catch (error) {
+      console.error('Error rebuilding learning history:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to rebuild learning history' 
+      });
+    }
+  });
+
+  app.get('/api/learning-summary', async (req, res) => {
+    try {
+      const { HistoricalLearningAnalyzer } = await import('./historicalLearningAnalyzer');
+      const analyzer = new HistoricalLearningAnalyzer(1);
+      
+      const summary = await analyzer.getLearningSummary();
+      res.json({ success: true, data: summary });
+    } catch (error) {
+      console.error('Error getting learning summary:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to get learning summary' 
+      });
+    }
+  });
   // Session middleware
   app.use(session({
     secret: process.env.SESSION_SECRET || "your-secret-key-change-in-production",
