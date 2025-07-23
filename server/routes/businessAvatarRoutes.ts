@@ -1,291 +1,187 @@
 import { Router } from 'express';
-import { 
-  BUSINESS_AVATARS, 
-  getAvatarById, 
-  getAvatarsByBusinessType, 
-  getAvatarsByIndustry,
-  getAvatarsByPricingTier,
-  CUSTOMIZATION_OPTIONS,
-  DEPLOYMENT_CONFIGS,
-  BusinessAvatar
-} from '../businessAvatars';
 
 const router = Router();
+
+// Mock business avatars for different business types
+const BUSINESS_AVATARS = [
+  {
+    id: 'sales_specialist_alex',
+    name: 'Alex Thunder',
+    businessType: 'sales_automation',
+    description: 'Expert sales specialist focused on lead qualification and deal closing with consultative selling approach.',
+    appearance: {
+      imageUrl: '/avatars/alex-thunder.svg',
+      hairColor: 'Electric blue',
+      eyeColor: 'Amber',
+    },
+    voiceProfile: {
+      tone: 'confident',
+      pace: 'energetic',
+      accent: 'American'
+    },
+    expertise: ['Lead qualification', 'Objection handling', 'Deal closing', 'Pipeline management'],
+    specializations: ['B2B sales', 'SaaS products', 'Enterprise deals', 'Cold outreach']
+  },
+  {
+    id: 'customer_service_miko',
+    name: 'Miko Harmony',
+    businessType: 'customer_service',
+    description: 'Friendly customer service representative specializing in issue resolution and customer satisfaction.',
+    appearance: {
+      imageUrl: '/avatars/miko-harmony.svg',
+      hairColor: 'Lavender',
+      eyeColor: 'Soft blue',
+    },
+    voiceProfile: {
+      tone: 'warm',
+      pace: 'moderate',
+      accent: 'Neutral'
+    },
+    expertise: ['Issue resolution', 'Customer empathy', 'Product knowledge', 'De-escalation'],
+    specializations: ['Live chat support', 'Email support', 'Complaint handling', 'Product guidance']
+  },
+  {
+    id: 'tech_support_kai',
+    name: 'Kai TechWiz',
+    businessType: 'technical_support',
+    description: 'Technical support specialist with expertise in troubleshooting and complex problem resolution.',
+    appearance: {
+      imageUrl: '/avatars/kai-techwiz.svg',
+      hairColor: 'Deep purple',
+      eyeColor: 'Cyan',
+    },
+    voiceProfile: {
+      tone: 'analytical',
+      pace: 'measured',
+      accent: 'Technical'
+    },
+    expertise: ['Technical troubleshooting', 'API integration', 'Bug diagnosis', 'User guidance'],
+    specializations: ['Software support', 'API help', 'Integration issues', 'Developer tools']
+  },
+  {
+    id: 'business_consultant_luna',
+    name: 'Luna Strategic',
+    businessType: 'business_consulting',
+    description: 'Strategic business consultant providing insights on growth, optimization, and strategic planning.',
+    appearance: {
+      imageUrl: '/avatars/luna-strategic.svg',
+      hairColor: 'Silver',
+      eyeColor: 'Violet',
+    },
+    voiceProfile: {
+      tone: 'professional',
+      pace: 'thoughtful',
+      accent: 'Executive'
+    },
+    expertise: ['Strategic planning', 'Business analysis', 'Growth strategies', 'Market insights'],
+    specializations: ['Business growth', 'Process optimization', 'Strategic consulting', 'Market analysis']
+  },
+  {
+    id: 'brezcode_health_coach',
+    name: 'Dr. Sakura Wellness',
+    businessType: 'health_coaching',
+    description: 'Specialized AI health coach for women\'s wellness and breast health awareness with empathetic medical guidance.',
+    appearance: {
+      imageUrl: '/avatars/dr-sakura-wellness.svg',
+      hairColor: 'Soft pink with blue highlights',
+      eyeColor: 'Gentle green',
+    },
+    voiceProfile: {
+      tone: 'warm',
+      pace: 'moderate',
+      accent: 'Neutral American'
+    },
+    expertise: ['Breast health education', 'Preventive care', 'Health risk assessment', 'Wellness coaching'],
+    specializations: ['Women\'s health', 'Breast health', 'Preventive medicine', 'Health education']
+  },
+  {
+    id: 'education_professor',
+    name: 'Professor Sage',
+    businessType: 'education',
+    description: 'Education specialist focused on learning facilitation, curriculum development, and student support.',
+    appearance: {
+      imageUrl: '/avatars/professor-sage.svg',
+      hairColor: 'Warm brown',
+      eyeColor: 'Amber',
+    },
+    voiceProfile: {
+      tone: 'encouraging',
+      pace: 'steady',
+      accent: 'Academic'
+    },
+    expertise: ['Curriculum design', 'Learning assessment', 'Student motivation', 'Educational technology'],
+    specializations: ['Online learning', 'Adult education', 'Skill development', 'Training programs']
+  }
+];
 
 // Get all business avatars
 router.get('/avatars', (req, res) => {
   try {
-    const { businessType, industry, tier, active } = req.query;
-    
-    let filteredAvatars = BUSINESS_AVATARS;
-    
-    if (businessType) {
-      filteredAvatars = getAvatarsByBusinessType(businessType as string);
-    }
-    
-    if (industry) {
-      filteredAvatars = getAvatarsByIndustry(industry as string);
-    }
-    
-    if (tier) {
-      filteredAvatars = getAvatarsByPricingTier(tier as 'basic' | 'premium' | 'enterprise');
-    }
-    
-    if (active === 'true') {
-      filteredAvatars = filteredAvatars.filter(avatar => avatar.isActive);
-    }
-    
     res.json({
       success: true,
-      avatars: filteredAvatars,
-      totalAvatars: filteredAvatars.length,
-      businessTypes: [...new Set(BUSINESS_AVATARS.map(a => a.businessType))],
-      industries: [...new Set(BUSINESS_AVATARS.flatMap(a => a.industries))],
-      pricingTiers: [...new Set(BUSINESS_AVATARS.map(a => a.pricing.tier))]
+      avatars: BUSINESS_AVATARS
     });
-  } catch (error) {
-    console.error('Error fetching business avatars:', error);
-    res.status(500).json({ error: 'Failed to fetch business avatars' });
-  }
-});
-
-// Get specific avatar details
-router.get('/avatars/:id', (req, res) => {
-  try {
-    const { id } = req.params;
-    const avatar = getAvatarById(id);
-    
-    if (!avatar) {
-      return res.status(404).json({ error: 'Avatar not found' });
-    }
-    
-    res.json({
-      success: true,
-      avatar,
-      customizationOptions: CUSTOMIZATION_OPTIONS
-    });
-  } catch (error) {
-    console.error('Error fetching avatar:', error);
-    res.status(500).json({ error: 'Failed to fetch avatar details' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 
 // Get avatars by business type
-router.get('/business-type/:type', (req, res) => {
-  try {
-    const { type } = req.params;
-    const avatars = getAvatarsByBusinessType(type);
-    
-    res.json({
-      success: true,
-      businessType: type,
-      avatars,
-      count: avatars.length
-    });
-  } catch (error) {
-    console.error('Error fetching avatars by business type:', error);
-    res.status(500).json({ error: 'Failed to fetch avatars by business type' });
-  }
-});
-
-// Get deployment recommendations
-router.get('/deployment/:businessType', (req, res) => {
+router.get('/business-type/:businessType', (req, res) => {
   try {
     const { businessType } = req.params;
-    const config = DEPLOYMENT_CONFIGS[businessType as keyof typeof DEPLOYMENT_CONFIGS];
-    
-    if (!config) {
-      return res.status(404).json({ error: 'Business type not found' });
-    }
-    
-    const recommendedAvatar = getAvatarById(config.recommendedAvatar);
-    const alternativeAvatars = getAvatarsByBusinessType(businessType);
+    const filteredAvatars = BUSINESS_AVATARS.filter(avatar => 
+      avatar.businessType === businessType
+    );
     
     res.json({
       success: true,
-      businessType,
-      recommendedAvatar,
-      alternativeAvatars,
-      deploymentConfig: config,
-      customizationOptions: CUSTOMIZATION_OPTIONS
+      businessType: businessType,
+      avatars: filteredAvatars,
+      count: filteredAvatars.length
     });
-  } catch (error) {
-    console.error('Error fetching deployment config:', error);
-    res.status(500).json({ error: 'Failed to fetch deployment configuration' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Create/customize avatar
-router.post('/avatars/customize', (req, res) => {
+// Get specific avatar by ID
+router.get('/avatar/:avatarId', (req, res) => {
   try {
-    const {
-      baseAvatarId,
-      customizations,
-      businessName,
-      targetAudience
-    } = req.body;
+    const { avatarId } = req.params;
+    const avatar = BUSINESS_AVATARS.find(a => a.id === avatarId);
     
-    const baseAvatar = getAvatarById(baseAvatarId);
-    if (!baseAvatar) {
-      return res.status(404).json({ error: 'Base avatar not found' });
-    }
-    
-    // Create customized avatar
-    const customizedAvatar: BusinessAvatar = {
-      ...baseAvatar,
-      id: `custom_${Date.now()}`,
-      name: customizations.name || baseAvatar.name,
-      description: customizations.description || baseAvatar.description,
-      appearance: {
-        ...baseAvatar.appearance,
-        ...customizations.appearance
-      },
-      voiceProfile: {
-        ...baseAvatar.voiceProfile,
-        ...customizations.voiceProfile
-      },
-      specializations: customizations.specializations || baseAvatar.specializations,
-      communicationStyle: customizations.communicationStyle || baseAvatar.communicationStyle,
-      updatedAt: new Date().toISOString()
-    };
-    
-    // In production, save to database
-    // await db.insert(customAvatars).values(customizedAvatar);
-    
-    res.json({
-      success: true,
-      avatar: customizedAvatar,
-      message: 'Avatar customized successfully',
-      deploymentReady: true
-    });
-  } catch (error) {
-    console.error('Error customizing avatar:', error);
-    res.status(500).json({ error: 'Failed to customize avatar' });
-  }
-});
-
-// Get customization options
-router.get('/customization-options', (req, res) => {
-  try {
-    res.json({
-      success: true,
-      options: CUSTOMIZATION_OPTIONS,
-      businessTypes: [...new Set(BUSINESS_AVATARS.map(a => a.businessType))],
-      popularCustomizations: {
-        most_professional: {
-          appearance: { style: 'professional', outfit: 'Executive Business Suit' },
-          voice: { tone: 'professional', pace: 'moderate' }
-        },
-        most_friendly: {
-          appearance: { style: 'friendly', outfit: 'Modern Casual Professional' },
-          voice: { tone: 'warm', pace: 'moderate' }
-        },
-        most_energetic: {
-          appearance: { style: 'energetic', outfit: 'Sales Professional' },
-          voice: { tone: 'enthusiastic', pace: 'fast' }
-        }
-      }
-    });
-  } catch (error) {
-    console.error('Error fetching customization options:', error);
-    res.status(500).json({ error: 'Failed to fetch customization options' });
-  }
-});
-
-// Deploy avatar to business
-router.post('/avatars/:id/deploy', (req, res) => {
-  try {
-    const { id } = req.params;
-    const { businessId, deploymentConfig } = req.body;
-    
-    const avatar = getAvatarById(id);
     if (!avatar) {
       return res.status(404).json({ error: 'Avatar not found' });
     }
     
-    // In production, save deployment configuration
-    const deployment = {
-      id: `deploy_${Date.now()}`,
-      avatarId: id,
-      businessId,
-      config: deploymentConfig,
-      status: 'active',
-      deployedAt: new Date().toISOString()
-    };
-    
     res.json({
       success: true,
-      deployment,
-      avatar,
-      message: 'Avatar deployed successfully',
-      endpoints: {
-        chat: `/api/chat/${deployment.id}`,
-        voice: `/api/voice/${deployment.id}`,
-        admin: `/api/avatar-admin/${deployment.id}`
-      }
+      avatar: avatar
     });
-  } catch (error) {
-    console.error('Error deploying avatar:', error);
-    res.status(500).json({ error: 'Failed to deploy avatar' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 
-// Get avatar performance analytics
-router.get('/avatars/:id/analytics', (req, res) => {
+// Get avatars by industry/specialization
+router.get('/industry/:industry', (req, res) => {
   try {
-    const { id } = req.params;
-    const { timeRange = '30d' } = req.query;
-    
-    const avatar = getAvatarById(id);
-    if (!avatar) {
-      return res.status(404).json({ error: 'Avatar not found' });
-    }
-    
-    // Mock analytics data - in production, fetch from analytics database
-    const analytics = {
-      avatarId: id,
-      timeRange,
-      conversations: {
-        total: 1247,
-        successful: 1156,
-        escalated: 91,
-        averageLength: '4.2 minutes'
-      },
-      satisfaction: {
-        average: 4.6,
-        distribution: { 5: 68, 4: 24, 3: 6, 2: 1, 1: 1 }
-      },
-      performance: {
-        responseTime: '1.2 seconds',
-        accuracyRate: 94.5,
-        resolutionRate: 87.3,
-        engagementScore: 92.1
-      },
-      topIssues: [
-        'Product information requests',
-        'Billing inquiries',
-        'Technical support',
-        'Account management'
-      ],
-      improvementAreas: [
-        'Complex technical queries',
-        'Emotional support scenarios',
-        'Multi-step processes'
-      ]
-    };
+    const { industry } = req.params;
+    const filteredAvatars = BUSINESS_AVATARS.filter(avatar => 
+      avatar.specializations.some(spec => 
+        spec.toLowerCase().includes(industry.toLowerCase())
+      )
+    );
     
     res.json({
       success: true,
-      analytics,
-      avatar: {
-        id: avatar.id,
-        name: avatar.name,
-        businessType: avatar.businessType
-      }
+      industry: industry,
+      avatars: filteredAvatars,
+      count: filteredAvatars.length
     });
-  } catch (error) {
-    console.error('Error fetching avatar analytics:', error);
-    res.status(500).json({ error: 'Failed to fetch avatar analytics' });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
   }
 });
 

@@ -96,7 +96,7 @@ export default function BusinessDashboard() {
     {
       icon: MessageSquare,
       title: "Avatar Training",
-      description: "Train avatars with dialogue scenarios",
+      description: "Train your AI avatars with realistic dialogue scenarios",
       action: "Start Training",
       href: "/business-avatar-training",
       color: "violet",

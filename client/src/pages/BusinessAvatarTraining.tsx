@@ -125,12 +125,12 @@ export default function BusinessAvatarTraining() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
 
-  // Fetch business avatars
+  // Fetch all business avatars for current user's businesses
   const { data: avatarsData, isLoading: avatarsLoading } = useQuery({
     queryKey: ['/api/business-avatars/avatars'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/business-avatars/avatars');
-      if (!response.ok) throw new Error('Failed to fetch avatars');
+      if (!response.ok) throw new Error('Failed to fetch business avatars');
       return response.json();
     }
   });
@@ -287,11 +287,11 @@ export default function BusinessAvatarTraining() {
             <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg">
               <MessageSquare className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Avatar Training Platform</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Business Avatar Training</h1>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Train your AI business avatars with realistic scenarios and dialogue testing. 
-            Improve their performance through hands-on practice sessions.
+            Train your business AI avatars with industry-specific scenarios and realistic dialogue testing. 
+            Improve customer interactions across sales, support, consulting, and specialized services.
           </p>
         </div>
 
@@ -336,6 +336,11 @@ export default function BusinessAvatarTraining() {
                       <CardDescription className="text-sm">
                         {avatar.description}
                       </CardDescription>
+                      <div className="mt-2">
+                        <Badge variant="outline" className="text-xs">
+                          {avatar.businessType.replace('_', ' ').toUpperCase()}
+                        </Badge>
+                      </div>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">

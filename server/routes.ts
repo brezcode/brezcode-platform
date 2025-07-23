@@ -4,6 +4,8 @@ import brandRoutes from "./brandRoutes";
 import brandCustomersRouter from "./routes/brandCustomers";
 import brandFeaturesRouter from "./routes/brandFeatures";
 import avatarRoutes from "./routes/avatarRoutes";
+import businessAvatarRoutes from "./routes/businessAvatarRoutes";
+import avatarTrainingRoutes from "./routes/avatarTrainingRoutes";
 import healthScheduleRoutes from "./routes/healthScheduleRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import { businessRoutes } from "./businessRoutes";
@@ -169,6 +171,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/customers', brandCustomersRouter);
   app.use('/api/features', brandFeaturesRouter);
   app.use('/api/avatar', avatarRoutes);
+  app.use('/api/business-avatars', businessAvatarRoutes);
+  app.use('/api/avatar-training', avatarTrainingRoutes);
   app.use('/api/health', healthScheduleRoutes);
   app.use('/api/notifications', notificationRoutes);
   
