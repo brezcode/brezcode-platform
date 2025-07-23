@@ -1,17 +1,19 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import Select from "react-select";
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { User, Camera, Save, MapPin, Phone } from "lucide-react";
+import { User, Camera, MapPin, Phone, Save, Edit2, Check, X } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
 import worldCountries from "world-countries";
 
@@ -19,22 +21,95 @@ const profileSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   profilePhoto: z.string().optional(),
+  
+  // Address fields
   streetAddress: z.string().min(1, "Street address is required"),
   city: z.string().min(1, "City is required"),
   state: z.string().min(1, "State/Province is required"),
   postalCode: z.string().min(1, "Postal code is required"),
   country: z.string().min(1, "Country is required"),
+  
+  // Phone number in E.164 format
   phoneNumber: z.string().min(1, "Phone number is required"),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
 
+// Generate country options from world-countries library
 const countryOptions = worldCountries
   .map(country => ({
     value: country.name.common,
     label: country.name.common,
+    flag: country.flag
   }))
   .sort((a, b) => a.label.localeCompare(b.label));
+
+// Inline Edit Component
+function InlineEditField({ label, value, placeholder, onSave }: {
+  label: string;
+  value: string;
+  placeholder: string;
+  onSave: (value: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(value);
+
+  useEffect(() => {
+    setEditValue(value);
+  }, [value]);
+
+  const handleSave = () => {
+    onSave(editValue);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditValue(value);
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSave();
+    } else if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-medium text-gray-700">{label}</label>
+      {isEditing ? (
+        <div className="flex items-center space-x-2">
+          <Input
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            placeholder={placeholder}
+            className="flex-1"
+            autoFocus
+            onKeyDown={handleKeyDown}
+          />
+          <Button size="sm" onClick={handleSave} className="px-2">
+            <Check className="w-4 h-4" />
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCancel} className="px-2">
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
+      ) : (
+        <div 
+          className="flex items-center justify-between p-3 border rounded-md cursor-pointer hover:bg-gray-50 transition-colors group"
+          onClick={() => setIsEditing(true)}
+        >
+          <span className={value ? "text-gray-900" : "text-gray-400"}>
+            {value || placeholder}
+          </span>
+          <Edit2 className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function UserProfile() {
   const { toast } = useToast();
@@ -79,6 +154,7 @@ export default function UserProfile() {
     },
   });
 
+  // Update form when profile data is loaded
   useEffect(() => {
     if (profile) {
       form.reset({
@@ -110,8 +186,13 @@ export default function UserProfile() {
   };
 
   const onSubmit = (data: ProfileFormData) => {
+    // Convert country code ID back to actual code for storage
+    const selectedCountryCode = countryCodeOptions.find(item => item.value === data.countryCode);
+    const actualCountryCode = selectedCountryCode ? selectedCountryCode.code : "+1";
+    
     saveProfile({ 
       ...data, 
+      countryCode: actualCountryCode,
       profilePhoto 
     });
   };
@@ -146,102 +227,219 @@ export default function UserProfile() {
           </div>
         </div>
 
-        {/* Current Profile Data - Replit Style */}
-        <Card className="mb-6 border-l-4 border-l-blue-500">
-          <CardHeader className="bg-blue-50">
-            <CardTitle className="text-lg text-blue-700">Current Profile Information</CardTitle>
-            <CardDescription className="text-blue-600">
-              Your current saved profile data
+        {/* Profile Overview with Inline Editing */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold">Profile Information</CardTitle>
+            <CardDescription>
+              Click any field to edit. Changes are saved automatically.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6">
-            {profile ? (
-              <div className="space-y-3">
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-600">Name:</span>
-                  <span className="text-gray-900">{profile.firstName} {profile.lastName}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-600">Email:</span>
-                  <span className="text-gray-900">{profile.email}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-600">Phone:</span>
-                  <span className="text-gray-900">{profile.phoneNumber || 'Not set'}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-gray-100">
-                  <span className="font-medium text-gray-600">Address:</span>
-                  <span className="text-gray-900 text-right">
-                    {profile.streetAddress ? (
-                      <>
-                        {profile.streetAddress}<br/>
-                        {profile.city}, {profile.state} {profile.postalCode}<br/>
-                        {profile.country}
-                      </>
-                    ) : 'Not set'}
-                  </span>
+          <CardContent className="space-y-6">
+            {/* Profile Photo Section */}
+            <div className="flex items-center space-x-6">
+              <div className="relative group">
+                <Avatar className="h-20 w-20 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
+                  {profilePhoto ? (
+                    <AvatarImage src={profilePhoto} alt="Profile" />
+                  ) : (
+                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
+                      {profile?.firstName?.[0] || ""}{profile?.lastName?.[0] || ""}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <div className="absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+                  <Camera className="w-6 h-6 text-white" />
                 </div>
               </div>
-            ) : (
-              <div className="animate-pulse space-y-3">
-                <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-800">
+                  {profile?.firstName || 'First'} {profile?.lastName || 'Last'}
+                </h3>
+                <p className="text-gray-600">{profile?.email}</p>
               </div>
-            )}
+            </div>
+
+            {/* Inline Editable Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              {/* First Name */}
+              <InlineEditField
+                label="First Name"
+                value={profile?.firstName || ''}
+                placeholder="Enter first name"
+                onSave={(value) => saveProfile({ firstName: value })}
+              />
+
+              {/* Last Name */}
+              <InlineEditField
+                label="Last Name"
+                value={profile?.lastName || ''}
+                placeholder="Enter last name"
+                onSave={(value) => saveProfile({ lastName: value })}
+              />
+
+              {/* Street Address */}
+              <InlineEditField
+                label="Street Address"
+                value={profile?.streetAddress || ''}
+                placeholder="Enter street address"
+                onSave={(value) => saveProfile({ streetAddress: value })}
+              />
+
+              {/* City */}
+              <InlineEditField
+                label="City"
+                value={profile?.city || ''}
+                placeholder="Enter city"
+                onSave={(value) => saveProfile({ city: value })}
+              />
+
+              {/* State */}
+              <InlineEditField
+                label="State/Province"
+                value={profile?.state || ''}
+                placeholder="Enter state or province"
+                onSave={(value) => saveProfile({ state: value })}
+              />
+
+              {/* Postal Code */}
+              <InlineEditField
+                label="Postal Code"
+                value={profile?.postalCode || ''}
+                placeholder="Enter postal code"
+                onSave={(value) => saveProfile({ postalCode: value })}
+              />
+
+              {/* Country */}
+              <InlineEditField
+                label="Country"
+                value={profile?.country || ''}
+                placeholder="Enter country"
+                onSave={(value) => saveProfile({ country: value })}
+              />
+
+              {/* Phone Number */}
+              <InlineEditField
+                label="Phone Number"
+                value={profile?.phoneNumber || ''}
+                placeholder="Enter phone number"
+                onSave={(value) => saveProfile({ phoneNumber: value })}
+              />
+            </div>
           </CardContent>
         </Card>
 
-        {/* Edit Form - Replit Style */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg text-gray-800">Update Profile</CardTitle>
-            <CardDescription>
-              Edit your profile information below
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-                
-                {/* Profile Photo */}
-                <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
-                    {profilePhoto ? (
-                      <AvatarImage src={profilePhoto} alt="Profile" />
-                    ) : (
-                      <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
-                        {form.getValues("firstName")?.[0] || ""}{form.getValues("lastName")?.[0] || ""}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={() => fileInputRef.current?.click()}
-                    className="flex items-center space-x-2"
-                  >
-                    <Camera className="w-4 h-4" />
-                    <span>Upload Photo</span>
-                  </Button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handlePhotoUpload}
-                    className="hidden"
-                  />
-                </div>
+        <div className="space-y-8">
+            
+            {/* Profile Photo Section */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Camera className="w-5 h-5 text-blue-600" />
+                  <span>Profile Photo</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col items-center space-y-4">
+                <Avatar className="h-24 w-24 cursor-pointer hover:ring-2 hover:ring-blue-300 transition-all" onClick={() => fileInputRef.current?.click()}>
+                  {profilePhoto ? (
+                    <AvatarImage src={profilePhoto} alt="Profile" />
+                  ) : (
+                    <AvatarFallback className="bg-blue-100 text-blue-700 text-lg">
+                      {form.getValues("firstName")?.[0] || ""}{form.getValues("lastName")?.[0] || ""}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="flex items-center space-x-2"
+                >
+                  <Camera className="w-4 h-4" />
+                  <span>Upload Photo</span>
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePhotoUpload}
+                  className="hidden"
+                />
+              </CardContent>
+            </Card>
 
-                {/* Name Fields */}
+            {/* Personal Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <User className="w-5 h-5 text-blue-600" />
+                  <span>Personal Information</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="grid md:grid-cols-2 gap-6">
+                <FormField
+                  control={form.control}
+                  name="firstName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>First Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your first name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="lastName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Last Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your last name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Address Information */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <span>Address</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="streetAddress"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Street Address</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter your street address" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="firstName"
+                    name="city"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>First Name</FormLabel>
+                        <FormLabel>City</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your first name" {...field} />
+                          <Input placeholder="Enter your city" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -250,12 +448,12 @@ export default function UserProfile() {
 
                   <FormField
                     control={form.control}
-                    name="lastName"
+                    name="state"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Last Name</FormLabel>
+                        <FormLabel>State/Province</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your last name" {...field} />
+                          <Input placeholder="Enter your state or province" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -263,70 +461,20 @@ export default function UserProfile() {
                   />
                 </div>
 
-                {/* Address Fields */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2 mb-4">
-                    <MapPin className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-700">Address Information</span>
-                  </div>
-                  
+                <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
-                    name="streetAddress"
+                    name="postalCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Street Address</FormLabel>
+                        <FormLabel>Postal Code</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your street address" {...field} />
+                          <Input placeholder="Enter your postal code" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="city"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>City</FormLabel>
-                          <FormControl>
-                            <Input placeholder="City" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="state"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>State/Province</FormLabel>
-                          <FormControl>
-                            <Input placeholder="State or Province" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="postalCode"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Postal Code</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Postal Code" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
 
                   <FormField
                     control={form.control}
@@ -334,63 +482,75 @@ export default function UserProfile() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Country</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select a country" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {countryOptions.map((country) => (
-                              <SelectItem key={country.value} value={country.value}>
-                                {country.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div className="space-y-4">
-                  <div className="flex items-center space-x-2">
-                    <Phone className="w-5 h-5 text-gray-600" />
-                    <span className="font-medium text-gray-700">Contact Information</span>
-                  </div>
-                  
-                  <FormField
-                    control={form.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter your phone number" {...field} />
+                          <Select
+                            options={countryOptions}
+                            value={countryOptions.find(option => option.value === field.value)}
+                            onChange={(selected) => field.onChange(selected?.value || "")}
+                            placeholder="Select your country"
+                            isSearchable
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            formatOptionLabel={(option) => (
+                              <div className="flex items-center">
+                                <span className="mr-2">{option.flag}</span>
+                                {option.label}
+                              </div>
+                            )}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Save Button */}
-                <div className="flex justify-end">
-                  <Button 
-                    type="submit" 
-                    disabled={isPending}
-                    className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>{isPending ? "Saving..." : "Save Profile"}</span>
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+            {/* Phone Number */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Phone className="w-5 h-5 text-blue-600" />
+                  <span>Phone Number</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <PhoneInput
+                          placeholder="Enter phone number"
+                          value={field.value}
+                          onChange={field.onChange}
+                          defaultCountry="US"
+                          className="phone-input"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Save Button */}
+            <div className="flex justify-end">
+              <Button 
+                type="submit"
+                disabled={isPending}
+                className="flex items-center space-x-2"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isPending ? "Saving..." : "Save Profile"}</span>
+              </Button>
+            </div>
+          </form>
+        </Form>
       </div>
     </div>
   );
