@@ -92,6 +92,15 @@ export default function BusinessDashboard() {
       href: "/business-avatar-training",
       color: "violet",
       status: "available"
+    },
+    {
+      icon: Bot,
+      title: "AI Conversation Training",
+      description: "Watch AI customers talk to AI avatars",
+      action: "AI-to-AI Training",
+      href: "/ai-conversation-training",
+      color: "cyan",
+      status: "available"
     }
   ];
 

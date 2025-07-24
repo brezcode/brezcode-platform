@@ -29,6 +29,7 @@ import BusinessAvatarManager from "@/pages/BusinessAvatarManager";
 import PersonalAvatarManager from "@/pages/PersonalAvatarManager";
 import BusinessAvatarTraining from "@/pages/BusinessAvatarTraining";
 import BrezCodeAvatarTraining from "@/pages/BrezCodeAvatarTraining";
+import AIConversationTraining from "@/pages/AIConversationTraining";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { BackToTopButton, BackButton } from "@/components/MobileNavigation";
@@ -99,6 +100,7 @@ function App() {
           <Route path="/personal-avatars" component={PersonalAvatarManager} />
           <Route path="/business-avatar-training" component={BusinessAvatarTraining} />
           <Route path="/business/brezcode/avatar-training" component={BrezCodeAvatarTraining} />
+          <Route path="/ai-conversation-training" component={AIConversationTraining} />
           <Route path="/feature-showcase" component={FeatureShowcase} />
           <Route path="/coding-assistant" component={CodingAssistant} />
           <Route path="/knowledge-center" component={KnowledgeCenter} />

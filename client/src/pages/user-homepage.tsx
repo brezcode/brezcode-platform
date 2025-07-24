@@ -218,6 +218,13 @@ export default function UserHomepage() {
       color: "bg-yellow-500"
     },
     {
+      title: "AI Conversation Training",
+      description: "Watch AI customers talk to AI avatars",
+      icon: <MessageCircle className="h-5 w-5" />,
+      action: () => setLocation('/ai-conversation-training'),
+      color: "bg-cyan-500"
+    },
+    {
       title: "Coding Assistant",
       description: "Remember code patterns & debugging solutions",
       icon: <Brain className="h-5 w-5" />,

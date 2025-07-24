@@ -7,6 +7,7 @@ import avatarRoutes from "./routes/avatarRoutes";
 import businessAvatarRoutes from "./routes/businessAvatarRoutes";
 import personalAvatarRoutes from "./routes/personalAvatarRoutes";
 import avatarTrainingRoutes from "./routes/avatarTrainingRoutes";
+import aiConversationRoutes from "./routes/aiConversationRoutes";
 import healthScheduleRoutes from "./routes/healthScheduleRoutes";
 import notificationRoutes from "./routes/notificationRoutes";
 import { businessRoutes } from "./businessRoutes";
@@ -175,6 +176,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/business-avatars', businessAvatarRoutes);
   app.use('/api/personal-avatars', personalAvatarRoutes);
   app.use('/api/avatar-training', avatarTrainingRoutes);
+  app.use('/api/ai-conversation', aiConversationRoutes);
   app.use('/api/health', healthScheduleRoutes);
   app.use('/api/notifications', notificationRoutes);
   
