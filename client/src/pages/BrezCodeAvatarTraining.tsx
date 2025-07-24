@@ -327,20 +327,19 @@ export default function BrezCodeAvatarTraining() {
       // Update session with improved response
       setActiveSession(data.session);
       
-      // Add the improved response to messages
+      // Update the original message with the improved response instead of adding a new message
       if (data.improved_message) {
-        const improvedMessage = {
-          id: data.improved_message.id,
-          role: 'assistant',
-          content: data.improved_message.content,
-          timestamp: data.improved_message.timestamp,
-          isTraining: true,
-          quality_score: data.improved_message.quality_score,
-          improved_from_feedback: true,
-          original_message_id: data.improved_message.original_message_id
-        };
-        
-        setMessages(prev => [...prev, improvedMessage]);
+        setMessages(prev => prev.map(msg => {
+          if (msg.id === data.improved_message.original_message_id) {
+            return {
+              ...msg,
+              improved_response: data.improved_message.content,
+              improved_quality_score: data.improved_message.quality_score,
+              improved_from_feedback: true
+            };
+          }
+          return msg;
+        }));
       }
       
       toast({
@@ -576,16 +575,40 @@ export default function BrezCodeAvatarTraining() {
                                      : '🎯 System'}
                                 </div>
                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                                
+                                {/* Show user comment if exists */}
+                                {messageRatings[index]?.comment && (
+                                  <div className="mt-4 p-3 bg-pink-100 border-l-4 border-pink-300 rounded-r-lg">
+                                    <div className="text-xs font-medium text-pink-700 mb-1">💬 Your Feedback:</div>
+                                    <p className="text-sm text-pink-800 italic">"{messageRatings[index].comment}"</p>
+                                  </div>
+                                )}
+                                
+                                {/* Show improved response if exists */}
+                                {(message as any).improved_response && (
+                                  <div className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <span className="text-emerald-600 text-sm font-semibold">✨ Revised Response:</span>
+                                      <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                                        Improved
+                                      </span>
+                                    </div>
+                                    <p className="text-sm leading-relaxed text-emerald-900 whitespace-pre-wrap">
+                                      {(message as any).improved_response}
+                                    </p>
+                                    {(message as any).improved_quality_score && (
+                                      <div className="text-xs text-emerald-600 mt-2 font-medium">
+                                        Quality: {(message as any).improved_quality_score}/100
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                                
                                 {message.quality_score && (
                                   <div className={`text-xs mt-2 font-medium ${
                                     (message as any).improved_from_feedback ? 'text-emerald-600' : 'text-pink-600'
                                   }`}>
                                     Quality: {message.quality_score}/100
-                                    {(message as any).improved_from_feedback && (
-                                      <span className="ml-2 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs">
-                                        ✨ Improved
-                                      </span>
-                                    )}
                                   </div>
                                 )}
                                 {message.emotion && (
