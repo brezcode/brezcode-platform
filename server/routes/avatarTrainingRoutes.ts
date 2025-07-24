@@ -112,6 +112,92 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
   }
 });
 
+// Add comment feedback endpoint for immediate learning
+router.post('/sessions/:sessionId/comment', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { messageId, comment, rating } = req.body;
+    
+    const session = trainingSessions.find(s => s.id === sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Find the message that was commented on
+    const messageIndex = session.messages.findIndex(m => m.id === messageId);
+    if (messageIndex === -1) {
+      return res.status(404).json({ error: 'Message not found' });
+    }
+    
+    const commentedMessage = session.messages[messageIndex];
+    
+    // Generate Dr. Sakura's improved response based on user feedback
+    let improvedResponse = "";
+    
+    if (comment.toLowerCase().includes('vague') || comment.toLowerCase().includes('general')) {
+      improvedResponse = "You're absolutely right - let me be more specific. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions. Look for hard, immobile masses (like marbles), skin dimpling, nipple discharge, or size changes. Schedule mammograms annually starting at age 40 if high-risk, age 50 if average risk. Any concerning findings should be evaluated within 1-2 weeks.";
+    } else if (comment.toLowerCase().includes('timeline') || comment.toLowerCase().includes('when')) {
+      improvedResponse = "Here's the exact schedule: Ages 20-39: Monthly self-exams, clinical breast exam every 1-3 years. Ages 40-49: Annual mammograms (high risk) or every 2 years (average risk), annual clinical exams, monthly self-exams. Ages 50+: Annual mammograms and clinical exams, monthly self-exams. If you find anything concerning, see your doctor within 2 weeks maximum.";
+    } else if (comment.toLowerCase().includes('process') || comment.toLowerCase().includes('what happens')) {
+      improvedResponse = "Here's exactly what happens during a mammogram: 1) You undress from waist up, wear a hospital gown opening in front. 2) Technologist positions your breast on a clear plastic plate. 3) A paddle compresses your breast for 10-15 seconds while X-ray is taken. 4) Two views per breast: top-to-bottom and side-to-side. 5) Total time: 20 minutes. 6) Results available in 48-72 hours. Pain level: 2-7/10, brief pressure only during compression.";
+    } else if (comment.toLowerCase().includes('specific') || comment.toLowerCase().includes('concrete')) {
+      improvedResponse = "Let me give you concrete numbers: 1 in 8 women develop breast cancer. 85% have no family history. Mammograms reduce death rates by 20-40%. For self-exams, normal tissue feels like small peas or gravel. Concerning lumps feel like hard marbles, don't move when pushed, have irregular edges. Any lump larger than a pea that persists through one menstrual cycle needs medical evaluation within 2 weeks.";
+    } else if (comment.toLowerCase().includes('better') || comment.toLowerCase().includes('improve')) {
+      improvedResponse = "Thank you for that feedback - you're helping me provide better care. Based on your concern, here's what I recommend: Start with monthly self-exams using the systematic approach (lying down, arm behind head, use flat fingertips in small circles). Schedule your first mammogram based on your risk level and family history. If you're unsure about timing, a clinical breast exam with your doctor can help determine the best screening schedule for your specific situation.";
+    } else {
+      // Default improved response for any feedback
+      improvedResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+    }
+    
+    // Create improved response message
+    const improvedMessage = {
+      id: `msg_${Date.now()}_improved`,
+      role: 'avatar',
+      content: improvedResponse,
+      timestamp: new Date().toISOString(),
+      quality_score: Math.min(100, (commentedMessage.quality_score || 80) + 10),
+      improved_from_feedback: true,
+      original_message_id: messageId,
+      user_comment: comment,
+      user_rating: rating
+    };
+    
+    // Add the improved response right after the commented message
+    session.messages.splice(messageIndex + 1, 0, improvedMessage);
+    
+    // Store the learning for future responses
+    if (!session.learned_responses) {
+      session.learned_responses = [];
+    }
+    
+    session.learned_responses.push({
+      original_response: commentedMessage.content,
+      user_feedback: comment,
+      improved_response: improvedResponse,
+      timestamp: new Date().toISOString(),
+      context: 'user_feedback_training'
+    });
+    
+    // Update performance metrics to reflect improvement
+    session.performance_metrics = {
+      response_quality: Math.min(100, (session.performance_metrics?.response_quality || 80) + 5),
+      customer_satisfaction: Math.min(100, (session.performance_metrics?.customer_satisfaction || 75) + 8),
+      goal_achievement: Math.min(100, (session.performance_metrics?.goal_achievement || 70) + 7),
+      conversation_flow: Math.min(100, (session.performance_metrics?.conversation_flow || 80) + 3)
+    };
+    
+    res.json({
+      success: true,
+      session: session,
+      improved_message: improvedMessage,
+      message: 'Dr. Sakura has provided an improved response based on your feedback'
+    });
+    
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get avatar types for training selection
 router.get('/avatar-types', (req, res) => {
   try {

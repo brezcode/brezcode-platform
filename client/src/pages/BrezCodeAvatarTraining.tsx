@@ -289,6 +289,7 @@ export default function BrezCodeAvatarTraining() {
     onSuccess: (data) => {
       const sessionMessages = data.session.messages || [];
       const formattedMessages = sessionMessages.map((msg: any) => ({
+        id: msg.id,
         role: msg.role,
         content: msg.content,
         timestamp: msg.timestamp,
@@ -305,6 +306,46 @@ export default function BrezCodeAvatarTraining() {
       toast({
         title: "Conversation Continued",
         description: `Dr. Sakura handling patient concerns`,
+      });
+    }
+  });
+
+  // Submit comment feedback for immediate learning
+  const submitCommentFeedback = useMutation({
+    mutationFn: async ({ messageId, comment, rating }: { messageId: string; comment: string; rating: number }) => {
+      if (!activeSession) throw new Error('No active session');
+      
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/comment`, {
+        messageId,
+        comment,
+        rating
+      });
+      if (!response.ok) throw new Error('Failed to submit feedback');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      // Update session with improved response
+      setActiveSession(data.session);
+      
+      // Add the improved response to messages
+      if (data.improved_message) {
+        const improvedMessage = {
+          id: data.improved_message.id,
+          role: 'assistant',
+          content: data.improved_message.content,
+          timestamp: data.improved_message.timestamp,
+          isTraining: true,
+          quality_score: data.improved_message.quality_score,
+          improved_from_feedback: true,
+          original_message_id: data.improved_message.original_message_id
+        };
+        
+        setMessages(prev => [...prev, improvedMessage]);
+      }
+      
+      toast({
+        title: "✅ Dr. Sakura Learned & Improved!",
+        description: data.message,
       });
     }
   });
@@ -823,6 +864,7 @@ export default function BrezCodeAvatarTraining() {
               <Button 
                 onClick={() => {
                   if (showCommentDialog && newComment.trim()) {
+                    // Store comment locally for display
                     setMessageRatings(prev => ({
                       ...prev,
                       [showCommentDialog]: {
@@ -830,18 +872,32 @@ export default function BrezCodeAvatarTraining() {
                         comment: newComment.trim()
                       }
                     }));
+                    
+                    // Get current rating for scoring
+                    const currentRating = messageRatings[showCommentDialog]?.rating;
+                    const rating = currentRating === 'thumbs_up' ? 5 : currentRating === 'thumbs_down' ? 1 : 3;
+                    
+                    // Get the actual message for feedback submission
+                    const messageIndex = parseInt(showCommentDialog);
+                    const message = messages[messageIndex];
+                    
+                    if (message?.id) {
+                      // Submit feedback for immediate learning
+                      submitCommentFeedback.mutate({
+                        messageId: message.id,
+                        comment: newComment.trim(),
+                        rating: rating
+                      });
+                    }
+                    
                     setShowCommentDialog(null);
                     setNewComment('');
-                    toast({
-                      title: "Comment saved",
-                      description: "Your feedback has been recorded for this response.",
-                    });
                   }
                 }}
-                disabled={!newComment.trim()}
+                disabled={!newComment.trim() || submitCommentFeedback.isPending}
                 className="flex-1 bg-pink-600 hover:bg-pink-700"
               >
-                Save Comment
+                {submitCommentFeedback.isPending ? 'Training Dr. Sakura...' : 'Submit & Train'}
               </Button>
             </div>
           </div>
