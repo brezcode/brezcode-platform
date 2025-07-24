@@ -208,6 +208,16 @@ export default function BrezCodeAvatarTraining() {
         }));
         
         console.log('Loading messages with improved responses:', formattedMessages.filter(m => m.improved_response).length);
+        formattedMessages.forEach((msg, index) => {
+          if (msg.improved_response) {
+            console.log(`🎯 Message ${index} has improved response:`, {
+              id: msg.id,
+              hasImproved: !!msg.improved_response,
+              comment: msg.user_comment,
+              improvedLength: msg.improved_response.length
+            });
+          }
+        });
         
         setMessages([
           {
