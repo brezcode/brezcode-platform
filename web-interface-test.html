@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Conversation Training Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .conversation { background: #f8f9fa; padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .customer { color: #dc3545; font-weight: bold; }
+        .avatar { color: #007bff; font-weight: bold; }
+        button { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0; }
+        .metric { background: #e9ecef; padding: 10px; border-radius: 5px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>AI Conversation Training System Test</h1>
+    
+    <div class="test-section">
+        <h2>Training Configuration</h2>
+        <div>
+            <label>Avatar Type:</label>
+            <select id="avatarSelect">
+                <option value="sales_specialist_alex">Alex Thunder (Sales Specialist)</option>
+                <option value="customer_service_miko">Miko Harmony (Customer Service)</option>
+                <option value="technical_kai">Kai TechWiz (Technical Support)</option>
+                <option value="business_luna">Luna Strategic (Business Consultant)</option>
+                <option value="health_sakura">Dr. Sakura (Health Coach)</option>
+                <option value="education_sage">Professor Sage (Education)</option>
+            </select>
+        </div>
+        <div>
+            <label>Customer Type:</label>
+            <select id="customerSelect">
+                <option value="frustrated_enterprise">Marcus Thompson (Frustrated Enterprise IT Director)</option>
+                <option value="anxious_small_business">Sarah Chen (Anxious Small Business Owner)</option>
+                <option value="angry_existing_customer">David Rodriguez (Angry Existing Customer)</option>
+                <option value="excited_startup">Alex Kim (Excited Startup Founder)</option>
+                <option value="cautious_executive">Jennifer Walsh (Cautious C-Level Executive)</option>
+            </select>
+        </div>
+        <div>
+            <label>Training Scenario:</label>
+            <select id="scenarioSelect">
+                <option value="pricing_objection">Pricing Objection Handling</option>
+                <option value="initial_inquiry">Initial Service Inquiry</option>
+                <option value="technical_question">Technical Implementation Questions</option>
+                <option value="competitor_comparison">Competitor Comparison</option>
+                <option value="cancellation_threat">Customer Cancellation Threat</option>
+            </select>
+        </div>
+        <button onclick="startTraining()">Start AI Training Session</button>
+    </div>
+
+    <div id="trainingResults" class="test-section" style="display: none;">
+        <h2>Training Session Results</h2>
+        <div id="sessionInfo"></div>
+        <div id="performanceMetrics" class="metrics"></div>
+        <div id="conversationLog"></div>
+        <button onclick="continueConversation()">Continue Conversation</button>
+        <button onclick="stopTraining()">Stop Training</button>
+    </div>
+
+    <div id="testResults" class="test-section">
+        <h2>Test Status</h2>
+        <div id="testLog">Ready to test AI conversation training...</div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        
+        function log(message, isError = false) {
+            const testLog = document.getElementById('testLog');
+            const timestamp = new Date().toLocaleTimeString();
+            testLog.innerHTML += `<div class="${isError ? 'error' : 'success'}">[${timestamp}] ${message}</div>`;
+        }
+        
+        async function startTraining() {
+            const avatarId = document.getElementById('avatarSelect').value;
+            const customerId = document.getElementById('customerSelect').value;
+            const scenario = document.getElementById('scenarioSelect').value;
+            
+            log(`Starting training: ${avatarId} vs ${customerId} in ${scenario} scenario`);
+            
+            try {
+                const response = await fetch('/direct-api/training/start', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ avatarId, customerId, scenario })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const session = await response.json();
+                currentSessionId = session.id;
+                
+                log(`✅ Training session started: ${session.id}`);
+                displaySession(session);
+                
+            } catch (error) {
+                log(`❌ Failed to start training: ${error.message}`, true);
+            }
+        }
+        
+        async function continueConversation() {
+            if (!currentSessionId) {
+                log('❌ No active session to continue', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/direct-api/training/${currentSessionId}/continue`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const session = await response.json();
+                log(`✅ Conversation continued with ${session.messages.length} messages`);
+                displaySession(session);
+                
+            } catch (error) {
+                log(`❌ Failed to continue conversation: ${error.message}`, true);
+            }
+        }
+        
+        async function stopTraining() {
+            if (!currentSessionId) {
+                log('❌ No active session to stop', true);
+                return;
+            }
+            
+            try {
+                const response = await fetch(`/direct-api/training/${currentSessionId}/stop`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const session = await response.json();
+                log(`✅ Training session completed. Duration: ${session.duration} seconds`);
+                displaySession(session);
+                currentSessionId = null;
+                
+            } catch (error) {
+                log(`❌ Failed to stop training: ${error.message}`, true);
+            }
+        }
+        
+        function displaySession(session) {
+            document.getElementById('trainingResults').style.display = 'block';
+            
+            // Session info
+            document.getElementById('sessionInfo').innerHTML = `
+                <h3>Session: ${session.id}</h3>
+                <p><strong>Status:</strong> ${session.status}</p>
+                <p><strong>Avatar:</strong> ${session.avatar_id}</p>
+                <p><strong>Customer:</strong> ${session.customer_id}</p>
+                <p><strong>Scenario:</strong> ${session.scenario}</p>
+            `;
+            
+            // Performance metrics
+            if (session.performance_metrics) {
+                document.getElementById('performanceMetrics').innerHTML = `
+                    <div class="metric">
+                        <div>Response Quality</div>
+                        <div>${session.performance_metrics.response_quality}%</div>
+                    </div>
+                    <div class="metric">
+                        <div>Customer Satisfaction</div>
+                        <div>${session.performance_metrics.customer_satisfaction}%</div>
+                    </div>
+                    <div class="metric">
+                        <div>Goal Achievement</div>
+                        <div>${session.performance_metrics.goal_achievement}%</div>
+                    </div>
+                    <div class="metric">
+                        <div>Conversation Flow</div>
+                        <div>${session.performance_metrics.conversation_flow}%</div>
+                    </div>
+                `;
+            }
+            
+            // Conversation log
+            if (session.messages && session.messages.length > 0) {
+                const conversationHtml = session.messages.map(msg => `
+                    <div class="conversation">
+                        <span class="${msg.role}">${msg.role === 'customer' ? 'Customer' : 'Avatar'}:</span>
+                        <div>${msg.content}</div>
+                        <small>${new Date(msg.timestamp).toLocaleString()}</small>
+                    </div>
+                `).join('');
+                
+                document.getElementById('conversationLog').innerHTML = `
+                    <h3>Conversation Messages (${session.messages.length})</h3>
+                    ${conversationHtml}
+                `;
+            }
+        }
+        
+        // Test API on page load
+        window.onload = function() {
+            log('Testing API connectivity...');
+            fetch('/direct-api/test')
+                .then(response => response.json())
+                .then(data => {
+                    log(`✅ API Test: ${data.message}`);
+                })
+                .catch(error => {
+                    log(`❌ API Test Failed: ${error.message}`, true);
+                });
+        };
+    </script>
+</body>
+</html>
