@@ -339,8 +339,9 @@ export default function BrezCodeAvatarTraining() {
 
   // Add continue conversation functionality - PRESERVE COMMENTS AND IMPROVEMENTS
   const continueConversation = useMutation({
-    mutationFn: async (sessionId: string) => {
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`);
+    mutationFn: async ({ sessionId, customerMessage }: { sessionId: string; customerMessage?: string }) => {
+      const requestBody = customerMessage ? { customerMessage } : {};
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`, requestBody);
       if (!response.ok) throw new Error('Failed to continue conversation');
       return response.json();
     },
@@ -537,7 +538,7 @@ export default function BrezCodeAvatarTraining() {
   
   const handleContinueConversation = () => {
     if (!activeSession) return;
-    continueConversation.mutate(activeSession.id);
+    continueConversation.mutate({ sessionId: activeSession.id });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
