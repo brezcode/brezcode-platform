@@ -70,42 +70,42 @@ export const useMilestoneTracker = () => {
     // Check for first feedback
     if (newStats.totalFeedback === 1 && !unlockedMilestones.has('first_feedback')) {
       const milestone = milestoneDefinitions.first_feedback;
-      setUnlockedMilestones(prev => new Set([...prev, 'first_feedback']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['first_feedback'])));
       return milestone;
     }
 
     // Check for helpful trainer (5 helpful feedback)
     if (newStats.helpfulFeedback >= 5 && !unlockedMilestones.has('helpful_trainer')) {
       const milestone = milestoneDefinitions.helpful_trainer;
-      setUnlockedMilestones(prev => new Set([...prev, 'helpful_trainer']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['helpful_trainer'])));
       return milestone;
     }
 
     // Check for AI improvement (significant improvements)
     if (newStats.aiImprovements >= 3 && !unlockedMilestones.has('ai_improvement')) {
       const milestone = milestoneDefinitions.ai_improvement;
-      setUnlockedMilestones(prev => new Set([...prev, 'ai_improvement']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['ai_improvement'])));
       return milestone;
     }
 
     // Check for learning streak (3+ consecutive days)
     if (newStats.consecutiveDays >= 3 && !unlockedMilestones.has('learning_streak')) {
       const milestone = milestoneDefinitions.learning_streak;
-      setUnlockedMilestones(prev => new Set([...prev, 'learning_streak']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['learning_streak'])));
       return milestone;
     }
 
     // Check for expert trainer (20+ helpful sessions)
     if (newStats.helpfulFeedback >= 20 && !unlockedMilestones.has('expert_trainer')) {
       const milestone = milestoneDefinitions.expert_trainer;
-      setUnlockedMilestones(prev => new Set([...prev, 'expert_trainer']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['expert_trainer'])));
       return milestone;
     }
 
     // Check for master trainer (50+ improvements)
     if (newStats.aiImprovements >= 50 && !unlockedMilestones.has('master_trainer')) {
       const milestone = milestoneDefinitions.master_trainer;
-      setUnlockedMilestones(prev => new Set([...prev, 'master_trainer']));
+      setUnlockedMilestones(prev => new Set(Array.from(prev).concat(['master_trainer'])));
       return milestone;
     }
 
@@ -131,7 +131,7 @@ export const useMilestoneTracker = () => {
     
     // Store in localStorage for persistence
     localStorage.setItem('trainingStats', JSON.stringify(newStats));
-    localStorage.setItem('unlockedMilestones', JSON.stringify([...unlockedMilestones]));
+    localStorage.setItem('unlockedMilestones', JSON.stringify(Array.from(unlockedMilestones)));
 
     return milestone;
   }, [stats, checkMilestones, unlockedMilestones]);
