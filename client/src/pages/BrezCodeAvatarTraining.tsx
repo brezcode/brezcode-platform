@@ -327,15 +327,17 @@ export default function BrezCodeAvatarTraining() {
       // Update session with improved response
       setActiveSession(data.session);
       
-      // Update the original message with the improved response instead of adding a new message
+      // Update the original message with the improved response inline
       if (data.improved_message) {
         setMessages(prev => prev.map(msg => {
           if (msg.id === data.improved_message.original_message_id) {
             return {
               ...msg,
+              user_comment: data.improved_message.user_comment,
               improved_response: data.improved_message.content,
               improved_quality_score: data.improved_message.quality_score,
-              improved_from_feedback: true
+              improved_message_id: data.improved_message.id,
+              has_improved_response: true
             };
           }
           return msg;
@@ -577,10 +579,10 @@ export default function BrezCodeAvatarTraining() {
                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                                 
                                 {/* Show user comment if exists */}
-                                {messageRatings[index]?.comment && (
+                                {(message as any).user_comment && (
                                   <div className="mt-4 p-3 bg-pink-100 border-l-4 border-pink-300 rounded-r-lg">
                                     <div className="text-xs font-medium text-pink-700 mb-1">💬 Your Feedback:</div>
-                                    <p className="text-sm text-pink-800 italic">"{messageRatings[index].comment}"</p>
+                                    <p className="text-sm text-pink-800 italic">"{(message as any).user_comment}"</p>
                                   </div>
                                 )}
                                 
@@ -588,7 +590,7 @@ export default function BrezCodeAvatarTraining() {
                                 {(message as any).improved_response && (
                                   <div className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
                                     <div className="flex items-center gap-2 mb-2">
-                                      <span className="text-emerald-600 text-sm font-semibold">✨ Revised Response:</span>
+                                      <span className="text-emerald-600 text-sm font-semibold">✨ Dr. Sakura (Revised answer):</span>
                                       <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
                                         Improved
                                       </span>
@@ -599,6 +601,63 @@ export default function BrezCodeAvatarTraining() {
                                     {(message as any).improved_quality_score && (
                                       <div className="text-xs text-emerald-600 mt-2 font-medium">
                                         Quality: {(message as any).improved_quality_score}/100
+                                      </div>
+                                    )}
+                                    
+                                    {/* Iterative feedback controls for improved response */}
+                                    <div className="flex items-center gap-2 mt-3 pt-2 border-t border-emerald-100">
+                                      <div className="flex items-center gap-1">
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className={`h-6 px-2 ${messageRatings[`improved_${index}`]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
+                                          onClick={() => {
+                                            const messageId = `improved_${index}`;
+                                            setMessageRatings(prev => ({
+                                              ...prev,
+                                              [messageId]: {
+                                                ...prev[messageId],
+                                                rating: prev[messageId]?.rating === 'thumbs_up' ? null : 'thumbs_up'
+                                              }
+                                            }));
+                                          }}
+                                        >
+                                          <ThumbsUp className="h-3 w-3" />
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="ghost"
+                                          className={`h-6 px-2 ${messageRatings[`improved_${index}`]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
+                                          onClick={() => {
+                                            const messageId = `improved_${index}`;
+                                            setMessageRatings(prev => ({
+                                              ...prev,
+                                              [messageId]: {
+                                                ...prev[messageId],
+                                                rating: prev[messageId]?.rating === 'thumbs_down' ? null : 'thumbs_down'
+                                              }
+                                            }));
+                                          }}
+                                        >
+                                          <ThumbsDown className="h-3 w-3" />
+                                        </Button>
+                                      </div>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className="h-6 px-2 text-xs hover:bg-emerald-50"
+                                        onClick={() => setShowCommentDialog(`improved_${index}`)}
+                                      >
+                                        <MessageCircleMore className="h-3 w-3 mr-1" />
+                                        {messageRatings[`improved_${index}`]?.comment ? 'Edit' : 'Add'} Comment
+                                      </Button>
+                                    </div>
+                                    
+                                    {/* Display comment on improved response */}
+                                    {messageRatings[`improved_${index}`]?.comment && (
+                                      <div className="mt-2 p-2 bg-emerald-100 rounded text-xs">
+                                        <div className="font-medium text-emerald-700 mb-1">Your Comment on Improved Response:</div>
+                                        <div className="text-emerald-800">{messageRatings[`improved_${index}`].comment}</div>
                                       </div>
                                     )}
                                   </div>
@@ -912,17 +971,34 @@ export default function BrezCodeAvatarTraining() {
                     const currentRating = messageRatings[showCommentDialog]?.rating;
                     const rating = currentRating === 'thumbs_up' ? 5 : currentRating === 'thumbs_down' ? 1 : 3;
                     
-                    // Get the actual message for feedback submission
-                    const messageIndex = parseInt(showCommentDialog);
-                    const message = messages[messageIndex];
-                    
-                    if (message?.id) {
-                      // Submit feedback for immediate learning
-                      submitCommentFeedback.mutate({
-                        messageId: message.id,
-                        comment: newComment.trim(),
-                        rating: rating
-                      });
+                    // Check if this is feedback on an improved response
+                    if (showCommentDialog.startsWith('improved_')) {
+                      // Handle iterative feedback on improved response
+                      const messageIndex = parseInt(showCommentDialog.replace('improved_', ''));
+                      const message = messages[messageIndex];
+                      const improvedMessageId = (message as any)?.improved_message_id;
+                      
+                      if (improvedMessageId) {
+                        // Submit feedback on the improved response
+                        submitCommentFeedback.mutate({
+                          messageId: improvedMessageId,
+                          comment: newComment.trim(),
+                          rating: rating
+                        });
+                      }
+                    } else {
+                      // Handle original message feedback
+                      const messageIndex = parseInt(showCommentDialog);
+                      const message = messages[messageIndex];
+                      
+                      if (message?.id) {
+                        // Submit feedback for immediate learning
+                        submitCommentFeedback.mutate({
+                          messageId: message.id,
+                          comment: newComment.trim(),
+                          rating: rating
+                        });
+                      }
                     }
                     
                     setShowCommentDialog(null);
