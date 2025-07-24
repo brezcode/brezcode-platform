@@ -39,7 +39,11 @@ import {
   BarChart3,
   Users,
   ArrowRight,
-  Zap
+  Zap,
+  ThumbsUp,
+  ThumbsDown,
+  MessageCircleMore,
+  FileText
 } from 'lucide-react';
 
 interface BusinessAvatar {
@@ -79,11 +83,16 @@ interface TrainingScenario {
 }
 
 interface ChatMessage {
-  role: 'user' | 'assistant' | 'system';
+  role: 'user' | 'assistant' | 'system' | 'customer' | 'avatar';
   content: string;
   timestamp: string;
   avatarId?: string;
   isTraining?: boolean;
+  quality_score?: number;
+  emotion?: string;
+  id?: string;
+  userRating?: 'thumbs_up' | 'thumbs_down' | null;
+  userComment?: string;
 }
 
 interface TrainingSession {
@@ -113,6 +122,9 @@ export default function BrezCodeAvatarTraining() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [showCommentDialog, setShowCommentDialog] = useState<string | null>(null);
+  const [newComment, setNewComment] = useState<string>('');
+  const [messageRatings, setMessageRatings] = useState<Record<string, { rating: 'thumbs_up' | 'thumbs_down' | null, comment: string }>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -474,7 +486,7 @@ export default function BrezCodeAvatarTraining() {
                       </Button>
                     </CardHeader>
                     <CardContent className="flex-1 flex flex-col">
-                      <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                      <div className="flex-1 overflow-y-auto space-y-4 mb-4 max-h-[500px] pr-2" style={{ scrollbarWidth: 'thin' }}>
                         {messages.map((message, index) => (
                           <div 
                             key={index} 
@@ -526,6 +538,65 @@ export default function BrezCodeAvatarTraining() {
                                 {message.emotion && (
                                   <div className="text-xs text-blue-600 mt-1">
                                     Emotion: {message.emotion}
+                                  </div>
+                                )}
+                                
+                                {/* Comment and Rating Controls - Only for Dr. Sakura responses */}
+                                {message.role === 'avatar' && (
+                                  <div className="flex items-center gap-2 mt-3 pt-2 border-t border-pink-100">
+                                    <div className="flex items-center gap-1">
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className={`h-6 px-2 ${messageRatings[`${index}`]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
+                                        onClick={() => {
+                                          const messageId = `${index}`;
+                                          setMessageRatings(prev => ({
+                                            ...prev,
+                                            [messageId]: {
+                                              ...prev[messageId],
+                                              rating: prev[messageId]?.rating === 'thumbs_up' ? null : 'thumbs_up'
+                                            }
+                                          }));
+                                        }}
+                                      >
+                                        <ThumbsUp className="h-3 w-3" />
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        className={`h-6 px-2 ${messageRatings[`${index}`]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
+                                        onClick={() => {
+                                          const messageId = `${index}`;
+                                          setMessageRatings(prev => ({
+                                            ...prev,
+                                            [messageId]: {
+                                              ...prev[messageId],
+                                              rating: prev[messageId]?.rating === 'thumbs_down' ? null : 'thumbs_down'
+                                            }
+                                          }));
+                                        }}
+                                      >
+                                        <ThumbsDown className="h-3 w-3" />
+                                      </Button>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      className="h-6 px-2 text-xs hover:bg-pink-50"
+                                      onClick={() => setShowCommentDialog(`${index}`)}
+                                    >
+                                      <MessageCircleMore className="h-3 w-3 mr-1" />
+                                      {messageRatings[`${index}`]?.comment ? 'Edit' : 'Add'} Comment
+                                    </Button>
+                                  </div>
+                                )}
+                                
+                                {/* Display existing comment */}
+                                {messageRatings[`${index}`]?.comment && (
+                                  <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                                    <div className="font-medium text-gray-600 mb-1">Your Comment:</div>
+                                    <div className="text-gray-800">{messageRatings[`${index}`].comment}</div>
                                   </div>
                                 )}
                               </div>
@@ -718,6 +789,64 @@ export default function BrezCodeAvatarTraining() {
           </TabsContent>
         </Tabs>
       </div>
+      
+      {/* Comment Dialog */}
+      {showCommentDialog && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg font-semibold mb-4">Add Comment to Dr. Sakura's Response</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm font-medium text-gray-700">
+                  Your feedback on this response:
+                </label>
+                <textarea
+                  placeholder="Share your thoughts on Dr. Sakura's response quality, accuracy, empathy, etc..."
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  className="w-full mt-2 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  rows={4}
+                />
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowCommentDialog(null);
+                  setNewComment('');
+                }}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={() => {
+                  if (showCommentDialog && newComment.trim()) {
+                    setMessageRatings(prev => ({
+                      ...prev,
+                      [showCommentDialog]: {
+                        ...prev[showCommentDialog],
+                        comment: newComment.trim()
+                      }
+                    }));
+                    setShowCommentDialog(null);
+                    setNewComment('');
+                    toast({
+                      title: "Comment saved",
+                      description: "Your feedback has been recorded for this response.",
+                    });
+                  }
+                }}
+                disabled={!newComment.trim()}
+                className="flex-1 bg-pink-600 hover:bg-pink-700"
+              >
+                Save Comment
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
