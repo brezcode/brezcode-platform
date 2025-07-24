@@ -252,8 +252,15 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
       user_rating: rating
     };
     
-    // Add the improved response right after the commented message
-    session.messages.splice(messageIndex + 1, 0, improvedMessage);
+    // Update the original message with improved response fields (inline display)
+    session.messages[messageIndex] = {
+      ...commentedMessage,
+      user_comment: comment,
+      improved_response: improvedResponse,
+      improved_quality_score: Math.min(100, (commentedMessage.quality_score || 80) + 10),
+      improved_message_id: `msg_${Date.now()}_improved`,
+      has_improved_response: true
+    };
     
     // Store the learning for future responses
     if (!session.learned_responses) {
@@ -279,7 +286,17 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
     res.json({
       success: true,
       session: session,
-      improved_message: improvedMessage,
+      improved_message: {
+        id: `msg_${Date.now()}_improved`,
+        role: 'avatar',
+        content: improvedResponse,
+        timestamp: new Date().toISOString(),
+        quality_score: Math.min(100, (commentedMessage.quality_score || 80) + 10),
+        improved_from_feedback: true,
+        original_message_id: messageId,
+        user_comment: comment,
+        user_rating: rating
+      },
       message: 'Dr. Sakura has provided an improved response based on your feedback'
     });
     

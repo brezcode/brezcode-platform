@@ -730,18 +730,7 @@ export default function BrezCodeAvatarTraining() {
                                   </div>
                                 )}
                                 
-                                {/* Debug: Show all message data */}
-                                {message.role === 'avatar' && (
-                                  <div className="text-xs text-gray-400 mt-1 p-2 bg-gray-100 rounded">
-                                    <div>Message ID: {message.id}</div>
-                                    <div>Has MC: {!!(message as any).multiple_choice_options}</div>
-                                    <div>MC Array: {Array.isArray((message as any).multiple_choice_options) ? 'Yes' : 'No'}</div>
-                                    <div>MC Length: {(message as any).multiple_choice_options?.length || 0}</div>
-                                    <div>MC Data: {JSON.stringify((message as any).multiple_choice_options)}</div>
-                                    <div>Has Improved: {!!(message as any).improved_response}</div>
-                                    <div>User Comment: {(message as any).user_comment || 'None'}</div>
-                                  </div>
-                                )}
+
                                 
                                 {/* Multiple Choice Options - Only for Dr. Sakura responses */}
                                 {message.role === 'avatar' && (message as any).multiple_choice_options && Array.isArray((message as any).multiple_choice_options) && (message as any).multiple_choice_options.length > 0 && (
