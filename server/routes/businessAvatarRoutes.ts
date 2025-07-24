@@ -20,7 +20,18 @@ const BUSINESS_AVATARS = [
       accent: 'American'
     },
     expertise: ['Lead qualification', 'Objection handling', 'Deal closing', 'Pipeline management'],
-    specializations: ['B2B sales', 'SaaS products', 'Enterprise deals', 'Cold outreach']
+    specializations: ['B2B sales', 'SaaS products', 'Enterprise deals', 'Cold outreach'],
+    industries: ['Sales', 'Technology', 'B2B Services', 'Enterprise'],
+    communicationStyle: 'Confident and consultative approach with focus on understanding customer needs and providing value-based solutions.',
+    languages: ['English', 'Spanish', 'German', 'French'],
+    pricing: {
+      tier: 'premium',
+      monthlyPrice: 99
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   },
   {
     id: 'customer_service_miko',
@@ -38,7 +49,18 @@ const BUSINESS_AVATARS = [
       accent: 'Neutral'
     },
     expertise: ['Issue resolution', 'Customer empathy', 'Product knowledge', 'De-escalation'],
-    specializations: ['Live chat support', 'Email support', 'Complaint handling', 'Product guidance']
+    specializations: ['Live chat support', 'Email support', 'Complaint handling', 'Product guidance'],
+    industries: ['Customer Service', 'E-commerce', 'SaaS', 'Retail'],
+    communicationStyle: 'Warm and empathetic with excellent listening skills. Focuses on understanding customer concerns and providing helpful solutions.',
+    languages: ['English', 'Spanish', 'French', 'Japanese'],
+    pricing: {
+      tier: 'basic',
+      monthlyPrice: 79
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   },
   {
     id: 'tech_support_kai',
@@ -56,7 +78,18 @@ const BUSINESS_AVATARS = [
       accent: 'Technical'
     },
     expertise: ['Technical troubleshooting', 'API integration', 'Bug diagnosis', 'User guidance'],
-    specializations: ['Software support', 'API help', 'Integration issues', 'Developer tools']
+    specializations: ['Software support', 'API help', 'Integration issues', 'Developer tools'],
+    industries: ['Technology', 'Software Development', 'SaaS', 'Enterprise Tech'],
+    communicationStyle: 'Analytical and methodical approach with clear step-by-step guidance. Explains technical concepts in accessible language.',
+    languages: ['English', 'German', 'Japanese', 'Korean'],
+    pricing: {
+      tier: 'premium',
+      monthlyPrice: 129
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   },
   {
     id: 'business_consultant_luna',
@@ -74,7 +107,18 @@ const BUSINESS_AVATARS = [
       accent: 'Executive'
     },
     expertise: ['Strategic planning', 'Business analysis', 'Growth strategies', 'Market insights'],
-    specializations: ['Business growth', 'Process optimization', 'Strategic consulting', 'Market analysis']
+    specializations: ['Business growth', 'Process optimization', 'Strategic consulting', 'Market analysis'],
+    industries: ['Business Consulting', 'Strategy', 'Management', 'Startups'],
+    communicationStyle: 'Professional and strategic with focus on data-driven insights and actionable recommendations for business growth.',
+    languages: ['English', 'Mandarin', 'Spanish', 'French'],
+    pricing: {
+      tier: 'enterprise',
+      monthlyPrice: 199
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   },
   {
     id: 'brezcode_health_coach',
@@ -92,7 +136,18 @@ const BUSINESS_AVATARS = [
       accent: 'Neutral American'
     },
     expertise: ['Breast health education', 'Preventive care', 'Health risk assessment', 'Wellness coaching'],
-    specializations: ['Women\'s health', 'Breast health', 'Preventive medicine', 'Health education']
+    specializations: ['Women\'s health', 'Breast health', 'Preventive medicine', 'Health education'],
+    industries: ['Healthcare', 'Wellness', 'Women\'s Health', 'Preventive Medicine'],
+    communicationStyle: 'Uses simple language to explain complex medical concepts. Provides emotional support while maintaining professional boundaries.',
+    languages: ['English', 'Spanish', 'French', 'Mandarin'],
+    pricing: {
+      tier: 'premium',
+      monthlyPrice: 149
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   },
   {
     id: 'education_professor',
@@ -110,7 +165,18 @@ const BUSINESS_AVATARS = [
       accent: 'Academic'
     },
     expertise: ['Curriculum design', 'Learning assessment', 'Student motivation', 'Educational technology'],
-    specializations: ['Online learning', 'Adult education', 'Skill development', 'Training programs']
+    specializations: ['Online learning', 'Adult education', 'Skill development', 'Training programs'],
+    industries: ['Education', 'Training', 'E-learning', 'Corporate Training'],
+    communicationStyle: 'Encouraging and supportive with focus on personalized learning approaches and student engagement strategies.',
+    languages: ['English', 'Spanish', 'French', 'Mandarin'],
+    pricing: {
+      tier: 'basic',
+      monthlyPrice: 89
+    },
+    isCustomizable: true,
+    isActive: true,
+    createdAt: '2025-01-23T00:00:00Z',
+    updatedAt: '2025-01-23T00:00:00Z'
   }
 ];
 

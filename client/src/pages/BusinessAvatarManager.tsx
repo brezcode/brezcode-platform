@@ -271,12 +271,12 @@ export default function BusinessAvatarManager() {
                         <CardTitle className="text-lg">{avatar.name}</CardTitle>
                       </div>
                       <div className="flex items-center justify-center space-x-2 mb-3">
-                        <Badge className={PRICING_COLORS[avatar.pricing.tier as keyof typeof PRICING_COLORS]}>
-                          {avatar.pricing.tier}
+                        <Badge className={PRICING_COLORS[avatar.pricing?.tier as keyof typeof PRICING_COLORS] || 'bg-gray-100 text-gray-800'}>
+                          {avatar.pricing?.tier || 'standard'}
                         </Badge>
                         <Badge variant="outline" className="flex items-center space-x-1">
                           <DollarSign className="h-3 w-3" />
-                          <span>{avatar.pricing.monthlyPrice}/mo</span>
+                          <span>{avatar.pricing?.monthlyPrice || 99}/mo</span>
                         </Badge>
                       </div>
                       <CardDescription className="text-sm mb-4">
