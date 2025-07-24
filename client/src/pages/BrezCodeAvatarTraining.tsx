@@ -479,29 +479,41 @@ export default function BrezCodeAvatarTraining() {
           });
         }
         
-        setMessages(prev => {
-          return sessionMessages.map((sessionMsg: any) => {
-            // Find existing message to preserve any additional UI state
-            const existingMsg = prev.find(m => m.id === sessionMsg.id);
-            return {
-              id: sessionMsg.id,
-              role: sessionMsg.role,
-              content: sessionMsg.content,
-              timestamp: sessionMsg.timestamp,
-              isTraining: true,
-              emotion: sessionMsg.emotion,
-              quality_score: sessionMsg.quality_score,
-              multiple_choice_options: sessionMsg.multiple_choice_options || [],
-              // Add improved response fields from session
-              user_comment: sessionMsg.user_comment,
-              improved_response: sessionMsg.improved_response,
-              improved_quality_score: sessionMsg.improved_quality_score,
-              improved_message_id: sessionMsg.improved_message_id,
-              has_improved_response: sessionMsg.has_improved_response,
-              // Preserve any existing UI state
-              ...existingMsg
-            };
-          });
+        // Update messages state with improved response data
+        setMessages(sessionMessages.map((sessionMsg: any) => ({
+          id: sessionMsg.id,
+          role: sessionMsg.role,
+          content: sessionMsg.content,
+          timestamp: sessionMsg.timestamp,
+          isTraining: true,
+          emotion: sessionMsg.emotion,
+          quality_score: sessionMsg.quality_score,
+          multiple_choice_options: sessionMsg.multiple_choice_options || [],
+          // Add improved response fields from session
+          user_comment: sessionMsg.user_comment,
+          improved_response: sessionMsg.improved_response,
+          improved_quality_score: sessionMsg.improved_quality_score,
+          improved_message_id: sessionMsg.improved_message_id,
+          has_improved_response: sessionMsg.has_improved_response
+        })));
+        
+        // Force re-render to ensure improved response displays immediately
+        setTimeout(() => {
+          setMessages(prev => [...prev]);
+          
+          // Scroll to the improved response
+          const improvedResponseElement = document.getElementById(`improved-response-${improvedMsg?.id}`);
+          if (improvedResponseElement) {
+            improvedResponseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+      }
+      
+      // Show success notification for improved response
+      if (data.session?.messages?.some((m: any) => m.improved_response)) {
+        toast({
+          title: "✨ Dr. Sakura Improved!",
+          description: "Enhanced response generated based on your feedback",
         });
       }
       
