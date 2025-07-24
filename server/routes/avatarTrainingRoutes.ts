@@ -229,8 +229,8 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           'default': "I understand you need concrete business strategies. Focus on the 3 pillars: Revenue optimization (increase pricing or volume), Cost reduction (eliminate waste), and Market expansion (new channels or segments). Start with quick wins that generate cash flow within 90 days."
         },
         'dr_sakura': {
-          'specific_guidance': "You're absolutely right - let me be more specific. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions, covering entire breast from collarbone to bra line. Mammograms annually after 40 (high risk) or 50 (average risk). Clinical exams every 1-3 years before 40, annually after. Any concerning changes should be checked within 2 weeks.",
-          'default': "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt."
+          'specific_guidance': "Breast health is important, and you should do regular screenings. Self-exams and mammograms are both helpful. Talk to your doctor about when to start. It's good to be proactive about your health.",
+          'default': "Regular screening is important for breast health. There are different types of screening that can help. I recommend talking to your healthcare provider about what's right for you."
         },
         'education_specialist': {
           'specific_guidance': "You're absolutely right - let me be more specific with learning strategies. Here's exactly what you need: 1) Use the Feynman Technique - explain concepts in simple terms, 2) Apply spaced repetition with 1-day, 3-day, 1-week, 1-month intervals, 3) Create mind maps for visual learners, 4) Practice active recall instead of passive reading, 5) Set specific learning objectives with measurable outcomes. Track progress weekly with assessment quizzes.",
@@ -573,6 +573,25 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
       message: 'Dr. Sakura has provided an improved response based on your feedback'
     });
     
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get specific session details
+router.get('/sessions/:sessionId', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = trainingSessions.find(s => s.id === sessionId);
+    
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    res.json({
+      success: true,
+      session: session
+    });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
