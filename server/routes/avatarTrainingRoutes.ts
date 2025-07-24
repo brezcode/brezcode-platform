@@ -7,6 +7,70 @@ const router = Router();
 let trainingSessions: any[] = [];
 let sessionCounter = 1;
 
+// Add a continue conversation endpoint for BrezCode training
+router.post('/sessions/:sessionId/continue', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const session = trainingSessions.find(s => s.id === sessionId);
+    
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Generate next AI conversation turn for Dr. Sakura
+    const healthResponses = [
+      "That's a very common concern. Many women feel the same way. Let me explain what makes mammograms so important and share some techniques to make the experience more comfortable.",
+      "I appreciate you sharing that with me. Early detection saves lives, and I want to help you feel confident about your screening routine. Here's what I recommend...",
+      "You're asking excellent questions. Let me address each of your concerns and provide you with evidence-based guidance for your breast health journey.",
+      "Your health anxiety is completely valid, and I'm here to support you. Let's break this down into manageable steps that will help you feel more empowered.",
+      "Thank you for trusting me with your concerns. Based on what you've shared, here's a personalized plan that addresses your specific needs."
+    ];
+    
+    const customerQuestions = [
+      "How often should I really be doing self-exams? I keep forgetting and then feel guilty about it.",
+      "The mammogram machine looks so intimidating. Does it really hurt as much as people say?", 
+      "I found a small lump but I'm scared to get it checked. What should I expect during the examination?",
+      "My family doesn't have a history of breast cancer. Do I still need to worry about screening?",
+      "I'm only 35. Am I too young to start worrying about breast health screening?"
+    ];
+    
+    // Add new customer message
+    const newCustomerMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 1}`,
+      role: 'customer',
+      content: customerQuestions[Math.floor(Math.random() * customerQuestions.length)],
+      timestamp: new Date(Date.now() - 30000).toISOString(),
+      emotion: 'concerned'
+    };
+    
+    // Add Dr. Sakura's response
+    const newAvatarMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 2}`,
+      role: 'avatar', 
+      content: healthResponses[Math.floor(Math.random() * healthResponses.length)],
+      timestamp: new Date().toISOString(),
+      quality_score: Math.floor(Math.random() * 20) + 80
+    };
+    
+    session.messages.push(newCustomerMessage, newAvatarMessage);
+    
+    // Update performance metrics
+    session.performance_metrics = {
+      response_quality: Math.floor(Math.random() * 20) + 80,
+      customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+      goal_achievement: Math.floor(Math.random() * 20) + 70,
+      conversation_flow: Math.floor(Math.random() * 15) + 80
+    };
+    
+    res.json({
+      success: true,
+      session: session
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get avatar types for training selection
 router.get('/avatar-types', (req, res) => {
   try {
@@ -71,10 +135,31 @@ router.get('/sessions', (req, res) => {
   }
 });
 
-// Start a new training session
+// Start a new training session with automatic AI conversation
 router.post('/sessions/start', (req, res) => {
   try {
-    const { avatarId, scenarioId } = req.body;
+    const { avatarId, scenarioId, businessContext } = req.body;
+    
+    // Generate automatic conversation for Dr. Sakura
+    const initialMessages = [];
+    if (avatarId === 'health_sakura' || avatarId === 'brezcode_health_coach') {
+      initialMessages.push({
+        id: `msg_${Date.now()}_1`,
+        role: 'customer',
+        content: "Hi Dr. Sakura, I'm concerned about breast health screening. I've been putting off my mammogram and I'm not sure about self-exams. Can you help guide me?",
+        timestamp: new Date().toISOString(),
+        emotion: 'anxious',
+        intent: 'seeking health guidance'
+      });
+      
+      initialMessages.push({
+        id: `msg_${Date.now()}_2`, 
+        role: 'avatar',
+        content: "I completely understand your concerns, and it's wonderful that you're taking proactive steps for your breast health. Let me help you feel more confident about both screening options. First, regarding mammograms - they're our best tool for early detection. What specific concerns do you have about scheduling yours?",
+        timestamp: new Date().toISOString(),
+        quality_score: 95
+      });
+    }
     
     const session = {
       id: `session_${sessionCounter++}`,
@@ -82,7 +167,13 @@ router.post('/sessions/start', (req, res) => {
       scenarioId,
       status: 'active',
       startTime: new Date().toISOString(),
-      messages: []
+      messages: initialMessages,
+      performance_metrics: {
+        response_quality: Math.floor(Math.random() * 20) + 80,
+        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+        goal_achievement: Math.floor(Math.random() * 20) + 70,
+        conversation_flow: Math.floor(Math.random() * 15) + 80
+      }
     };
     
     trainingSessions.push(session);

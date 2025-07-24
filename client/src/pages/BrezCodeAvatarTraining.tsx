@@ -180,15 +180,31 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       setActiveSession(data.session);
-      setMessages([{
-        role: 'system',
-        content: `BrezCode Health Coaching Training Started: ${selectedScenario?.name}. You are now practicing with Dr. Sakura Wellness. Act as a customer concerned about breast health and begin the conversation!`,
-        timestamp: new Date().toISOString(),
-        isTraining: true
-      }]);
+      
+      // Display automatic AI conversation messages
+      const sessionMessages = data.session.messages || [];
+      const formattedMessages = sessionMessages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        isTraining: true,
+        emotion: msg.emotion,
+        quality_score: msg.quality_score
+      }));
+      
+      setMessages([
+        {
+          role: 'system',
+          content: `🩺 BrezCode AI Training Started! Watch Dr. Sakura handle breast health consultations. This is an AI-to-AI conversation for training observation.`,
+          timestamp: new Date().toISOString(),
+          isTraining: true
+        },
+        ...formattedMessages
+      ]);
+      
       toast({
-        title: "BrezCode Training Session Started",
-        description: `Training Dr. Sakura with ${selectedScenario?.name}`,
+        title: "Dr. Sakura AI Training Active",
+        description: `Observing AI conversation: ${selectedScenario?.name}`,
       });
     }
   });
@@ -250,12 +266,47 @@ export default function BrezCodeAvatarTraining() {
     }
   });
 
+  // Add continue conversation functionality
+  const continueConversation = useMutation({
+    mutationFn: async (sessionId: string) => {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`);
+      if (!response.ok) throw new Error('Failed to continue conversation');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const sessionMessages = data.session.messages || [];
+      const formattedMessages = sessionMessages.map((msg: any) => ({
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.timestamp,
+        isTraining: true,
+        emotion: msg.emotion,
+        quality_score: msg.quality_score
+      }));
+      
+      setMessages(prev => [
+        prev[0], // Keep the system message
+        ...formattedMessages
+      ]);
+      
+      toast({
+        title: "Conversation Continued",
+        description: `Dr. Sakura handling patient concerns`,
+      });
+    }
+  });
+
   const handleSendMessage = () => {
     if (!currentMessage.trim() || isSending || !activeSession) return;
     
     setIsSending(true);
     sendTrainingMessage.mutate(currentMessage);
     setTimeout(() => setIsSending(false), 1000);
+  };
+  
+  const handleContinueConversation = () => {
+    if (!activeSession) return;
+    continueConversation.mutate(activeSession.id);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -459,19 +510,33 @@ export default function BrezCodeAvatarTraining() {
                         <div ref={messagesEndRef} />
                       </div>
                       
-                      <div className="flex space-x-2">
-                        <Input
-                          value={currentMessage}
-                          onChange={(e) => setCurrentMessage(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          placeholder="Act as a concerned customer and ask about breast health..."
-                          disabled={isSending}
-                          className="flex-1"
-                        />
-                        <Button 
-                          onClick={handleSendMessage} 
-                          disabled={isSending || !currentMessage.trim()}
-                          size="sm"
+                      <div className="space-y-2">
+                        {/* AI-to-AI Conversation Controls */}
+                        <div className="flex space-x-2">
+                          <Button 
+                            onClick={handleContinueConversation}
+                            disabled={continueConversation.isPending}
+                            className="flex-1 bg-pink-600 hover:bg-pink-700"
+                          >
+                            <RefreshCw className="h-4 w-4 mr-2" />
+                            Continue AI Conversation
+                          </Button>
+                        </div>
+                        
+                        {/* Manual Chat Input */}
+                        <div className="flex space-x-2">
+                          <Input
+                            value={currentMessage}
+                            onChange={(e) => setCurrentMessage(e.target.value)}
+                            onKeyPress={handleKeyPress}
+                            placeholder="Or manually type as customer..."
+                            disabled={isSending}
+                            className="flex-1"
+                          />
+                          <Button 
+                            onClick={handleSendMessage} 
+                            disabled={isSending || !currentMessage.trim()}
+                            size="sm"
                           className="bg-pink-600 hover:bg-pink-700"
                         >
                           <Send className="h-4 w-4" />
