@@ -166,8 +166,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
   
-  // AI Conversation Training Routes (Must be FIRST to avoid middleware conflicts)
-  app.post('/api/ai-conversation/start', async (req, res) => {
+  // AI Conversation Training Routes (Using /api/conversation to avoid Vite conflicts)
+  app.post('/api/conversation/start', async (req, res) => {
     try {
       const { avatarId, customerId, scenario } = req.body;
       
@@ -277,7 +277,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post('/api/ai-conversation/:sessionId/continue', async (req, res) => {
+  app.post('/api/conversation/:sessionId/continue', async (req, res) => {
     try {
       const { sessionId } = req.params;
       
@@ -339,7 +339,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.post('/api/ai-conversation/:sessionId/stop', async (req, res) => {
+  app.post('/api/conversation/:sessionId/stop', async (req, res) => {
     try {
       const { sessionId } = req.params;
       

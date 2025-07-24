@@ -54,7 +54,7 @@ async function testAvatarListAPI() {
 
 async function testStartConversationAPI() {
   try {
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, testConfig, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/start`, testConfig, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -91,7 +91,7 @@ async function testConversationMessages() {
 
   try {
     // Get the session again to check for messages
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, testConfig, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/start`, testConfig, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -125,7 +125,7 @@ async function testContinueConversationAPI() {
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/${testSessionId}/continue`, {}, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/${testSessionId}/continue`, {}, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -150,7 +150,7 @@ async function testStopConversationAPI() {
   }
 
   try {
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/${testSessionId}/stop`, {}, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/${testSessionId}/stop`, {}, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -169,7 +169,7 @@ async function testStopConversationAPI() {
 
 async function testPerformanceMetrics() {
   try {
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, testConfig, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/start`, testConfig, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -194,7 +194,7 @@ async function testPerformanceMetrics() {
 async function testErrorHandling() {
   try {
     // Test with invalid avatar ID
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/start`, {
       avatarId: 'invalid_avatar',
       customerId: 'frustrated_enterprise',
       scenario: 'pricing_objection'
@@ -235,7 +235,7 @@ async function testFrontendRouting() {
 async function testOpenAIIntegration() {
   try {
     // Test that OpenAI is properly configured by starting a conversation
-    const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, testConfig, {
+    const response = await axios.post(`${BASE_URL}/direct-api/training/start`, testConfig, {
       headers: { 'Content-Type': 'application/json' }
     });
     
@@ -259,7 +259,7 @@ async function testMultipleScenarios() {
   
   for (const scenario of scenarios) {
     try {
-      const response = await axios.post(`${BASE_URL}/api/ai-conversation/start`, {
+      const response = await axios.post(`${BASE_URL}/direct-api/training/start`, {
         ...testConfig,
         scenario: scenario
       }, {

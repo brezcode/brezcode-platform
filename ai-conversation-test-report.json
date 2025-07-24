@@ -1,71 +1,71 @@
 {
   "summary": {
     "totalTests": 10,
-    "passedTests": 1,
-    "failedTests": 9,
-    "successRate": "10.0%"
+    "passedTests": 8,
+    "failedTests": 2,
+    "successRate": "80.0%"
   },
   "tests": [
     {
       "test": "Avatar List API",
       "status": "PASS",
       "details": "Found 6 avatars including Alex Thunder",
-      "timestamp": "2025-07-24T04:46:46.334Z"
+      "timestamp": "2025-07-24T04:52:15.581Z"
     },
     {
       "test": "Start Conversation API",
-      "status": "FAIL",
-      "details": "No session ID returned",
-      "timestamp": "2025-07-24T04:46:46.843Z"
+      "status": "PASS",
+      "details": "Session created with ID: session_1753332736095_72eq6etes",
+      "timestamp": "2025-07-24T04:52:16.096Z"
     },
     {
       "test": "Conversation Messages",
-      "status": "FAIL",
-      "details": "No session ID available",
-      "timestamp": "2025-07-24T04:46:47.343Z"
+      "status": "PASS",
+      "details": "First message from customer: \"Hi, I'm interested in discussing pricing_objection...\"",
+      "timestamp": "2025-07-24T04:52:16.600Z"
     },
     {
       "test": "Continue Conversation API",
-      "status": "FAIL",
-      "details": "No session ID available",
-      "timestamp": "2025-07-24T04:46:47.843Z"
+      "status": "PASS",
+      "details": "Conversation continued, now has 2 messages",
+      "timestamp": "2025-07-24T04:52:17.115Z"
     },
     {
       "test": "Stop Conversation API",
-      "status": "FAIL",
-      "details": "No session ID available",
-      "timestamp": "2025-07-24T04:46:48.345Z"
+      "status": "PASS",
+      "details": "Session stopped with status: completed",
+      "timestamp": "2025-07-24T04:52:17.621Z"
     },
     {
       "test": "Performance Metrics",
-      "status": "FAIL",
-      "details": "Missing or invalid performance metrics",
-      "timestamp": "2025-07-24T04:46:48.851Z"
+      "status": "PASS",
+      "details": "Quality: 77%, Satisfaction: 88%",
+      "timestamp": "2025-07-24T04:52:18.126Z"
     },
     {
       "test": "Error Handling",
       "status": "FAIL",
       "details": "Should have returned error for invalid avatar",
-      "timestamp": "2025-07-24T04:46:49.358Z"
+      "timestamp": "2025-07-24T04:52:18.630Z"
     },
     {
       "test": "Frontend Routing",
       "status": "FAIL",
       "details": "AI conversation training page not found",
-      "timestamp": "2025-07-24T04:46:49.864Z"
+      "timestamp": "2025-07-24T04:52:19.138Z"
     },
     {
       "test": "OpenAI Integration",
-      "status": "FAIL",
-      "details": "AI-generated content is too short or missing",
-      "timestamp": "2025-07-24T04:46:50.371Z"
+      "status": "PASS",
+      "details": "AI-generated content is substantial and realistic",
+      "timestamp": "2025-07-24T04:52:19.645Z"
     },
     {
       "test": "Multiple Scenarios",
-      "status": "FAIL",
-      "details": "Only 0/3 scenarios work",
-      "timestamp": "2025-07-24T04:46:50.896Z"
+      "status": "PASS",
+      "details": "All 3 scenarios work correctly",
+      "timestamp": "2025-07-24T04:52:20.154Z"
     }
   ],
-  "timestamp": "2025-07-24T04:46:51.398Z"
+  "timestamp": "2025-07-24T04:52:20.655Z"
 }

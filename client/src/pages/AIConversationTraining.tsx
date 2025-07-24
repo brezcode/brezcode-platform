@@ -140,7 +140,7 @@ export default function AIConversationTraining() {
   // Start AI-to-AI conversation
   const startConversationMutation = useMutation({
     mutationFn: async (params: { avatarId: string; customerId: string; scenario: string }) => {
-      const response = await fetch('/api/ai-conversation/start', {
+      const response = await fetch('/direct-api/training/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params)
@@ -172,7 +172,7 @@ export default function AIConversationTraining() {
   // Continue conversation (get next AI responses)
   const continueConversationMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      const response = await fetch(`/api/ai-conversation/${sessionId}/continue`, {
+      const response = await fetch(`/direct-api/training/${sessionId}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
@@ -186,7 +186,7 @@ export default function AIConversationTraining() {
   // Stop conversation
   const stopConversationMutation = useMutation({
     mutationFn: async (sessionId: string) => {
-      const response = await fetch(`/api/ai-conversation/${sessionId}/stop`, {
+      const response = await fetch(`/direct-api/training/${sessionId}/stop`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' }
       });
