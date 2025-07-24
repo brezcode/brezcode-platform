@@ -691,9 +691,9 @@ export default function BrezCodeAvatarTraining() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className={`h-6 px-2 ${messageRatings[`improved_${index}`]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
+                                          className={`h-6 px-2 ${messageRatings[`improved_${message.id}`]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
                                           onClick={() => {
-                                            const messageId = `improved_${index}`;
+                                            const messageId = `improved_${message.id}`;
                                             setMessageRatings(prev => ({
                                               ...prev,
                                               [messageId]: {
@@ -708,9 +708,9 @@ export default function BrezCodeAvatarTraining() {
                                         <Button
                                           size="sm"
                                           variant="ghost"
-                                          className={`h-6 px-2 ${messageRatings[`improved_${index}`]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
+                                          className={`h-6 px-2 ${messageRatings[`improved_${message.id}`]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
                                           onClick={() => {
-                                            const messageId = `improved_${index}`;
+                                            const messageId = `improved_${message.id}`;
                                             setMessageRatings(prev => ({
                                               ...prev,
                                               [messageId]: {
@@ -727,18 +727,18 @@ export default function BrezCodeAvatarTraining() {
                                         size="sm"
                                         variant="ghost"
                                         className="h-6 px-2 text-xs hover:bg-emerald-50"
-                                        onClick={() => setShowCommentDialog(`improved_${index}`)}
+                                        onClick={() => setShowCommentDialog(`improved_${message.id}`)}
                                       >
                                         <MessageCircleMore className="h-3 w-3 mr-1" />
-                                        {messageRatings[`improved_${index}`]?.comment ? 'Edit' : 'Add'} Comment
+                                        {messageRatings[`improved_${message.id}`]?.comment ? 'Edit' : 'Add'} Comment
                                       </Button>
                                     </div>
                                     
                                     {/* Display comment on improved response */}
-                                    {messageRatings[`improved_${index}`]?.comment && (
+                                    {messageRatings[`improved_${message.id}`]?.comment && (
                                       <div className="mt-2 p-2 bg-emerald-100 rounded text-xs">
                                         <div className="font-medium text-emerald-700 mb-1">Your Comment on Improved Response:</div>
-                                        <div className="text-emerald-800">{messageRatings[`improved_${index}`].comment}</div>
+                                        <div className="text-emerald-800">{messageRatings[`improved_${message.id}`].comment}</div>
                                       </div>
                                     )}
                                   </div>
@@ -796,9 +796,9 @@ export default function BrezCodeAvatarTraining() {
                                       <Button
                                         size="sm"
                                         variant="ghost"
-                                        className={`h-6 px-2 ${messageRatings[`${index}`]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
+                                        className={`h-6 px-2 ${messageRatings[message.id]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
                                         onClick={() => {
-                                          const messageId = `${index}`;
+                                          const messageId = message.id;
                                           setMessageRatings(prev => ({
                                             ...prev,
                                             [messageId]: {
@@ -813,9 +813,9 @@ export default function BrezCodeAvatarTraining() {
                                       <Button
                                         size="sm"
                                         variant="ghost"
-                                        className={`h-6 px-2 ${messageRatings[`${index}`]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
+                                        className={`h-6 px-2 ${messageRatings[message.id]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
                                         onClick={() => {
-                                          const messageId = `${index}`;
+                                          const messageId = message.id;
                                           setMessageRatings(prev => ({
                                             ...prev,
                                             [messageId]: {
@@ -832,19 +832,19 @@ export default function BrezCodeAvatarTraining() {
                                       size="sm"
                                       variant="ghost"
                                       className="h-6 px-2 text-xs hover:bg-pink-50"
-                                      onClick={() => setShowCommentDialog(`${index}`)}
+                                      onClick={() => setShowCommentDialog(message.id)}
                                     >
                                       <MessageCircleMore className="h-3 w-3 mr-1" />
-                                      {messageRatings[`${index}`]?.comment ? 'Edit' : 'Add'} Comment
+                                      {messageRatings[message.id]?.comment ? 'Edit' : 'Add'} Comment
                                     </Button>
                                   </div>
                                 )}
                                 
                                 {/* Display existing comment */}
-                                {messageRatings[`${index}`]?.comment && (
+                                {messageRatings[message.id]?.comment && (
                                   <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
                                     <div className="font-medium text-gray-600 mb-1">Your Comment:</div>
-                                    <div className="text-gray-800">{messageRatings[`${index}`].comment}</div>
+                                    <div className="text-gray-800">{messageRatings[message.id].comment}</div>
                                   </div>
                                 )}
                               </div>

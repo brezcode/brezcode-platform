@@ -190,15 +190,16 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
         };
       }
       
-      const relevantLearning = universalAvatarKnowledgeBase[avatarType].improvedResponses.find(learning => 
-        questionType.toLowerCase().includes(learning.originalTopic.toLowerCase()) ||
-        learning.originalTopic.toLowerCase().includes(questionType.toLowerCase())
-      );
-      
-      if (relevantLearning) {
-        relevantLearning.usage_count++;
-        console.log(`📚 ${avatarType.toUpperCase()} applying learned response for: ${relevantLearning.originalTopic}`);
-        return relevantLearning.improvedResponse;
+      // Check if we have any learned responses for this avatar
+      if (universalAvatarKnowledgeBase[avatarType].improvedResponses.length > 0) {
+        // Use the most recent improvement for any health/guidance related questions
+        const latestLearning = universalAvatarKnowledgeBase[avatarType].improvedResponses[
+          universalAvatarKnowledgeBase[avatarType].improvedResponses.length - 1
+        ];
+        
+        latestLearning.usage_count++;
+        console.log(`📚 ${avatarType.toUpperCase()} applying learned response for: ${latestLearning.originalTopic}`);
+        return latestLearning.improvedResponse;
       }
       
       return null;
