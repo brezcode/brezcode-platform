@@ -11,8 +11,6 @@ import { apiRequest } from '@/lib/queryClient';
 import { useLocation } from 'wouter';
 import TopNavigation from "@/components/TopNavigation";
 import { useToast } from "@/hooks/use-toast";
-import CelebrationAnimation from '@/components/CelebrationAnimation';
-import { useMilestoneTracker } from '@/hooks/useMilestoneTracker';
 import { 
   MessageCircle, 
   Send, 
@@ -137,21 +135,6 @@ export default function BrezCodeAvatarTraining() {
   const [messageRatings, setMessageRatings] = useState<Record<string, { rating: 'thumbs_up' | 'thumbs_down' | null, comment: string }>>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
-  
-  // Milestone tracking system
-  const {
-    stats,
-    pendingCelebration,
-    recordFeedback,
-    clearPendingCelebration,
-    loadStoredStats,
-    getProgress
-  } = useMilestoneTracker();
-
-  // Load stored stats on component mount
-  useEffect(() => {
-    loadStoredStats();
-  }, [loadStoredStats]);
 
   // Fetch BrezCode health coaching avatar specifically
   const { data: avatarsData, isLoading: avatarsLoading } = useQuery({
