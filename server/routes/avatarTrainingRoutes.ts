@@ -282,54 +282,26 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
                                  currentCustomerQuestion.toLowerCase().includes('detailed');
         
         if (isSpecificRequest) {
-          // Find the most relevant learned pattern when specifically requested
-          const relevantLearning = allLearning
-            .filter(entry => entry.improved_response && entry.user_feedback && entry.learning_pattern)
-            .find(entry => {
-              // Perfect match: Same topic + specificity request
-              return entry.learning_pattern.patient_topic === currentPatientTopic;
-            });
+          console.log(`🔍 Checking for relevant learning patterns (specific request detected)`);
+          console.log(`   Available learning entries: ${allLearning.length}`);
           
-          if (relevantLearning) {
-            console.log(`💡 Found perfect match from previous conversation!`);
-            console.log(`📚 Remembering: "${relevantLearning.user_feedback}"`);
-            console.log(`🎯 Applying learned response pattern for ${currentPatientTopic}`);
-            return relevantLearning.improved_response;
-          }
-        }
-        
-        // Only apply general relevant learning when explicitly requested for better responses
-        if (isSpecificRequest) {
-          const generalRelevantLearning = allLearning
-            .filter(entry => entry.improved_response && entry.user_feedback)
-            .find(entry => {
-              // Apply screening/general health learning to screening questions when specifically asked
-              const isHealthRelated = ['screening', 'general_health', 'mammograms'].includes(entry.learning_pattern?.patient_topic);
-              const currentIsHealthRelated = ['screening', 'general_health', 'mammograms'].includes(currentPatientTopic);
-              return isHealthRelated && currentIsHealthRelated;
-            });
-          
-          if (generalRelevantLearning) {
-            console.log(`📖 Applying relevant health learning due to specificity request`);
-            console.log(`🎯 Using: "${generalRelevantLearning.user_feedback}"`);
-            return generalRelevantLearning.improved_response;
-          }
-        }
-        
-        // Only apply general learning if we're specifically asked for improved responses
-        // This preserves conversation variety while still using learning when appropriate
-        if (currentCustomerQuestion.toLowerCase().includes('specific') || 
-            currentCustomerQuestion.toLowerCase().includes('exactly') || 
-            currentCustomerQuestion.toLowerCase().includes('vague')) {
-          
-          const generalLearning = allLearning
-            .filter(entry => entry.improved_response && entry.user_feedback)
+          // Find the most recent learned response for any topic when specifically requested
+          const applicableLearning = allLearning
+            .filter(entry => {
+              const hasResponse = entry.improved_response && entry.user_feedback;
+              console.log(`   Entry: "${entry.user_feedback?.substring(0, 30)}" - Has response: ${hasResponse}`);
+              console.log(`   Improved response length: ${entry.improved_response?.length || 0}`);
+              return hasResponse;
+            })
             .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
           
-          if (generalLearning) {
-            console.log(`📖 Applying general learning due to specificity request`);
-            console.log(`🎯 Using: "${generalLearning.user_feedback}"`);
-            return generalLearning.improved_response;
+          if (applicableLearning) {
+            console.log(`💡 APPLYING LEARNING: "${applicableLearning.user_feedback}"`);
+            console.log(`📚 Response length: ${applicableLearning.improved_response.length} chars`);
+            console.log(`🎯 Learning successfully applied for specific request`);
+            return applicableLearning.improved_response;
+          } else {
+            console.log(`❌ No applicable learning found despite ${allLearning.length} entries`);
           }
         }
       }
@@ -412,12 +384,12 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       return avatarData[questionType] || avatarData['default'];
     };
 
-    // Always check for learned responses first, but now with contextual matching
+    // Check for learned responses with the new simplified system
     const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType, customerQuestion);
     if (learnedResponse) {
       avatarResponse = learnedResponse;
       usedLearning = true;
-      console.log("🎯 Using contextual learned response - AI has improved from previous training");
+      console.log("🎯 Using learned response - AI has improved from previous training");
     } else {
       // Use basic responses only when no learning exists
       avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'default');
