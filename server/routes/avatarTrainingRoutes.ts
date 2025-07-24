@@ -176,7 +176,7 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
     
     // Check knowledge base for improved responses based on ALL previous learning (persistent across sessions)
-    const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
+    const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura', currentCustomerQuestion: string = ''): string | null => {
       console.log(`🔍 Checking for persistent learning across ALL sessions...`);
       
       // First check current session for any new learning
@@ -197,13 +197,36 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
         const allLearning = universalKnowledgeBase[avatarType];
         console.log(`🔍 Found universal learning entries: ${allLearning.length}`);
         
-        // Use the most recent learned response that matches the context
+        // Analyze current customer question context
+        const currentIsAboutMammograms = currentCustomerQuestion.toLowerCase().includes('mammogram');
+        const currentIsAboutSelfExams = currentCustomerQuestion.toLowerCase().includes('self-exam');
+        const currentIsAboutScreening = currentCustomerQuestion.toLowerCase().includes('screening') || 
+                                       currentCustomerQuestion.toLowerCase().includes('when to start');
+        
+        // Find the most contextually relevant learned response
+        const contextualLearning = allLearning
+          .filter(entry => entry.improved_response && entry.user_feedback && entry.question_context)
+          .find(entry => {
+            // Match similar question contexts
+            const contexts = entry.question_context;
+            return (currentIsAboutMammograms && contexts.isAboutMammograms) ||
+                   (currentIsAboutSelfExams && contexts.isAboutSelfExams) ||
+                   (currentIsAboutScreening && contexts.isAboutScreening);
+          });
+        
+        if (contextualLearning) {
+          console.log(`📚 ${avatarType.toUpperCase()} applying contextual learning from previous sessions`);
+          console.log(`🎯 Matched context: "${contextualLearning.user_feedback}"`);
+          return contextualLearning.improved_response;
+        }
+        
+        // Fallback to most recent learning if no contextual match
         const latestLearning = allLearning
           .filter(entry => entry.improved_response && entry.user_feedback)
           .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
         
         if (latestLearning) {
-          console.log(`📚 ${avatarType.toUpperCase()} applying persistent learning from previous sessions`);
+          console.log(`📚 ${avatarType.toUpperCase()} applying latest learning (no contextual match)`);
           console.log(`🎯 Using accumulated knowledge: "${latestLearning.user_feedback}"`);
           return latestLearning.improved_response;
         }
@@ -250,12 +273,12 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       return avatarData[questionType] || avatarData['default'];
     };
 
-    // Always check for learned responses first, regardless of question type
-    const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType);
+    // Always check for learned responses first, but now with contextual matching
+    const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType, customerQuestion);
     if (learnedResponse) {
       avatarResponse = learnedResponse;
       usedLearning = true;
-      console.log("🎯 Using learned response - AI has improved from previous training");
+      console.log("🎯 Using contextual learned response - AI has improved from previous training");
     } else {
       // Use basic responses only when no learning exists
       avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'default');
@@ -467,25 +490,51 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
     
     const commentedMessage = session.messages[messageIndex];
     
-    // Generate Dr. Sakura's improved response based on user feedback
+    // Generate contextual improved response based on original patient question AND feedback
     let improvedResponse = "";
     
-    if (comment.toLowerCase().includes('vague') || comment.toLowerCase().includes('general')) {
-      improvedResponse = "I completely understand your concerns about breast health screening. Let me be more specific about what you need to know. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions. Look for hard, immobile masses (like marbles), skin dimpling, nipple discharge, or size changes. Schedule mammograms annually starting at age 40 if high-risk, age 50 if average risk. Any concerning findings should be evaluated within 1-2 weeks.";
-    } else if (comment.toLowerCase().includes('timeline') || comment.toLowerCase().includes('when')) {
-      improvedResponse = "I understand you want to know the specific timeline for breast health screening. Here's the exact schedule: Ages 20-39: Monthly self-exams, clinical breast exam every 1-3 years. Ages 40-49: Annual mammograms (high risk) or every 2 years (average risk), annual clinical exams, monthly self-exams. Ages 50+: Annual mammograms and clinical exams, monthly self-exams. If you find anything concerning, see your doctor within 2 weeks maximum.";
-    } else if (comment.toLowerCase().includes('process') || comment.toLowerCase().includes('what happens')) {
-      improvedResponse = "Let me walk you through exactly what happens during a mammogram so you know what to expect: 1) You undress from waist up, wear a hospital gown opening in front. 2) Technologist positions your breast on a clear plastic plate. 3) A paddle compresses your breast for 10-15 seconds while X-ray is taken. 4) Two views per breast: top-to-bottom and side-to-side. 5) Total time: 20 minutes. 6) Results available in 48-72 hours. Pain level: 2-7/10, brief pressure only during compression.";
-    } else if (comment.toLowerCase().includes('specific') || comment.toLowerCase().includes('concrete')) {
-      improvedResponse = "I understand you want concrete information about breast health. Here are the specific numbers: 1 in 8 women develop breast cancer. 85% have no family history. Mammograms reduce death rates by 20-40%. For self-exams, normal tissue feels like small peas or gravel. Concerning lumps feel like hard marbles, don't move when pushed, have irregular edges. Any lump larger than a pea that persists through one menstrual cycle needs medical evaluation within 2 weeks.";
-    } else if (comment.toLowerCase().includes('better') || comment.toLowerCase().includes('improve')) {
-      improvedResponse = "I understand your concerns about breast health screening. Based on what you've shared, here's what I recommend: Start with monthly self-exams using the systematic approach (lying down, arm behind head, use flat fingertips in small circles). Schedule your first mammogram based on your risk level and family history. If you're unsure about timing, a clinical breast exam with your doctor can help determine the best screening schedule for your specific situation.";
-    } else if (comment.toLowerCase().includes('self-exam') || comment.toLowerCase().includes('not sure about self-exams')) {
-      improvedResponse = "I completely understand your concerns, and many women feel uncertain about self-exams - that's completely normal. Let me help you feel more confident about breast health screening. There are three components working together: 1) Monthly self-exams to know what's normal for you, 2) Annual clinical breast exams by healthcare providers, and 3) Regular mammograms starting at age 40-50. For self-exams, examine your breasts monthly, 3-7 days after your period. Use flat fingertips in circular motions, checking for hard lumps, skin changes, or nipple discharge. The key is learning what feels normal for your body so you can notice any changes.";
+    // Get the original patient question context
+    const patientMessage = session.messages.find(m => m.role === 'customer');
+    const patientQuestion = patientMessage?.content || "";
+    
+    // Find what the patient was asking about specifically
+    const isAboutMammograms = patientQuestion.toLowerCase().includes('mammogram') || 
+                             commentedMessage.content.toLowerCase().includes('mammogram');
+    const isAboutSelfExams = patientQuestion.toLowerCase().includes('self-exam') || 
+                            commentedMessage.content.toLowerCase().includes('self-exam');
+    const isAboutScreening = patientQuestion.toLowerCase().includes('screening') || 
+                            patientQuestion.toLowerCase().includes('when to start');
+    const isAboutConcerns = patientQuestion.toLowerCase().includes('concern') || 
+                           patientQuestion.toLowerCase().includes('worried') || 
+                           patientQuestion.toLowerCase().includes('anxious');
+    
+    // Debug logging to understand what's being processed
+    console.log('🔍 Contextual improvement analysis:');
+    console.log('   Patient question:', patientQuestion);
+    console.log('   Feedback comment:', comment);
+    console.log('   isAboutMammograms:', isAboutMammograms);
+    console.log('   isAboutSelfExams:', isAboutSelfExams);
+    console.log('   isAboutScreening:', isAboutScreening);
+    
+    // Generate improved response that addresses the ORIGINAL question with feedback-driven improvements
+    if (isAboutMammograms && comment.toLowerCase().includes('self-exam')) {
+      // Patient asked about mammograms, but feedback says address self-exam concerns
+      improvedResponse = "I completely understand your concerns about mammograms and breast health screening. Many women also feel uncertain about self-exams, so let me address both. For mammograms: they're recommended annually starting at age 40-50 depending on your risk factors. The process takes about 20 minutes with brief compression discomfort. For self-exams: examine your breasts monthly, 3-7 days after your period using flat fingertips in circular motions. Look for hard lumps, skin changes, or nipple discharge. Both mammograms and self-exams work together - mammograms catch what you can't feel, while self-exams help you know what's normal for your body.";
+    } else if (isAboutSelfExams && comment.toLowerCase().includes('specific')) {
+      // Patient asked about self-exams and wants more specific details
+      improvedResponse = "I completely understand your concerns about breast self-exams, and many women feel uncertain about them - that's completely normal. Let me help you feel more confident with specific instructions. Here's exactly how to do them: Examine your breasts monthly, 3-7 days after your period. Lie down with your arm behind your head, use flat fingertips (not fingertips) in small circular motions. Feel for hard, immobile lumps (like marbles), skin dimpling, nipple discharge, or size changes. Normal tissue feels like small peas or gravel. The key is learning what feels normal for your body so you can notice changes. If you find anything concerning, see your doctor within 1-2 weeks - most lumps are benign, but early detection is important.";
+    } else if (isAboutSelfExams) {
+      // Patient specifically asked about self-exams - general improvement
+      improvedResponse = "I completely understand your concerns about breast self-exams, and many women feel uncertain about them - that's completely normal. Let me help you feel more confident. Here's exactly how to do them: Examine your breasts monthly, 3-7 days after your period. Lie down with your arm behind your head, use flat fingertips in small circular motions. Feel for hard, immobile lumps (like marbles), skin dimpling, nipple discharge, or size changes. Normal tissue feels like small peas or gravel. The key is learning what feels normal for your body so you can notice changes. If you find anything concerning, see your doctor within 1-2 weeks - most lumps are benign, but early detection is important.";
+    } else if (isAboutScreening || isAboutConcerns) {
+      // Patient asked about general screening or expressed concerns
+      improvedResponse = "I completely understand your concerns about breast health screening - it's natural to feel anxious about this. Let me give you a clear, comprehensive plan. Breast health involves three components: 1) Monthly self-exams starting in your 20s to know what's normal for you, 2) Clinical breast exams by healthcare providers every 1-3 years, and 3) Mammograms annually starting at age 40-50 based on your risk factors. Each serves a different purpose: self-exams help you notice changes, clinical exams provide professional assessment, and mammograms detect issues before they can be felt. The key is starting at the right age for your situation and maintaining consistency.";
     } else {
-      // Default improved response - address patient directly, not feedback
-      improvedResponse = "I completely understand your concerns about breast health screening, and I want to make sure you have all the information you need. Let me provide more comprehensive guidance. Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      // Improve the original response based on feedback context but maintain question context
+      improvedResponse = `I completely understand your concerns about breast health. Let me provide more specific guidance to address what you're asking about. ${commentedMessage.content.includes('mammogram') ? 'For mammograms: they\'re recommended annually starting at age 40-50, take about 20 minutes, and detect issues before they can be felt. ' : ''}${comment.toLowerCase().includes('self-exam') ? 'For self-exams: do them monthly, 3-7 days after your period using flat fingertips in circular motions. Look for hard lumps, skin changes, or nipple discharge. ' : ''}The most important thing is having a comprehensive screening plan that includes both professional screening and self-awareness of your body's normal changes.`;
     }
+    
+    console.log('🎯 Generated contextual response:', improvedResponse.substring(0, 100) + '...');
     
     // Create improved response message
     const improvedMessage = {
@@ -540,14 +589,21 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
       universalKnowledgeBase[avatarType] = [];
     }
     
-    // Store learning entry with all necessary data for future use
+    // Store contextual learning entry with patient question context for future retrieval
     universalKnowledgeBase[avatarType].push({
       user_feedback: comment,
       improved_response: improvedResponse,
       original_response: commentedMessage.content,
+      patient_question: patientQuestion, // Store original patient question for context matching
       topic_type: topicType,
       timestamp: new Date().toISOString(),
       business_context: session.business_type || 'health_coaching',
+      question_context: {
+        isAboutMammograms,
+        isAboutSelfExams,
+        isAboutScreening,
+        isAboutConcerns
+      },
       usage_count: 0
     });
 
