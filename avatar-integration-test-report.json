@@ -1,0 +1,215 @@
+{
+  "timestamp": "2025-07-24T01:07:52.400Z",
+  "summary": {
+    "totalTests": 10,
+    "passedTests": 6,
+    "failedTests": 4,
+    "successRate": "60.00%"
+  },
+  "results": [
+    {
+      "timestamp": "2025-07-24T01:07:48.348Z",
+      "type": "info",
+      "message": "Starting Avatar Integration Test Suite",
+      "test": "setup"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:48.356Z",
+      "type": "info",
+      "message": "Starting test: Server Health Check",
+      "test": "Server Health Check"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:50.589Z",
+      "type": "info",
+      "message": "Server responding correctly with authentication required",
+      "test": "Server Health Check"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:50.590Z",
+      "type": "success",
+      "message": "✅ PASSED: Server Health Check",
+      "test": "Server Health Check"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:50.590Z",
+      "type": "info",
+      "message": "Starting test: Business Avatar Routes",
+      "test": "Business Avatar Routes"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:50.913Z",
+      "type": "info",
+      "message": "Business avatar endpoint /api/business-avatars/avatars working correctly",
+      "test": "Business Avatar Routes"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.023Z",
+      "type": "error",
+      "message": "❌ FAILED: Business Avatar Routes - Business avatar endpoint /api/business-avatars/customization-options returned HTML instead of JSON",
+      "test": "Business Avatar Routes"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.023Z",
+      "type": "info",
+      "message": "Starting test: Personal Avatar Routes",
+      "test": "Personal Avatar Routes"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.101Z",
+      "type": "error",
+      "message": "❌ FAILED: Personal Avatar Routes - Personal avatar endpoint /api/personal-avatars/avatars returned HTML instead of JSON",
+      "test": "Personal Avatar Routes"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.101Z",
+      "type": "info",
+      "message": "Starting test: Business Avatar Data Structure",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.147Z",
+      "type": "info",
+      "message": "Business avatar Alex Thunder data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.147Z",
+      "type": "info",
+      "message": "Business avatar Miko Harmony data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.147Z",
+      "type": "info",
+      "message": "Business avatar Kai TechWiz data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.148Z",
+      "type": "info",
+      "message": "Business avatar Luna Strategic data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.148Z",
+      "type": "info",
+      "message": "Business avatar Dr. Sakura Wellness data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.148Z",
+      "type": "info",
+      "message": "Business avatar Professor Sage data structure validated",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.148Z",
+      "type": "success",
+      "message": "✅ PASSED: Business Avatar Data Structure",
+      "test": "Business Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.148Z",
+      "type": "info",
+      "message": "Starting test: Personal Avatar Data Structure",
+      "test": "Personal Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.273Z",
+      "type": "error",
+      "message": "❌ FAILED: Personal Avatar Data Structure - Unexpected token '<', \"<!DOCTYPE \"... is not valid JSON",
+      "test": "Personal Avatar Data Structure"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.273Z",
+      "type": "info",
+      "message": "Starting test: Business Dashboard Integration",
+      "test": "Business Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.275Z",
+      "type": "info",
+      "message": "Business dashboard integration verified",
+      "test": "Business Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.275Z",
+      "type": "success",
+      "message": "✅ PASSED: Business Dashboard Integration",
+      "test": "Business Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.275Z",
+      "type": "info",
+      "message": "Starting test: Personal Dashboard Integration",
+      "test": "Personal Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.277Z",
+      "type": "info",
+      "message": "Personal dashboard integration verified",
+      "test": "Personal Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.277Z",
+      "type": "success",
+      "message": "✅ PASSED: Personal Dashboard Integration",
+      "test": "Personal Dashboard Integration"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.277Z",
+      "type": "info",
+      "message": "Starting test: Avatar Customization",
+      "test": "Avatar Customization"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.378Z",
+      "type": "info",
+      "message": "Avatar customization endpoints working correctly",
+      "test": "Avatar Customization"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.378Z",
+      "type": "success",
+      "message": "✅ PASSED: Avatar Customization",
+      "test": "Avatar Customization"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.378Z",
+      "type": "info",
+      "message": "Starting test: Avatar Deployment",
+      "test": "Avatar Deployment"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.395Z",
+      "type": "info",
+      "message": "Avatar deployment endpoints working correctly",
+      "test": "Avatar Deployment"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.395Z",
+      "type": "success",
+      "message": "✅ PASSED: Avatar Deployment",
+      "test": "Avatar Deployment"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.395Z",
+      "type": "info",
+      "message": "Starting test: Runtime Error Check",
+      "test": "Runtime Error Check"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.398Z",
+      "type": "info",
+      "message": "Runtime error check passed for client/src/pages/BusinessDashboard.tsx",
+      "test": "Runtime Error Check"
+    },
+    {
+      "timestamp": "2025-07-24T01:07:52.400Z",
+      "type": "error",
+      "message": "❌ FAILED: Runtime Error Check - Runtime error in client/src/pages/PersonalAvatarManager.tsx: Incorrect TopNavigation import (should be default)",
+      "test": "Runtime Error Check"
+    }
+  ]
+}

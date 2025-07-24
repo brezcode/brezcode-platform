@@ -422,6 +422,16 @@ export default function UserHomepage() {
                   <Bot className="h-3 w-3 mr-2" />
                   Business Avatars
                 </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-xs"
+                  onClick={() => setLocation('/personal-avatars')}
+                >
+                  <Heart className="h-3 w-3 mr-2" />
+                  Personal Avatars
+                </Button>
               </CardContent>
             </Card>
 

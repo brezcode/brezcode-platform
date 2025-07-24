@@ -85,30 +85,12 @@ export default function BusinessDashboard() {
       status: "available"
     },
     {
-      icon: Brain,
-      title: "Business Avatars",
-      description: "Manage your AI business avatars",
-      action: "Manage Avatars",
-      href: "/business-avatar-manager",
-      color: "indigo",
-      status: "available"
-    },
-    {
       icon: MessageSquare,
       title: "Avatar Training",
       description: "Train your AI avatars with realistic dialogue scenarios",
       action: "Start Training",
       href: "/business-avatar-training",
       color: "violet",
-      status: "available"
-    },
-    {
-      icon: User,
-      title: "Personal Avatars",
-      description: "Manage your personal AI assistants for life goals",
-      action: "View Personal",
-      href: "/personal-avatars",
-      color: "pink",
       status: "available"
     }
   ];
@@ -329,9 +311,12 @@ export default function BusinessDashboard() {
           <CardContent>
             <Tabs defaultValue="overview" className="w-full">
               <div className="flex flex-col space-y-3">
-                <TabsList className="grid w-full grid-cols-2 h-auto p-2">
+                <TabsList className="grid w-full grid-cols-3 h-auto p-2">
                   <TabsTrigger value="overview" className="flex items-center justify-center py-3">
                     <span>Performance Overview</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="business-avatars" className="flex items-center justify-center py-3">
+                    <span>Business Avatars</span>
                   </TabsTrigger>
                   <TabsTrigger value="engagement" className="flex items-center justify-center py-3">
                     <span>Customer Engagement</span>
@@ -376,6 +361,28 @@ export default function BusinessDashboard() {
                 </div>
               </TabsContent>
               
+              <TabsContent value="business-avatars" className="space-y-4">
+                <div className="text-center py-8">
+                  <Brain className="w-12 h-12 mx-auto mb-3 text-indigo-600" />
+                  <h3 className="text-lg font-semibold mb-2">Business Avatars</h3>
+                  <p className="text-gray-600 mb-4">Create and manage AI assistants for your business operations</p>
+                  <div className="flex gap-3 justify-center">
+                    <Link href="/business-avatar-manager">
+                      <Button>
+                        <Settings className="w-4 h-4 mr-2" />
+                        Manage Business Avatars
+                      </Button>
+                    </Link>
+                    <Link href="/business-avatar-training">
+                      <Button variant="outline">
+                        <MessageSquare className="w-4 h-4 mr-2" />
+                        Avatar Training
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </TabsContent>
+
               <TabsContent value="engagement" className="space-y-4">
                 <div className="text-center py-8 text-gray-500">
                   <MessageSquare className="w-12 h-12 mx-auto mb-3 text-gray-400" />
