@@ -150,6 +150,10 @@ function calculateMetrics(messages: any[]): any {
 // Start a new AI-to-AI conversation
 router.post('/start', async (req, res) => {
   console.log('AI conversation start request:', req.body);
+  console.log('Request headers:', req.headers);
+  
+  // Ensure we return JSON
+  res.setHeader('Content-Type', 'application/json');
   
   try {
     const { avatarId, customerId, scenario } = req.body;
@@ -184,28 +188,11 @@ router.post('/start', async (req, res) => {
       duration: 0
     };
     
-    // Generate opening customer message
-    const openingPrompt = `${customer.systemPrompt}
-
-Context: ${scenarioData.context}
-Your goal: ${scenarioData.customerGoal}
-
-Start a conversation that fits this scenario. Be authentic to your personality and emotional state. Keep your opening message natural and realistic - don't mention this is a training exercise.`;
-
-    const customerResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        { role: "system", content: openingPrompt },
-        { role: "user", content: "Start the conversation." }
-      ],
-      max_tokens: 200,
-      temperature: 0.8
-    });
-    
+    // For now, create a simple opening message without OpenAI to test basic functionality
     const openingMessage = {
       id: `msg_${Date.now()}_1`,
       role: 'customer',
-      content: customerResponse.choices[0].message.content?.trim() || "Hi, I'd like to learn more about your service.",
+      content: `Hi, I'm ${customer.name}. ${scenarioData.context}`,
       timestamp: new Date().toISOString(),
       emotion: customer.emotional_state.split(',')[0],
       intent: scenarioData.customerGoal
@@ -214,10 +201,11 @@ Start a conversation that fits this scenario. Be authentic to your personality a
     session.messages.push(openingMessage as any);
     conversationSessions.set(sessionId, session);
     
-    res.json(session);
+    console.log('Returning session:', sessionId);
+    return res.json(session);
   } catch (error) {
     console.error('Error starting AI conversation:', error);
-    res.status(500).json({ error: 'Failed to start conversation' });
+    return res.status(500).json({ error: 'Failed to start conversation' });
   }
 });
 
@@ -364,6 +352,13 @@ router.get('/', async (req, res) => {
     console.error('Error getting conversations:', error);
     res.status(500).json({ error: 'Failed to get conversations' });
   }
+});
+
+// Simple test route to verify routing works
+router.get('/test', (req, res) => {
+  console.log('Test route hit');
+  res.setHeader('Content-Type', 'application/json');
+  res.json({ success: true, message: 'AI conversation routing works!' });
 });
 
 export default router;

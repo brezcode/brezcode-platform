@@ -1,0 +1,41 @@
+{
+  "summary": {
+    "totalTests": 5,
+    "passedTests": 1,
+    "failedTests": 4,
+    "successRate": "20.0%"
+  },
+  "tests": [
+    {
+      "test": "Avatar Response Uniqueness",
+      "status": "FAIL",
+      "details": "Only 0 unique responses from 0 avatars",
+      "timestamp": "2025-07-24T04:43:33.604Z"
+    },
+    {
+      "test": "Personality Consistency",
+      "status": "PASS",
+      "details": "Sales specialist maintained personality in 0/0 scenarios",
+      "timestamp": "2025-07-24T04:43:36.625Z"
+    },
+    {
+      "test": "Customer Personality Uniqueness",
+      "status": "FAIL",
+      "details": "Only 0 distinct emotions from 0 customers",
+      "timestamp": "2025-07-24T04:43:39.643Z"
+    },
+    {
+      "test": "Conversation Flow",
+      "status": "FAIL",
+      "details": "Error: Cannot read properties of undefined (reading 'length')",
+      "timestamp": "2025-07-24T04:43:39.657Z"
+    },
+    {
+      "test": "Performance Tracking",
+      "status": "FAIL",
+      "details": "Error: Cannot read properties of undefined (reading 'response_quality')",
+      "timestamp": "2025-07-24T04:43:39.664Z"
+    }
+  ],
+  "timestamp": "2025-07-24T04:43:39.665Z"
+}

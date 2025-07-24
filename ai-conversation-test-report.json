@@ -1,0 +1,71 @@
+{
+  "summary": {
+    "totalTests": 10,
+    "passedTests": 1,
+    "failedTests": 9,
+    "successRate": "10.0%"
+  },
+  "tests": [
+    {
+      "test": "Avatar List API",
+      "status": "PASS",
+      "details": "Found 6 avatars including Alex Thunder",
+      "timestamp": "2025-07-24T04:46:46.334Z"
+    },
+    {
+      "test": "Start Conversation API",
+      "status": "FAIL",
+      "details": "No session ID returned",
+      "timestamp": "2025-07-24T04:46:46.843Z"
+    },
+    {
+      "test": "Conversation Messages",
+      "status": "FAIL",
+      "details": "No session ID available",
+      "timestamp": "2025-07-24T04:46:47.343Z"
+    },
+    {
+      "test": "Continue Conversation API",
+      "status": "FAIL",
+      "details": "No session ID available",
+      "timestamp": "2025-07-24T04:46:47.843Z"
+    },
+    {
+      "test": "Stop Conversation API",
+      "status": "FAIL",
+      "details": "No session ID available",
+      "timestamp": "2025-07-24T04:46:48.345Z"
+    },
+    {
+      "test": "Performance Metrics",
+      "status": "FAIL",
+      "details": "Missing or invalid performance metrics",
+      "timestamp": "2025-07-24T04:46:48.851Z"
+    },
+    {
+      "test": "Error Handling",
+      "status": "FAIL",
+      "details": "Should have returned error for invalid avatar",
+      "timestamp": "2025-07-24T04:46:49.358Z"
+    },
+    {
+      "test": "Frontend Routing",
+      "status": "FAIL",
+      "details": "AI conversation training page not found",
+      "timestamp": "2025-07-24T04:46:49.864Z"
+    },
+    {
+      "test": "OpenAI Integration",
+      "status": "FAIL",
+      "details": "AI-generated content is too short or missing",
+      "timestamp": "2025-07-24T04:46:50.371Z"
+    },
+    {
+      "test": "Multiple Scenarios",
+      "status": "FAIL",
+      "details": "Only 0/3 scenarios work",
+      "timestamp": "2025-07-24T04:46:50.896Z"
+    }
+  ],
+  "timestamp": "2025-07-24T04:46:51.398Z"
+}

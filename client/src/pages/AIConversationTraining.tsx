@@ -135,7 +135,7 @@ export default function AIConversationTraining() {
     enabled: true
   });
 
-  const avatars = avatarsData?.avatars || [];
+  const avatars = (avatarsData as any)?.avatars || [];
 
   // Start AI-to-AI conversation
   const startConversationMutation = useMutation({
