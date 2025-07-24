@@ -1,65 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { useLocation } from "wouter";
-import { AVATAR_IMAGES } from "@/components/AvatarImageGenerator";
 import TopNavigation from "@/components/TopNavigation";
-import { 
-  Bot, 
-  Star, 
-  Users, 
-  Zap, 
-  Edit, 
-  Eye, 
-  Play,
-  Settings,
-  Palette,
-  Mic,
-  Brain,
-  TrendingUp,
-  DollarSign,
-  Globe,
-  Heart,
-  Briefcase,
-  HeadphonesIcon,
-  Wrench,
-  GraduationCap,
-  Award,
-  CheckCircle,
-  Sparkles
+import { apiRequest } from "@/lib/queryClient";
+import {
+  Bot, Heart, Plane, Dumbbell, Apple, Brain as BrainIcon, Sparkles,
+  DollarSign, Globe, Edit, Play, Settings, Eye, Mic, Palette,
+  CheckCircle, Zap, User, Target, Calendar, MessageSquare
 } from "lucide-react";
 
-interface BusinessAvatar {
+interface PersonalAvatar {
   id: string;
   name: string;
-  businessType: string;
+  avatarType: string;
   description: string;
-  personality: string;
-  expertise: string[];
   appearance: {
     imageUrl: string;
-    style: string;
     hairColor: string;
     eyeColor: string;
-    outfit: string;
-    accessories: string[];
+    style: string;
   };
   voiceProfile: {
     tone: string;
     pace: string;
     accent: string;
   };
+  expertise: string[];
   specializations: string[];
   industries: string[];
   communicationStyle: string;
@@ -68,18 +43,19 @@ interface BusinessAvatar {
     tier: string;
     monthlyPrice: number;
   };
+  personalityTraits: string[];
   isCustomizable: boolean;
   isActive: boolean;
 }
 
 // Avatar type icons
 const AVATAR_TYPE_ICONS = {
-  health_coaching: Heart,
-  sales_automation: Briefcase,
-  customer_service: HeadphonesIcon,
-  technical_support: Wrench,
-  business_consulting: Brain,
-  education_training: GraduationCap
+  travel_planning: Plane,
+  wellness_coaching: Heart,
+  fitness_training: Dumbbell,
+  nutrition_coaching: Apple,
+  counseling_support: BrainIcon,
+  spiritual_guidance: Sparkles
 };
 
 // Pricing tier colors
@@ -89,61 +65,68 @@ const PRICING_COLORS = {
   enterprise: 'bg-purple-100 text-purple-800'
 };
 
-export default function BusinessAvatarManager() {
+// Avatar type descriptions
+const AVATAR_DESCRIPTIONS = {
+  travel_planning: 'Plan perfect trips and discover amazing destinations',
+  wellness_coaching: 'Achieve mind-body balance and healthy lifestyle habits',
+  fitness_training: 'Reach your fitness goals with personalized workout plans',
+  nutrition_coaching: 'Optimize your nutrition with expert dietary guidance', 
+  counseling_support: 'Get emotional support and mental wellness guidance',
+  spiritual_guidance: 'Explore personal growth through spiritual practices'
+};
+
+export default function PersonalAvatarManager() {
   const [, setLocation] = useLocation();
-  const [selectedAvatar, setSelectedAvatar] = useState<BusinessAvatar | null>(null);
+  const [selectedAvatar, setSelectedAvatar] = useState<PersonalAvatar | null>(null);
   const [customizationMode, setCustomizationMode] = useState(false);
   const [deploymentMode, setDeploymentMode] = useState(false);
   const [customizations, setCustomizations] = useState<any>({});
+  const [selectedType, setSelectedType] = useState<string>('all');
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Fetch all business avatars
+  // Fetch all personal avatars
   const { data: avatarsData, isLoading: avatarsLoading, error: avatarsError } = useQuery({
-    queryKey: ['/api/business-avatars/avatars'],
+    queryKey: ['/api/personal-avatars/avatars'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/business-avatars/avatars');
-      if (!response.ok) throw new Error('Failed to fetch avatars');
-      return response.json();
+      const response = await apiRequest('GET', '/api/personal-avatars/avatars');
+      return response;
     }
   });
 
   // Fetch customization options
-  const { data: optionsData } = useQuery({
-    queryKey: ['/api/business-avatars/customization-options'],
+  const { data: customizationOptions } = useQuery({
+    queryKey: ['/api/personal-avatars/customization-options'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/business-avatars/customization-options');
-      if (!response.ok) throw new Error('Failed to fetch customization options');
-      return response.json();
+      const response = await apiRequest('GET', '/api/personal-avatars/customization-options');
+      return response.options;
     }
   });
 
-  const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
-  const customizationOptions = (optionsData as any)?.options || {};
+  const avatars = avatarsData?.avatars || [];
 
-
+  // Filter avatars by type
+  const filteredAvatars = selectedType === 'all' 
+    ? avatars 
+    : avatars.filter((avatar: PersonalAvatar) => avatar.avatarType === selectedType);
 
   // Customize avatar mutation
   const customizeAvatarM = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', '/api/business-avatars/avatars/customize', data);
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Customization failed');
-      return result;
+      return await apiRequest('POST', '/api/personal-avatars/customize', data);
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/personal-avatars/avatars'] });
       toast({
-        title: "Avatar Customized Successfully",
-        description: `${data.avatar.name} is ready for deployment`,
+        title: "Avatar Customized",
+        description: "Your personal avatar has been customized successfully.",
       });
-      setSelectedAvatar(data.avatar);
       setCustomizationMode(false);
-      queryClient.invalidateQueries({ queryKey: ['/api/business-avatars/avatars'] });
     },
     onError: (error: any) => {
       toast({
         title: "Customization Failed",
-        description: error.message,
+        description: error.message || "Failed to customize avatar",
         variant: "destructive",
       });
     }
@@ -152,22 +135,19 @@ export default function BusinessAvatarManager() {
   // Deploy avatar mutation
   const deployAvatarM = useMutation({
     mutationFn: async (data: any) => {
-      const response = await apiRequest('POST', `/api/business-avatars/avatars/${data.avatarId}/deploy`, data);
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Deployment failed');
-      return result;
+      return await apiRequest('POST', '/api/personal-avatars/deploy', data);
     },
     onSuccess: (data) => {
       toast({
-        title: "Avatar Deployed Successfully",
-        description: `${data.avatar.name} is now live and ready to assist customers`,
+        title: "Avatar Deployed",
+        description: `Your personal assistant is now active at ${data.deployment.endpoint}`,
       });
       setDeploymentMode(false);
     },
     onError: (error: any) => {
       toast({
         title: "Deployment Failed",
-        description: error.message,
+        description: error.message || "Failed to deploy avatar",
         variant: "destructive",
       });
     }
@@ -179,57 +159,81 @@ export default function BusinessAvatarManager() {
     customizeAvatarM.mutate({
       baseAvatarId: selectedAvatar.id,
       customizations,
-      businessName: 'LeadGen Business',
-      targetAudience: 'Business professionals'
-    });
-  };
-
-  const handleDeployAvatar = (businessId: string = 'leadgen_main') => {
-    if (!selectedAvatar) return;
-
-    deployAvatarM.mutate({
-      avatarId: selectedAvatar.id,
-      businessId,
-      deploymentConfig: {
-        environment: 'production',
-        channels: ['web', 'mobile', 'api'],
-        features: ['chat', 'voice', 'analytics']
+      personalGoals: customizations.goals || [],
+      preferences: {
+        reminderFrequency: customizations.reminderFrequency || 'daily',
+        privacyLevel: customizations.privacyLevel || 'personal'
       }
     });
   };
 
-  const getAvatarImage = (avatar: BusinessAvatar) => {
-    const imageKey = avatar.appearance.imageUrl.split('/').pop()?.replace('.svg', '.svg') || '';
-    const ImageComponent = AVATAR_IMAGES[imageKey as keyof typeof AVATAR_IMAGES];
-    return ImageComponent ? ImageComponent(80) : (
-      <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center">
-        <Bot className="h-10 w-10 text-white" />
+  const handleDeployAvatar = () => {
+    if (!selectedAvatar) return;
+
+    deployAvatarM.mutate({
+      avatarId: selectedAvatar.id,
+      personalSettings: {
+        goals: customizations.goals || [],
+        preferences: customizations.preferences || {}
+      },
+      deploymentConfig: {
+        channels: ['mobile', 'web'],
+        features: ['chat', 'reminders', 'progress_tracking'],
+        privacy: 'personal'
+      }
+    });
+  };
+
+  const getAvatarImage = (avatar: PersonalAvatar) => {
+    // For now, use the icon as placeholder
+    const IconComponent = AVATAR_TYPE_ICONS[avatar.avatarType as keyof typeof AVATAR_TYPE_ICONS] || Bot;
+    return (
+      <div className="w-20 h-20 bg-gradient-to-br from-pink-400 to-purple-500 rounded-full flex items-center justify-center">
+        <IconComponent className="h-10 w-10 text-white" />
       </div>
     );
   };
 
-  const getBusinessTypeIcon = (businessType: string) => {
-    const IconComponent = AVATAR_TYPE_ICONS[businessType as keyof typeof AVATAR_TYPE_ICONS] || Bot;
+  const getAvatarTypeIcon = (avatarType: string) => {
+    const IconComponent = AVATAR_TYPE_ICONS[avatarType as keyof typeof AVATAR_TYPE_ICONS] || Bot;
     return <IconComponent className="h-5 w-5" />;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
       <TopNavigation />
       
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-4">
-            <div className="p-3 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg">
-              <Sparkles className="h-8 w-8 text-white" />
+            <div className="p-3 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg">
+              <User className="h-8 w-8 text-white" />
             </div>
-            <h1 className="text-3xl font-bold text-gray-900">Business Avatar Manager</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Personal Avatar Manager</h1>
           </div>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Deploy ready-to-use AI avatars for your business. Each avatar is specialized for specific industries 
-            with anime-style personalities and customizable features.
+            Choose your personal AI assistant for travel, wellness, fitness, nutrition, counseling, and spiritual guidance.
+            Each avatar is designed to support your individual goals and personal growth.
           </p>
+        </div>
+
+        {/* Avatar Type Filter */}
+        <div className="flex justify-center mb-6">
+          <Select value={selectedType} onValueChange={setSelectedType}>
+            <SelectTrigger className="w-64">
+              <SelectValue placeholder="Filter by avatar type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Personal Avatars</SelectItem>
+              <SelectItem value="travel_planning">Travel Planning</SelectItem>
+              <SelectItem value="wellness_coaching">Wellness Coaching</SelectItem>
+              <SelectItem value="fitness_training">Fitness Training</SelectItem>
+              <SelectItem value="nutrition_coaching">Nutrition Coaching</SelectItem>
+              <SelectItem value="counseling_support">Counseling Support</SelectItem>
+              <SelectItem value="spiritual_guidance">Spiritual Guidance</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <Tabs defaultValue="gallery" className="space-y-6">
@@ -237,7 +241,7 @@ export default function BusinessAvatarManager() {
             <TabsTrigger value="gallery">Avatar Gallery</TabsTrigger>
             <TabsTrigger value="customize">Customize</TabsTrigger>
             <TabsTrigger value="deploy">Deploy</TabsTrigger>
-            <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="manage">My Avatars</TabsTrigger>
           </TabsList>
 
           {/* Avatar Gallery Tab */}
@@ -254,11 +258,11 @@ export default function BusinessAvatarManager() {
                   </Card>
                 ))
               ) : (
-                avatars.map((avatar) => (
+                filteredAvatars.map((avatar: PersonalAvatar) => (
                   <Card 
                     key={avatar.id} 
                     className={`cursor-pointer transition-all hover:shadow-lg ${
-                      selectedAvatar?.id === avatar.id ? 'ring-2 ring-indigo-500 bg-indigo-50' : 'hover:bg-gray-50'
+                      selectedAvatar?.id === avatar.id ? 'ring-2 ring-pink-500 bg-pink-50' : 'hover:bg-gray-50'
                     }`}
                     onClick={() => setSelectedAvatar(avatar)}
                   >
@@ -267,7 +271,7 @@ export default function BusinessAvatarManager() {
                         {getAvatarImage(avatar)}
                       </div>
                       <div className="flex items-center justify-center space-x-2 mb-2">
-                        {getBusinessTypeIcon(avatar.businessType)}
+                        {getAvatarTypeIcon(avatar.avatarType)}
                         <CardTitle className="text-lg">{avatar.name}</CardTitle>
                       </div>
                       <div className="flex items-center justify-center space-x-2 mb-3">
@@ -276,7 +280,7 @@ export default function BusinessAvatarManager() {
                         </Badge>
                         <Badge variant="outline" className="flex items-center space-x-1">
                           <DollarSign className="h-3 w-3" />
-                          <span>{avatar.pricing?.monthlyPrice || 99}/mo</span>
+                          <span>{avatar.pricing?.monthlyPrice || 29}/mo</span>
                         </Badge>
                       </div>
                       <CardDescription className="text-sm mb-4">
@@ -302,27 +306,15 @@ export default function BusinessAvatarManager() {
                         </div>
                       </div>
 
-                      {/* Industries */}
+                      {/* Personality Traits */}
                       <div>
-                        <h4 className="font-medium text-sm text-gray-700 mb-2">Industries</h4>
+                        <h4 className="font-medium text-sm text-gray-700 mb-2">Personality</h4>
                         <div className="flex flex-wrap gap-1">
-                          {(avatar.industries || []).slice(0, 3).map((industry, index) => (
+                          {(avatar.personalityTraits || []).slice(0, 3).map((trait, index) => (
                             <Badge key={index} variant="outline" className="text-xs">
-                              {industry}
+                              {trait}
                             </Badge>
                           ))}
-                        </div>
-                      </div>
-
-                      {/* Voice & Style */}
-                      <div className="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium text-gray-700">Voice:</span>
-                          <p className="text-gray-600">{avatar.voiceProfile.tone}</p>
-                        </div>
-                        <div>
-                          <span className="font-medium text-gray-700">Style:</span>
-                          <p className="text-gray-600">{avatar.appearance.style}</p>
                         </div>
                       </div>
 
@@ -355,7 +347,7 @@ export default function BusinessAvatarManager() {
                         </Button>
                         <Button 
                           size="sm" 
-                          className="flex-1"
+                          className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                           onClick={(e) => {
                             e.stopPropagation();
                             setSelectedAvatar(avatar);
@@ -363,7 +355,7 @@ export default function BusinessAvatarManager() {
                           }}
                         >
                           <Play className="h-4 w-4 mr-1" />
-                          Deploy
+                          Activate
                         </Button>
                       </div>
                     </CardContent>
@@ -380,7 +372,7 @@ export default function BusinessAvatarManager() {
                 <CardContent>
                   <Palette className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Avatar to Customize</h3>
-                  <p className="text-gray-600 mb-4">Choose an avatar from the gallery to start customization</p>
+                  <p className="text-gray-600 mb-4">Choose a personal avatar from the gallery to start customization</p>
                 </CardContent>
               </Card>
             ) : (
@@ -409,7 +401,6 @@ export default function BusinessAvatarManager() {
                       <div className="text-sm text-gray-600">
                         <p>Tone: {customizations.voiceProfile?.tone || selectedAvatar.voiceProfile.tone}</p>
                         <p>Pace: {customizations.voiceProfile?.pace || selectedAvatar.voiceProfile.pace}</p>
-                        <p>Accent: {customizations.voiceProfile?.accent || selectedAvatar.voiceProfile.accent}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -420,7 +411,7 @@ export default function BusinessAvatarManager() {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <Settings className="h-5 w-5" />
-                      <span>Customization Options</span>
+                      <span>Personal Settings</span>
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-6">
@@ -436,101 +427,58 @@ export default function BusinessAvatarManager() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="avatar-description">Description</Label>
+                        <Label htmlFor="personal-goals">Personal Goals</Label>
                         <Textarea
-                          id="avatar-description"
-                          value={customizations.description || selectedAvatar.description}
-                          onChange={(e) => setCustomizations({...customizations, description: e.target.value})}
-                          placeholder="Describe your avatar's role and personality"
+                          id="personal-goals"
+                          value={customizations.goals || ''}
+                          onChange={(e) => setCustomizations({...customizations, goals: e.target.value})}
+                          placeholder="What are your goals? (e.g., lose weight, travel more, reduce stress)"
                           rows={3}
                         />
                       </div>
                     </div>
 
-                    {/* Appearance Customization */}
+                    {/* Personal Preferences */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900">Appearance</h4>
+                      <h4 className="font-medium text-gray-900">Preferences</h4>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="hair-color">Hair Color</Label>
+                          <Label htmlFor="reminder-frequency">Reminder Frequency</Label>
                           <Select
-                            value={customizations.appearance?.hairColor || selectedAvatar.appearance.hairColor}
+                            value={customizations.reminderFrequency || 'daily'}
                             onValueChange={(value) => setCustomizations({
                               ...customizations,
-                              appearance: {...customizations.appearance, hairColor: value}
+                              reminderFrequency: value
                             })}
                           >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {customizationOptions.appearance?.hairColors?.map((color: string) => (
-                                <SelectItem key={color} value={color}>{color}</SelectItem>
-                              ))}
+                              <SelectItem value="daily">Daily</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="custom">Custom</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                         <div>
-                          <Label htmlFor="eye-color">Eye Color</Label>
+                          <Label htmlFor="communication-style">Communication Style</Label>
                           <Select
-                            value={customizations.appearance?.eyeColor || selectedAvatar.appearance.eyeColor}
+                            value={customizations.communicationStyle || 'friendly'}
                             onValueChange={(value) => setCustomizations({
                               ...customizations,
-                              appearance: {...customizations.appearance, eyeColor: value}
+                              communicationStyle: value
                             })}
                           >
                             <SelectTrigger>
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {customizationOptions.appearance?.eyeColors?.map((color: string) => (
-                                <SelectItem key={color} value={color}>{color}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Voice Customization */}
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900">Voice Profile</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="voice-tone">Tone</Label>
-                          <Select
-                            value={customizations.voiceProfile?.tone || selectedAvatar.voiceProfile.tone}
-                            onValueChange={(value) => setCustomizations({
-                              ...customizations,
-                              voiceProfile: {...customizations.voiceProfile, tone: value}
-                            })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {customizationOptions.voice?.tones?.map((tone: string) => (
-                                <SelectItem key={tone} value={tone}>{tone}</SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="voice-pace">Pace</Label>
-                          <Select
-                            value={customizations.voiceProfile?.pace || selectedAvatar.voiceProfile.pace}
-                            onValueChange={(value) => setCustomizations({
-                              ...customizations,
-                              voiceProfile: {...customizations.voiceProfile, pace: value}
-                            })}
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {customizationOptions.voice?.paces?.map((pace: string) => (
-                                <SelectItem key={pace} value={pace}>{pace}</SelectItem>
-                              ))}
+                              <SelectItem value="supportive">Supportive</SelectItem>
+                              <SelectItem value="motivational">Motivational</SelectItem>
+                              <SelectItem value="gentle">Gentle</SelectItem>
+                              <SelectItem value="direct">Direct</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
@@ -538,25 +486,13 @@ export default function BusinessAvatarManager() {
                     </div>
 
                     {/* Save Customization */}
-                    <div className="flex space-x-3 pt-6 border-t">
-                      <Button
-                        variant="outline"
-                        onClick={() => {
-                          setCustomizations({});
-                          setCustomizationMode(false);
-                        }}
-                        className="flex-1"
-                      >
-                        Reset
-                      </Button>
-                      <Button
-                        onClick={handleCustomizeAvatar}
-                        disabled={customizeAvatarM.isPending}
-                        className="flex-1"
-                      >
-                        {customizeAvatarM.isPending ? 'Saving...' : 'Save Customization'}
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={handleCustomizeAvatar}
+                      disabled={customizeAvatarM.isPending}
+                      className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
+                    >
+                      {customizeAvatarM.isPending ? 'Customizing...' : 'Save Customization'}
+                    </Button>
                   </CardContent>
                 </Card>
               </div>
@@ -568,9 +504,9 @@ export default function BusinessAvatarManager() {
             {!selectedAvatar ? (
               <Card className="text-center py-12">
                 <CardContent>
-                  <Play className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Avatar to Deploy</h3>
-                  <p className="text-gray-600 mb-4">Choose an avatar from the gallery to deploy to your business</p>
+                  <Zap className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Avatar to Activate</h3>
+                  <p className="text-gray-600 mb-4">Choose a personal avatar to activate as your assistant</p>
                 </CardContent>
               </Card>
             ) : (
@@ -579,29 +515,29 @@ export default function BusinessAvatarManager() {
                   <CardHeader>
                     <CardTitle className="flex items-center space-x-2">
                       <CheckCircle className="h-5 w-5 text-green-600" />
-                      <span>Deploy {selectedAvatar.name}</span>
+                      <span>Activate {selectedAvatar.name}</span>
                     </CardTitle>
                     <CardDescription>
-                      Ready to deploy your AI avatar to production
+                      Ready to activate your personal AI assistant
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {/* Deployment Preview */}
-                    <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-lg">
+                    {/* Activation Preview */}
+                    <div className="bg-gradient-to-r from-pink-50 to-purple-50 p-6 rounded-lg">
                       <div className="flex items-center space-x-4 mb-4">
                         <div className="w-16 h-16">
                           {getAvatarImage(selectedAvatar)}
                         </div>
                         <div>
                           <h3 className="font-semibold text-lg">{selectedAvatar.name}</h3>
-                          <p className="text-gray-600">{selectedAvatar.businessType.replace('_', ' ')}</p>
+                          <p className="text-gray-600">{AVATAR_DESCRIPTIONS[selectedAvatar.avatarType as keyof typeof AVATAR_DESCRIPTIONS]}</p>
                         </div>
                       </div>
                       
                       <div className="grid grid-cols-2 gap-4 text-sm">
                         <div>
-                          <span className="font-medium">Industries:</span>
-                          <p className="text-gray-600">{(selectedAvatar.industries || []).slice(0, 2).join(', ')}</p>
+                          <span className="font-medium">Specializations:</span>
+                          <p className="text-gray-600">{(selectedAvatar.specializations || []).slice(0, 2).join(', ')}</p>
                         </div>
                         <div>
                           <span className="font-medium">Languages:</span>
@@ -610,38 +546,38 @@ export default function BusinessAvatarManager() {
                       </div>
                     </div>
 
-                    {/* Deployment Options */}
+                    {/* Activation Configuration */}
                     <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900">Deployment Configuration</h4>
+                      <h4 className="font-medium text-gray-900">Activation Settings</h4>
                       <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium">Environment:</span>
-                          <Badge>Production</Badge>
+                          <span className="text-sm font-medium">Access:</span>
+                          <Badge>Personal</Badge>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Channels:</span>
-                          <span className="text-sm text-gray-600">Web, Mobile, API</span>
+                          <span className="text-sm text-gray-600">Mobile, Web</span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm font-medium">Features:</span>
-                          <span className="text-sm text-gray-600">Chat, Voice, Analytics</span>
+                          <span className="text-sm text-gray-600">Chat, Reminders, Progress Tracking</span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Deploy Button */}
+                    {/* Activate Button */}
                     <Button
-                      onClick={() => handleDeployAvatar()}
+                      onClick={handleDeployAvatar}
                       disabled={deployAvatarM.isPending}
-                      className="w-full"
+                      className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700"
                       size="lg"
                     >
                       {deployAvatarM.isPending ? (
-                        'Deploying...'
+                        'Activating...'
                       ) : (
                         <>
                           <Zap className="h-4 w-4 mr-2" />
-                          Deploy Avatar to Production
+                          Activate Personal Assistant
                         </>
                       )}
                     </Button>
@@ -651,19 +587,24 @@ export default function BusinessAvatarManager() {
             )}
           </TabsContent>
 
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-6">
-            <Card className="text-center py-12">
+          {/* My Avatars Tab */}
+          <TabsContent value="manage" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center space-x-2">
+                  <Target className="h-5 w-5" />
+                  <span>My Active Avatars</span>
+                </CardTitle>
+                <CardDescription>
+                  Manage your activated personal assistants and view their performance
+                </CardDescription>
+              </CardHeader>
               <CardContent>
-                <TrendingUp className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Avatar Analytics Coming Soon</h3>
-                <p className="text-gray-600 mb-4">
-                  Track performance metrics, conversation analytics, and business impact of your deployed avatars
-                </p>
-                <Button variant="outline" disabled>
-                  <Award className="h-4 w-4 mr-2" />
-                  View Analytics Dashboard
-                </Button>
+                <div className="text-center py-8 text-gray-500">
+                  <MessageSquare className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                  <p>No active personal avatars yet</p>
+                  <p className="text-sm">Activate an avatar from the gallery to get started</p>
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

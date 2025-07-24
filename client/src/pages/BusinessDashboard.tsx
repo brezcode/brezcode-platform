@@ -9,7 +9,7 @@ import { Progress } from "@/components/ui/progress";
 import { 
   BarChart3, Users, TrendingUp, MessageSquare, Mail, Phone, 
   Calendar, Target, Zap, Settings, Brain, Store, CreditCard,
-  PlusCircle, Activity, CheckCircle, Clock, ArrowUpRight
+  PlusCircle, Activity, CheckCircle, Clock, ArrowUpRight, User
 } from "lucide-react";
 
 export default function BusinessDashboard() {
@@ -100,6 +100,15 @@ export default function BusinessDashboard() {
       action: "Start Training",
       href: "/business-avatar-training",
       color: "violet",
+      status: "available"
+    },
+    {
+      icon: User,
+      title: "Personal Avatars",
+      description: "Manage your personal AI assistants for life goals",
+      action: "View Personal",
+      href: "/personal-avatars",
+      color: "pink",
       status: "available"
     }
   ];
