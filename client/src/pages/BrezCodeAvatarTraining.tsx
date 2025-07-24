@@ -297,7 +297,11 @@ export default function BrezCodeAvatarTraining() {
         timestamp: msg.timestamp,
         isTraining: true,
         emotion: msg.emotion,
-        quality_score: msg.quality_score
+        quality_score: msg.quality_score,
+        multiple_choice_options: msg.multiple_choice_options,
+        user_comment: msg.user_comment,
+        improved_response: msg.improved_response,
+        improved_quality_score: msg.improved_quality_score
       }));
       
       setMessages(prev => [
