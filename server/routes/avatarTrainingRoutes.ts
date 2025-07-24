@@ -258,10 +258,20 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           return relevantLearning.improved_response;
         }
         
-        // Contextual intelligence: Only apply general learning if it's truly appropriate
-        if (currentPatientTopic === 'mammograms' || currentPatientTopic === 'screening') {
-          console.log(`🎯 No specific ${currentPatientTopic} learning found - using basic response to avoid topic confusion`);
-          return null; // Let the system use basic response instead of potentially confusing self-exam advice
+        // If no perfect topic match, check if we have general relevant learning that can be applied
+        const generalRelevantLearning = allLearning
+          .filter(entry => entry.improved_response && entry.user_feedback)
+          .find(entry => {
+            // Apply screening/general health learning to screening questions
+            const isHealthRelated = ['screening', 'general_health', 'mammograms'].includes(entry.learning_pattern?.patient_topic);
+            const currentIsHealthRelated = ['screening', 'general_health', 'mammograms'].includes(currentPatientTopic);
+            return isHealthRelated && currentIsHealthRelated;
+          });
+        
+        if (generalRelevantLearning) {
+          console.log(`📖 Applying relevant health learning pattern for ${currentPatientTopic}`);
+          console.log(`🎯 Using: "${generalRelevantLearning.user_feedback}"`);
+          return generalRelevantLearning.improved_response;
         }
         
         // For general topics, look for any learning that might be helpful
