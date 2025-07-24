@@ -390,12 +390,41 @@ export default function BrezCodeAvatarTraining() {
       return response.json();
     },
     onSuccess: (data) => {
+      console.log('Comment feedback response:', data);
+      
       // Update session with improved response
       if (data.session) {
         setActiveSession(data.session);
+        
+        // Update messages from session data to get improved responses
+        const sessionMessages = data.session.messages || [];
+        setMessages(prev => {
+          return sessionMessages.map((sessionMsg: any) => {
+            // Find existing message to preserve any additional UI state
+            const existingMsg = prev.find(m => m.id === sessionMsg.id);
+            return {
+              id: sessionMsg.id,
+              role: sessionMsg.role,
+              content: sessionMsg.content,
+              timestamp: sessionMsg.timestamp,
+              isTraining: true,
+              emotion: sessionMsg.emotion,
+              quality_score: sessionMsg.quality_score,
+              multiple_choice_options: sessionMsg.multiple_choice_options || [],
+              // Add improved response fields from session
+              user_comment: sessionMsg.user_comment,
+              improved_response: sessionMsg.improved_response,
+              improved_quality_score: sessionMsg.improved_quality_score,
+              improved_message_id: sessionMsg.improved_message_id,
+              has_improved_response: sessionMsg.has_improved_response,
+              // Preserve any existing UI state
+              ...existingMsg
+            };
+          });
+        });
       }
       
-      // Update the original message with the improved response inline
+      // Also handle direct improved_message response
       if (data.improved_message) {
         setMessages(prev => prev.map(msg => {
           if (msg.id === data.improved_message.original_message_id) {
@@ -410,11 +439,6 @@ export default function BrezCodeAvatarTraining() {
           }
           return msg;
         }));
-        
-        // Also ensure the comment form is closed after successful submission
-        setCommentingOnMessage(null);
-        setCommentText('');
-        setSelectedRating(null);
         
         // Scroll to the improved message
         setTimeout(() => {
