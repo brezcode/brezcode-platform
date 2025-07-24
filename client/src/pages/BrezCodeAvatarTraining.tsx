@@ -559,21 +559,33 @@ export default function BrezCodeAvatarTraining() {
                                 message.role === 'customer' 
                                   ? 'bg-blue-50 text-blue-900 border border-blue-200' 
                                   : message.role === 'avatar'
-                                  ? 'bg-pink-50 text-pink-900 border border-pink-200'
+                                  ? (message as any).improved_from_feedback 
+                                    ? 'bg-emerald-50 text-emerald-900 border-2 border-emerald-300 shadow-md'
+                                    : 'bg-pink-50 text-pink-900 border border-pink-200'
                                   : 'bg-gray-50 text-gray-800 border border-gray-200'
                               }`}>
                                 <div className={`text-xs font-medium mb-1 ${
                                   message.role === 'customer' ? 'text-blue-600' :
-                                  message.role === 'avatar' ? 'text-pink-600' : 'text-gray-500'
+                                  message.role === 'avatar' 
+                                    ? (message as any).improved_from_feedback ? 'text-emerald-600' : 'text-pink-600'
+                                    : 'text-gray-500'
                                 }`}>
                                   {message.role === 'customer' ? '🧑‍⚕️ Patient' : 
-                                   message.role === 'avatar' ? '🩺 Dr. Sakura' : 
-                                   '🎯 System'}
+                                   message.role === 'avatar' ? 
+                                     (message as any).improved_from_feedback ? '✨ Dr. Sakura (Improved Response)' : '🩺 Dr. Sakura'
+                                     : '🎯 System'}
                                 </div>
                                 <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
                                 {message.quality_score && (
-                                  <div className="text-xs text-pink-600 mt-2 font-medium">
+                                  <div className={`text-xs mt-2 font-medium ${
+                                    (message as any).improved_from_feedback ? 'text-emerald-600' : 'text-pink-600'
+                                  }`}>
                                     Quality: {message.quality_score}/100
+                                    {(message as any).improved_from_feedback && (
+                                      <span className="ml-2 px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs">
+                                        ✨ Improved
+                                      </span>
+                                    )}
                                   </div>
                                 )}
                                 {message.emotion && (
