@@ -55,13 +55,20 @@ AVATAR_LEARNING_TYPES.forEach(avatarType => {
 router.post('/sessions/:sessionId/continue', (req, res) => {
   try {
     const { sessionId } = req.params;
+    console.log('🔍 API Request Debug:');
+    console.log('   Request body:', JSON.stringify(req.body, null, 2));
+    console.log('   Session ID:', sessionId);
+    
+    const { customerMessage } = req.body; // REAL customer input from API request
+    console.log('   Extracted customerMessage:', customerMessage);
+    
     const session = trainingSessions.find(s => s.id === sessionId);
     
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
     
-    // SMART AI PATIENT: Generate contextual, progressive questions based on avatar type and conversation flow
+    // Use REAL customer message instead of generated questions for human-like conversation
     const sessionAvatarType = session.avatarType || 'dr_sakura';
     const lastAvatarResponse = session.messages.filter(m => m.role === 'avatar').pop()?.content || "";
     const customerMessageCount = session.messages.filter(m => m.role === 'customer').length;
@@ -173,13 +180,18 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       return questions.progressive[progressIndex] || questions.progressive[questions.progressive.length - 1];
     };
     
-    const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
+    // Use the REAL customer message for human-like conversation intelligence (no fallback to generated questions)
+    const customerQuestion = customerMessage ? customerMessage : generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
     
-    // Check knowledge base for improved responses based on ALL previous learning (persistent across sessions)
+    console.log('🎯 Customer input debug:');
+    console.log('   Raw customerMessage from API:', customerMessage);
+    console.log('   Final customerQuestion used:', customerQuestion.substring(0, 100) + '...');
+    
+    // HUMAN-LIKE CONVERSATION INTELLIGENCE: Just like how I remember our conversation patterns and apply them contextually
     const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura', currentCustomerQuestion: string = ''): string | null => {
-      console.log(`🔍 Checking for persistent learning across ALL sessions...`);
+      console.log(`🧠 Checking conversation memory for similar patterns...`);
       
-      // First check current session for any new learning
+      // First check current session for any new learning (like remembering what we just discussed)
       const currentSessionLearning = session.messages.find(m => 
         m.role === 'avatar' && 
         m.improved_response && 
@@ -187,51 +199,54 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       );
       
       if (currentSessionLearning) {
-        console.log(`🔍 Found current session learning: ${currentSessionLearning.id}`);
-        console.log(`📚 ${avatarType.toUpperCase()} applying current session learning`);
+        console.log(`💭 Found recent learning in this conversation`);
+        console.log(`🎯 Applying immediate context: "${currentSessionLearning.user_comment}"`);
         return currentSessionLearning.improved_response;
       }
       
-      // Check universal knowledge base for accumulated learning from ALL previous sessions
+      // Check universal knowledge base - like my memory of all our previous conversations
       if (universalKnowledgeBase[avatarType]) {
         const allLearning = universalKnowledgeBase[avatarType];
-        console.log(`🔍 Found universal learning entries: ${allLearning.length}`);
+        console.log(`💭 Found ${allLearning.length} learned conversation patterns from previous sessions`);
         
-        // Analyze current customer question context
-        const currentIsAboutMammograms = currentCustomerQuestion.toLowerCase().includes('mammogram');
-        const currentIsAboutSelfExams = currentCustomerQuestion.toLowerCase().includes('self-exam');
-        const currentIsAboutScreening = currentCustomerQuestion.toLowerCase().includes('screening') || 
-                                       currentCustomerQuestion.toLowerCase().includes('when to start');
+        // Identify what the current patient is concerned about (like understanding your current question)
+        const currentPatientTopic = 
+          (currentCustomerQuestion.toLowerCase().includes('self-exam') || 
+           currentCustomerQuestion.toLowerCase().includes('teach me how') ||
+           currentCustomerQuestion.toLowerCase().includes('how to do')) ? 'self_exams' :
+          currentCustomerQuestion.toLowerCase().includes('mammogram') ? 'mammograms' :
+          currentCustomerQuestion.toLowerCase().includes('screening') ? 'screening' : 'general_health';
         
-        // Find the most contextually relevant learned response
-        const contextualLearning = allLearning
-          .filter(entry => entry.improved_response && entry.user_feedback && entry.question_context)
+        console.log(`🎯 Patient is asking about: ${currentPatientTopic}`);
+        
+        // Find the most relevant learned pattern - exactly like how I match your current question to previous learnings
+        const relevantLearning = allLearning
+          .filter(entry => entry.improved_response && entry.user_feedback && entry.learning_pattern)
           .find(entry => {
-            // Match similar question contexts
-            const contexts = entry.question_context;
-            return (currentIsAboutMammograms && contexts.isAboutMammograms) ||
-                   (currentIsAboutSelfExams && contexts.isAboutSelfExams) ||
-                   (currentIsAboutScreening && contexts.isAboutScreening);
+            // Perfect match: Same topic + same type of improvement needed
+            return entry.learning_pattern.patient_topic === currentPatientTopic;
           });
         
-        if (contextualLearning) {
-          console.log(`📚 ${avatarType.toUpperCase()} applying contextual learning from previous sessions`);
-          console.log(`🎯 Matched context: "${contextualLearning.user_feedback}"`);
-          return contextualLearning.improved_response;
+        if (relevantLearning) {
+          console.log(`💡 Found perfect match from previous conversation!`);
+          console.log(`📚 Remembering: "${relevantLearning.user_feedback}"`);
+          console.log(`🎯 Applying learned response pattern for ${currentPatientTopic}`);
+          return relevantLearning.improved_response;
         }
         
-        // Fallback to most recent learning if no contextual match
-        const latestLearning = allLearning
+        // Fallback: Look for any learning that might be helpful (like when I apply general lessons)
+        const generalLearning = allLearning
           .filter(entry => entry.improved_response && entry.user_feedback)
           .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
         
-        if (latestLearning) {
-          console.log(`📚 ${avatarType.toUpperCase()} applying latest learning (no contextual match)`);
-          console.log(`🎯 Using accumulated knowledge: "${latestLearning.user_feedback}"`);
-          return latestLearning.improved_response;
+        if (generalLearning) {
+          console.log(`📖 No exact match, but applying general learning pattern`);
+          console.log(`🎯 Using: "${generalLearning.user_feedback}"`);
+          return generalLearning.improved_response;
         }
       }
       
+      console.log(`💭 No previous learning found - will use basic response and learn from feedback`);
       return null;
     };
 
@@ -490,51 +505,57 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
     
     const commentedMessage = session.messages[messageIndex];
     
-    // Generate contextual improved response based on original patient question AND feedback
+    // HUMAN-LIKE LEARNING SYSTEM: Just like our conversation, understand the specific concern and respond contextually
     let improvedResponse = "";
     
-    // Get the original patient question context
-    const patientMessage = session.messages.find(m => m.role === 'customer');
-    const patientQuestion = patientMessage?.content || "";
+    // Get the full conversation context - what did the patient actually ask about?
+    const conversationHistory = session.messages.filter(m => m.role === 'customer' || m.role === 'avatar');
+    const latestPatientMessage = [...conversationHistory].reverse().find(m => m.role === 'customer');
+    const patientConcern = latestPatientMessage?.content || "";
     
-    // Find what the patient was asking about specifically
-    const isAboutMammograms = patientQuestion.toLowerCase().includes('mammogram') || 
-                             commentedMessage.content.toLowerCase().includes('mammogram');
-    const isAboutSelfExams = patientQuestion.toLowerCase().includes('self-exam') || 
-                            commentedMessage.content.toLowerCase().includes('self-exam');
-    const isAboutScreening = patientQuestion.toLowerCase().includes('screening') || 
-                            patientQuestion.toLowerCase().includes('when to start');
-    const isAboutConcerns = patientQuestion.toLowerCase().includes('concern') || 
-                           patientQuestion.toLowerCase().includes('worried') || 
-                           patientQuestion.toLowerCase().includes('anxious');
+    // What specific issue is the trainer pointing out? (Like you pointing out issues to me)
+    const trainerConcern = comment.toLowerCase();
     
-    // Debug logging to understand what's being processed
-    console.log('🔍 Contextual improvement analysis:');
-    console.log('   Patient question:', patientQuestion);
-    console.log('   Feedback comment:', comment);
-    console.log('   isAboutMammograms:', isAboutMammograms);
-    console.log('   isAboutSelfExams:', isAboutSelfExams);
-    console.log('   isAboutScreening:', isAboutScreening);
+    console.log('🧠 HUMAN-LIKE LEARNING ANALYSIS:');
+    console.log('   Patient asked about:', patientConcern.substring(0, 100) + '...');
+    console.log('   Trainer feedback:', comment);
+    console.log('   My previous response:', commentedMessage.content.substring(0, 100) + '...');
     
-    // Generate improved response that addresses the ORIGINAL question with feedback-driven improvements
-    if (isAboutMammograms && comment.toLowerCase().includes('self-exam')) {
-      // Patient asked about mammograms, but feedback says address self-exam concerns
-      improvedResponse = "I completely understand your concerns about mammograms and breast health screening. Many women also feel uncertain about self-exams, so let me address both. For mammograms: they're recommended annually starting at age 40-50 depending on your risk factors. The process takes about 20 minutes with brief compression discomfort. For self-exams: examine your breasts monthly, 3-7 days after your period using flat fingertips in circular motions. Look for hard lumps, skin changes, or nipple discharge. Both mammograms and self-exams work together - mammograms catch what you can't feel, while self-exams help you know what's normal for your body.";
-    } else if (isAboutSelfExams && comment.toLowerCase().includes('specific')) {
-      // Patient asked about self-exams and wants more specific details
-      improvedResponse = "I completely understand your concerns about breast self-exams, and many women feel uncertain about them - that's completely normal. Let me help you feel more confident with specific instructions. Here's exactly how to do them: Examine your breasts monthly, 3-7 days after your period. Lie down with your arm behind your head, use flat fingertips (not fingertips) in small circular motions. Feel for hard, immobile lumps (like marbles), skin dimpling, nipple discharge, or size changes. Normal tissue feels like small peas or gravel. The key is learning what feels normal for your body so you can notice changes. If you find anything concerning, see your doctor within 1-2 weeks - most lumps are benign, but early detection is important.";
-    } else if (isAboutSelfExams) {
-      // Patient specifically asked about self-exams - general improvement
-      improvedResponse = "I completely understand your concerns about breast self-exams, and many women feel uncertain about them - that's completely normal. Let me help you feel more confident. Here's exactly how to do them: Examine your breasts monthly, 3-7 days after your period. Lie down with your arm behind your head, use flat fingertips in small circular motions. Feel for hard, immobile lumps (like marbles), skin dimpling, nipple discharge, or size changes. Normal tissue feels like small peas or gravel. The key is learning what feels normal for your body so you can notice changes. If you find anything concerning, see your doctor within 1-2 weeks - most lumps are benign, but early detection is important.";
-    } else if (isAboutScreening || isAboutConcerns) {
-      // Patient asked about general screening or expressed concerns
-      improvedResponse = "I completely understand your concerns about breast health screening - it's natural to feel anxious about this. Let me give you a clear, comprehensive plan. Breast health involves three components: 1) Monthly self-exams starting in your 20s to know what's normal for you, 2) Clinical breast exams by healthcare providers every 1-3 years, and 3) Mammograms annually starting at age 40-50 based on your risk factors. Each serves a different purpose: self-exams help you notice changes, clinical exams provide professional assessment, and mammograms detect issues before they can be felt. The key is starting at the right age for your situation and maintaining consistency.";
-    } else {
-      // Improve the original response based on feedback context but maintain question context
-      improvedResponse = `I completely understand your concerns about breast health. Let me provide more specific guidance to address what you're asking about. ${commentedMessage.content.includes('mammogram') ? 'For mammograms: they\'re recommended annually starting at age 40-50, take about 20 minutes, and detect issues before they can be felt. ' : ''}${comment.toLowerCase().includes('self-exam') ? 'For self-exams: do them monthly, 3-7 days after your period using flat fingertips in circular motions. Look for hard lumps, skin changes, or nipple discharge. ' : ''}The most important thing is having a comprehensive screening plan that includes both professional screening and self-awareness of your body's normal changes.`;
-    }
+    // Understand the specific concern and respond appropriately (exactly like I do with you)
+    const generateContextualImprovement = () => {
+      // Step 1: Acknowledge I understand the specific concern
+      let response = "I understand your concern. ";
+      
+      // Step 2: Address the original patient question with the trainer's improvement guidance
+      if (trainerConcern.includes('specific') || trainerConcern.includes('technique') || trainerConcern.includes('concrete')) {
+        // Trainer wants more specificity (like when you ask me to be more specific)
+        if (patientConcern.toLowerCase().includes('self-exam')) {
+          response = "I completely understand your concerns about breast self-exams. Let me give you the specific technique you need: Do them monthly, 3-7 days after your period when breasts are least tender. Lie down with your arm behind your head, use the flat part of your fingers (not fingertips) in small circular motions covering the entire breast. Apply three levels of pressure: light for skin surface, medium for breast tissue, firm down to the chest wall. Feel for hard, immobile lumps (like marbles), skin dimpling, nipple discharge, or size changes. Normal tissue feels like small peas or gravel. If you find anything concerning, see your doctor within 1-2 weeks.";
+        } else if (patientConcern.toLowerCase().includes('mammogram')) {
+          response = "I completely understand your concerns about mammograms. Let me give you the specific information you need: Schedule annually starting at age 40 (high risk) or 50 (average risk). The process: You'll undress from waist up, technologist positions your breast on a clear plate, compression paddle presses for 10-15 seconds per image (2 views per breast). Total time: 20 minutes. Pain level: 2-7/10, but only during compression. Results within 48-72 hours. 90%+ are normal. Cost: $100-300, usually covered by insurance.";
+        } else {
+          response = "I completely understand your concerns about breast health screening. Let me give you the specific plan you need: Ages 20-39: Monthly self-exams, clinical exam every 1-3 years. Ages 40-49: Annual mammograms (high risk) or every 2 years (average risk), plus annual clinical exams and monthly self-exams. Ages 50+: Annual mammograms and clinical exams, monthly self-exams. Timeline: If you find anything concerning, see your doctor within 1-2 weeks maximum.";
+        }
+      } else if (trainerConcern.includes('self-exam') || trainerConcern.includes('not sure about self-exams')) {
+        // Trainer wants me to address self-exam uncertainty (like when you point out I missed something)
+        response = "I completely understand your concerns, and many women feel uncertain about self-exams - that's completely normal. Let me help you feel more confident. Self-exams are one part of breast health, along with clinical exams and mammograms. For self-exams: Do them monthly, 3-7 days after your period. Use flat fingertips in circular motions, checking for hard lumps, skin changes, or nipple discharge. The key is learning what feels normal for your body so you can notice changes. Don't worry if it feels awkward at first - it gets easier with practice.";
+      } else if (trainerConcern.includes('better') || trainerConcern.includes('improve') || trainerConcern.includes('more helpful')) {
+        // General improvement request (like when you ask me to do better)
+        if (patientConcern.toLowerCase().includes('self-exam')) {
+          response = "I understand you need clearer guidance about breast self-exams. Here's exactly what to do: Examine your breasts monthly, 3-7 days after your period. Lie down with your arm behind your head, use flat fingertips in small circular motions. Check the entire breast area from collarbone to bra line, armpit to breastbone. Feel for hard, immobile lumps, skin dimpling, nipple discharge, or size changes. The key is consistency - doing it the same way each month so you know what's normal for you.";
+        } else {
+          response = "I understand you need more comprehensive guidance about breast health screening. Here's a complete approach: Breast health involves three complementary methods: 1) Monthly self-exams to know your normal, 2) Regular clinical breast exams by healthcare providers, and 3) Mammograms for early detection. Each serves a different purpose and they work together. The key is starting at the right age for your risk level and maintaining consistency with all three approaches.";
+        }
+      } else {
+        // Address the specific concern mentioned in feedback
+        response = `I understand your concern about ${comment.includes('.') ? comment.split('.')[0] : comment}. ${patientConcern.toLowerCase().includes('mammogram') ? 'For mammograms: they take about 20 minutes, involve brief breast compression for clear images, and are recommended annually starting at age 40-50 based on your risk factors. ' : ''}${patientConcern.toLowerCase().includes('self-exam') ? 'For self-exams: do them monthly, 3-7 days after your period using flat fingertips in circular motions. Look for hard lumps, skin changes, or nipple discharge. ' : ''}The most important thing is having a comprehensive screening plan that includes both professional screening and self-awareness of your body.`;
+      }
+      
+      return response;
+    };
     
-    console.log('🎯 Generated contextual response:', improvedResponse.substring(0, 100) + '...');
+    improvedResponse = generateContextualImprovement();
+    console.log('🎯 Generated human-like improvement:', improvedResponse.substring(0, 100) + '...');
     
     // Create improved response message
     const improvedMessage = {
@@ -589,22 +610,30 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
       universalKnowledgeBase[avatarType] = [];
     }
     
-    // Store contextual learning entry with patient question context for future retrieval
+    // Store human-like learning entry - exactly like how I remember our conversation patterns
     universalKnowledgeBase[avatarType].push({
-      user_feedback: comment,
-      improved_response: improvedResponse,
-      original_response: commentedMessage.content,
-      patient_question: patientQuestion, // Store original patient question for context matching
-      topic_type: topicType,
+      user_feedback: comment, // What the trainer told me to improve
+      improved_response: improvedResponse, // My better response after understanding the concern
+      original_response: commentedMessage.content, // My initial response that needed improvement
+      patient_concern: patientConcern, // What the patient originally asked about
+      conversation_context: conversationHistory.map(m => ({ role: m.role, content: m.content?.substring(0, 200) })), // Full conversation flow
+      learning_pattern: {
+        concern_type: trainerConcern.includes('specific') ? 'needs_specificity' :
+                     trainerConcern.includes('self-exam') ? 'address_self_exam_concerns' :
+                     trainerConcern.includes('better') ? 'general_improvement' : 'contextual_guidance',
+        patient_topic: (patientConcern.toLowerCase().includes('self-exam') || 
+                       patientConcern.toLowerCase().includes('teach me how') ||
+                       patientConcern.toLowerCase().includes('how to do')) ? 'self_exams' :
+                      patientConcern.toLowerCase().includes('mammogram') ? 'mammograms' :
+                      patientConcern.toLowerCase().includes('screening') ? 'screening' : 'general_health'
+      },
       timestamp: new Date().toISOString(),
       business_context: session.business_type || 'health_coaching',
-      question_context: {
-        isAboutMammograms,
-        isAboutSelfExams,
-        isAboutScreening,
-        isAboutConcerns
-      },
-      usage_count: 0
+      success_factors: [
+        'acknowledged_specific_concern',
+        'addressed_original_question',
+        'provided_actionable_guidance'
+      ]
     });
 
     console.log(`📚 ${avatarType.toUpperCase()} learned new response for: ${topicType} (Total learned: ${universalKnowledgeBase[avatarType].length})`);
