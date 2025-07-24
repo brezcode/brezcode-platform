@@ -478,32 +478,56 @@ export default function BrezCodeAvatarTraining() {
                         {messages.map((message, index) => (
                           <div 
                             key={index} 
-                            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                            className={`flex mb-4 ${
+                              message.role === 'customer' ? 'justify-start' : 
+                              message.role === 'avatar' ? 'justify-end' : 
+                              'justify-center'
+                            }`}
                           >
-                            <div className={`flex items-start space-x-2 max-w-[80%] ${
-                              message.role === 'user' ? 'flex-row-reverse space-x-reverse' : ''
+                            <div className={`flex items-start space-x-3 max-w-[85%] ${
+                              message.role === 'avatar' ? 'flex-row-reverse space-x-reverse' : ''
                             }`}>
-                              <Avatar className="h-8 w-8">
+                              <Avatar className="h-10 w-10 flex-shrink-0">
                                 <AvatarFallback className={
-                                  message.role === 'user' 
-                                    ? 'bg-blue-100 text-blue-700' 
-                                    : message.role === 'system'
-                                    ? 'bg-gray-100 text-gray-700'
-                                    : 'bg-pink-100 text-pink-700'
+                                  message.role === 'customer' 
+                                    ? 'bg-blue-100 text-blue-700 border-2 border-blue-200' 
+                                    : message.role === 'avatar'
+                                    ? 'bg-pink-100 text-pink-700 border-2 border-pink-200'
+                                    : 'bg-gray-100 text-gray-600'
                                 }>
-                                  {message.role === 'user' ? <User className="h-4 w-4" /> : 
-                                   message.role === 'system' ? <Settings className="h-4 w-4" /> : 
-                                   <Heart className="h-4 w-4" />}
+                                  {message.role === 'customer' ? 
+                                    <User className="h-5 w-5" /> : 
+                                   message.role === 'avatar' ? 
+                                    <Heart className="h-5 w-5" /> : 
+                                    <Settings className="h-4 w-4" />}
                                 </AvatarFallback>
                               </Avatar>
-                              <div className={`rounded-lg px-4 py-2 ${
-                                message.role === 'user' 
-                                  ? 'bg-blue-500 text-white' 
-                                  : message.role === 'system'
-                                  ? 'bg-pink-100 text-pink-800 border border-pink-200'
-                                  : 'bg-gray-100 text-gray-800 border'
+                              <div className={`rounded-lg px-4 py-3 shadow-sm ${
+                                message.role === 'customer' 
+                                  ? 'bg-blue-50 text-blue-900 border border-blue-200' 
+                                  : message.role === 'avatar'
+                                  ? 'bg-pink-50 text-pink-900 border border-pink-200'
+                                  : 'bg-gray-50 text-gray-800 border border-gray-200'
                               }`}>
-                                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                                <div className={`text-xs font-medium mb-1 ${
+                                  message.role === 'customer' ? 'text-blue-600' :
+                                  message.role === 'avatar' ? 'text-pink-600' : 'text-gray-500'
+                                }`}>
+                                  {message.role === 'customer' ? '🧑‍⚕️ Patient' : 
+                                   message.role === 'avatar' ? '🩺 Dr. Sakura' : 
+                                   '🎯 System'}
+                                </div>
+                                <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
+                                {message.quality_score && (
+                                  <div className="text-xs text-pink-600 mt-2 font-medium">
+                                    Quality: {message.quality_score}/100
+                                  </div>
+                                )}
+                                {message.emotion && (
+                                  <div className="text-xs text-blue-600 mt-1">
+                                    Emotion: {message.emotion}
+                                  </div>
+                                )}
                               </div>
                             </div>
                           </div>
