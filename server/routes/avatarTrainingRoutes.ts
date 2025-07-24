@@ -234,13 +234,19 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           return relevantLearning.improved_response;
         }
         
-        // Fallback: Look for any learning that might be helpful (like when I apply general lessons)
+        // Contextual intelligence: Only apply general learning if it's truly appropriate
+        if (currentPatientTopic === 'mammograms' || currentPatientTopic === 'screening') {
+          console.log(`🎯 No specific ${currentPatientTopic} learning found - using basic response to avoid topic confusion`);
+          return null; // Let the system use basic response instead of potentially confusing self-exam advice
+        }
+        
+        // For general topics, look for any learning that might be helpful
         const generalLearning = allLearning
           .filter(entry => entry.improved_response && entry.user_feedback)
           .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
         
         if (generalLearning) {
-          console.log(`📖 No exact match, but applying general learning pattern`);
+          console.log(`📖 Applying general learning pattern for ${currentPatientTopic}`);
           console.log(`🎯 Using: "${generalLearning.user_feedback}"`);
           return generalLearning.improved_response;
         }
