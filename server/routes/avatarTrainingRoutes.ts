@@ -163,7 +163,13 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           }
         },
         'dr_sakura': {
-          initial: "I'm concerned about breast health screening, but I need SPECIFIC information. Everyone gives me vague advice. What exactly should I do and when?",
+          initial: [
+            "I'm concerned about breast health screening. Everyone gives me different advice. What should I do and when?",
+            "I've heard conflicting information about mammograms and breast health. Can you help me understand the basics?",
+            "I'm worried about breast cancer risk factors. What are the most important things I should know?",
+            "My doctor mentioned breast self-exams but didn't explain much. Can you walk me through this?",
+            "I'm confused about when to start different types of breast health screening. What do you recommend?"
+          ],
           progressive: [
             "You mentioned screening but didn't tell me HOW OFTEN exactly. Every year? Every two years? At what age do I start?",
             "That's too vague about self-exams. What EXACTLY am I looking for? Describe what a concerning lump feels like.",
@@ -197,6 +203,11 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       const questions = avatarQuestions[avatarType] || avatarQuestions['dr_sakura'];
       
       if (messageIndex === 0) {
+        // Handle array of initial questions for variety
+        if (Array.isArray(questions.initial)) {
+          const randomIndex = Math.floor(Math.random() * questions.initial.length);
+          return questions.initial[randomIndex];
+        }
         return questions.initial;
       }
       
@@ -263,35 +274,46 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
         
         console.log(`🎯 Patient is asking about: ${currentPatientTopic}`);
         
-        // Find the most relevant learned pattern - exactly like how I match your current question to previous learnings
-        const relevantLearning = allLearning
-          .filter(entry => entry.improved_response && entry.user_feedback && entry.learning_pattern)
-          .find(entry => {
-            // Perfect match: Same topic + same type of improvement needed
-            return entry.learning_pattern.patient_topic === currentPatientTopic;
-          });
+        // Only apply learned responses when customer specifically asks for detailed information
+        // This preserves natural conversation variety while using learning appropriately
+        const isSpecificRequest = currentCustomerQuestion.toLowerCase().includes('specific') || 
+                                 currentCustomerQuestion.toLowerCase().includes('exactly') || 
+                                 currentCustomerQuestion.toLowerCase().includes('vague') ||
+                                 currentCustomerQuestion.toLowerCase().includes('detailed');
         
-        if (relevantLearning) {
-          console.log(`💡 Found perfect match from previous conversation!`);
-          console.log(`📚 Remembering: "${relevantLearning.user_feedback}"`);
-          console.log(`🎯 Applying learned response pattern for ${currentPatientTopic}`);
-          return relevantLearning.improved_response;
+        if (isSpecificRequest) {
+          // Find the most relevant learned pattern when specifically requested
+          const relevantLearning = allLearning
+            .filter(entry => entry.improved_response && entry.user_feedback && entry.learning_pattern)
+            .find(entry => {
+              // Perfect match: Same topic + specificity request
+              return entry.learning_pattern.patient_topic === currentPatientTopic;
+            });
+          
+          if (relevantLearning) {
+            console.log(`💡 Found perfect match from previous conversation!`);
+            console.log(`📚 Remembering: "${relevantLearning.user_feedback}"`);
+            console.log(`🎯 Applying learned response pattern for ${currentPatientTopic}`);
+            return relevantLearning.improved_response;
+          }
         }
         
-        // If no perfect topic match, check if we have general relevant learning that can be applied
-        const generalRelevantLearning = allLearning
-          .filter(entry => entry.improved_response && entry.user_feedback)
-          .find(entry => {
-            // Apply screening/general health learning to screening questions
-            const isHealthRelated = ['screening', 'general_health', 'mammograms'].includes(entry.learning_pattern?.patient_topic);
-            const currentIsHealthRelated = ['screening', 'general_health', 'mammograms'].includes(currentPatientTopic);
-            return isHealthRelated && currentIsHealthRelated;
-          });
-        
-        if (generalRelevantLearning) {
-          console.log(`📖 Applying relevant health learning pattern for ${currentPatientTopic}`);
-          console.log(`🎯 Using: "${generalRelevantLearning.user_feedback}"`);
-          return generalRelevantLearning.improved_response;
+        // Only apply general relevant learning when explicitly requested for better responses
+        if (isSpecificRequest) {
+          const generalRelevantLearning = allLearning
+            .filter(entry => entry.improved_response && entry.user_feedback)
+            .find(entry => {
+              // Apply screening/general health learning to screening questions when specifically asked
+              const isHealthRelated = ['screening', 'general_health', 'mammograms'].includes(entry.learning_pattern?.patient_topic);
+              const currentIsHealthRelated = ['screening', 'general_health', 'mammograms'].includes(currentPatientTopic);
+              return isHealthRelated && currentIsHealthRelated;
+            });
+          
+          if (generalRelevantLearning) {
+            console.log(`📖 Applying relevant health learning due to specificity request`);
+            console.log(`🎯 Using: "${generalRelevantLearning.user_feedback}"`);
+            return generalRelevantLearning.improved_response;
+          }
         }
         
         // Only apply general learning if we're specifically asked for improved responses
