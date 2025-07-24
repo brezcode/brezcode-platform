@@ -41,19 +41,20 @@ const AVATAR_LEARNING_TYPES = [
   'luna_strategic', 'professor_sage'
 ];
 
-AVATAR_LEARNING_TYPES.forEach(avatarType => {
-  if (!universalAvatarKnowledgeBase[avatarType]) {
-    universalAvatarKnowledgeBase[avatarType] = {
-      improvedResponses: [],
-      commonQuestions: [],
-      learningStats: {
-        total_feedback_received: 0,
-        improvement_trends: [],
-        last_updated: new Date().toISOString()
-      }
-    };
-  }
-});
+// Disabled cross-session learning to ensure users always start with basic responses
+// AVATAR_LEARNING_TYPES.forEach(avatarType => {
+//   if (!universalAvatarKnowledgeBase[avatarType]) {
+//     universalAvatarKnowledgeBase[avatarType] = {
+//       improvedResponses: [],
+//       commonQuestions: [],
+//       learningStats: {
+//         total_feedback_received: 0,
+//         improvement_trends: [],
+//         last_updated: new Date().toISOString()
+//       }
+//     };
+//   }
+// });
 
 // Add a continue conversation endpoint for BrezCode training
 router.post('/sessions/:sessionId/continue', (req, res) => {
@@ -179,27 +180,27 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     
     const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
     
-    // Check knowledge base for improved responses based on previous learning (universal for all avatars)
+    // Check knowledge base for improved responses based on previous learning (session-specific only)
     const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
-      // Ensure avatar knowledge base exists
-      if (!universalAvatarKnowledgeBase[avatarType]) {
-        universalAvatarKnowledgeBase[avatarType] = {
-          improvedResponses: [],
-          commonQuestions: [],
-          learningStats: { total_feedback_received: 0, improvement_trends: [], last_updated: new Date().toISOString() }
-        };
-      }
+      // Only apply learning within the same session, not across sessions
+      // This ensures users always start with basic responses to see improvement
       
-      // Check if we have any learned responses for this avatar
-      if (universalAvatarKnowledgeBase[avatarType].improvedResponses.length > 0) {
-        // Use the most recent improvement for any health/guidance related questions
-        const latestLearning = universalAvatarKnowledgeBase[avatarType].improvedResponses[
-          universalAvatarKnowledgeBase[avatarType].improvedResponses.length - 1
-        ];
-        
-        latestLearning.usage_count++;
-        console.log(`📚 ${avatarType.toUpperCase()} applying learned response for: ${latestLearning.originalTopic}`);
-        return latestLearning.improvedResponse;
+      console.log(`🔍 Checking for session learning... Session has ${session.messages.length} messages`);
+      
+      // Check if we have learning from comments in THIS session
+      const sessionLearning = session.messages.find(m => 
+        m.role === 'avatar' && 
+        m.improved_response && 
+        m.user_comment
+      );
+      
+      console.log(`🔍 Found session learning:`, !!sessionLearning);
+      if (sessionLearning) {
+        console.log(`🔍 Learning message ID: ${sessionLearning.id}`);
+        console.log(`🔍 Has improved response: ${!!sessionLearning.improved_response}`);
+        console.log(`🔍 Has user comment: ${!!sessionLearning.user_comment}`);
+        console.log(`📚 ${avatarType.toUpperCase()} applying session learning from previous comment`);
+        return sessionLearning.improved_response;
       }
       
       return null;
@@ -230,8 +231,8 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           'default': "I understand you need concrete business strategies. Focus on the 3 pillars: Revenue optimization (increase pricing or volume), Cost reduction (eliminate waste), and Market expansion (new channels or segments). Start with quick wins that generate cash flow within 90 days."
         },
         'dr_sakura': {
-          'specific_guidance': "Breast health is important, and you should do regular screenings. Self-exams and mammograms are both helpful. Talk to your doctor about when to start. It's good to be proactive about your health.",
-          'default': "Regular screening is important for breast health. There are different types of screening that can help. I recommend talking to your healthcare provider about what's right for you."
+          'specific_guidance': "You're absolutely right - let me be more specific. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions. Look for hard, immobile masses (like marbles), skin dimpling, nipple discharge, or size changes. Schedule mammograms annually starting at age 40 if high-risk, age 50 if average risk. Any concerning findings should be evaluated within 1-2 weeks.",
+          'default': "Breast health is important, and you should do regular screenings. Self-exams and mammograms are both helpful. Talk to your doctor about when to start. It's good to be proactive about your health."
         },
         'education_specialist': {
           'specific_guidance': "You're absolutely right - let me be more specific with learning strategies. Here's exactly what you need: 1) Use the Feynman Technique - explain concepts in simple terms, 2) Apply spaced repetition with 1-day, 3-day, 1-week, 1-month intervals, 3) Create mind maps for visual learners, 4) Practice active recall instead of passive reading, 5) Set specific learning objectives with measurable outcomes. Track progress weekly with assessment quizzes.",
@@ -243,16 +244,20 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       return avatarData[questionType] || avatarData['default'];
     };
 
-    if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague")) {
-      // Check for learned responses first
-      const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType);
-      if (learnedResponse) {
-        avatarResponse = learnedResponse;
-        usedLearning = true;
-      } else {
-        avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'specific_guidance');
-      }
-      
+    // Always check for learned responses first, regardless of question type
+    const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType);
+    if (learnedResponse) {
+      avatarResponse = learnedResponse;
+      usedLearning = true;
+      console.log("🎯 Using learned response for improved experience");
+    } else {
+      // Always start with basic responses for fresh sessions to show improvement potential
+      // Only use detailed responses if we have learning from user feedback
+      avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'default');
+      console.log("🎯 Using basic response - user can provide feedback for improvement");
+    }
+
+    if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague") || usedLearning) {
       // Generate avatar-specific multiple choice options
       const avatarOptions = {
         'sales_specialist': [
