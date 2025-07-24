@@ -52,27 +52,53 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       customerQuestion = drillingQuestions[Math.floor(Math.random() * drillingQuestions.length)];
     }
     
-    // Generate specific Dr. Sakura responses based on patient's drilling questions
+    // Generate specific Dr. Sakura responses with multiple choice options
     let drSakuraResponse = "";
+    let multipleChoiceOptions: string[] = [];
     
     if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague")) {
-      drSakuraResponse = "You're absolutely right to ask for specifics. For someone your age, mammograms should start at 40 (or 50 depending on risk factors). Schedule annually if you have family history, every 2 years if average risk. Self-exams monthly, 3-7 days after your period ends. Any lump that feels like a grape or marble, is immobile, or has irregular edges needs immediate evaluation within 1-2 weeks.";
+      drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      multipleChoiceOptions = [
+        "Do you want me to guide you through monthly self-exams?",
+        "Do you want to know more about how healthcare providers perform clinical exams?",
+        "Do you want to know more about mammogram screening?"
+      ];
     } else if (customerQuestion.includes("HOW OFTEN") || customerQuestion.includes("timeline")) {
       drSakuraResponse = "Here's the exact timeline: Clinical breast exams every 1-3 years from age 25-39, then annually. Mammograms annually starting at age 40 (high risk) or age 50 (average risk). Self-exams monthly. If you find anything concerning, see your doctor within 2 weeks. Schedule mammograms for the week after your period when breasts are least tender.";
+      multipleChoiceOptions = [
+        "Can you explain what happens during a clinical breast exam?",
+        "What should I do if I find something concerning during self-exam?",
+        "How do I know if I'm high risk and need earlier screening?"
+      ];
     } else if (customerQuestion.includes("process") || customerQuestion.includes("what happens")) {
       drSakuraResponse = "Here's exactly what happens: You'll undress from the waist up, put on a hospital gown that opens in front. The technologist positions your breast on a plastic plate, then a paddle compresses it for 10-15 seconds while the X-ray is taken. Two views per breast - one from top to bottom, one side to side. Total time: 20 minutes. Pain level: 2-7 out of 10, brief compression discomfort only.";
+      multipleChoiceOptions = [
+        "How can I reduce discomfort during mammogram?",
+        "What do the mammogram results mean?",
+        "What happens if they find something abnormal?"
+      ];
     } else if (customerQuestion.includes("feel like") || customerQuestion.includes("warning signs")) {
       drSakuraResponse = "Concerning lumps feel like: hard, immobile mass (like a marble); irregular, not round; painless initially; different from surrounding tissue. Normal breast tissue feels like small peas or gravel. Red flags: new lump that doesn't move, skin dimpling, nipple discharge (bloody or clear), breast size changes, persistent pain in one spot. Any of these warrant a doctor visit within 1-2 weeks.";
+      multipleChoiceOptions = [
+        "Can you teach me the proper self-exam technique?",
+        "What questions should I ask my doctor if I find a lump?",
+        "Are there other symptoms besides lumps I should watch for?"
+      ];
     } else if (customerQuestion.includes("step-by-step") || customerQuestion.includes("instructions")) {
       drSakuraResponse = "Step 1: Call your doctor's office, request 'clinical breast exam and mammogram referral'. Step 2: Schedule mammogram for 1 week after your period. Step 3: Don't wear deodorant/lotion that day. Step 4: Bring previous mammogram films if available. Step 5: Arrive 15 minutes early for paperwork. Step 6: Results typically available within 48-72 hours via phone call or patient portal.";
-    } else {
-      // Default more specific responses when patients are being persistent
-      const specificResponses = [
-        "I understand you need concrete information. Mammograms detect cancer 1-2 years before you can feel a lump. They reduce breast cancer death rates by 20-40%. For a 50-year-old woman, annual screening prevents 1 death per 1000 women screened over 10 years. The compression lasts 10-15 seconds and feels like firm pressure, not cutting pain.",
-        "Let me give you exact numbers: 1 in 8 women develop breast cancer. 85% have no family history. Mammograms find 80-90% of breast cancers in women over 50. Self-exams help you know what's normal for you. Schedule your mammogram between days 1-7 of your cycle when breasts are least dense and tender.",
-        "Here are the specific ages and actions: 20s-30s: monthly self-exams, clinical exam every 3 years. 40s+: annual mammograms and clinical exams, monthly self-exams. High risk (family history): start mammograms 10 years before affected relative's age or age 40, whichever is earlier. MRI may be recommended for BRCA carriers."
+      multipleChoiceOptions = [
+        "What should I expect when I get my results?",
+        "Do I need a referral or can I schedule directly?",
+        "What if I don't have previous mammogram films?"
       ];
-      drSakuraResponse = specificResponses[Math.floor(Math.random() * specificResponses.length)];
+    } else {
+      // Default: ALWAYS provide multiple choice options to ensure guided interaction
+      drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      multipleChoiceOptions = [
+        "Do you want me to guide you through monthly self-exams?",
+        "Do you want to know more about how healthcare providers perform clinical exams?",
+        "Do you want to know more about mammogram screening?"
+      ];
     }
     
     // Add new customer message
@@ -84,13 +110,14 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       emotion: customerQuestion.includes('EXACTLY') || customerQuestion.includes('vague') ? 'demanding' : 'concerned'
     };
     
-    // Add Dr. Sakura's response
+    // Add Dr. Sakura's response with multiple choice options
     const newAvatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 2}`,
       role: 'avatar', 
       content: drSakuraResponse,
       timestamp: new Date().toISOString(),
-      quality_score: Math.floor(Math.random() * 20) + 80
+      quality_score: Math.floor(Math.random() * 20) + 80,
+      multiple_choice_options: multipleChoiceOptions
     };
     
     session.messages.push(newCustomerMessage, newAvatarMessage);
@@ -106,6 +133,69 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     res.json({
       success: true,
       session: session
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Add endpoint for handling multiple choice selections
+router.post('/sessions/:sessionId/choice', (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { choice } = req.body;
+    
+    const session = trainingSessions.find(s => s.id === sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Generate Dr. Sakura's response based on the selected choice
+    let drSakuraResponse = "";
+    
+    if (choice.includes("guide you through monthly self-exams")) {
+      drSakuraResponse = "Absolutely! Here's the proper self-exam technique: 1) Do it monthly, 3-7 days after your period when breasts are least tender. 2) Lie down with a pillow under your right shoulder, right arm behind your head. 3) Use your left hand's flat fingertips (not fingernails) to examine your right breast in small circular motions. 4) Check the entire breast area from collarbone to bra line, armpit to breastbone. 5) Use three levels of pressure: light (skin surface), medium (tissue), firm (down to ribs). 6) Repeat on left breast. 7) Also check while standing in shower with soapy hands.";
+    } else if (choice.includes("clinical exams")) {
+      drSakuraResponse = "During a clinical breast exam, your healthcare provider will: 1) Have you undress from the waist up and put on a gown. 2) Visually inspect your breasts for size/shape changes, skin dimpling, nipple discharge. 3) You'll lie down and they'll systematically feel each breast using fingertips in circular motions. 4) They'll check lymph nodes under arms, above/below collarbone. 5) They'll also examine while you're sitting up with arms in different positions. 6) The exam takes 5-10 minutes and should not be painful. This professional assessment can detect changes you might miss during self-exams.";
+    } else if (choice.includes("mammogram screening")) {
+      drSakuraResponse = "Mammogram screening details: 1) Schedule annually starting at age 40 (high risk) or 50 (average risk). 2) Schedule for 1 week after your period when breasts are least tender. 3) Don't wear deodorant, perfume, or powder on exam day. 4) Wear a two-piece outfit for easy undressing. 5) Bring previous mammogram films if available. 6) The technologist will position and compress your breast for 10-15 seconds per view. 7) Two views per breast: top-to-bottom and side-to-side. 8) Results typically available within 48-72 hours. Most mammograms (90%+) are normal. If abnormal, additional imaging or biopsy may be needed.";
+    } else if (choice.includes("reduce discomfort")) {
+      drSakuraResponse = "To reduce mammogram discomfort: 1) Schedule for the week after your period when breasts are least tender. 2) Avoid caffeine the day before (can increase breast sensitivity). 3) Take an over-the-counter pain reliever 1 hour before your appointment. 4) Practice deep breathing during compression. 5) Ask the technologist to warn you before compression starts. 6) Remember compression only lasts 10-15 seconds. 7) If you have fibrocystic breasts, discuss timing with your doctor. The discomfort is brief but necessary for clear images that could save your life.";
+    } else if (choice.includes("results mean")) {
+      drSakuraResponse = "Mammogram results explained: 1) Normal/Negative: No signs of cancer, continue routine screening. 2) Benign findings: Non-cancerous changes like cysts or calcifications, may need monitoring. 3) Probably benign: 98% chance of being normal, usually requires 6-month follow-up. 4) Suspicious abnormality: Needs biopsy to determine if cancerous. 5) Highly suggestive of malignancy: Very likely cancer, immediate biopsy needed. Results are categorized as BI-RADS 0-6. Most abnormal findings (80%) turn out to be benign. If called back for additional imaging, don't panic - it's often just to get clearer pictures.";
+    } else if (choice.includes("something abnormal")) {
+      drSakuraResponse = "If mammogram finds something abnormal: 1) You'll be called back for additional imaging (diagnostic mammogram or ultrasound). 2) If still abnormal, a biopsy will be recommended. 3) Core needle biopsy is most common - takes tissue sample with a needle. 4) Results available in 3-5 days. 5) If benign, return to routine screening. 6) If malignant, you'll be referred to oncology within 1-2 weeks. 7) Remember: Being called back doesn't mean cancer - only 2-4% of callbacks result in cancer diagnosis. Early detection greatly improves treatment outcomes.";
+    } else {
+      // Default response for other choices
+      drSakuraResponse = "That's an excellent question. Let me provide you with specific, actionable information about that topic. Based on current medical guidelines and best practices, here's what you need to know...";
+    }
+    
+    // Add patient's choice as a message
+    const choiceMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 1}`,
+      role: 'customer',
+      content: choice,
+      timestamp: new Date().toISOString(),
+      emotion: 'curious',
+      is_choice_selection: true
+    };
+    
+    // Add Dr. Sakura's response
+    const responseMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 2}`,
+      role: 'avatar',
+      content: drSakuraResponse,
+      timestamp: new Date().toISOString(),
+      quality_score: Math.floor(Math.random() * 10) + 90,
+      multiple_choice_options: [] // No additional choices for now, can be expanded
+    };
+    
+    session.messages.push(choiceMessage, responseMessage);
+    
+    res.json({
+      success: true,
+      session: session,
+      message: "Choice processed successfully"
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });

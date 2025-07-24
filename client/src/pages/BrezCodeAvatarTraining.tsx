@@ -93,6 +93,8 @@ interface ChatMessage {
   id?: string;
   userRating?: 'thumbs_up' | 'thumbs_down' | null;
   userComment?: string;
+  multiple_choice_options?: string[];
+  is_choice_selection?: boolean;
 }
 
 interface TrainingSession {
@@ -306,6 +308,29 @@ export default function BrezCodeAvatarTraining() {
       toast({
         title: "Conversation Continued",
         description: `Dr. Sakura handling patient concerns`,
+      });
+    }
+  });
+
+  // Handle multiple choice selection
+  const handleMultipleChoice = useMutation({
+    mutationFn: async (choice: string) => {
+      if (!activeSession) throw new Error('No active session');
+      
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/choice`, {
+        choice
+      });
+      if (!response.ok) throw new Error('Failed to submit choice');
+      return response.json();
+    },
+    onSuccess: (data) => {
+      if (data.success && data.session) {
+        setMessages(data.session.messages);
+        setActiveSession(data.session);
+      }
+      toast({
+        title: "💬 Response Generated",
+        description: "Dr. Sakura responded to your selected question",
       });
     }
   });
@@ -673,6 +698,36 @@ export default function BrezCodeAvatarTraining() {
                                 {message.emotion && (
                                   <div className="text-xs text-blue-600 mt-1">
                                     Emotion: {message.emotion}
+                                  </div>
+                                )}
+                                
+                                {/* Multiple Choice Options - Only for Dr. Sakura responses */}
+                                {message.role === 'avatar' && (message as any).multiple_choice_options && (message as any).multiple_choice_options.length > 0 && (
+                                  <div className="mt-4 p-3 bg-pink-25 border border-pink-200 rounded-lg">
+                                    <div className="text-sm font-medium text-pink-700 mb-3">Choose what you'd like to know more about:</div>
+                                    <div className="space-y-2">
+                                      {(message as any).multiple_choice_options.map((option: string, optionIndex: number) => (
+                                        <Button
+                                          key={optionIndex}
+                                          variant="outline"
+                                          size="sm"
+                                          className="w-full text-left justify-start h-auto p-3 hover:bg-pink-50 hover:border-pink-300 border-pink-200"
+                                          onClick={() => handleMultipleChoice.mutate(option)}
+                                          disabled={handleMultipleChoice.isPending}
+                                        >
+                                          <div className="flex items-start gap-2">
+                                            <span className="text-pink-600 font-semibold mt-0.5">{optionIndex + 1})</span>
+                                            <span className="text-sm text-gray-700 leading-relaxed">{option}</span>
+                                          </div>
+                                        </Button>
+                                      ))}
+                                    </div>
+                                    {handleMultipleChoice.isPending && (
+                                      <div className="text-xs text-pink-600 mt-2 flex items-center gap-1">
+                                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-pink-600 border-t-transparent"></div>
+                                        Dr. Sakura is responding...
+                                      </div>
+                                    )}
                                   </div>
                                 )}
                                 
