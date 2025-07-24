@@ -325,8 +325,22 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       if (data.success && data.session) {
+        // Update session and messages completely
         setMessages(data.session.messages);
         setActiveSession(data.session);
+        
+        // Force a re-render to ensure multiple choice options show up
+        setTimeout(() => {
+          setMessages([...data.session.messages]);
+        }, 50);
+        
+        // Scroll to bottom to show new messages
+        setTimeout(() => {
+          const messagesContainer = document.querySelector('.overflow-y-auto');
+          if (messagesContainer) {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+          }
+        }, 200);
       }
       toast({
         title: "💬 Response Generated",
@@ -350,7 +364,9 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       // Update session with improved response
-      setActiveSession(data.session);
+      if (data.session) {
+        setActiveSession(data.session);
+      }
       
       // Update the original message with the improved response inline
       if (data.improved_message) {
@@ -367,11 +383,24 @@ export default function BrezCodeAvatarTraining() {
           }
           return msg;
         }));
+        
+        // Also ensure the comment form is closed after successful submission
+        setCommentingOnMessage(null);
+        setCommentText('');
+        setSelectedRating(null);
+        
+        // Scroll to the improved message
+        setTimeout(() => {
+          const improvedElement = document.getElementById(`improved-response-${data.improved_message.original_message_id}`);
+          if (improvedElement) {
+            improvedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
       }
       
       toast({
         title: "✅ Dr. Sakura Learned & Improved!",
-        description: data.message,
+        description: data.message || "Response improved based on your feedback",
       });
     }
   });
@@ -613,7 +642,7 @@ export default function BrezCodeAvatarTraining() {
                                 
                                 {/* Show improved response if exists */}
                                 {(message as any).improved_response && (
-                                  <div className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
+                                  <div id={`improved-response-${message.id}`} className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
                                     <div className="flex items-center gap-2 mb-2">
                                       <span className="text-emerald-600 text-sm font-semibold">✨ Dr. Sakura (Revised answer):</span>
                                       <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
@@ -703,7 +732,7 @@ export default function BrezCodeAvatarTraining() {
                                 
                                 {/* Multiple Choice Options - Only for Dr. Sakura responses */}
                                 {message.role === 'avatar' && (message as any).multiple_choice_options && (message as any).multiple_choice_options.length > 0 && (
-                                  <div className="mt-4 p-3 bg-pink-25 border border-pink-200 rounded-lg">
+                                  <div className="mt-4 p-3 bg-pink-50 border border-pink-200 rounded-lg">
                                     <div className="text-sm font-medium text-pink-700 mb-3">Choose what you'd like to know more about:</div>
                                     <div className="space-y-2">
                                       {(message as any).multiple_choice_options.map((option: string, optionIndex: number) => (

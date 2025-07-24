@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Display Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f2f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 6px; }
+        .success { border-color: #10b981; background: #f0fdf4; }
+        .error { border-color: #ef4444; background: #fef2f2; }
+        .warning { border-color: #f59e0b; background: #fffbeb; }
+        .test-result { margin: 10px 0; padding: 10px; font-family: monospace; background: #f8f9fa; border-radius: 4px; }
+        .button { display: inline-block; padding: 8px 12px; margin: 5px; background: #3b82f6; color: white; text-decoration: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #2563eb; }
+        .loading { color: #6b7280; }
+        .multiple-choice { background: #fdf2f8; border: 1px solid #f9a8d4; padding: 15px; border-radius: 6px; margin: 10px 0; }
+        .choice-button { display: block; width: 100%; padding: 10px; margin: 5px 0; background: white; border: 1px solid #f9a8d4; border-radius: 4px; text-align: left; cursor: pointer; }
+        .choice-button:hover { background: #fdf2f8; }
+        .improved-response { background: #f0fdf4; border: 2px solid #a7f3d0; padding: 15px; border-radius: 6px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Frontend Display Test for Avatar Training</h1>
+        <p>Testing both Multiple Choice and Iterative Feedback systems in the browser</p>
+        
+        <div id="testResults"></div>
+        
+        <div class="test-section">
+            <h3>🎯 Test 1: Start Training Session</h3>
+            <button class="button" onclick="startSession()">Start New Session</button>
+            <div id="sessionResult" class="test-result loading">Waiting for test...</div>
+        </div>
+        
+        <div class="test-section">
+            <h3>📋 Test 2: Multiple Choice Display</h3>
+            <button class="button" onclick="testMultipleChoice()">Test Multiple Choice</button>
+            <div id="multipleChoiceResult" class="test-result loading">Waiting for test...</div>
+            <div id="multipleChoiceDisplay"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>✨ Test 3: Iterative Feedback Display</h3>
+            <button class="button" onclick="testIterativeFeedback()">Test Iterative Feedback</button>
+            <div id="feedbackResult" class="test-result loading">Waiting for test...</div>
+            <div id="feedbackDisplay"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>🏆 Final Results</h3>
+            <div id="finalResults" class="test-result loading">Run all tests to see final results...</div>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+        let lastMessageId = null;
+        
+        async function apiRequest(method, endpoint, data = null) {
+            const url = `http://localhost:5000${endpoint}`;
+            const options = {
+                method,
+                headers: { 'Content-Type': 'application/json' }
+            };
+            
+            if (data) {
+                options.body = JSON.stringify(data);
+            }
+            
+            const response = await fetch(url, options);
+            return {
+                ok: response.ok,
+                status: response.status,
+                json: async () => response.json()
+            };
+        }
+        
+        async function startSession() {
+            const resultDiv = document.getElementById('sessionResult');
+            resultDiv.innerHTML = '<span style="color: #3b82f6;">🔄 Starting session...</span>';
+            
+            try {
+                const response = await apiRequest('POST', '/api/avatar-training/sessions/start', {
+                    avatarId: 'brezcode_health_coach',
+                    scenarioId: 'breast_health_anxiety',
+                    businessContext: 'brezcode'
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentSessionId = data.session.id;
+                    resultDiv.innerHTML = `<span style="color: #10b981;">✅ Session created: ${currentSessionId}</span>`;
+                    
+                    // Get initial response
+                    const continueResponse = await apiRequest('POST', `/api/avatar-training/sessions/${currentSessionId}/continue`);
+                    const continueData = await continueResponse.json();
+                    
+                    if (continueData.success) {
+                        const messages = continueData.session.messages;
+                        const avatarMessage = messages.reverse().find(m => m.role === 'avatar');
+                        lastMessageId = avatarMessage.id;
+                        
+                        resultDiv.innerHTML += `<br><span style="color: #10b981;">✅ Dr. Sakura responded (Message ID: ${lastMessageId})</span>`;
+                        resultDiv.innerHTML += `<br><span style="color: #6b7280;">Has multiple choice: ${!!avatarMessage.multiple_choice_options}</span>`;
+                        resultDiv.innerHTML += `<br><span style="color: #6b7280;">Choice count: ${avatarMessage.multiple_choice_options?.length || 0}</span>`;
+                    }
+                } else {
+                    resultDiv.innerHTML = `<span style="color: #ef4444;">❌ Failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ef4444;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testMultipleChoice() {
+            if (!currentSessionId || !lastMessageId) {
+                document.getElementById('multipleChoiceResult').innerHTML = '<span style="color: #ef4444;">❌ Must start session first</span>';
+                return;
+            }
+            
+            const resultDiv = document.getElementById('multipleChoiceResult');
+            const displayDiv = document.getElementById('multipleChoiceDisplay');
+            resultDiv.innerHTML = '<span style="color: #3b82f6;">🔄 Testing multiple choice...</span>';
+            
+            try {
+                // Get current session to check for multiple choice options
+                const sessionsResponse = await apiRequest('GET', '/api/avatar-training/sessions');
+                const sessionsData = await sessionsResponse.json();
+                const currentSession = sessionsData.sessions.find(s => s.id === currentSessionId);
+                
+                if (currentSession) {
+                    const avatarMessages = currentSession.messages.filter(m => m.role === 'avatar');
+                    const latestAvatarMessage = avatarMessages[avatarMessages.length - 1];
+                    
+                    if (latestAvatarMessage.multiple_choice_options && latestAvatarMessage.multiple_choice_options.length > 0) {
+                        resultDiv.innerHTML = '<span style="color: #10b981;">✅ Multiple choice options found!</span>';
+                        
+                        // Display the multiple choice UI
+                        displayDiv.innerHTML = `
+                            <div class="multiple-choice">
+                                <h4>🩺 Dr. Sakura says:</h4>
+                                <p>${latestAvatarMessage.content.substring(0, 100)}...</p>
+                                <div style="margin-top: 10px; font-weight: bold; color: #be185d;">Choose what you'd like to know more about:</div>
+                                ${latestAvatarMessage.multiple_choice_options.map((option, index) => 
+                                    `<button class="choice-button" onclick="selectChoice('${option}')">${index + 1}) ${option}</button>`
+                                ).join('')}
+                            </div>
+                        `;
+                        
+                        // Test selecting the first choice
+                        const firstChoice = latestAvatarMessage.multiple_choice_options[0];
+                        const choiceResponse = await apiRequest('POST', `/api/avatar-training/sessions/${currentSessionId}/choice`, {
+                            choice: firstChoice
+                        });
+                        
+                        const choiceData = await choiceResponse.json();
+                        
+                        if (choiceData.success) {
+                            resultDiv.innerHTML += '<br><span style="color: #10b981;">✅ Choice selection working!</span>';
+                            resultDiv.innerHTML += `<br><span style="color: #6b7280;">Patient said: "${firstChoice.substring(0, 50)}..."</span>`;
+                            resultDiv.innerHTML += `<br><span style="color: #6b7280;">Dr. Sakura responded with ${choiceData.session.messages[choiceData.session.messages.length - 1].content.length} characters</span>`;
+                        } else {
+                            resultDiv.innerHTML += '<br><span style="color: #ef4444;">❌ Choice selection failed</span>';
+                        }
+                    } else {
+                        resultDiv.innerHTML = '<span style="color: #ef4444;">❌ No multiple choice options found</span>';
+                        displayDiv.innerHTML = '<div style="color: #6b7280;">Multiple choice options not available</div>';
+                    }
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ef4444;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function testIterativeFeedback() {
+            if (!currentSessionId || !lastMessageId) {
+                document.getElementById('feedbackResult').innerHTML = '<span style="color: #ef4444;">❌ Must start session first</span>';
+                return;
+            }
+            
+            const resultDiv = document.getElementById('feedbackResult');
+            const displayDiv = document.getElementById('feedbackDisplay');
+            resultDiv.innerHTML = '<span style="color: #3b82f6;">🔄 Testing iterative feedback...</span>';
+            
+            try {
+                const feedbackComment = "This response needs more specific examples and empathy.";
+                const feedbackRating = 2;
+                
+                const feedbackResponse = await apiRequest('POST', `/api/avatar-training/sessions/${currentSessionId}/comment`, {
+                    messageId: lastMessageId,
+                    comment: feedbackComment,
+                    rating: feedbackRating
+                });
+                
+                const feedbackData = await feedbackResponse.json();
+                
+                if (feedbackData.success && feedbackData.improved_message) {
+                    resultDiv.innerHTML = '<span style="color: #10b981;">✅ Iterative feedback working!</span>';
+                    resultDiv.innerHTML += `<br><span style="color: #6b7280;">Quality improved: ${feedbackData.improved_message.quality_score}/100</span>`;
+                    
+                    // Display the improved response UI
+                    displayDiv.innerHTML = `
+                        <div style="background: #f9fafb; padding: 15px; border-radius: 6px; margin: 10px 0;">
+                            <h4>🩺 Dr. Sakura (Original):</h4>
+                            <p>Original response here...</p>
+                            
+                            <div style="background: #fdf2f8; padding: 10px; border-left: 4px solid #f9a8d4; margin: 10px 0;">
+                                <strong>💬 Your Feedback:</strong>
+                                <p style="font-style: italic;">"${feedbackComment}"</p>
+                            </div>
+                            
+                            <div class="improved-response">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <span style="color: #059669; font-weight: bold;">✨ Dr. Sakura (Revised answer):</span>
+                                    <span style="background: #d1fae5; color: #059669; padding: 4px 8px; border-radius: 12px; font-size: 12px;">Improved</span>
+                                </div>
+                                <p>${feedbackData.improved_message.content.substring(0, 200)}...</p>
+                                <div style="font-size: 12px; color: #059669; font-weight: bold;">
+                                    Quality: ${feedbackData.improved_message.quality_score}/100
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                } else {
+                    resultDiv.innerHTML = '<span style="color: #ef4444;">❌ Iterative feedback failed</span>';
+                    displayDiv.innerHTML = '<div style="color: #6b7280;">Iterative feedback not working</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span style="color: #ef4444;">❌ Error: ${error.message}</span>`;
+            }
+        }
+        
+        async function selectChoice(choice) {
+            alert(`You selected: "${choice}"\n\nIn the real app, this would send the choice to Dr. Sakura and she would respond with specific information about this topic.`);
+        }
+        
+        // Update final results
+        function updateFinalResults() {
+            const sessionResult = document.getElementById('sessionResult').textContent;
+            const multipleChoiceResult = document.getElementById('multipleChoiceResult').textContent;
+            const feedbackResult = document.getElementById('feedbackResult').textContent;
+            
+            const sessionWorking = sessionResult.includes('✅');
+            const multipleChoiceWorking = multipleChoiceResult.includes('✅');
+            const feedbackWorking = feedbackResult.includes('✅');
+            
+            const finalDiv = document.getElementById('finalResults');
+            
+            if (sessionWorking && multipleChoiceWorking && feedbackWorking) {
+                finalDiv.innerHTML = '<span style="color: #10b981; font-weight: bold;">🎉 ALL SYSTEMS WORKING!</span><br>Both multiple choice and iterative feedback are functional.';
+                finalDiv.className = 'test-result success';
+            } else if (sessionWorking) {
+                finalDiv.innerHTML = `
+                    <span style="color: #f59e0b; font-weight: bold;">⚠️ PARTIAL SUCCESS</span><br>
+                    Session: ${sessionWorking ? '✅' : '❌'}<br>
+                    Multiple Choice: ${multipleChoiceWorking ? '✅' : '❌'}<br>
+                    Iterative Feedback: ${feedbackWorking ? '✅' : '❌'}
+                `;
+                finalDiv.className = 'test-result warning';
+            } else {
+                finalDiv.innerHTML = '<span style="color: #ef4444; font-weight: bold;">❌ TESTS NOT COMPLETE</span><br>Please run all tests first.';
+                finalDiv.className = 'test-result error';
+            }
+        }
+        
+        // Check results every 2 seconds
+        setInterval(updateFinalResults, 2000);
+    </script>
+</body>
+</html>
