@@ -7,6 +7,36 @@ const router = Router();
 let trainingSessions: any[] = [];
 let sessionCounter = 1;
 
+// Global Dr. Sakura learning database - persists across all sessions
+let drSakuraKnowledgeBase: {
+  improvedResponses: Array<{
+    originalTopic: string;
+    userFeedback: string;
+    improvedResponse: string;
+    timestamp: string;
+    usage_count: number;
+  }>;
+  commonQuestions: Array<{
+    question: string;
+    bestResponse: string;
+    quality_score: number;
+    updated: string;
+  }>;
+  learningStats: {
+    total_feedback_received: number;
+    improvement_trends: string[];
+    last_updated: string;
+  };
+} = {
+  improvedResponses: [],
+  commonQuestions: [],
+  learningStats: {
+    total_feedback_received: 0,
+    improvement_trends: [],
+    last_updated: new Date().toISOString()
+  }
+};
+
 // Add a continue conversation endpoint for BrezCode training
 router.post('/sessions/:sessionId/continue', (req, res) => {
   try {
@@ -52,12 +82,37 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       customerQuestion = drillingQuestions[Math.floor(Math.random() * drillingQuestions.length)];
     }
     
+    // Check knowledge base for improved responses based on previous learning
+    const getImprovedResponse = (questionType: string): string | null => {
+      const relevantLearning = drSakuraKnowledgeBase.improvedResponses.find(learning => 
+        questionType.toLowerCase().includes(learning.originalTopic.toLowerCase()) ||
+        learning.originalTopic.toLowerCase().includes(questionType.toLowerCase())
+      );
+      
+      if (relevantLearning) {
+        relevantLearning.usage_count++;
+        console.log(`📚 Dr. Sakura applying learned response for: ${relevantLearning.originalTopic}`);
+        return relevantLearning.improvedResponse;
+      }
+      
+      return null;
+    };
+
     // Generate specific Dr. Sakura responses with multiple choice options
     let drSakuraResponse = "";
     let multipleChoiceOptions: string[] = [];
+    let usedLearning = false;
     
     if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague")) {
-      drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      // Check for learned responses first
+      const learnedResponse = getImprovedResponse("specific guidance");
+      if (learnedResponse) {
+        drSakuraResponse = learnedResponse;
+        usedLearning = true;
+      } else {
+        drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      }
+      
       multipleChoiceOptions = [
         "Do you want me to guide you through monthly self-exams?",
         "Do you want to know more about how healthcare providers perform clinical exams?",
@@ -315,6 +370,29 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
       timestamp: new Date().toISOString(),
       context: 'user_feedback_training'
     });
+
+    // Add to global knowledge base for persistent learning across all sessions
+    const topicType = comment.toLowerCase().includes('vague') ? 'specific guidance' :
+                     comment.toLowerCase().includes('timeline') ? 'timeline guidance' :
+                     comment.toLowerCase().includes('process') ? 'process explanation' :
+                     comment.toLowerCase().includes('specific') ? 'concrete details' :
+                     'general improvement';
+
+    // Store in global knowledge base
+    drSakuraKnowledgeBase.improvedResponses.push({
+      originalTopic: topicType,
+      userFeedback: comment,
+      improvedResponse: improvedResponse,
+      timestamp: new Date().toISOString(),
+      usage_count: 0
+    });
+
+    // Update learning stats
+    drSakuraKnowledgeBase.learningStats.total_feedback_received++;
+    drSakuraKnowledgeBase.learningStats.improvement_trends.push(topicType);
+    drSakuraKnowledgeBase.learningStats.last_updated = new Date().toISOString();
+
+    console.log(`📚 Dr. Sakura learned new response for: ${topicType} (Total learned: ${drSakuraKnowledgeBase.improvedResponses.length})`);
     
     // Update performance metrics to reflect improvement
     session.performance_metrics = {
@@ -352,6 +430,23 @@ router.get('/avatar-types', (req, res) => {
     res.json({
       success: true,
       avatarTypes: AVATAR_TYPES
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Dr. Sakura's learning progress endpoint
+router.get('/learning-progress', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      knowledgeBase: drSakuraKnowledgeBase,
+      summary: {
+        total_learned_responses: drSakuraKnowledgeBase.improvedResponses.length,
+        most_common_improvements: drSakuraKnowledgeBase.learningStats.improvement_trends.slice(-5),
+        learning_active: drSakuraKnowledgeBase.improvedResponses.length > 0
+      }
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
