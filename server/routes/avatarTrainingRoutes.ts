@@ -65,40 +65,126 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
     
-    // Get Dr. Sakura's last response to generate drilling follow-up questions
-    const lastDrSakuraResponse = session.messages[session.messages.length - 1]?.content || "";
+    // SMART AI PATIENT: Generate contextual, progressive questions based on avatar type and conversation flow
+    const sessionAvatarType = session.avatarType || 'dr_sakura';
+    const lastAvatarResponse = session.messages[session.messages.length - 1]?.content || "";
     const messageCount = session.messages.length;
+    const conversationHistory = session.messages.map(m => m.content).join(' ').toLowerCase();
     
-    // AI patient drilling questions that demand specific, actionable answers
-    let customerQuestion = "";
+    // Create avatar-specific smart customer questions that test different aspects
+    const generateSmartCustomerQuestion = (avatarType: string, messageCount: number, lastResponse: string, history: string): string => {
+      const avatarQuestions = {
+        'sales_specialist': {
+          initial: "I'm interested in your product, but I need to understand the ROI before I can justify this purchase to my boss. Can you show me specific numbers?",
+          progressive: [
+            "Your competitor just offered me the same thing for 30% less. Why should I pay more for yours?",
+            "I like the features, but I need to see a detailed implementation timeline. How long will this actually take?",
+            "The pricing seems high. Can you break down exactly what I'm getting for that price? I need to justify every dollar.",
+            "I'm concerned about the learning curve for my team. What specific training and support do you provide?",
+            "I need to see case studies from companies exactly like mine. Do you have specific examples in my industry?"
+          ],
+          contextual: {
+            'roi|return': "You mentioned ROI but didn't give me concrete numbers. I need to see a detailed cost-benefit analysis with specific metrics.",
+            'features|benefits': "Those features sound good, but how do they translate to actual business results? I need measurable outcomes.",
+            'implementation': "Implementation sounds complex. What are the specific risks if this doesn't work as promised?"
+          }
+        },
+        'customer_service': {
+          initial: "I'm really frustrated with your service. I've been trying to resolve this issue for weeks and nobody seems to understand what I'm going through.",
+          progressive: [
+            "This is the third time I'm calling about the same problem. Why hasn't anyone fixed this yet?",
+            "I've been a loyal customer for years, but this experience is making me consider switching to your competitor.",
+            "Your last representative promised to call me back yesterday. Why am I still waiting for a resolution?",
+            "I understand you have policies, but my situation is unique. Can't you make an exception just this once?",
+            "I'm not angry at you personally, but your company's system is clearly broken. How are you going to fix this for me?"
+          ],
+          contextual: {
+            'policy|procedure': "I don't care about your policies. I need a real solution that works for my specific situation.",
+            'escalate': "Don't just escalate this again. I need you to personally ensure this gets resolved today.",
+            'understand': "You say you understand, but your actions don't show it. What are you actually going to do differently?"
+          }
+        },
+        'technical_support': {
+          initial: "My system crashed during a critical deadline and I need this fixed immediately. The error message doesn't make any sense to me.",
+          progressive: [
+            "I tried the basic troubleshooting steps already. I need advanced technical solutions, not the usual restart advice.",
+            "This issue is affecting my entire team's productivity. What's the root cause and how do we prevent this from happening again?",
+            "Your documentation doesn't cover my specific configuration. I need step-by-step instructions for my exact setup.",
+            "I'm not very technical, but I need to understand what went wrong so I can explain it to my manager.",
+            "Time is critical here. Can you remote in and fix this directly instead of walking me through steps?"
+          ],
+          contextual: {
+            'restart|reboot': "I already tried restarting multiple times. I need more sophisticated troubleshooting steps.",
+            'update|patch': "Updating didn't work. What are the other technical solutions you can provide?",
+            'configuration': "My configuration is custom. Your standard fixes don't apply to my specific setup."
+          }
+        },
+        'business_consultant': {
+          initial: "My business is struggling and I need concrete strategies to turn things around. I'm tired of generic business advice - I need specific solutions.",
+          progressive: [
+            "You mentioned growth strategies, but I need to know which ones will work for my specific industry and budget.",
+            "I've tried marketing before and it didn't work. What makes your approach different and how do you measure results?",
+            "My cash flow is tight. I need strategies that will generate revenue quickly, not long-term plans.",
+            "I'm competing against much larger companies. How can a small business like mine actually compete and win?",
+            "I need to make tough decisions about my team and operations. How do I prioritize what to cut versus what to invest in?"
+          ],
+          contextual: {
+            'strategy|plan': "Your strategy sounds theoretical. I need practical steps I can implement starting tomorrow.",
+            'growth|revenue': "Growth is great, but I need to know the specific tactics that will drive immediate results.",
+            'market|competition': "Market analysis is nice, but I need actionable competitive advantages I can execute."
+          }
+        },
+        'dr_sakura': {
+          initial: "I'm concerned about breast health screening, but I need SPECIFIC information. Everyone gives me vague advice. What exactly should I do and when?",
+          progressive: [
+            "You mentioned screening but didn't tell me HOW OFTEN exactly. Every year? Every two years? At what age do I start?",
+            "That's too vague about self-exams. What EXACTLY am I looking for? Describe what a concerning lump feels like.",
+            "You talked about mammograms but didn't explain the actual process. What happens when I get there? Will it hurt?",
+            "I need step-by-step instructions. What do I do first? When do I schedule what? Give me a specific timeline.",
+            "I'm still not getting clear answers. I need YOU to tell me exactly what I should do for MY specific situation."
+          ],
+          contextual: {
+            'screening|mammogram': "You mentioned screening but didn't give me the exact timeline. When specifically should I start?",
+            'self-exam': "Self-exams sound important, but what exactly am I feeling for? Give me specific details.",
+            'doctor|appointment': "You said see a doctor, but for what exactly? What should I ask them?"
+          }
+        },
+        'education_specialist': {
+          initial: "I'm struggling to learn this material and traditional study methods aren't working for me. I need personalized learning strategies.",
+          progressive: [
+            "You mentioned active learning, but I need specific techniques that work for my learning style.",
+            "I have limited time to study. What are the most efficient methods to retain the most information quickly?",
+            "I understand the theory, but I can't apply it to real problems. How do I bridge that gap?",
+            "I get overwhelmed with too much information at once. How do I break down complex topics into manageable pieces?",
+            "I need to prepare for an important exam. What's the most effective study schedule and technique for test success?"
+          ],
+          contextual: {
+            'study|learning': "Your study advice is too general. I need methods specific to my subject and learning challenges.",
+            'retention|memory': "I forget things quickly. What are proven techniques to improve long-term retention?",
+            'practice|application': "I need more than theory. How do I get hands-on practice that prepares me for real situations?"
+          }
+        }
+      };
+      
+      const questions = avatarQuestions[avatarType] || avatarQuestions['dr_sakura'];
+      
+      if (messageCount <= 2) {
+        return questions.initial;
+      }
+      
+      // Check for contextual responses based on last avatar response
+      for (const [keywords, response] of Object.entries(questions.contextual)) {
+        if (keywords.split('|').some(keyword => lastResponse.toLowerCase().includes(keyword))) {
+          return response;
+        }
+      }
+      
+      // Use progressive questions based on conversation length
+      const progressIndex = Math.min(messageCount - 3, questions.progressive.length - 1);
+      return questions.progressive[progressIndex] || questions.progressive[questions.progressive.length - 1];
+    };
     
-    if (messageCount <= 2) {
-      // Initial questions
-      customerQuestion = "I'm concerned about breast health screening, but I need SPECIFIC information. Everyone gives me vague advice. What exactly should I do and when?";
-    } else if (lastDrSakuraResponse.includes("important") || lastDrSakuraResponse.includes("recommend")) {
-      customerQuestion = `You said it's "important" but that doesn't help me. What EXACTLY happens if I don't get screened this year? Give me specific risks, not general statements.`;
-    } else if (lastDrSakuraResponse.includes("routine") || lastDrSakuraResponse.includes("screening")) {
-      customerQuestion = `You mentioned screening but didn't tell me HOW OFTEN exactly. Every year? Every two years? At what age do I start? I need the specific timeline.`;
-    } else if (lastDrSakuraResponse.includes("self-exam") || lastDrSakuraResponse.includes("check")) {
-      customerQuestion = `That's too vague about self-exams. What EXACTLY am I looking for? Describe what a concerning lump feels like versus normal breast tissue.`;
-    } else if (lastDrSakuraResponse.includes("mammogram")) {
-      customerQuestion = `You talked about mammograms but didn't explain the actual process. What happens when I get there? How long does it take? Will it really hurt?`;
-    } else if (lastDrSakuraResponse.includes("plan") || lastDrSakuraResponse.includes("step")) {
-      customerQuestion = `That "plan" you mentioned is still too general. I need step-by-step instructions. What do I do first? When do I schedule what?`;
-    } else if (messageCount > 6) {
-      customerQuestion = `I'm still not getting clear answers. Stop giving me general healthcare advice. I need YOU to tell me exactly what I should do for MY specific situation.`;
-    } else {
-      // Default drilling questions for persistent training
-      const drillingQuestions = [
-        "That doesn't answer my specific question. I asked about timing and you gave me general advice. When EXACTLY should I schedule my mammogram?",
-        "You're being too vague again. I need concrete steps, not reassuring words. What are the exact warning signs I should look for?",
-        "I still don't understand what you mean by 'routine screening.' How often is routine? What specific tests do I need?",
-        "That sounds like something you'd tell everyone. What about MY specific age and situation? What's different for someone like me?",
-        "You didn't address my main concern. I asked about pain during mammograms and you talked about importance. Does it hurt or not?",
-        "I need specifics, not general comfort. What exactly will the technician do? How long will I be there? What should I wear?"
-      ];
-      customerQuestion = drillingQuestions[Math.floor(Math.random() * drillingQuestions.length)];
-    }
+    const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, messageCount, lastAvatarResponse, conversationHistory);
     
     // Check knowledge base for improved responses based on previous learning (universal for all avatars)
     const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
@@ -126,7 +212,6 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     };
 
     // Generate avatar-specific responses based on avatar type and business context
-    const sessionAvatarType = session.avatarType || 'dr_sakura';
     let avatarResponse = "";
     let multipleChoiceOptions: string[] = [];
     let usedLearning = false;

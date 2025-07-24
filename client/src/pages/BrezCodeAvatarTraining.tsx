@@ -281,7 +281,7 @@ export default function BrezCodeAvatarTraining() {
     }
   });
 
-  // Add continue conversation functionality
+  // Add continue conversation functionality - PRESERVE COMMENTS AND IMPROVEMENTS
   const continueConversation = useMutation({
     mutationFn: async (sessionId: string) => {
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`);
@@ -290,19 +290,42 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       const sessionMessages = data.session.messages || [];
-      const formattedMessages = sessionMessages.map((msg: any) => ({
-        id: msg.id,
-        role: msg.role,
-        content: msg.content,
-        timestamp: msg.timestamp,
-        isTraining: true,
-        emotion: msg.emotion,
-        quality_score: msg.quality_score,
-        multiple_choice_options: msg.multiple_choice_options,
-        user_comment: msg.user_comment,
-        improved_response: msg.improved_response,
-        improved_quality_score: msg.improved_quality_score
-      }));
+      const existingMessages = messages;
+      
+      // Create map of existing message data to preserve comments and improvements
+      const existingMessageData = new Map();
+      existingMessages.forEach(msg => {
+        if (msg.id) {
+          existingMessageData.set(msg.id, {
+            user_comment: msg.user_comment,
+            improved_response: msg.improved_response,
+            improved_quality_score: msg.improved_quality_score,
+            improved_message_id: msg.improved_message_id,
+            has_improved_response: msg.has_improved_response
+          });
+        }
+      });
+      
+      // Merge session data with preserved user interaction data
+      const formattedMessages = sessionMessages.map((msg: any) => {
+        const existingData = existingMessageData.get(msg.id) || {};
+        return {
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          isTraining: true,
+          emotion: msg.emotion,
+          quality_score: msg.quality_score,
+          multiple_choice_options: msg.multiple_choice_options || [],
+          // PRESERVE existing user comments and improved responses
+          user_comment: existingData.user_comment || msg.user_comment,
+          improved_response: existingData.improved_response || msg.improved_response,
+          improved_quality_score: existingData.improved_quality_score || msg.improved_quality_score,
+          improved_message_id: existingData.improved_message_id || msg.improved_message_id,
+          has_improved_response: existingData.has_improved_response || msg.has_improved_response
+        };
+      });
       
       setMessages(prev => [
         prev[0], // Keep the system message
@@ -311,7 +334,7 @@ export default function BrezCodeAvatarTraining() {
       
       toast({
         title: "Conversation Continued",
-        description: `Dr. Sakura handling patient concerns`,
+        description: `AI conversation proceeding with preserved feedback`,
       });
     }
   });
