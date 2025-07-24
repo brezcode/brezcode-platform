@@ -67,8 +67,8 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     
     // SMART AI PATIENT: Generate contextual, progressive questions based on avatar type and conversation flow
     const sessionAvatarType = session.avatarType || 'dr_sakura';
-    const lastAvatarResponse = session.messages[session.messages.length - 1]?.content || "";
-    const messageCount = session.messages.length;
+    const lastAvatarResponse = session.messages.filter(m => m.role === 'avatar').pop()?.content || "";
+    const customerMessageCount = session.messages.filter(m => m.role === 'customer').length;
     const conversationHistory = session.messages.map(m => m.content).join(' ').toLowerCase();
     
     // Create avatar-specific smart customer questions that test different aspects
@@ -168,23 +168,16 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       
       const questions = avatarQuestions[avatarType] || avatarQuestions['dr_sakura'];
       
-      if (messageCount <= 2) {
+      if (customerMessageCount === 0) {
         return questions.initial;
       }
       
-      // Check for contextual responses based on last avatar response
-      for (const [keywords, response] of Object.entries(questions.contextual)) {
-        if (keywords.split('|').some(keyword => lastResponse.toLowerCase().includes(keyword))) {
-          return response;
-        }
-      }
-      
-      // Use progressive questions based on conversation length
-      const progressIndex = Math.min(messageCount - 3, questions.progressive.length - 1);
+      // Always use progressive questions to ensure advancement - no contextual repetition
+      const progressIndex = Math.min(customerMessageCount - 1, questions.progressive.length - 1);
       return questions.progressive[progressIndex] || questions.progressive[questions.progressive.length - 1];
     };
     
-    const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, messageCount, lastAvatarResponse, conversationHistory);
+    const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
     
     // Check knowledge base for improved responses based on previous learning (universal for all avatars)
     const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
