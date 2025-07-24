@@ -145,11 +145,27 @@ export default function AIConversationTraining() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params)
       });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        console.error('Expected JSON but got:', contentType, text.substring(0, 200));
+        throw new Error('Server returned HTML instead of JSON');
+      }
+      
       return response.json();
     },
     onSuccess: (session) => {
+      console.log('Conversation started successfully:', session);
       setCurrentSession(session);
       setIsConversationActive(true);
+    },
+    onError: (error) => {
+      console.error('Failed to start conversation:', error);
     }
   });
 

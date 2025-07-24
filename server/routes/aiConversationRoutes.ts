@@ -149,6 +149,8 @@ function calculateMetrics(messages: any[]): any {
 
 // Start a new AI-to-AI conversation
 router.post('/start', async (req, res) => {
+  console.log('AI conversation start request:', req.body);
+  
   try {
     const { avatarId, customerId, scenario } = req.body;
     
