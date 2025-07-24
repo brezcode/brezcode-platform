@@ -294,15 +294,21 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
           return generalRelevantLearning.improved_response;
         }
         
-        // For general topics, look for any learning that might be helpful
-        const generalLearning = allLearning
-          .filter(entry => entry.improved_response && entry.user_feedback)
-          .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
-        
-        if (generalLearning) {
-          console.log(`📖 Applying general learning pattern for ${currentPatientTopic}`);
-          console.log(`🎯 Using: "${generalLearning.user_feedback}"`);
-          return generalLearning.improved_response;
+        // Only apply general learning if we're specifically asked for improved responses
+        // This preserves conversation variety while still using learning when appropriate
+        if (currentCustomerQuestion.toLowerCase().includes('specific') || 
+            currentCustomerQuestion.toLowerCase().includes('exactly') || 
+            currentCustomerQuestion.toLowerCase().includes('vague')) {
+          
+          const generalLearning = allLearning
+            .filter(entry => entry.improved_response && entry.user_feedback)
+            .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
+          
+          if (generalLearning) {
+            console.log(`📖 Applying general learning due to specificity request`);
+            console.log(`🎯 Using: "${generalLearning.user_feedback}"`);
+            return generalLearning.improved_response;
+          }
         }
       }
       
@@ -315,6 +321,42 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     let multipleChoiceOptions: string[] = [];
     let usedLearning = false;
     
+    // Function to generate varied Dr. Sakura responses for better conversation variety
+    const generateVariedDrSakuraResponse = (customerQuestion: string): string => {
+      const question = customerQuestion.toLowerCase();
+      
+      if (question.includes('self-exam') || question.includes('how to do')) {
+        const selfExamResponses = [
+          "Self-exams are an important part of breast health awareness. The best time is 3-7 days after your period when breasts are least tender. Use the flat part of your fingers in small circular motions to feel for any changes.",
+          "Monthly self-exams help you learn what's normal for your body. Stand in the shower or lie down, and systematically check each breast using gentle circular motions. Look for lumps, changes in texture, or nipple discharge.",
+          "I recommend doing self-exams monthly at the same time each cycle. Check both breasts and the area around them, including up to your collarbone and under your arms. Any new lumps or changes should be discussed with your doctor."
+        ];
+        return selfExamResponses[Math.floor(Math.random() * selfExamResponses.length)];
+      } else if (question.includes('mammogram') || question.includes('screening')) {
+        const mammogramResponses = [
+          "Mammogram timing depends on your risk factors. Generally, women with average risk start annual screening at 50, while those with higher risk may start at 40. Your doctor can help determine the right schedule for you.",
+          "Regular mammogram screening is crucial for early detection. The procedure takes about 20 minutes and involves compressing breast tissue to get clear images. Most women find the discomfort manageable and brief.",
+          "Mammography guidelines vary, but most medical organizations recommend starting annual or biennial screening between ages 40-50. Family history and other risk factors may influence when you should begin."
+        ];
+        return mammogramResponses[Math.floor(Math.random() * mammogramResponses.length)];
+      } else if (question.includes('risk') || question.includes('family history')) {
+        const riskResponses = [
+          "Breast cancer risk involves many factors including age, genetics, family history, and lifestyle choices. While some factors can't be changed, others like maintaining a healthy weight and limiting alcohol can help reduce risk.",
+          "Family history is important, but remember that 85% of breast cancers occur in women without a family history. Age is actually the biggest risk factor - risk increases as you get older.",
+          "Understanding your personal risk factors helps guide screening decisions. Factors like age at first period, pregnancy history, breastfeeding, and hormone use all play a role alongside genetics."
+        ];
+        return riskResponses[Math.floor(Math.random() * riskResponses.length)];
+      } else {
+        const generalResponses = [
+          "Breast health awareness involves multiple approaches: regular self-exams, clinical exams by healthcare providers, and appropriate screening mammography. Each plays an important role in early detection.",
+          "A comprehensive breast health plan includes knowing your body, understanding your risk factors, and following appropriate screening guidelines. Regular communication with your healthcare provider is essential.",
+          "Breast health is an ongoing commitment to awareness and prevention. This includes monthly self-checks, annual clinical exams, and mammograms as recommended by your doctor based on your individual risk profile.",
+          "Taking charge of your breast health means being proactive with screenings, understanding what's normal for your body, and promptly addressing any concerns with your healthcare provider."
+        ];
+        return generalResponses[Math.floor(Math.random() * generalResponses.length)];
+      }
+    };
+
     // Universal function to generate avatar-specific responses
     const generateAvatarSpecificResponse = (avatarType: string, questionType: string) => {
       const avatarResponses = {
@@ -336,7 +378,7 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
         },
         'dr_sakura': {
           'specific_guidance': "You're absolutely right - let me be more specific. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions. Look for hard, immobile masses (like marbles), skin dimpling, nipple discharge, or size changes. Schedule mammograms annually starting at age 40 if high-risk, age 50 if average risk. Any concerning findings should be evaluated within 1-2 weeks.",
-          'default': "Breast health is important, and you should do regular screenings. Self-exams and mammograms are both helpful. Talk to your doctor about when to start. It's good to be proactive about your health."
+          'default': generateVariedDrSakuraResponse(customerQuestion)
         },
         'education_specialist': {
           'specific_guidance': "You're absolutely right - let me be more specific with learning strategies. Here's exactly what you need: 1) Use the Feynman Technique - explain concepts in simple terms, 2) Apply spaced repetition with 1-day, 3-day, 1-week, 1-month intervals, 3) Create mind maps for visual learners, 4) Practice active recall instead of passive reading, 5) Set specific learning objectives with measurable outcomes. Track progress weekly with assessment quizzes.",
@@ -551,6 +593,15 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
   try {
     const { sessionId } = req.params;
     const { messageId, comment, rating } = req.body;
+    
+    // Validate comment input
+    if (!comment || comment.trim().length === 0) {
+      return res.status(400).json({ error: 'Comment cannot be empty' });
+    }
+    
+    if (comment.trim().length < 3) {
+      return res.status(400).json({ error: 'Comment must be at least 3 characters long' });
+    }
     
     const session = trainingSessions.find(s => s.id === sessionId);
     if (!session) {
