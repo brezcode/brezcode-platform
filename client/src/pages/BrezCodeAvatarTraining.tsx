@@ -456,9 +456,12 @@ export default function BrezCodeAvatarTraining() {
       return response.json();
     },
     onSuccess: (data) => {
-      console.log('Comment feedback response:', data);
+      console.log('🎯 Comment feedback successful:', data);
       console.log('Has session:', !!data.session);
       console.log('Has improved_message:', !!data.improved_message);
+      
+      // Invalidate queries to force refresh
+      queryClient.invalidateQueries({ queryKey: ['/api/avatar-training/sessions'] });
       
       // Update session with improved response
       if (data.session) {
@@ -497,7 +500,7 @@ export default function BrezCodeAvatarTraining() {
           has_improved_response: sessionMsg.has_improved_response
         })));
         
-        // Force re-render to ensure improved response displays immediately
+        // Force re-render and immediate display of improved response
         setTimeout(() => {
           setMessages(prev => [...prev]);
           
@@ -507,6 +510,8 @@ export default function BrezCodeAvatarTraining() {
             improvedResponseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 100);
+        
+        console.log('🔄 Messages updated with improved responses:', sessionMessages.filter(m => m.improved_response).length);
       }
       
       // Show success notification for improved response
@@ -1204,8 +1209,8 @@ export default function BrezCodeAvatarTraining() {
                     // Check if this is feedback on an improved response
                     if (showCommentDialog.startsWith('improved_')) {
                       // Handle iterative feedback on improved response
-                      const messageIndex = parseInt(showCommentDialog.replace('improved_', ''));
-                      const message = messages[messageIndex];
+                      const originalMessageId = showCommentDialog.replace('improved_', '');
+                      const message = messages.find(m => m.id === originalMessageId);
                       const improvedMessageId = (message as any)?.improved_message_id;
                       
                       if (improvedMessageId) {
@@ -1217,14 +1222,16 @@ export default function BrezCodeAvatarTraining() {
                         });
                       }
                     } else {
-                      // Handle original message feedback
-                      const messageIndex = parseInt(showCommentDialog);
-                      const message = messages[messageIndex];
+                      // Handle original message feedback - showCommentDialog contains the message ID
+                      const messageId = showCommentDialog;
                       
-                      if (message?.id) {
+                      console.log('🎯 Submitting comment for message ID:', messageId);
+                      console.log('🎯 Comment text:', newComment.trim());
+                      
+                      if (messageId) {
                         // Submit feedback for immediate learning
                         submitCommentFeedback.mutate({
-                          messageId: message.id,
+                          messageId: messageId,
                           comment: newComment.trim(),
                           rating: rating
                         });
