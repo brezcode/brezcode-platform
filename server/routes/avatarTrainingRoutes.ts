@@ -175,11 +175,45 @@ router.post('/sessions/:sessionId/choice', (req, res) => {
       drSakuraResponse = "That's an excellent question. Let me provide you with specific, actionable information about that topic. Based on current medical guidelines and best practices, here's what you need to know...";
     }
     
-    // Add patient's choice as a message
+    // Convert doctor's question to natural patient response
+    const convertToPatientResponse = (doctorQuestion: string): string => {
+      const question = doctorQuestion.toLowerCase();
+      
+      if (question.includes('guide you through monthly self-exams')) {
+        return "Yes, please guide me through monthly self-exams.";
+      } else if (question.includes('clinical exams')) {
+        return "Yes, I'd like to know more about how healthcare providers perform clinical exams.";
+      } else if (question.includes('mammogram screening')) {
+        return "Yes, I want to know more about mammogram screening.";
+      } else if (question.includes('risk factors')) {
+        return "Yes, I'd like to understand my risk factors better.";
+      } else if (question.includes('symptoms')) {
+        return "Yes, please tell me what symptoms I should watch for.";
+      } else if (question.includes('family history')) {
+        return "Yes, I want to understand how family history affects my risk.";
+      } else if (question.includes('diet') || question.includes('lifestyle')) {
+        return "Yes, I'm interested in lifestyle changes that can help.";
+      } else if (question.includes('when to see') || question.includes('doctor')) {
+        return "Yes, I want to know when I should see a doctor.";
+      } else if (question.startsWith('do you want')) {
+        // Generic "do you want" -> "Yes, I would like..."
+        const topic = question.replace('do you want me to', '').replace('do you want to', '').trim();
+        return `Yes, I would like ${topic}.`;
+      } else if (question.startsWith('would you like')) {
+        // "would you like" -> "Yes, I would like..."
+        const topic = question.replace('would you like me to', '').replace('would you like to', '').trim();
+        return `Yes, I would like ${topic}.`;
+      } else {
+        // Fallback: convert question to affirmative response
+        return `Yes, ${choice.toLowerCase().replace(/\?$/, '').replace(/^(do you want|would you like) (me to )?/, 'I would like ')}.`;
+      }
+    };
+
+    // Add patient's choice as a message with natural response
     const choiceMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,
       role: 'customer',
-      content: choice,
+      content: convertToPatientResponse(choice),
       timestamp: new Date().toISOString(),
       emotion: 'curious',
       is_choice_selection: true
