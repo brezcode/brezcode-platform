@@ -95,6 +95,12 @@ interface ChatMessage {
   userComment?: string;
   multiple_choice_options?: string[];
   is_choice_selection?: boolean;
+  // Improved response fields for comment feedback
+  user_comment?: string;
+  improved_response?: string;
+  improved_quality_score?: number;
+  improved_message_id?: string;
+  has_improved_response?: boolean;
 }
 
 interface TrainingSession {
@@ -814,7 +820,7 @@ export default function BrezCodeAvatarTraining() {
                                 )}
                                 
                                 {/* Comment and Rating Controls - Only for Dr. Sakura responses */}
-                                {message.role === 'avatar' && (
+                                {message.role === 'avatar' && message.id && (
                                   <div className="flex items-center gap-2 mt-3 pt-2 border-t border-pink-100">
                                     <div className="flex items-center gap-1">
                                       <Button
@@ -822,7 +828,7 @@ export default function BrezCodeAvatarTraining() {
                                         variant="ghost"
                                         className={`h-6 px-2 ${messageRatings[message.id]?.rating === 'thumbs_up' ? 'bg-green-100 text-green-600' : 'hover:bg-green-50'}`}
                                         onClick={() => {
-                                          const messageId = message.id;
+                                          const messageId = message.id!;
                                           setMessageRatings(prev => ({
                                             ...prev,
                                             [messageId]: {
@@ -839,7 +845,7 @@ export default function BrezCodeAvatarTraining() {
                                         variant="ghost"
                                         className={`h-6 px-2 ${messageRatings[message.id]?.rating === 'thumbs_down' ? 'bg-red-100 text-red-600' : 'hover:bg-red-50'}`}
                                         onClick={() => {
-                                          const messageId = message.id;
+                                          const messageId = message.id!;
                                           setMessageRatings(prev => ({
                                             ...prev,
                                             [messageId]: {
@@ -856,7 +862,7 @@ export default function BrezCodeAvatarTraining() {
                                       size="sm"
                                       variant="ghost"
                                       className="h-6 px-2 text-xs hover:bg-pink-50"
-                                      onClick={() => setShowCommentDialog(message.id)}
+                                      onClick={() => setShowCommentDialog(message.id!)}
                                     >
                                       <MessageCircleMore className="h-3 w-3 mr-1" />
                                       {messageRatings[message.id]?.comment ? 'Edit' : 'Add'} Comment
@@ -865,7 +871,7 @@ export default function BrezCodeAvatarTraining() {
                                 )}
                                 
                                 {/* Display existing comment */}
-                                {messageRatings[message.id]?.comment && (
+                                {message.id && messageRatings[message.id]?.comment && (
                                   <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
                                     <div className="font-medium text-gray-600 mb-1">Your Comment:</div>
                                     <div className="text-gray-800">{messageRatings[message.id].comment}</div>
