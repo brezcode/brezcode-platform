@@ -71,11 +71,16 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     // Use REAL customer message instead of generated questions for human-like conversation
     const sessionAvatarType = session.avatarType || 'dr_sakura';
     const lastAvatarResponse = session.messages.filter(m => m.role === 'avatar').pop()?.content || "";
-    const customerMessageCount = session.messages.filter(m => m.role === 'customer').length;
+    const existingCustomerMessages = session.messages.filter(m => m.role === 'customer').length;
+    const nextCustomerMessageIndex = existingCustomerMessages; // This will be the index of the NEW message we're about to create
     const conversationHistory = session.messages.map(m => m.content).join(' ').toLowerCase();
     
+    console.log(`📊 Conversation Progress Debug:`);
+    console.log(`   Existing customer messages: ${existingCustomerMessages}`);
+    console.log(`   Next message index: ${nextCustomerMessageIndex}`);
+    
     // Create avatar-specific smart customer questions that test different aspects
-    const generateSmartCustomerQuestion = (avatarType: string, messageCount: number, lastResponse: string, history: string): string => {
+    const generateSmartCustomerQuestion = (avatarType: string, messageIndex: number, lastResponse: string, history: string): string => {
       const avatarQuestions = {
         'sales_specialist': {
           initial: "I'm interested in your product, but I need to understand the ROI before I can justify this purchase to my boss. Can you show me specific numbers?",
@@ -171,17 +176,36 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       
       const questions = avatarQuestions[avatarType] || avatarQuestions['dr_sakura'];
       
-      if (customerMessageCount === 0) {
+      if (messageIndex === 0) {
         return questions.initial;
       }
       
-      // Always use progressive questions to ensure advancement - no contextual repetition
-      const progressIndex = Math.min(customerMessageCount - 1, questions.progressive.length - 1);
+      // Use progressive questions with proper conversation ending
+      const progressIndex = messageIndex - 1;
+      
+      console.log(`🎯 Question Selection Debug:`);
+      console.log(`   Message index: ${messageIndex}`);
+      console.log(`   Progress index: ${progressIndex}`);
+      console.log(`   Available progressive questions: ${questions.progressive.length}`);
+      
+      // If we've reached the end of progressive questions, end the conversation naturally
+      if (progressIndex >= questions.progressive.length) {
+        const conversationEnders = [
+          "Thank you for the detailed explanation. I feel much more confident about taking action now.",
+          "That's exactly what I needed to know. I really appreciate your specific guidance.",
+          "Perfect! Now I have a clear plan. I'll follow your recommendations and schedule accordingly.",
+          "This has been incredibly helpful. I know exactly what steps to take next.",
+          "Excellent information. I feel prepared and informed now. Thank you for being so thorough."
+        ];
+        const enderIndex = Math.floor(Math.random() * conversationEnders.length);
+        return conversationEnders[enderIndex];
+      }
+      
       return questions.progressive[progressIndex] || questions.progressive[questions.progressive.length - 1];
     };
     
     // Use the REAL customer message for human-like conversation intelligence (no fallback to generated questions)
-    const customerQuestion = customerMessage ? customerMessage : generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
+    const customerQuestion = customerMessage ? customerMessage : generateSmartCustomerQuestion(sessionAvatarType, nextCustomerMessageIndex, lastAvatarResponse, conversationHistory);
     
     console.log('🎯 Customer input debug:');
     console.log('   Raw customerMessage from API:', customerMessage);
