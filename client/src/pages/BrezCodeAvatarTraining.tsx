@@ -346,6 +346,15 @@ export default function BrezCodeAvatarTraining() {
       return response.json();
     },
     onSuccess: (data) => {
+      // Check if conversation has ended naturally
+      if (data.conversationEnded) {
+        toast({
+          title: "Conversation Complete",
+          description: "The conversation has reached its natural conclusion",
+        });
+        return;
+      }
+      
       const sessionMessages = data.session.messages || [];
       const existingMessages = messages;
       

@@ -79,6 +79,26 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     console.log(`   Existing customer messages: ${existingCustomerMessages}`);
     console.log(`   Next message index: ${nextCustomerMessageIndex}`);
     
+    // Check if conversation has already ended naturally
+    const lastCustomerMessage = session.messages.filter(m => m.role === 'customer').pop();
+    const hasNaturalEnding = lastCustomerMessage && (
+      lastCustomerMessage.content.includes('exactly what I needed') ||
+      lastCustomerMessage.content.includes('Thank you') ||
+      lastCustomerMessage.content.includes('appreciate your specific guidance') ||
+      lastCustomerMessage.content.includes('feel prepared and informed') ||
+      lastCustomerMessage.content.includes('This has been incredibly helpful')
+    );
+    
+    if (hasNaturalEnding) {
+      console.log('🏁 Conversation already ended naturally - not continuing');
+      return res.json({
+        success: true,
+        session: session,
+        conversationEnded: true,
+        message: 'Conversation has reached its natural conclusion'
+      });
+    }
+    
     // Create avatar-specific smart customer questions that test different aspects
     const generateSmartCustomerQuestion = (avatarType: string, messageIndex: number, lastResponse: string, history: string): string => {
       const avatarQuestions = {
