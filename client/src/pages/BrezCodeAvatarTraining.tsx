@@ -19,6 +19,7 @@ import {
   Play,
   Pause,
   RotateCcw,
+  RefreshCw,
   Target,
   TrendingUp,
   Clock,
@@ -541,6 +542,7 @@ export default function BrezCodeAvatarTraining() {
                         >
                           <Send className="h-4 w-4" />
                         </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
@@ -562,7 +564,7 @@ export default function BrezCodeAvatarTraining() {
                           <Progress value={Math.min((messages.length / 10) * 100, 100)} className="bg-pink-100" />
                         </div>
                         <div className="text-xs text-gray-600">
-                          <p><strong>Scenario:</strong> {selectedScenario.difficulty}</p>
+                          <p><strong>Scenario:</strong> {selectedScenario?.difficulty || 'N/A'}</p>
                           <p><strong>Focus:</strong> Breast health coaching</p>
                         </div>
                       </div>
