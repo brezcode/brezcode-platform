@@ -110,14 +110,19 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       emotion: customerQuestion.includes('EXACTLY') || customerQuestion.includes('vague') ? 'demanding' : 'concerned'
     };
     
-    // Add Dr. Sakura's response with multiple choice options
+    // Determine when to show multiple choice options
+    // RULE: Show choices only on first continue call (when session has exactly 1 avatar message before adding new one)
+    const avatarMessageCount = session.messages.filter(m => m.role === 'avatar').length;
+    const shouldShowChoices = avatarMessageCount === 1;
+
+    // Add Dr. Sakura's response with conditional multiple choice options
     const newAvatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 2}`,
       role: 'avatar', 
       content: drSakuraResponse,
       timestamp: new Date().toISOString(),
       quality_score: Math.floor(Math.random() * 20) + 80,
-      multiple_choice_options: multipleChoiceOptions
+      multiple_choice_options: shouldShowChoices ? multipleChoiceOptions : []
     };
     
     session.messages.push(newCustomerMessage, newAvatarMessage);
@@ -180,14 +185,14 @@ router.post('/sessions/:sessionId/choice', (req, res) => {
       is_choice_selection: true
     };
     
-    // Add Dr. Sakura's response
+    // Add Dr. Sakura's response (choice responses should not have multiple choice options)
     const responseMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 2}`,
       role: 'avatar',
       content: drSakuraResponse,
       timestamp: new Date().toISOString(),
       quality_score: Math.floor(Math.random() * 10) + 90,
-      multiple_choice_options: [] // No additional choices for now, can be expanded
+      multiple_choice_options: [] // Choice responses don't get additional choices
     };
     
     session.messages.push(choiceMessage, responseMessage);
@@ -253,13 +258,15 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
     };
     
     // Update the original message with improved response fields (inline display)
+    // Remove multiple choice options when user provides feedback
     session.messages[messageIndex] = {
       ...commentedMessage,
       user_comment: comment,
       improved_response: improvedResponse,
       improved_quality_score: Math.min(100, (commentedMessage.quality_score || 80) + 10),
       improved_message_id: `msg_${Date.now()}_improved`,
-      has_improved_response: true
+      has_improved_response: true,
+      multiple_choice_options: [] // Remove choices after feedback
     };
     
     // Store the learning for future responses
