@@ -41,20 +41,15 @@ const AVATAR_LEARNING_TYPES = [
   'luna_strategic', 'professor_sage'
 ];
 
-// Disabled cross-session learning to ensure users always start with basic responses
-// AVATAR_LEARNING_TYPES.forEach(avatarType => {
-//   if (!universalAvatarKnowledgeBase[avatarType]) {
-//     universalAvatarKnowledgeBase[avatarType] = {
-//       improvedResponses: [],
-//       commonQuestions: [],
-//       learningStats: {
-//         total_feedback_received: 0,
-//         improvement_trends: [],
-//         last_updated: new Date().toISOString()
-//       }
-//     };
-//   }
-// });
+// Universal knowledge base for persistent cross-session learning
+const universalKnowledgeBase: Record<string, any[]> = {};
+
+// Initialize knowledge base for all avatar types
+AVATAR_LEARNING_TYPES.forEach(avatarType => {
+  if (!universalKnowledgeBase[avatarType]) {
+    universalKnowledgeBase[avatarType] = [];
+  }
+});
 
 // Add a continue conversation endpoint for BrezCode training
 router.post('/sessions/:sessionId/continue', (req, res) => {
@@ -180,27 +175,38 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     
     const customerQuestion = generateSmartCustomerQuestion(sessionAvatarType, customerMessageCount, lastAvatarResponse, conversationHistory);
     
-    // Check knowledge base for improved responses based on previous learning (session-specific only)
+    // Check knowledge base for improved responses based on ALL previous learning (persistent across sessions)
     const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
-      // Only apply learning within the same session, not across sessions
-      // This ensures users always start with basic responses to see improvement
+      console.log(`🔍 Checking for persistent learning across ALL sessions...`);
       
-      console.log(`🔍 Checking for session learning... Session has ${session.messages.length} messages`);
-      
-      // Check if we have learning from comments in THIS session
-      const sessionLearning = session.messages.find(m => 
+      // First check current session for any new learning
+      const currentSessionLearning = session.messages.find(m => 
         m.role === 'avatar' && 
         m.improved_response && 
         m.user_comment
       );
       
-      console.log(`🔍 Found session learning:`, !!sessionLearning);
-      if (sessionLearning) {
-        console.log(`🔍 Learning message ID: ${sessionLearning.id}`);
-        console.log(`🔍 Has improved response: ${!!sessionLearning.improved_response}`);
-        console.log(`🔍 Has user comment: ${!!sessionLearning.user_comment}`);
-        console.log(`📚 ${avatarType.toUpperCase()} applying session learning from previous comment`);
-        return sessionLearning.improved_response;
+      if (currentSessionLearning) {
+        console.log(`🔍 Found current session learning: ${currentSessionLearning.id}`);
+        console.log(`📚 ${avatarType.toUpperCase()} applying current session learning`);
+        return currentSessionLearning.improved_response;
+      }
+      
+      // Check universal knowledge base for accumulated learning from ALL previous sessions
+      if (universalKnowledgeBase[avatarType]) {
+        const allLearning = universalKnowledgeBase[avatarType];
+        console.log(`🔍 Found universal learning entries: ${allLearning.length}`);
+        
+        // Use the most recent learned response that matches the context
+        const latestLearning = allLearning
+          .filter(entry => entry.improved_response && entry.user_feedback)
+          .sort((a, b) => new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime())[0];
+        
+        if (latestLearning) {
+          console.log(`📚 ${avatarType.toUpperCase()} applying persistent learning from previous sessions`);
+          console.log(`🎯 Using accumulated knowledge: "${latestLearning.user_feedback}"`);
+          return latestLearning.improved_response;
+        }
       }
       
       return null;
@@ -249,12 +255,11 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     if (learnedResponse) {
       avatarResponse = learnedResponse;
       usedLearning = true;
-      console.log("🎯 Using learned response for improved experience");
+      console.log("🎯 Using learned response - AI has improved from previous training");
     } else {
-      // Always start with basic responses for fresh sessions to show improvement potential
-      // Only use detailed responses if we have learning from user feedback
+      // Use basic responses only when no learning exists
       avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'default');
-      console.log("🎯 Using basic response - user can provide feedback for improvement");
+      console.log("🎯 Using basic response - AI will improve with your feedback");
     }
 
     if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague") || usedLearning) {
@@ -528,31 +533,23 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
     // Determine avatar type from session or default to dr_sakura
     const avatarType = session.avatarType || session.avatar_type || 'dr_sakura';
     
-    // Ensure avatar knowledge base exists
-    if (!universalAvatarKnowledgeBase[avatarType]) {
-      universalAvatarKnowledgeBase[avatarType] = {
-        improvedResponses: [],
-        commonQuestions: [],
-        learningStats: { total_feedback_received: 0, improvement_trends: [], last_updated: new Date().toISOString() }
-      };
+    // Store learning in universal knowledge base for persistent cross-session learning
+    if (!universalKnowledgeBase[avatarType]) {
+      universalKnowledgeBase[avatarType] = [];
     }
     
-    // Store in universal avatar knowledge base
-    universalAvatarKnowledgeBase[avatarType].improvedResponses.push({
-      originalTopic: topicType,
-      userFeedback: comment,
-      improvedResponse: improvedResponse,
+    // Store learning entry with all necessary data for future use
+    universalKnowledgeBase[avatarType].push({
+      user_feedback: comment,
+      improved_response: improvedResponse,
+      original_response: commentedMessage.content,
+      topic_type: topicType,
       timestamp: new Date().toISOString(),
-      usage_count: 0,
-      business_context: session.business_type || 'health_coaching'
+      business_context: session.business_type || 'health_coaching',
+      usage_count: 0
     });
 
-    // Update learning stats for this avatar
-    universalAvatarKnowledgeBase[avatarType].learningStats.total_feedback_received++;
-    universalAvatarKnowledgeBase[avatarType].learningStats.improvement_trends.push(topicType);
-    universalAvatarKnowledgeBase[avatarType].learningStats.last_updated = new Date().toISOString();
-
-    console.log(`📚 ${avatarType.toUpperCase()} learned new response for: ${topicType} (Total learned: ${universalAvatarKnowledgeBase[avatarType].improvedResponses.length})`);
+    console.log(`📚 ${avatarType.toUpperCase()} learned new response for: ${topicType} (Total learned: ${universalKnowledgeBase[avatarType].length})`);
     
     // Update performance metrics to reflect improvement
     session.performance_metrics = {
@@ -718,6 +715,43 @@ router.get('/sessions', (req, res) => {
     res.json({
       success: true,
       sessions: trainingSessions
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create new training session (for persistent learning testing)
+router.post('/sessions', (req, res) => {
+  try {
+    const { avatarType, businessType } = req.body;
+    
+    const sessionId = `session_${sessionCounter++}`;
+    
+    // Create new session but don't add initial messages yet
+    const session = {
+      id: sessionId,
+      avatarId: avatarType || 'dr_sakura',
+      avatarType: avatarType || 'dr_sakura',
+      scenarioId: 'health_consultation',
+      businessContext: businessType || 'health_coaching',
+      status: 'active',
+      startTime: new Date().toISOString(),
+      messages: [], // Empty initially - messages added via /continue
+      performance_metrics: {
+        response_quality: Math.floor(Math.random() * 20) + 80,
+        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+        goal_achievement: Math.floor(Math.random() * 20) + 70,
+        conversation_flow: Math.floor(Math.random() * 15) + 80
+      }
+    };
+    
+    trainingSessions.push(session);
+    
+    res.json({
+      success: true,
+      sessionId: sessionId,
+      session: session
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
