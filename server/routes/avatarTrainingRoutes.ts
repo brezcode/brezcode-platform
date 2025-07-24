@@ -7,35 +7,53 @@ const router = Router();
 let trainingSessions: any[] = [];
 let sessionCounter = 1;
 
-// Global Dr. Sakura learning database - persists across all sessions
-let drSakuraKnowledgeBase: {
-  improvedResponses: Array<{
-    originalTopic: string;
-    userFeedback: string;
-    improvedResponse: string;
-    timestamp: string;
-    usage_count: number;
-  }>;
-  commonQuestions: Array<{
-    question: string;
-    bestResponse: string;
-    quality_score: number;
-    updated: string;
-  }>;
-  learningStats: {
-    total_feedback_received: number;
-    improvement_trends: string[];
-    last_updated: string;
+// Universal AI Avatar Learning Database - persists across all avatars and sessions
+let universalAvatarKnowledgeBase: {
+  [avatarType: string]: {
+    improvedResponses: Array<{
+      originalTopic: string;
+      userFeedback: string;
+      improvedResponse: string;
+      timestamp: string;
+      usage_count: number;
+      business_context?: string;
+    }>;
+    commonQuestions: Array<{
+      question: string;
+      bestResponse: string;
+      quality_score: number;
+      updated: string;
+      business_context?: string;
+    }>;
+    learningStats: {
+      total_feedback_received: number;
+      improvement_trends: string[];
+      last_updated: string;
+    };
   };
-} = {
-  improvedResponses: [],
-  commonQuestions: [],
-  learningStats: {
-    total_feedback_received: 0,
-    improvement_trends: [],
-    last_updated: new Date().toISOString()
+} = {};
+
+// Initialize knowledge base for all avatar types
+const AVATAR_LEARNING_TYPES = [
+  'sales_specialist', 'customer_service', 'technical_support', 
+  'business_consultant', 'health_coach', 'education_specialist',
+  'dr_sakura', 'alex_thunder', 'miko_harmony', 'kai_techwiz',
+  'luna_strategic', 'professor_sage'
+];
+
+AVATAR_LEARNING_TYPES.forEach(avatarType => {
+  if (!universalAvatarKnowledgeBase[avatarType]) {
+    universalAvatarKnowledgeBase[avatarType] = {
+      improvedResponses: [],
+      commonQuestions: [],
+      learningStats: {
+        total_feedback_received: 0,
+        improvement_trends: [],
+        last_updated: new Date().toISOString()
+      }
+    };
   }
-};
+});
 
 // Add a continue conversation endpoint for BrezCode training
 router.post('/sessions/:sessionId/continue', (req, res) => {
@@ -82,77 +100,122 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
       customerQuestion = drillingQuestions[Math.floor(Math.random() * drillingQuestions.length)];
     }
     
-    // Check knowledge base for improved responses based on previous learning
-    const getImprovedResponse = (questionType: string): string | null => {
-      const relevantLearning = drSakuraKnowledgeBase.improvedResponses.find(learning => 
+    // Check knowledge base for improved responses based on previous learning (universal for all avatars)
+    const getImprovedResponse = (questionType: string, avatarType: string = 'dr_sakura'): string | null => {
+      // Ensure avatar knowledge base exists
+      if (!universalAvatarKnowledgeBase[avatarType]) {
+        universalAvatarKnowledgeBase[avatarType] = {
+          improvedResponses: [],
+          commonQuestions: [],
+          learningStats: { total_feedback_received: 0, improvement_trends: [], last_updated: new Date().toISOString() }
+        };
+      }
+      
+      const relevantLearning = universalAvatarKnowledgeBase[avatarType].improvedResponses.find(learning => 
         questionType.toLowerCase().includes(learning.originalTopic.toLowerCase()) ||
         learning.originalTopic.toLowerCase().includes(questionType.toLowerCase())
       );
       
       if (relevantLearning) {
         relevantLearning.usage_count++;
-        console.log(`📚 Dr. Sakura applying learned response for: ${relevantLearning.originalTopic}`);
+        console.log(`📚 ${avatarType.toUpperCase()} applying learned response for: ${relevantLearning.originalTopic}`);
         return relevantLearning.improvedResponse;
       }
       
       return null;
     };
 
-    // Generate specific Dr. Sakura responses with multiple choice options
-    let drSakuraResponse = "";
+    // Generate avatar-specific responses based on avatar type and business context
+    const sessionAvatarType = session.avatarType || 'dr_sakura';
+    let avatarResponse = "";
     let multipleChoiceOptions: string[] = [];
     let usedLearning = false;
     
+    // Universal function to generate avatar-specific responses
+    const generateAvatarSpecificResponse = (avatarType: string, questionType: string) => {
+      const avatarResponses = {
+        'sales_specialist': {
+          'specific_guidance': "You're absolutely right - let me be more specific with sales strategies. Here's exactly what you need: 1) Identify the real objection behind the price concern, 2) Use the 'Feel, Felt, Found' technique to address it, 3) Present value-based pricing with specific ROI examples, 4) Close with urgency using scarcity or time-limited offers. The key is to quantify the value proposition with exact numbers and timelines.",
+          'default': "I understand you need concrete sales strategies, not generic advice. Let me give you specific techniques: Use the BANT qualification framework (Budget, Authority, Need, Timeline) to identify qualified prospects. For price objections, break down cost per day/hour to minimize the amount. Always present three pricing options to create anchoring effect."
+        },
+        'customer_service': {
+          'specific_guidance': "You're absolutely right - let me be more specific with customer service protocols. Here's exactly what you need: 1) Acknowledge the customer's concern within 30 seconds, 2) Use empathy statements like 'I understand how frustrating this must be', 3) Ask clarifying questions to identify root cause, 4) Provide specific resolution timeline, 5) Follow up within 24 hours to ensure satisfaction. Every interaction should end with 'Is there anything else I can help you with today?'",
+          'default': "I understand you need concrete customer service techniques. Use the LAST method: Listen actively, Apologize sincerely, Solve the problem, Thank the customer. For angry customers, lower your voice tone and speak slower to de-escalate. Always offer two solutions when possible to give customers control."
+        },
+        'technical_support': {
+          'specific_guidance': "You're absolutely right - let me be more specific with technical troubleshooting. Here's exactly what you need: 1) Gather system information first (OS, browser, error codes), 2) Reproduce the issue step-by-step, 3) Check common solutions in this order: restart, clear cache, update software, check permissions, 4) Document all steps taken, 5) Escalate to Level 2 if not resolved in 15 minutes. Always test the solution before marking resolved.",
+          'default': "I understand you need concrete technical support processes. Use the ITIL framework: Identify → Diagnose → Repair → Test → Close. Always start with 'Have you tried turning it off and on again?' but then move quickly to specific diagnostics based on the error symptoms."
+        },
+        'business_consultant': {
+          'specific_guidance': "You're absolutely right - let me be more specific with business strategy. Here's exactly what you need: 1) Conduct SWOT analysis within 30 days, 2) Set SMART goals with quarterly milestones, 3) Implement KPI tracking for revenue, customer acquisition cost, and lifetime value, 4) Review cash flow weekly, 5) Schedule monthly strategy sessions with key stakeholders. Every recommendation should have ROI projections and implementation timelines.",
+          'default': "I understand you need concrete business strategies. Focus on the 3 pillars: Revenue optimization (increase pricing or volume), Cost reduction (eliminate waste), and Market expansion (new channels or segments). Start with quick wins that generate cash flow within 90 days."
+        },
+        'dr_sakura': {
+          'specific_guidance': "You're absolutely right - let me be more specific. For breast self-exams: Do them monthly, 3-7 days after your period. Feel for lumps using flat fingertips in circular motions, covering entire breast from collarbone to bra line. Mammograms annually after 40 (high risk) or 50 (average risk). Clinical exams every 1-3 years before 40, annually after. Any concerning changes should be checked within 2 weeks.",
+          'default': "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt."
+        },
+        'education_specialist': {
+          'specific_guidance': "You're absolutely right - let me be more specific with learning strategies. Here's exactly what you need: 1) Use the Feynman Technique - explain concepts in simple terms, 2) Apply spaced repetition with 1-day, 3-day, 1-week, 1-month intervals, 3) Create mind maps for visual learners, 4) Practice active recall instead of passive reading, 5) Set specific learning objectives with measurable outcomes. Track progress weekly with assessment quizzes.",
+          'default': "I understand you need concrete learning techniques. Use the 70-20-10 model: 70% experiential learning, 20% social learning, 10% formal training. Always start with learning objectives and end with practical application exercises."
+        }
+      };
+      
+      const avatarData = avatarResponses[avatarType] || avatarResponses['dr_sakura'];
+      return avatarData[questionType] || avatarData['default'];
+    };
+
     if (customerQuestion.includes("SPECIFIC") || customerQuestion.includes("exactly") || customerQuestion.includes("vague")) {
       // Check for learned responses first
-      const learnedResponse = getImprovedResponse("specific guidance");
+      const learnedResponse = getImprovedResponse("specific guidance", sessionAvatarType);
       if (learnedResponse) {
-        drSakuraResponse = learnedResponse;
+        avatarResponse = learnedResponse;
         usedLearning = true;
       } else {
-        drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+        avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'specific_guidance');
       }
       
-      multipleChoiceOptions = [
-        "Do you want me to guide you through monthly self-exams?",
-        "Do you want to know more about how healthcare providers perform clinical exams?",
-        "Do you want to know more about mammogram screening?"
-      ];
-    } else if (customerQuestion.includes("HOW OFTEN") || customerQuestion.includes("timeline")) {
-      drSakuraResponse = "Here's the exact timeline: Clinical breast exams every 1-3 years from age 25-39, then annually. Mammograms annually starting at age 40 (high risk) or age 50 (average risk). Self-exams monthly. If you find anything concerning, see your doctor within 2 weeks. Schedule mammograms for the week after your period when breasts are least tender.";
-      multipleChoiceOptions = [
-        "Can you explain what happens during a clinical breast exam?",
-        "What should I do if I find something concerning during self-exam?",
-        "How do I know if I'm high risk and need earlier screening?"
-      ];
-    } else if (customerQuestion.includes("process") || customerQuestion.includes("what happens")) {
-      drSakuraResponse = "Here's exactly what happens: You'll undress from the waist up, put on a hospital gown that opens in front. The technologist positions your breast on a plastic plate, then a paddle compresses it for 10-15 seconds while the X-ray is taken. Two views per breast - one from top to bottom, one side to side. Total time: 20 minutes. Pain level: 2-7 out of 10, brief compression discomfort only.";
-      multipleChoiceOptions = [
-        "How can I reduce discomfort during mammogram?",
-        "What do the mammogram results mean?",
-        "What happens if they find something abnormal?"
-      ];
-    } else if (customerQuestion.includes("feel like") || customerQuestion.includes("warning signs")) {
-      drSakuraResponse = "Concerning lumps feel like: hard, immobile mass (like a marble); irregular, not round; painless initially; different from surrounding tissue. Normal breast tissue feels like small peas or gravel. Red flags: new lump that doesn't move, skin dimpling, nipple discharge (bloody or clear), breast size changes, persistent pain in one spot. Any of these warrant a doctor visit within 1-2 weeks.";
-      multipleChoiceOptions = [
-        "Can you teach me the proper self-exam technique?",
-        "What questions should I ask my doctor if I find a lump?",
-        "Are there other symptoms besides lumps I should watch for?"
-      ];
-    } else if (customerQuestion.includes("step-by-step") || customerQuestion.includes("instructions")) {
-      drSakuraResponse = "Step 1: Call your doctor's office, request 'clinical breast exam and mammogram referral'. Step 2: Schedule mammogram for 1 week after your period. Step 3: Don't wear deodorant/lotion that day. Step 4: Bring previous mammogram films if available. Step 5: Arrive 15 minutes early for paperwork. Step 6: Results typically available within 48-72 hours via phone call or patient portal.";
-      multipleChoiceOptions = [
-        "What should I expect when I get my results?",
-        "Do I need a referral or can I schedule directly?",
-        "What if I don't have previous mammogram films?"
-      ];
+      // Generate avatar-specific multiple choice options
+      const avatarOptions = {
+        'sales_specialist': [
+          "Can you teach me specific objection handling scripts?",
+          "What are the best closing techniques for my industry?",
+          "How do I qualify prospects more effectively?"
+        ],
+        'customer_service': [
+          "Can you show me de-escalation techniques for angry customers?",
+          "What are the best ways to handle refund requests?",
+          "How do I manage multiple customer channels efficiently?"
+        ],
+        'technical_support': [
+          "Can you walk me through advanced troubleshooting steps?",
+          "What diagnostic tools should I use first?",
+          "How do I document technical issues effectively?"
+        ],
+        'business_consultant': [
+          "Can you help me create a 90-day business plan?",
+          "What metrics should I track for business growth?",
+          "How do I conduct effective market analysis?"
+        ],
+        'dr_sakura': [
+          "Do you want me to guide you through monthly self-exams?",
+          "Do you want to know more about how healthcare providers perform clinical exams?",
+          "Do you want to know more about mammogram screening?"
+        ],
+        'education_specialist': [
+          "Can you teach me effective study techniques?",
+          "What are the best methods for knowledge retention?",
+          "How do I create engaging learning experiences?"
+        ]
+      };
+      
+      multipleChoiceOptions = avatarOptions[sessionAvatarType] || avatarOptions['dr_sakura'];
     } else {
-      // Default: ALWAYS provide multiple choice options to ensure guided interaction
-      drSakuraResponse = "I appreciate your feedback - it helps me provide better guidance. Let me be more direct: Breast health screening involves three components working together: 1) Monthly self-exams to know your normal, 2) Clinical exams by healthcare providers for professional assessment, 3) Mammograms for early detection before lumps are felt. The key is consistency and knowing when each component should start based on your age and risk factors.";
+      // Default response based on avatar type
+      avatarResponse = generateAvatarSpecificResponse(sessionAvatarType, 'default');
       multipleChoiceOptions = [
-        "Do you want me to guide you through monthly self-exams?",
-        "Do you want to know more about how healthcare providers perform clinical exams?",
-        "Do you want to know more about mammogram screening?"
+        "Can you provide more specific guidance for my situation?",
+        "What are the key steps I should focus on first?",
+        "How do I measure success in this area?"
       ];
     }
     
@@ -170,11 +233,11 @@ router.post('/sessions/:sessionId/continue', (req, res) => {
     const avatarMessageCount = session.messages.filter(m => m.role === 'avatar').length;
     const shouldShowChoices = avatarMessageCount === 1;
 
-    // Add Dr. Sakura's response with conditional multiple choice options
+    // Add avatar's response with conditional multiple choice options
     const newAvatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 2}`,
       role: 'avatar', 
-      content: drSakuraResponse,
+      content: avatarResponse,
       timestamp: new Date().toISOString(),
       quality_score: Math.floor(Math.random() * 20) + 80,
       multiple_choice_options: shouldShowChoices ? multipleChoiceOptions : []
@@ -378,21 +441,34 @@ router.post('/sessions/:sessionId/comment', (req, res) => {
                      comment.toLowerCase().includes('specific') ? 'concrete details' :
                      'general improvement';
 
-    // Store in global knowledge base
-    drSakuraKnowledgeBase.improvedResponses.push({
+    // Determine avatar type from session or default to dr_sakura
+    const avatarType = session.avatarType || session.avatar_type || 'dr_sakura';
+    
+    // Ensure avatar knowledge base exists
+    if (!universalAvatarKnowledgeBase[avatarType]) {
+      universalAvatarKnowledgeBase[avatarType] = {
+        improvedResponses: [],
+        commonQuestions: [],
+        learningStats: { total_feedback_received: 0, improvement_trends: [], last_updated: new Date().toISOString() }
+      };
+    }
+    
+    // Store in universal avatar knowledge base
+    universalAvatarKnowledgeBase[avatarType].improvedResponses.push({
       originalTopic: topicType,
       userFeedback: comment,
       improvedResponse: improvedResponse,
       timestamp: new Date().toISOString(),
-      usage_count: 0
+      usage_count: 0,
+      business_context: session.business_type || 'health_coaching'
     });
 
-    // Update learning stats
-    drSakuraKnowledgeBase.learningStats.total_feedback_received++;
-    drSakuraKnowledgeBase.learningStats.improvement_trends.push(topicType);
-    drSakuraKnowledgeBase.learningStats.last_updated = new Date().toISOString();
+    // Update learning stats for this avatar
+    universalAvatarKnowledgeBase[avatarType].learningStats.total_feedback_received++;
+    universalAvatarKnowledgeBase[avatarType].learningStats.improvement_trends.push(topicType);
+    universalAvatarKnowledgeBase[avatarType].learningStats.last_updated = new Date().toISOString();
 
-    console.log(`📚 Dr. Sakura learned new response for: ${topicType} (Total learned: ${drSakuraKnowledgeBase.improvedResponses.length})`);
+    console.log(`📚 ${avatarType.toUpperCase()} learned new response for: ${topicType} (Total learned: ${universalAvatarKnowledgeBase[avatarType].improvedResponses.length})`);
     
     // Update performance metrics to reflect improvement
     session.performance_metrics = {
@@ -436,18 +512,58 @@ router.get('/avatar-types', (req, res) => {
   }
 });
 
-// Get Dr. Sakura's learning progress endpoint
+// Get universal avatar learning progress endpoint (works for all avatars)
 router.get('/learning-progress', (req, res) => {
   try {
-    res.json({
-      success: true,
-      knowledgeBase: drSakuraKnowledgeBase,
-      summary: {
-        total_learned_responses: drSakuraKnowledgeBase.improvedResponses.length,
-        most_common_improvements: drSakuraKnowledgeBase.learningStats.improvement_trends.slice(-5),
-        learning_active: drSakuraKnowledgeBase.improvedResponses.length > 0
-      }
-    });
+    const { avatarType } = req.query;
+    
+    if (avatarType && universalAvatarKnowledgeBase[avatarType]) {
+      // Return specific avatar's learning progress
+      const avatarData = universalAvatarKnowledgeBase[avatarType];
+      res.json({
+        success: true,
+        avatarType: avatarType,
+        knowledgeBase: avatarData,
+        summary: {
+          total_learned_responses: avatarData.improvedResponses.length,
+          most_common_improvements: avatarData.learningStats.improvement_trends.slice(-5),
+          learning_active: avatarData.improvedResponses.length > 0
+        }
+      });
+    } else {
+      // Return learning progress for all avatars
+      const allAvatarsProgress = {};
+      let totalResponses = 0;
+      let allTrends: string[] = [];
+      
+      Object.keys(universalAvatarKnowledgeBase).forEach(avatar => {
+        const data = universalAvatarKnowledgeBase[avatar];
+        allAvatarsProgress[avatar] = {
+          learned_responses: data.improvedResponses.length,
+          feedback_received: data.learningStats.total_feedback_received,
+          last_updated: data.learningStats.last_updated
+        };
+        totalResponses += data.improvedResponses.length;
+        allTrends = [...allTrends, ...data.learningStats.improvement_trends];
+      });
+      
+      res.json({
+        success: true,
+        knowledgeBase: {
+          allAvatars: allAvatarsProgress,
+          totalLearned: totalResponses,
+          commonTrends: allTrends.slice(-10)
+        },
+        summary: {
+          total_learned_responses: totalResponses,
+          most_common_improvements: allTrends.slice(-5),
+          learning_active: totalResponses > 0,
+          active_avatars: Object.keys(universalAvatarKnowledgeBase).filter(avatar => 
+            universalAvatarKnowledgeBase[avatar].improvedResponses.length > 0
+          )
+        }
+      });
+    }
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -505,10 +621,10 @@ router.get('/sessions', (req, res) => {
   }
 });
 
-// Start a new training session with automatic AI conversation
+// Start a new training session with automatic AI conversation (universal for all avatars)
 router.post('/sessions/start', (req, res) => {
   try {
-    const { avatarId, scenarioId, businessContext } = req.body;
+    const { avatarId, scenarioId, businessContext, avatarType } = req.body;
     
     // Generate automatic conversation for Dr. Sakura
     const initialMessages = [];
@@ -534,7 +650,9 @@ router.post('/sessions/start', (req, res) => {
     const session = {
       id: `session_${sessionCounter++}`,
       avatarId,
+      avatarType: avatarType || avatarId || 'dr_sakura', // Store avatar type for learning separation
       scenarioId,
+      businessContext: businessContext || 'general',
       status: 'active',
       startTime: new Date().toISOString(),
       messages: initialMessages,
