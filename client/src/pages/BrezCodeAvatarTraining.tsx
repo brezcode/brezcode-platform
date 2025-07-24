@@ -180,6 +180,48 @@ export default function BrezCodeAvatarTraining() {
     }
   }, [avatars, selectedAvatar]);
 
+  // Auto-load active session with improved responses on page load
+  useEffect(() => {
+    if (sessions.length > 0 && !activeSession) {
+      const activeSessionData = sessions.find(s => s.status === 'active');
+      if (activeSessionData) {
+        console.log('Loading active session:', activeSessionData.id);
+        setActiveSession(activeSessionData);
+        
+        // Load session messages with improved responses
+        const sessionMessages = activeSessionData.messages || [];
+        const formattedMessages = sessionMessages.map((msg: any) => ({
+          id: msg.id,
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.timestamp,
+          isTraining: true,
+          emotion: msg.emotion,
+          quality_score: msg.quality_score,
+          multiple_choice_options: msg.multiple_choice_options || [],
+          // Load improved response fields from session
+          user_comment: msg.user_comment,
+          improved_response: msg.improved_response,
+          improved_quality_score: msg.improved_quality_score,
+          improved_message_id: msg.improved_message_id,
+          has_improved_response: msg.has_improved_response
+        }));
+        
+        console.log('Loading messages with improved responses:', formattedMessages.filter(m => m.improved_response).length);
+        
+        setMessages([
+          {
+            role: 'system',
+            content: `🎯 BrezCode AI Training Active\n\nYou are now training Dr. Sakura in breast health coaching. This simulation helps improve AI responses through realistic customer interactions.`,
+            timestamp: new Date().toISOString(),
+            isTraining: true
+          },
+          ...formattedMessages
+        ]);
+      }
+    }
+  }, [sessions, activeSession]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -202,15 +244,23 @@ export default function BrezCodeAvatarTraining() {
     onSuccess: (data) => {
       setActiveSession(data.session);
       
-      // Display automatic AI conversation messages
+      // Display automatic AI conversation messages with improved responses
       const sessionMessages = data.session.messages || [];
       const formattedMessages = sessionMessages.map((msg: any) => ({
+        id: msg.id,
         role: msg.role,
         content: msg.content,
         timestamp: msg.timestamp,
         isTraining: true,
         emotion: msg.emotion,
-        quality_score: msg.quality_score
+        quality_score: msg.quality_score,
+        multiple_choice_options: msg.multiple_choice_options || [],
+        // Include improved response fields from session restoration
+        user_comment: msg.user_comment,
+        improved_response: msg.improved_response,
+        improved_quality_score: msg.improved_quality_score,
+        improved_message_id: msg.improved_message_id,
+        has_improved_response: msg.has_improved_response
       }));
       
       setMessages([
@@ -397,6 +447,8 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       console.log('Comment feedback response:', data);
+      console.log('Has session:', !!data.session);
+      console.log('Has improved_message:', !!data.improved_message);
       
       // Update session with improved response
       if (data.session) {
@@ -404,6 +456,19 @@ export default function BrezCodeAvatarTraining() {
         
         // Update messages from session data to get improved responses
         const sessionMessages = data.session.messages || [];
+        console.log('Session messages count:', sessionMessages.length);
+        
+        // Log improved response details
+        const improvedMsg = sessionMessages.find((m: any) => m.improved_response);
+        if (improvedMsg) {
+          console.log('Found improved message:', {
+            id: improvedMsg.id,
+            hasImprovedResponse: !!improvedMsg.improved_response,
+            improvedResponseLength: improvedMsg.improved_response?.length,
+            userComment: improvedMsg.user_comment
+          });
+        }
+        
         setMessages(prev => {
           return sessionMessages.map((sessionMsg: any) => {
             // Find existing message to preserve any additional UI state
