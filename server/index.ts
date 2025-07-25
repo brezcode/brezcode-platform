@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerAvatarTrainingRoutes } from './routes/avatarTrainingRoutes';
+import avatarKnowledgeRoutes from './routes/avatarKnowledgeRoutes';
 import { registerBusinessAvatarRoutes } from './routes/businessAvatarRoutes';
 import { registerKnowledgeUploadRoutes } from './routes/knowledgeUploadRoutes';
 
@@ -211,6 +212,7 @@ app.use((req, res, next) => {
   const server = await registerRoutes(app);
 
   registerAvatarTrainingRoutes(app);
+  app.use('/api/avatar-training', avatarKnowledgeRoutes);
   registerBusinessAvatarRoutes(app);
   registerKnowledgeUploadRoutes(app);
 

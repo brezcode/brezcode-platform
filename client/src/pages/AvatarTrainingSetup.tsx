@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
+import AvatarKnowledgeUploader from "@/components/AvatarKnowledgeUploader";
 import { 
   Bot, 
   Users, 
@@ -29,7 +31,9 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
-  BarChart3
+  BarChart3,
+  Upload,
+  Database
 } from "lucide-react";
 import TopNavigation from "@/components/TopNavigation";
 
@@ -161,9 +165,10 @@ export default function AvatarTrainingSetup() {
         </div>
 
         <Tabs defaultValue="avatar-types" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 max-w-md mx-auto">
+          <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
             <TabsTrigger value="avatar-types">Avatar Types</TabsTrigger>
             <TabsTrigger value="scenarios">Training Scenarios</TabsTrigger>
+            <TabsTrigger value="knowledge-upload">Upload Knowledge</TabsTrigger>
             <TabsTrigger value="progress">My Progress</TabsTrigger>
           </TabsList>
 
@@ -401,6 +406,79 @@ export default function AvatarTrainingSetup() {
             )}
           </TabsContent>
 
+          {/* Knowledge Upload Tab */}
+          <TabsContent value="knowledge-upload" className="space-y-6">
+            {!selectedAvatarType ? (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <Upload className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">Select an Avatar Type First</h3>
+                  <p className="text-gray-600 mb-4">Choose your AI avatar specialization to upload custom knowledge files</p>
+                  <Button onClick={() => setLocation('#avatar-types')}>
+                    Choose Avatar Type
+                  </Button>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-6">
+                {/* Selected Avatar Info */}
+                <Card className="bg-purple-50 border-purple-200">
+                  <CardHeader>
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 bg-purple-100 rounded-lg">
+                        {AVATAR_ICONS[selectedAvatarType as keyof typeof AVATAR_ICONS] && 
+                          (() => {
+                            const IconComponent = AVATAR_ICONS[selectedAvatarType as keyof typeof AVATAR_ICONS];
+                            return <IconComponent className="h-6 w-6 text-purple-600" />;
+                          })()
+                        }
+                      </div>
+                      <div>
+                        <CardTitle className="text-xl">
+                          Train {avatarTypes.find(a => a.id === selectedAvatarType)?.name} with Custom Knowledge
+                        </CardTitle>
+                        <CardDescription>
+                          Upload files to expand your avatar's knowledge base and improve training responses
+                        </CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+
+                {/* Knowledge Upload Component */}
+                <AvatarKnowledgeUploader
+                  selectedAvatarType={selectedAvatarType}
+                  onKnowledgeExtracted={(knowledge) => {
+                    console.log('Knowledge extracted:', knowledge);
+                    toast({
+                      title: "Knowledge Added Successfully",
+                      description: `Added ${knowledge.knowledgePoints?.length || 0} knowledge points to ${knowledge.avatarType}`,
+                    });
+                  }}
+                />
+
+                {/* Knowledge Base Summary */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Database className="h-5 w-5" />
+                      Current Knowledge Base
+                    </CardTitle>
+                    <CardDescription>
+                      View and manage the custom knowledge for this avatar
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8 text-muted-foreground">
+                      <BookOpen className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                      <p>Upload files to see your avatar's custom knowledge base</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+
           {/* Progress Tab */}
           <TabsContent value="progress" className="space-y-6">
             <Card className="text-center py-12">
@@ -416,7 +494,7 @@ export default function AvatarTrainingSetup() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent></old_str>
         </Tabs>
       </div>
     </div>
