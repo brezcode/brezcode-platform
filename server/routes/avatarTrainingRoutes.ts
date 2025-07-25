@@ -157,25 +157,39 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
 
     // Handle automatic conversation continuation when no customer message provided
     let customerQuestion: string;
+    let customerEmotion: string;
     if (!customerMessage || customerMessage.trim() === '') {
-      // Generate automatic follow-up question based on conversation context
-      const lastAvatarMessage = session.messages.filter((m: any) => m.role === 'avatar').pop();
-      const conversationTopic = lastAvatarMessage?.content || "";
-      
-      // Generate contextual follow-up questions
-      const followUpQuestions = [
-        "Can you provide more specific guidance about what you just explained?",
-        "I'd like to understand this better - can you give me practical steps?",
-        "That's helpful, but I have some concerns about implementing this advice.",
-        "What should I do if I encounter problems with what you've suggested?",
-        "Can you explain how this applies to my specific situation?",
-        "I want to make sure I understand this correctly - can you clarify?"
-      ];
-      
-      customerQuestion = followUpQuestions[Math.floor(Math.random() * followUpQuestions.length)];
-      console.log('🤖 Auto-generated customer question:', customerQuestion);
+      try {
+        console.log('🚀 Calling Claude for intelligent patient question generation...');
+        
+        // Generate intelligent patient question using Claude
+        const patientResponse = await ClaudeAvatarService.generatePatientQuestion(
+          session.messages, 
+          session.scenarioId, 
+          session.avatarId
+        );
+        
+        customerQuestion = patientResponse.question;
+        customerEmotion = patientResponse.emotion;
+        console.log('🎯 Claude-generated patient question:', customerQuestion.substring(0, 100) + '...');
+        console.log('🎭 Patient emotion:', customerEmotion);
+        console.log('📝 Question context:', patientResponse.context);
+      } catch (error) {
+        console.error('❌ Claude patient question failed, using fallback:', error);
+        // Fallback to simple questions if Claude fails
+        const fallbackQuestions = [
+          { question: "I'm still feeling anxious about this - can you help me understand what specific steps I should take next?", emotion: "anxious" },
+          { question: "Based on what you've explained, how will I know if I'm doing this correctly?", emotion: "concerned" },
+          { question: "You mentioned several things - which should I prioritize first given my situation?", emotion: "curious" }
+        ];
+        const selected = fallbackQuestions[Math.floor(Math.random() * fallbackQuestions.length)];
+        customerQuestion = selected.question;
+        customerEmotion = selected.emotion;
+        console.log('🤖 Auto-generated fallback question:', customerQuestion.substring(0, 50) + '...');
+      }
     } else {
       customerQuestion = customerMessage.trim();
+      customerEmotion = 'neutral';
     }
     const sessionAvatarType = session.avatarType || 'dr_sakura';
 
@@ -186,13 +200,13 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     // Use AI-only response generation
     const aiResponse = await generateAIResponse(sessionAvatarType, customerQuestion);
     
-    // Add new customer message
+    // Add new customer message with Claude-generated emotion
     const newCustomerMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,
       role: 'customer',
       content: customerQuestion,
       timestamp: new Date(Date.now() - 30000).toISOString(),
-      emotion: customerQuestion.includes('EXACTLY') || customerQuestion.includes('vague') ? 'demanding' : 'concerned'
+      emotion: customerEmotion || 'concerned'
     };
     
     // Add avatar's response
@@ -202,11 +216,14 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       content: aiResponse.content,
       timestamp: new Date().toISOString(),
       quality_score: aiResponse.quality_score,
-      multiple_choice_options: [
-        "Can you provide more specific guidance for my situation?",
-        "What are the key steps I should focus on first?",
-        "How do I measure success in this area?"
-      ]
+      multiple_choice_options: await generateClaudeMultipleChoiceOptions(customerQuestion, sessionAvatarType).catch(err => {
+        console.error('❌ Multiple choice generation failed:', err);
+        return [
+          "Can you provide more specific guidance for my situation?",
+          "What are the key steps I should focus on first?", 
+          "How do I measure success in this area?"
+        ];
+      })
     };
     
     session.messages.push(newCustomerMessage, newAvatarMessage);

@@ -18,6 +18,138 @@ const anthropic = new Anthropic({
 
 export class ClaudeAvatarService {
   
+  // Generate intelligent patient questions using Claude
+  static async generatePatientQuestion(
+    conversationHistory: any[],
+    scenario: string,
+    avatarType: string = 'dr_sakura'
+  ): Promise<{ question: string; emotion: string; context: string }> {
+    try {
+      // Analyze conversation context
+      const recentMessages = conversationHistory.slice(-4).map(msg => 
+        `${msg.role}: ${msg.content}`
+      ).join('\n');
+      
+      const scenarioContexts = {
+        'breast_health_anxiety': 'A patient anxious about breast health screening, self-exams, and potential findings',
+        'health_breast_screening': 'A patient seeking guidance on mammography, screening schedules, and early detection',
+        'customer_service_complaint': 'A frustrated customer with service issues needing resolution',
+        'sales_pricing_objection': 'A potential client concerned about pricing and value proposition'
+      };
+      
+      const scenarioContext = scenarioContexts[scenario as keyof typeof scenarioContexts] || 'A general healthcare consultation';
+
+      const prompt = `You are simulating an intelligent patient/customer in a medical training scenario: "${scenarioContext}"
+
+Recent conversation:
+${recentMessages}
+
+Generate a thoughtful, contextual follow-up question that a real patient would ask. The question should:
+1. Show deeper engagement with the medical topic discussed
+2. Reflect genuine patient concerns and anxieties
+3. Build naturally on the conversation flow
+4. Demonstrate the patient is processing and thinking about the advice
+5. Include specific details that show active listening
+
+For breast health scenarios, patients might ask about:
+- Specific techniques or procedures mentioned
+- Personal risk factors and family history implications  
+- Timing and frequency of screenings
+- What to expect during procedures
+- Signs and symptoms to watch for
+- Lifestyle modifications and their effectiveness
+- How to manage anxiety about findings
+
+Respond with a JSON object:
+{
+  "question": "The patient's next question (natural, specific, thoughtful)",
+  "emotion": "concerned|anxious|curious|hopeful|confused",
+  "context": "Brief explanation of why this question follows naturally"
+}`;
+
+      const response = await anthropic.messages.create({
+        model: DEFAULT_MODEL_STR, // claude-sonnet-4-20250514
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      });
+
+      const result = JSON.parse((response.content[0] as any).text);
+      console.log('🎯 Claude-generated patient question:', result.question.substring(0, 100) + '...');
+      return result;
+
+    } catch (error) {
+      console.error('❌ Claude patient question generation failed:', error);
+      // Fallback to contextual questions
+      const fallbackQuestions = [
+        { 
+          question: "I'm still feeling anxious about this - can you help me understand what specific steps I should take next?", 
+          emotion: "anxious",
+          context: "Patient needs more specific guidance to reduce anxiety"
+        },
+        { 
+          question: "Based on what you've explained, how will I know if I'm doing this correctly?", 
+          emotion: "concerned",
+          context: "Patient wants validation and success metrics"
+        },
+        { 
+          question: "You mentioned several things - which should I prioritize first given my situation?", 
+          emotion: "curious",
+          context: "Patient needs help prioritizing recommendations"
+        }
+      ];
+      return fallbackQuestions[Math.floor(Math.random() * fallbackQuestions.length)];
+    }
+  }
+  
+  // Generate intelligent multiple choice options using Claude
+  static async generateMultipleChoiceOptions(
+    customerQuestion: string,
+    avatarType: string
+  ): Promise<string[]> {
+    try {
+      const prompt = `Based on this patient question: "${customerQuestion}"
+
+Generate 3 intelligent follow-up questions that a real patient would naturally ask next. These should:
+1. Show deeper engagement with the medical topic
+2. Reflect genuine patient concerns and anxieties  
+3. Build on the information-seeking behavior
+4. Be specific and actionable
+
+For breast health contexts, patients often want to know about:
+- Specific procedures and what to expect
+- Personal risk assessment and family history
+- Warning signs and symptoms to monitor
+- Lifestyle changes and their effectiveness
+- Timing and frequency recommendations
+- How to manage anxiety and fear
+
+Respond with a JSON array of exactly 3 questions:
+["Question 1", "Question 2", "Question 3"]`;
+
+      const response = await anthropic.messages.create({
+        model: DEFAULT_MODEL_STR, // claude-sonnet-4-20250514
+        max_tokens: 800,
+        messages: [{ role: 'user', content: prompt }]
+      });
+
+      const questions = JSON.parse((response.content[0] as any).text);
+      console.log('🎯 Claude-generated multiple choice options:', questions.length);
+      return Array.isArray(questions) ? questions : [
+        "Can you provide more specific guidance for my situation?",
+        "What are the key steps I should focus on first?", 
+        "How do I measure success in this area?"
+      ];
+
+    } catch (error) {
+      console.error('❌ Claude multiple choice generation failed:', error);
+      return [
+        "Can you provide more specific guidance for my situation?",
+        "What are the key steps I should focus on first?", 
+        "How do I measure success in this area?"
+      ];
+    }
+  }
+  
   static async generateAvatarResponse(
     avatarType: string,
     customerMessage: string,
