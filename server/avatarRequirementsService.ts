@@ -298,21 +298,24 @@ Always be helpful, accurate, and maintain a professional tone while staying true
     configId: string,
     query: string
   ): Promise<any[]> {
-    // Simple text search - in production you'd use full-text search
-    const knowledge = await db
-      .select()
-      .from(avatarKnowledge)
-      .where(and(
-        eq(avatarKnowledge.brandId, brandId),
-        eq(avatarKnowledge.configId, configId),
-        eq(avatarKnowledge.isActive, true)
-      ));
+    try {
+      const knowledge = await db
+        .select()
+        .from(avatarKnowledge)
+        .where(and(
+          eq(avatarKnowledge.brandId, brandId),
+          eq(avatarKnowledge.isActive, true)
+        ));
 
-    // Filter by content matching query
-    return knowledge.filter(item => 
-      item.title.toLowerCase().includes(query.toLowerCase()) ||
-      item.content.toLowerCase().includes(query.toLowerCase()) ||
-      item.tags.some((tag: string) => tag.toLowerCase().includes(query.toLowerCase()))
-    );
+      // Filter by content matching query
+      return knowledge.filter(item => 
+        item.title.toLowerCase().includes(query.toLowerCase()) ||
+        item.content.toLowerCase().includes(query.toLowerCase()) ||
+        item.tags.some((tag: string) => tag.toLowerCase().includes(query.toLowerCase()))
+      );
+    } catch (error) {
+      console.error("Error searching knowledge:", error);
+      return [];
+    }
   }
 }

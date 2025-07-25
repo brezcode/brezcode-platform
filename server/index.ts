@@ -1,6 +1,9 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { registerAvatarTrainingRoutes } from './routes/avatarTrainingRoutes';
+import { registerBusinessAvatarRoutes } from './routes/businessAvatarRoutes';
+import { registerKnowledgeUploadRoutes } from './routes/knowledgeUploadRoutes';
 
 const app = express();
 // Increase payload limit for image uploads
@@ -15,17 +18,17 @@ app.get('/direct-api/test', (req, res) => {
 app.post('/direct-api/training/start', (req, res) => {
   try {
     const { avatarId, customerId, scenario } = req.body;
-    
+
     if (!avatarId || !customerId || !scenario) {
       return res.status(400).json({ error: 'Missing required parameters' });
     }
-    
+
     // Validate avatar ID exists (basic validation for testing)
     const validAvatarIds = ['sales_specialist_alex', 'customer_service_miko', 'technical_kai', 'business_luna', 'health_sakura', 'education_sage'];
     if (!validAvatarIds.includes(avatarId)) {
       return res.status(400).json({ error: 'Invalid avatar ID' });
     }
-    
+
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const session = {
       id: sessionId,
@@ -50,7 +53,7 @@ app.post('/direct-api/training/start', (req, res) => {
       started_at: new Date().toISOString(),
       duration: 0
     };
-    
+
     res.json(session);
   } catch (error) {
     console.error('Error starting training session:', error);
@@ -61,7 +64,7 @@ app.post('/direct-api/training/start', (req, res) => {
 app.post('/direct-api/training/:sessionId/continue', (req, res) => {
   try {
     const { sessionId } = req.params;
-    
+
     const avatarResponses = [
       "I understand your pricing concerns. Let me show you the specific value we provide.",
       "That's a great technical question. Based on your requirements, here's how we can help.",
@@ -69,7 +72,7 @@ app.post('/direct-api/training/:sessionId/continue', (req, res) => {
       "Compared to competitors, here are our three key advantages that clients value most.",
       "I hear your frustration. Here's what we can do to improve your experience immediately."
     ];
-    
+
     const session = {
       id: sessionId,
       status: 'running',
@@ -96,7 +99,7 @@ app.post('/direct-api/training/:sessionId/continue', (req, res) => {
         conversation_flow: Math.floor(Math.random() * 15) + 75
       }
     };
-    
+
     res.json(session);
   } catch (error) {
     console.error('Error continuing training:', error);
@@ -107,7 +110,7 @@ app.post('/direct-api/training/:sessionId/continue', (req, res) => {
 app.post('/direct-api/training/:sessionId/stop', (req, res) => {
   try {
     const { sessionId } = req.params;
-    
+
     const finalSession = {
       id: sessionId,
       status: 'completed',
@@ -120,7 +123,7 @@ app.post('/direct-api/training/:sessionId/stop', (req, res) => {
       },
       messages: []
     };
-    
+
     res.json(finalSession);
   } catch (error) {
     console.error('Error stopping training:', error);
@@ -160,7 +163,7 @@ app.use((req, res, next) => {
 
 (async () => {
   console.log('Starting server...');
-  
+
   // Comment out problematic initializations for now
   /*
   // Initialize knowledge base with evidence-based medical facts
@@ -187,7 +190,7 @@ app.use((req, res, next) => {
   } catch (error) {
     console.error('Failed to seed default brand:', error);
   }
-  
+
   // Initialize brand knowledge bases
   try {
     const { initializeBrandKnowledge } = await import('./initializeBrandKnowledge');
@@ -204,8 +207,12 @@ app.use((req, res, next) => {
     console.error('Failed to seed business questions:', error);
   }
   */
-  
+
   const server = await registerRoutes(app);
+
+  registerAvatarTrainingRoutes(app);
+  registerBusinessAvatarRoutes(app);
+  registerKnowledgeUploadRoutes(app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
