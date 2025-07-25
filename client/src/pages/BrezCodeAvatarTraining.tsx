@@ -552,7 +552,7 @@ export default function BrezCodeAvatarTraining() {
           }
         }, 100);
         
-        console.log('🔄 Messages updated with improved responses:', sessionMessages.filter(m => m.improved_response).length);
+        console.log('🔄 Messages updated with improved responses:', sessionMessages.filter((m: any) => m.improved_response).length);
       }
       
       // Show success notification for improved response
@@ -685,7 +685,7 @@ export default function BrezCodeAvatarTraining() {
                       <Card 
                         key={scenario.id} 
                         className={`cursor-pointer transition-all hover:shadow-lg ${
-                          selectedScenario?.id === scenario.id ? 'ring-2 ring-pink-500 bg-pink-50' : ''
+                          selectedScenario && selectedScenario.id === scenario.id ? 'ring-2 ring-pink-500 bg-pink-50' : ''
                         }`}
                         onClick={() => setSelectedScenario(scenario)}
                       >
