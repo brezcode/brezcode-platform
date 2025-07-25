@@ -12,7 +12,7 @@ let universalKnowledgeBase: { [avatarType: string]: any[] } = {};
 // Multiple choice functionality removed to streamline user experience
 
 // DYNAMIC AI-ONLY RESPONSE SYSTEM - NO HARDCODED CONTENT
-const generateAIResponse = async (avatarType: string, customerQuestion: string): Promise<{ content: string, quality_score: number }> => {
+const generateAIResponse = async (avatarType: string, customerQuestion: string, conversationHistory: any[] = []): Promise<{ content: string, quality_score: number }> => {
   console.log(`🔄 Generating AI-only response for ${avatarType} - Question: ${customerQuestion.substring(0, 50)}...`);
   
   try {
@@ -20,7 +20,7 @@ const generateAIResponse = async (avatarType: string, customerQuestion: string):
     const claudeResponse = await ClaudeAvatarService.generateAvatarResponse(
       avatarType,
       customerQuestion,
-      [],
+      conversationHistory,
       'health_coaching'
     );
     console.log("🎯 Using Claude for dynamic response");
@@ -200,8 +200,8 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     console.log(`   Raw customerMessage from API: ${customerMessage}`);
     console.log(`   Final customerQuestion used: ${customerQuestion.substring(0, 100)}...`);
 
-    // Use AI-only response generation
-    const aiResponse = await generateAIResponse(sessionAvatarType, customerQuestion);
+    // Use AI-only response generation with conversation history to prevent repetition
+    const aiResponse = await generateAIResponse(sessionAvatarType, customerQuestion, session.messages);
     
     // Multiple choice functionality removed to streamline experience
     const multipleChoiceOptions: string[] = [];
@@ -326,9 +326,9 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
     
     session.messages.push(userMessage);
     
-    // Generate AI response
+    // Generate AI response with conversation context to prevent repetition
     const sessionAvatarType = session.avatarType || 'dr_sakura';
-    const aiResponse = await generateAIResponse(sessionAvatarType, message.trim());
+    const aiResponse = await generateAIResponse(sessionAvatarType, message.trim(), session.messages);
     
     const avatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,

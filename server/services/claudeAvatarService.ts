@@ -103,168 +103,6 @@ Respond with a JSON object:
   
   // Multiple choice functionality removed to streamline user experience
   // Focus on Claude patient intelligence and Dr. Sakura responses
-  
-  static async generateAvatarResponse(
-    avatarType: string,
-    customerMessage: string,
-    conversationHistory: any[],
-    businessContext: string = 'general'
-  ): Promise<{ content: string; quality_score: number }> {
-    
-    const avatarPersonalities = {
-      'dr_sakura': {
-        name: 'Dr. Sakura',
-        expertise: 'Health Coach and Breast Health Specialist',
-        systemPrompt: `You are Dr. Sakura, a compassionate and knowledgeable health coach specializing in breast health education and wellness. You provide evidence-based guidance with empathy and precision.
-
-Your communication style:
-- Warm, professional, and reassuring
-- Provide specific, actionable advice
-- Use medical knowledge but explain in accessible terms
-- Always encourage professional medical consultation for concerns
-- Focus on education, prevention, and early detection
-- Be thorough but not overwhelming
-
-Key areas of expertise:
-- Breast self-examination techniques
-- Mammography and screening guidelines
-- Risk factor assessment
-- Lifestyle recommendations for breast health
-- Supporting patients through health anxiety`
-      },
-      'alex_thunder': {
-        name: 'Alex Thunder',
-        expertise: 'Sales Specialist',
-        systemPrompt: `You are Alex Thunder, a high-energy sales specialist with proven results in lead generation and conversion. You provide strategic, actionable sales advice.
-
-Your communication style:
-- Confident, energetic, and results-focused
-- Provide specific tactics with measurable outcomes
-- Use real-world examples and case studies
-- Focus on ROI and practical implementation
-- Be direct but supportive
-
-Key areas of expertise:
-- Lead qualification and conversion
-- Objection handling and closing techniques
-- Sales funnel optimization
-- CRM strategies and customer relationship building
-- Performance metrics and sales analytics`
-      },
-      'miko_harmony': {
-        name: 'Miko Harmony',
-        expertise: 'Customer Service Excellence',
-        systemPrompt: `You are Miko Harmony, a customer service expert focused on creating exceptional customer experiences and resolving complex issues with grace.
-
-Your communication style:
-- Empathetic, patient, and solution-oriented
-- Provide step-by-step conflict resolution strategies
-- Focus on customer satisfaction and retention
-- Be thorough in problem-solving approaches
-- Maintain calm professionalism
-
-Key areas of expertise:
-- Customer complaint resolution
-- De-escalation techniques
-- Service quality improvement
-- Customer retention strategies
-- Team training and development`
-      },
-      'kai_techwiz': {
-        name: 'Kai TechWiz',
-        expertise: 'Technical Support Specialist',
-        systemPrompt: `You are Kai TechWiz, a technical support expert with deep knowledge of troubleshooting, system diagnostics, and technical problem-solving.
-
-Your communication style:
-- Precise, logical, and methodical
-- Provide step-by-step technical solutions
-- Use clear explanations for complex concepts
-- Focus on root cause analysis
-- Be patient with non-technical users
-
-Key areas of expertise:
-- System troubleshooting and diagnostics
-- Software and hardware issue resolution
-- Technical documentation and processes
-- User training and technical education
-- Escalation procedures and team coordination`
-      },
-      'luna_strategic': {
-        name: 'Luna Strategic',
-        expertise: 'Business Consultant',
-        systemPrompt: `You are Luna Strategic, a strategic business consultant with expertise in growth planning, operational efficiency, and market analysis.
-
-Your communication style:
-- Analytical, strategic, and forward-thinking
-- Provide data-driven recommendations
-- Focus on long-term growth and sustainability
-- Use frameworks and proven methodologies
-- Be comprehensive in strategic planning
-
-Key areas of expertise:
-- Business strategy and planning
-- Market analysis and competitive positioning
-- Operational efficiency and process improvement
-- Financial planning and resource optimization
-- Leadership development and organizational growth`
-      },
-      'professor_sage': {
-        name: 'Professor Sage',
-        expertise: 'Education Specialist',
-        systemPrompt: `You are Professor Sage, an educational expert focused on effective learning strategies, curriculum development, and student engagement.
-
-Your communication style:
-- Thoughtful, encouraging, and pedagogical
-- Provide structured learning approaches
-- Focus on comprehension and skill development
-- Use interactive and engaging methods
-- Be patient and adaptive to different learning styles
-
-Key areas of expertise:
-- Curriculum design and educational planning
-- Learning assessment and progress tracking
-- Student engagement and motivation techniques
-- Educational technology integration
-- Professional development and training programs`
-      }
-    };
-
-    const avatar = (avatarPersonalities as any)[avatarType] || avatarPersonalities['dr_sakura'];
-    
-    // Build conversation context
-    const messages = [
-      {
-        role: 'user' as const,
-        content: `${avatar.systemPrompt}
-
-Business Context: ${businessContext}
-
-Current conversation context:
-${conversationHistory.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
-
-Customer/Patient message: "${customerMessage}"
-
-Please respond as ${avatar.name}, providing helpful, specific, and actionable guidance while maintaining your professional expertise and communication style. Keep responses focused and practical, typically 150-300 words.`
-      }
-    ];
-
-    try {
-      const response = await anthropic.messages.create({
-        model: DEFAULT_MODEL_STR, // "claude-sonnet-4-20250514"
-        max_tokens: 500,
-        messages: messages,
-        temperature: 0.7
-      });
-
-      const content = (response.content[0] as any)?.text || "I'd be happy to help you with that.";
-      const quality_score = Math.round(85 + Math.random() * 15); // 85-100 quality score for Claude
-
-      return { content, quality_score };
-    } catch (error: any) {
-      console.error('Claude API error:', error);
-      throw new Error(`Failed to generate avatar response: ${error.message}`);
-    }
-  }
 
   static async generateImprovedResponse(
     originalResponse: string,
@@ -358,5 +196,71 @@ Generate an improved response that directly addresses the customer's feedback wh
     };
 
     return (personalities as any)[avatarType] || personalities['dr_sakura'];
+  }
+
+  // Complete implementation of generateAvatarResponse with anti-repetition logic
+  static async generateAvatarResponse(
+    avatarType: string,
+    customerMessage: string,
+    conversationHistory: any[] = [],
+    businessContext: string = 'general'
+  ): Promise<{ content: string; quality_score: number }> {
+    
+    const avatarPersonality = this.getAvatarPersonality(avatarType);
+    
+    // Build conversation context with anti-repetition logic
+    const recentMessages = conversationHistory.slice(-6); // Use last 6 messages for context
+    const previousResponses = recentMessages.filter(msg => msg.role === 'avatar').map(msg => msg.content);
+    const hasPreivousConversation = previousResponses.length > 0;
+    
+    const messages = [
+      {
+        role: 'user' as const,
+        content: `You are ${avatarPersonality.name}, ${avatarPersonality.expertise}.
+
+${avatarPersonality.systemPrompt}
+
+Business Context: ${businessContext}
+
+${hasPreivousConversation ? `
+IMPORTANT: Avoid repetitive responses. Here are your previous responses in this conversation:
+${previousResponses.map((resp, i) => `Previous Response ${i + 1}: ${resp.substring(0, 100)}...`).join('\n')}
+
+CRITICAL INSTRUCTIONS:
+1. DO NOT repeat greetings or introductions - you're already in conversation
+2. DO NOT start with "Hello", "Hi", or any greeting if you've already introduced yourself
+3. Build on what you've already told them - reference previous advice naturally
+4. Use completely different phrasing and examples than your previous responses
+5. If they ask similar questions, say "Building on what I mentioned earlier..." or "Let me add to that previous guidance..."
+6. Provide specific, actionable details they haven't heard yet
+` : 'This is the start of a new conversation.'}
+
+Current conversation context:
+${recentMessages.map(msg => `${msg.role}: ${msg.content}`).join('\n')}
+
+Customer/Patient message: "${customerMessage}"
+
+Please respond as ${avatarPersonality.name} with a FRESH, SPECIFIC response that directly addresses their question with NEW information. ${hasPreivousConversation ? 'Jump directly into helpful content since you\'re continuing an ongoing conversation.' : 'You may introduce yourself briefly if this is the first interaction.'}
+
+Keep responses focused and practical, typically 150-300 words.`
+      }
+    ];
+
+    try {
+      const response = await anthropic.messages.create({
+        model: DEFAULT_MODEL_STR, // "claude-sonnet-4-20250514"
+        max_tokens: 500,
+        messages: messages,
+        temperature: 0.7
+      });
+
+      const content = (response.content[0] as any)?.text || "I'd be happy to help you with that.";
+      const quality_score = Math.round(85 + Math.random() * 15); // 85-100 quality score for Claude
+
+      return { content, quality_score };
+    } catch (error: any) {
+      console.error('Claude avatar response error:', error);
+      throw new Error(`Failed to generate avatar response: ${error.message}`);
+    }
   }
 }
