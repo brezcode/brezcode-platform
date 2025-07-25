@@ -286,35 +286,43 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async (message: string) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', '/api/avatar-training/sessions/message', {
-        sessionId: activeSession.id,
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/message`, {
         message: message,
-        role: 'user',
-        businessContext: 'brezcode'
+        role: 'customer'
       });
       if (!response.ok) throw new Error('Failed to send message');
       return response.json();
     },
     onSuccess: (data) => {
-      // Add user message
-      const userMessage: ChatMessage = {
-        role: 'user',
-        content: currentMessage,
-        timestamp: new Date().toISOString(),
-        isTraining: true
-      };
-      
-      // Add avatar response
-      const avatarMessage: ChatMessage = {
-        role: 'assistant',
-        content: data.response,
-        timestamp: new Date().toISOString(),
-        avatarId: selectedAvatar?.id,
-        isTraining: true
-      };
+      if (data.success && data.userMessage && data.avatarMessage) {
+        // Add both user message and avatar response from backend
+        const userMessage: ChatMessage = {
+          id: data.userMessage.id,
+          role: 'customer',
+          content: data.userMessage.content,
+          timestamp: data.userMessage.timestamp,
+          isTraining: true,
+          emotion: data.userMessage.emotion
+        };
+        
+        const avatarMessage: ChatMessage = {
+          id: data.avatarMessage.id,
+          role: 'avatar',
+          content: data.avatarMessage.content,
+          timestamp: data.avatarMessage.timestamp,
+          isTraining: true,
+          quality_score: data.avatarMessage.quality_score,
+          multiple_choice_options: data.avatarMessage.multiple_choice_options || []
+        };
 
-      setMessages(prev => [...prev, userMessage, avatarMessage]);
-      setCurrentMessage('');
+        setMessages(prev => [...prev, userMessage, avatarMessage]);
+        setCurrentMessage('');
+        
+        toast({
+          title: "Manual Message Sent",
+          description: "Dr. Sakura responded to your message",
+        });
+      }
     }
   });
 

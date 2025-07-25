@@ -243,6 +243,55 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
   }
 });
 
+// Manual message endpoint for user input
+router.post('/sessions/:sessionId/message', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { message, role = 'customer' } = req.body;
+    
+    const session = trainingSessions.find(s => s.id === sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+    
+    // Add user message to session
+    const userMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 1}`,
+      role: 'customer',
+      content: message.trim(),
+      timestamp: new Date().toISOString(),
+      emotion: 'neutral'
+    };
+    
+    session.messages.push(userMessage);
+    
+    // Generate AI response
+    const sessionAvatarType = session.avatarType || 'dr_sakura';
+    const aiResponse = await generateAIResponse(sessionAvatarType, message.trim());
+    
+    const avatarMessage = {
+      id: `msg_${Date.now()}_${session.messages.length + 1}`,
+      role: 'avatar',
+      content: aiResponse.content,
+      timestamp: new Date().toISOString(),
+      quality_score: aiResponse.quality_score,
+      multiple_choice_options: [] // Streamlined - no multiple choice
+    };
+    
+    session.messages.push(avatarMessage);
+    
+    res.json({
+      success: true,
+      userMessage,
+      avatarMessage,
+      session: session
+    });
+  } catch (error: any) {
+    console.error('Manual message error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Comment feedback endpoint for immediate learning
 router.post('/sessions/:sessionId/comment', async (req, res) => {
   try {
