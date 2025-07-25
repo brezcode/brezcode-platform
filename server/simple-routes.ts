@@ -1243,6 +1243,10 @@ Format your response as JSON with the exact structure:
   const avatarTrainingRoutes = await import('./routes/avatarTrainingRoutes');
   app.use('/api/avatar-training', avatarTrainingRoutes.default);
   
+  // Register knowledge base routes for conversation storage
+  const knowledgeBaseRoutes = await import('./routes/knowledgeBaseRoutes');
+  app.use('/api/knowledge-base', knowledgeBaseRoutes.default);
+  
   // Register business avatar routes
   const businessAvatarRoutes = await import('./routes/businessAvatarRoutes');
   app.use('/api/business-avatars', businessAvatarRoutes.default);

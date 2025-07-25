@@ -14,6 +14,7 @@ export * from "./roleplay-schema";   // AI training scenarios
 export * from "./ai-training-schema"; // New AI training system
 export * from "./coding-assistant-schema"; // AI coding assistant
 export * from "./conversation-history-schema"; // Real conversation learning system
+export * from "./conversation-storage-schema"; // Database conversation storage & knowledge base
 
 // Legacy users table - keeping for compatibility during migration
 // NEW APPROACH: Use leadgenUsers and brezcodeUsers tables instead

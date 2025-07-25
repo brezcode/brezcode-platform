@@ -1,5 +1,6 @@
 import express from 'express';
 import { ClaudeAvatarService } from '../services/claudeAvatarService';
+import { conversationStorageService } from '../services/conversationStorageService';
 import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
 
 const router = express.Router();
@@ -226,6 +227,66 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     
     session.messages.push(newCustomerMessage, newAvatarMessage);
     
+    // 💾 STORE CONVERSATIONS IN DATABASE & KNOWLEDGE BASE
+    try {
+      // Assume user ID = 1 for demo (in production, get from authenticated session)
+      const userId = 1;
+      
+      // Store customer message
+      await conversationStorageService.storeConversationMessage({
+        userId,
+        sessionId: session.id,
+        messageId: newCustomerMessage.id,
+        role: 'customer',
+        content: newCustomerMessage.content,
+        emotion: newCustomerMessage.emotion,
+        avatarId: session.avatarId,
+        scenarioId: session.scenario?.id,
+        businessContext: session.businessType,
+        conversationContext: { sessionType: 'ai_continue', messages: session.messages.length }
+      });
+      
+      // Store avatar message
+      await conversationStorageService.storeConversationMessage({
+        userId,
+        sessionId: session.id,
+        messageId: newAvatarMessage.id,
+        role: 'avatar',
+        content: newAvatarMessage.content,
+        qualityScore: newAvatarMessage.quality_score,
+        avatarId: session.avatarId,
+        scenarioId: session.scenario?.id,
+        businessContext: session.businessType,
+        conversationContext: { sessionType: 'ai_continue', messages: session.messages.length }
+      });
+      
+      // Extract and store knowledge from both messages
+      const customerConversationId = (await conversationStorageService.getUserConversations(userId, 1))[0]?.id;
+      if (customerConversationId) {
+        await conversationStorageService.extractKnowledgeFromConversation(
+          userId,
+          customerConversationId,
+          session.id,
+          newCustomerMessage.content,
+          'customer',
+          { avatarType: session.avatarType, scenario: session.scenario }
+        );
+        
+        await conversationStorageService.extractKnowledgeFromConversation(
+          userId,
+          customerConversationId,
+          session.id,
+          newAvatarMessage.content,
+          'avatar',
+          { quality_score: newAvatarMessage.quality_score, avatarType: session.avatarType }
+        );
+      }
+      
+      console.log('💾 Conversations stored in database & knowledge base updated');
+    } catch (storageError) {
+      console.error('❌ Failed to store conversation:', storageError);
+    }
+    
     // Update performance metrics
     session.performance_metrics = {
       response_quality: Math.floor(Math.random() * 20) + 80,
@@ -279,6 +340,66 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
     };
     
     session.messages.push(avatarMessage);
+    
+    // 💾 STORE MANUAL CONVERSATION IN DATABASE & KNOWLEDGE BASE
+    try {
+      // Assume user ID = 1 for demo (in production, get from authenticated session)
+      const userId = 1;
+      
+      // Store user message
+      await conversationStorageService.storeConversationMessage({
+        userId,
+        sessionId: session.id,
+        messageId: userMessage.id,
+        role: 'customer',
+        content: userMessage.content,
+        emotion: userMessage.emotion,
+        avatarId: session.avatarId,
+        scenarioId: session.scenario?.id,
+        businessContext: session.businessType,
+        conversationContext: { sessionType: 'manual_input', messages: session.messages.length }
+      });
+      
+      // Store avatar response
+      await conversationStorageService.storeConversationMessage({
+        userId,
+        sessionId: session.id,
+        messageId: avatarMessage.id,
+        role: 'avatar',
+        content: avatarMessage.content,
+        qualityScore: avatarMessage.quality_score,
+        avatarId: session.avatarId,
+        scenarioId: session.scenario?.id,
+        businessContext: session.businessType,
+        conversationContext: { sessionType: 'manual_input', messages: session.messages.length }
+      });
+      
+      // Extract and store knowledge from both messages
+      const latestConversations = await conversationStorageService.getUserConversations(userId, 2);
+      if (latestConversations.length > 0) {
+        await conversationStorageService.extractKnowledgeFromConversation(
+          userId,
+          latestConversations[0].id,
+          session.id,
+          userMessage.content,
+          'customer',
+          { avatarType: session.avatarType, scenario: session.scenario }
+        );
+        
+        await conversationStorageService.extractKnowledgeFromConversation(
+          userId,
+          latestConversations[0].id,
+          session.id,
+          avatarMessage.content,
+          'avatar',
+          { quality_score: avatarMessage.quality_score, avatarType: session.avatarType }
+        );
+      }
+      
+      console.log('💾 Manual conversation stored in database & knowledge base updated');
+    } catch (storageError) {
+      console.error('❌ Failed to store manual conversation:', storageError);
+    }
     
     res.json({
       success: true,
