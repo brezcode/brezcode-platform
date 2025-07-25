@@ -129,6 +129,7 @@ export default function BrezCodeAvatarTraining() {
   const [activeSession, setActiveSession] = useState<TrainingSession | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
   const [isSending, setIsSending] = useState(false);
   const [showCommentDialog, setShowCommentDialog] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>('');
@@ -411,16 +412,29 @@ export default function BrezCodeAvatarTraining() {
         };
       });
       
-      setMessages(prev => [
-        prev[0], // Keep the system message
+      // Update the messages to show latest conversation including preserved data
+      setMessages([
+        {
+          role: 'system',
+          content: `🩺 BrezCode AI Training Active\n\nYou are now training Dr. Sakura in breast health coaching. This simulation helps improve AI responses through realistic customer interactions.`,
+          timestamp: new Date().toISOString(),
+          isTraining: true
+        },
         ...formattedMessages
       ]);
       
-      toast({
-        title: "Conversation Continued",
-        description: `Dr. Sakura responded with ${sessionMessages.length} total messages`,
-      });
-      console.log('✅ Messages updated, total count:', sessionMessages.length);
+      console.log('✅ Messages updated, total count:', formattedMessages.length + 1);
+      
+      // Force React re-render by updating refresh key
+      setRefreshKey(prev => prev + 1);
+      
+      // Force UI refresh and scroll to bottom
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+      
+      // Refresh sessions to show updated state
+      queryClient.invalidateQueries({ queryKey: ['/api/avatar-training/sessions'] });
     },
     onError: (error) => {
       console.error('❌ Continue conversation error:', error);
