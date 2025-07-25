@@ -30,18 +30,18 @@ export default function BrezCodeDashboard() {
       color: "bg-blue-500"
     },
     {
+      title: "Knowledge Center",
+      description: "Upload files to train all AI avatars",
+      icon: <BookOpen className="h-6 w-6" />,
+      action: () => setLocation('/knowledge-center'),
+      color: "bg-indigo-500"
+    },
+    {
       title: "User Analytics",
       description: "View user engagement and health outcomes",
       icon: <TrendingUp className="h-6 w-6" />,
       action: () => setLocation('/analytics'),
       color: "bg-green-500"
-    },
-    {
-      title: "Health Content",
-      description: "Manage educational content and assessments",
-      icon: <BookOpen className="h-6 w-6" />,
-      action: () => setLocation('/content-management'),
-      color: "bg-purple-500"
     },
     {
       title: "Customer Support",
