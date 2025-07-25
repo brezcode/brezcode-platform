@@ -148,7 +148,7 @@ export default function AvatarTrainingSetup() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-gray-900 dark:to-gray-800">
       <TopNavigation />
-      
+
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Header */}
         <div className="text-center mb-8">
@@ -201,7 +201,7 @@ export default function AvatarTrainingSetup() {
                 {avatarTypes.map((avatarType) => {
                   const IconComponent = AVATAR_ICONS[avatarType.id as keyof typeof AVATAR_ICONS] || Bot;
                   const isSelected = selectedAvatarType === avatarType.id;
-                  
+
                   return (
                     <Card 
                       key={avatarType.id} 
@@ -345,7 +345,7 @@ export default function AvatarTrainingSetup() {
                             {scenario.difficulty}
                           </Badge>
                         </div>
-                        
+
                         {/* Customer Persona */}
                         <div className="bg-gray-50 p-3 rounded-lg">
                           <div className="flex items-center space-x-2 mb-2">
@@ -355,7 +355,7 @@ export default function AvatarTrainingSetup() {
                           <p className="text-sm text-gray-600">{scenario.customerPersona}</p>
                         </div>
                       </CardHeader>
-                      
+
                       <CardContent className="space-y-4">
                         {/* Objectives */}
                         <div>
@@ -494,7 +494,7 @@ export default function AvatarTrainingSetup() {
                 </Button>
               </CardContent>
             </Card>
-          </TabsContent></old_str>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
