@@ -954,6 +954,46 @@ router.post('/sessions', (req, res) => {
   }
 });
 
+// Create start-session endpoint for frontend compatibility
+router.post('/start-session', (req, res) => {
+  try {
+    const { avatarId, customerId, scenario } = req.body;
+    
+    const sessionId = `session_${sessionCounter++}`;
+    
+    // Create new session with proper initialization
+    const session = {
+      id: sessionId,
+      avatarId: avatarId || 'dr_sakura_wellness',
+      avatarType: avatarId?.includes('sakura') ? 'dr_sakura' : 'dr_sakura',
+      customerId: customerId,
+      scenario: scenario,
+      businessType: 'health_coaching',
+      businessContext: 'health_coaching',
+      status: 'active',
+      startTime: new Date().toISOString(),
+      messages: [],
+      performance_metrics: {
+        response_quality: Math.floor(Math.random() * 20) + 80,
+        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+        goal_achievement: Math.floor(Math.random() * 20) + 70,
+        conversation_flow: Math.floor(Math.random() * 15) + 80
+      }
+    };
+    
+    trainingSessions.push(session);
+    console.log(`✅ Session created successfully: ${sessionId}`);
+    
+    res.json({
+      success: true,
+      session: session
+    });
+  } catch (error: any) {
+    console.error('❌ Session creation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start a new training session with automatic AI conversation (universal for all avatars)
 router.post('/sessions/start', (req, res) => {
   try {
