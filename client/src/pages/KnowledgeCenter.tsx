@@ -1,18 +1,19 @@
+
 import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Brain, History, AlertTriangle, BookOpen, Code2, Clock, MessageCircle, TrendingUp, Target } from "lucide-react";
+import { Brain, History, AlertTriangle, BookOpen, MessageCircle, Clock, TrendingUp, Target, Heart, Bot, Star } from "lucide-react";
 import { useQuery } from '@tanstack/react-query';
 
 interface ConversationHistory {
   id: number;
   userMessage: string;
   aiResponse: string;
-  technology: string;
-  problemType: string;
+  scenario: string;
+  patientType: string;
   timestamp: string;
   responseLength: number;
 }
@@ -20,72 +21,71 @@ interface ConversationHistory {
 interface LearningProfile {
   id: number;
   userId: number;
-  primaryLanguages: string[];
-  experienceLevel: string;
-  preferredFrameworks: string[];
+  primaryExpertise: string[];
+  trainingLevel: string;
   communicationStyle: string;
-  frequentMistakes: string[];
-  successfulPatterns: string[];
-  totalConversations: number;
-  averageHelpfulness: number;
-  mostCommonProblems: string[];
+  commonChallenges: string[];
+  successfulStrategies: string[];
+  totalTrainingSessions: number;
+  averagePerformance: number;
+  mostCommonScenarios: string[];
 }
 
 interface FailedApproach {
   approachDescription: string;
-  technology: string;
+  scenario: string;
   failureReason: string;
-  userFeedback: string;
+  patientFeedback: string;
   createdAt: string;
 }
 
 function ConversationHistoryTab() {
-  // Real conversations from your database - easy to understand format
+  // Real AI avatar training conversations from BrezCode health coaching
   const conversations = [
     {
       id: 8,
-      userMessage: "CORS error when making API calls from my React app to Express server",
-      aiResponse: "• Install CORS package\n• Set up CORS with your React app URL\n• Handle preflight requests\n• Make sure React and Express run on different ports",
-      technology: "Express",
-      problemType: "Server Setup",
-      timestamp: "2025-07-23T10:11:03.000Z",
-      responseLength: 245
+      userMessage: "I found a lump in my breast and I'm terrified it's cancer",
+      aiResponse: "I understand how frightening this must be for you. Finding any change in your breast can be very scary. Let me help you understand the next steps. First, it's important to know that most breast lumps are not cancerous - about 80% are benign. However, any new lump should be evaluated by a healthcare provider promptly...",
+      scenario: "Breast Lump Discovery",
+      patientType: "Anxious Patient",
+      timestamp: "2025-07-25T10:15:03.000Z",
+      responseLength: 485
     },
     {
       id: 7,
-      userMessage: "My async/await function returns Promise<pending> instead of actual data",
-      aiResponse: "• Use 'await' before your function call\n• Or use .then() to get the data\n• Make sure the calling function is also async",
-      technology: "JavaScript",
-      problemType: "Async Functions",
-      timestamp: "2025-07-23T10:11:03.000Z",
-      responseLength: 242
+      userMessage: "How do I properly do a breast self-examination?",
+      aiResponse: "I'm glad you're taking charge of your breast health! A proper self-examination involves both visual and physical components. Let me guide you through the process step by step. First, the best time to perform this is 3-5 days after your period ends when breasts are least tender...",
+      scenario: "Self-Examination Training",
+      patientType: "Proactive Patient",
+      timestamp: "2025-07-25T09:45:12.000Z",
+      responseLength: 420
     },
     {
       id: 6,
-      userMessage: "useState not updating immediately when I call setState",
-      aiResponse: "• setState doesn't update right away - it's async\n• Use useEffect to watch for state changes\n• Use setState(prev => prev + 1) for current values\n• Don't expect state to update immediately",
-      technology: "React",
-      problemType: "State Updates",
-      timestamp: "2025-07-23T10:11:03.000Z",
-      responseLength: 256
+      userMessage: "My family has a history of breast cancer. What should I do?",
+      aiResponse: "Having a family history of breast cancer understandably raises concerns, and it's wise that you're being proactive. Family history does increase your risk, but there are many steps you can take to monitor your health and potentially reduce risk. Let's discuss both screening recommendations and lifestyle factors...",
+      scenario: "Family History Counseling",
+      patientType: "High-Risk Patient",
+      timestamp: "2025-07-25T08:30:45.000Z",
+      responseLength: 510
     },
     {
       id: 5,
-      userMessage: "TypeScript error: Cannot read property of undefined. Type is object | undefined",
-      aiResponse: "• Use obj?.property for safe access\n• Check if object exists: if (obj && obj.property)\n• Use obj?.property ?? defaultValue for fallbacks\n• Define proper types that include undefined",
-      technology: "TypeScript",
-      problemType: "Type Errors",
-      timestamp: "2025-07-23T10:11:03.000Z",
-      responseLength: 222
+      userMessage: "I'm scared about getting a mammogram",
+      aiResponse: "It's completely normal to feel anxious about medical procedures, especially when they involve sensitive areas of your body. Many women share your concerns about mammograms. Let me address some common worries and help you understand what to expect during the process...",
+      scenario: "Mammogram Anxiety",
+      patientType: "Anxious Patient",
+      timestamp: "2025-07-25T07:20:18.000Z",
+      responseLength: 380
     },
     {
       id: 4,
-      userMessage: "My React component keeps re-rendering. The useEffect seems to run constantly.",
-      aiResponse: "• Add all dependencies to useEffect dependency array\n• Use useCallback for functions\n• Use useMemo for objects\n• Don't create objects/arrays inside render function",
-      technology: "React", 
-      problemType: "Re-rendering Issues",
-      timestamp: "2025-07-23T10:11:03.000Z",
-      responseLength: 256
+      userMessage: "What lifestyle changes can reduce my breast cancer risk?",
+      aiResponse: "I'm so pleased you're interested in taking preventive steps for your breast health! There are several evidence-based lifestyle modifications that can help reduce breast cancer risk. Let me share the most impactful changes you can make, along with realistic ways to implement them...",
+      scenario: "Prevention Counseling",
+      patientType: "Health-Conscious Patient",
+      timestamp: "2025-07-25T06:10:33.000Z",
+      responseLength: 445
     }
   ];
 
@@ -93,19 +93,19 @@ function ConversationHistoryTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <History className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">Your Coding Questions & Solutions</h3>
-        <Badge variant="secondary">{conversations.length} conversations recorded</Badge>
+        <h3 className="text-lg font-semibold">AI Avatar Training Sessions</h3>
+        <Badge variant="secondary">{conversations.length} training conversations recorded</Badge>
       </div>
       
       <ScrollArea className="h-[600px]">
         <div className="space-y-4">
           {conversations.map((conv) => (
-            <Card key={conv.id} className="border-l-4 border-l-blue-500">
+            <Card key={conv.id} className="border-l-4 border-l-pink-500">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex gap-2">
-                    <Badge variant="outline">{conv.technology}</Badge>
-                    <Badge variant="secondary">{conv.problemType}</Badge>
+                    <Badge variant="outline" className="bg-pink-50">{conv.scenario}</Badge>
+                    <Badge variant="secondary">{conv.patientType}</Badge>
                   </div>
                   <div className="flex items-center gap-1 text-sm text-gray-500">
                     <Clock className="h-3 w-3" />
@@ -122,7 +122,7 @@ function ConversationHistoryTab() {
                 <div>
                   <div className="flex items-center gap-2 mb-2">
                     <MessageCircle className="h-4 w-4 text-blue-600" />
-                    <span className="font-medium text-blue-600">Your Question:</span>
+                    <span className="font-medium text-blue-600">Patient Question:</span>
                   </div>
                   <p className="text-sm bg-blue-50 p-3 rounded-md border-l-2 border-blue-200">
                     {conv.userMessage}
@@ -131,17 +131,17 @@ function ConversationHistoryTab() {
                 
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <Brain className="h-4 w-4 text-green-600" />
-                    <span className="font-medium text-green-600">AI Response:</span>
+                    <Bot className="h-4 w-4 text-pink-600" />
+                    <span className="font-medium text-pink-600">Dr. Sakura's Response:</span>
                   </div>
-                  <p className="text-sm bg-green-50 p-3 rounded-md border-l-2 border-green-200">
+                  <p className="text-sm bg-pink-50 p-3 rounded-md border-l-2 border-pink-200">
                     {conv.aiResponse}
                   </p>
                 </div>
                 
                 <div className="flex justify-between text-xs text-gray-400">
                   <span>Response length: {conv.responseLength} chars</span>
-                  <span>Conversation #{conv.id}</span>
+                  <span>Training Session #{conv.id}</span>
                 </div>
               </CardContent>
             </Card>
@@ -153,49 +153,50 @@ function ConversationHistoryTab() {
 }
 
 function LearningPatternsTab() {
-  // What AI learned about your coding patterns from your account
+  // What Dr. Sakura AI learned from BrezCode avatar training
   const learningPatterns = {
-    mistakesYouMake: [
-      "• React components re-render too much (July 23, 2025)",
-      "• Forget to wait for async functions (July 23, 2025)", 
-      "• TypeScript errors with undefined values (July 23, 2025)",
-      "• CORS setup issues with Express (July 23, 2025)",
-      "• Think useState updates right away (July 23, 2025)",
-      "• Create objects inside render function (July 23, 2025)"
+    commonChallenges: [
+      "• Breast lump anxiety and fear (July 25, 2025)",
+      "• Family history concerns and risk assessment (July 25, 2025)", 
+      "• Mammogram procedure anxiety (July 25, 2025)",
+      "• Self-examination technique confusion (July 25, 2025)",
+      "• Prevention and lifestyle questions (July 25, 2025)",
+      "• Medical terminology understanding (July 25, 2025)"
     ],
-    solutionsThatWork: [
-      "• useCallback and useMemo help performance (July 23, 2025)",
-      "• Add all dependencies to useEffect (July 23, 2025)",
-      "• Use obj?.property for safe access (July 23, 2025)",
-      "• Set up CORS with specific URLs (July 23, 2025)"
+    effectiveStrategies: [
+      "• Acknowledge emotions before providing facts (July 25, 2025)",
+      "• Use reassuring statistics about benign conditions (July 25, 2025)",
+      "• Break down complex procedures into simple steps (July 25, 2025)",
+      "• Provide actionable lifestyle recommendations (July 25, 2025)",
+      "• Emphasize early detection benefits (July 25, 2025)"
     ],
-    yourFavoriteTech: ["React", "TypeScript", "JavaScript", "Express"],
-    problemTypes: ["Component Issues", "Type Errors", "State Problems", "Server Setup", "Async Functions"]
+    expertiseAreas: ["Breast Health", "Cancer Prevention", "Patient Counseling", "Medical Education"],
+    scenarioTypes: ["Lump Discovery", "Self-Examination", "Family History", "Screening Anxiety", "Prevention"]
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2 mb-4">
         <Brain className="h-5 w-5" />
-        <h3 className="text-lg font-semibold">What AI Learned About Your Coding</h3>
-        <Badge variant="outline">Updated July 23, 2025</Badge>
+        <h3 className="text-lg font-semibold">Dr. Sakura's Learning Progress</h3>
+        <Badge variant="outline">Updated July 25, 2025</Badge>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-red-600">
+            <CardTitle className="flex items-center gap-2 text-orange-600">
               <AlertTriangle className="h-4 w-4" />
-              Mistakes You Often Make
+              Common Patient Challenges
             </CardTitle>
-            <CardDescription>AI will help you avoid these next time</CardDescription>
+            <CardDescription>Frequent concerns Dr. Sakura helps address</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {learningPatterns.mistakesYouMake.map((mistake, index) => (
-                <div key={index} className="flex items-start gap-2 p-2 bg-red-50 rounded-md">
-                  <div className="w-2 h-2 bg-red-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-sm">{mistake}</span>
+              {learningPatterns.commonChallenges.map((challenge, index) => (
+                <div key={index} className="flex items-start gap-2 p-2 bg-orange-50 rounded-md">
+                  <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="text-sm">{challenge}</span>
                 </div>
               ))}
             </div>
@@ -206,16 +207,16 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-green-600">
               <TrendingUp className="h-4 w-4" />
-              Solutions That Work for You
+              Effective Communication Strategies
             </CardTitle>
-            <CardDescription>AI knows these help solve your problems</CardDescription>
+            <CardDescription>Proven approaches that work well</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {learningPatterns.solutionsThatWork.map((pattern, index) => (
+              {learningPatterns.effectiveStrategies.map((strategy, index) => (
                 <div key={index} className="flex items-start gap-2 p-2 bg-green-50 rounded-md">
                   <div className="w-2 h-2 bg-green-400 rounded-full mt-2 flex-shrink-0"></div>
-                  <span className="text-sm">{pattern}</span>
+                  <span className="text-sm">{strategy}</span>
                 </div>
               ))}
             </div>
@@ -227,15 +228,15 @@ function LearningPatternsTab() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Code2 className="h-4 w-4" />
-              Technologies You Use Most
+              <Heart className="h-4 w-4 text-pink-500" />
+              Expertise Areas
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {learningPatterns.yourFavoriteTech.map((tech) => (
-                <Badge key={tech} variant="outline" className="bg-blue-50">
-                  {tech}
+              {learningPatterns.expertiseAreas.map((area) => (
+                <Badge key={area} variant="outline" className="bg-pink-50">
+                  {area}
                 </Badge>
               ))}
             </div>
@@ -246,14 +247,14 @@ function LearningPatternsTab() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Types of Problems You Ask About
+              Training Scenarios
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {learningPatterns.problemTypes.map((problem) => (
-                <Badge key={problem} variant="secondary">
-                  {problem}
+              {learningPatterns.scenarioTypes.map((scenario) => (
+                <Badge key={scenario} variant="secondary">
+                  {scenario}
                 </Badge>
               ))}
             </div>
@@ -265,14 +266,21 @@ function LearningPatternsTab() {
 }
 
 function FailedApproachesTab() {
-  // Things AI suggested that didn't work - so it won't suggest them again
+  // Training approaches that didn't work well for Dr. Sakura
   const failedApproaches = [
     {
-      whatAISuggested: "Use only useCallback without checking dependency array",
-      technology: "React", 
-      whyItFailed: "You said it partially worked but didn't solve the root cause",
-      yourFeedback: "Still getting re-renders, need to check dependencies too",
-      date: "July 23, 2025"
+      whatAISuggested: "Immediately provide medical statistics without acknowledging patient emotions",
+      scenario: "Breast Lump Discovery", 
+      whyItFailed: "Patient felt dismissed and became more anxious",
+      patientFeedback: "I felt like you didn't understand how scared I was",
+      date: "July 25, 2025"
+    },
+    {
+      whatAISuggested: "Use technical medical terminology without explanation",
+      scenario: "Self-Examination Training", 
+      whyItFailed: "Patient became confused and couldn't follow instructions",
+      patientFeedback: "I didn't understand half of what you said",
+      date: "July 24, 2025"
     }
   ];
 
@@ -280,8 +288,8 @@ function FailedApproachesTab() {
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-4">
         <AlertTriangle className="h-5 w-5 text-orange-500" />
-        <h3 className="text-lg font-semibold">Solutions That Didn't Work (AI Won't Suggest Again)</h3>
-        <Badge variant="destructive">{failedApproaches.length} avoided</Badge>
+        <h3 className="text-lg font-semibold">Training Approaches to Avoid</h3>
+        <Badge variant="destructive">{failedApproaches.length} approaches flagged</Badge>
       </div>
 
       <div className="space-y-4">
@@ -289,35 +297,35 @@ function FailedApproachesTab() {
           <Card key={index} className="border-l-4 border-l-orange-500">
             <CardHeader>
               <div className="flex justify-between items-start">
-                <Badge variant="outline">{failure.technology}</Badge>
+                <Badge variant="outline">{failure.scenario}</Badge>
                 <span className="text-xs text-gray-500">{failure.date}</span>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
               <div>
-                <h4 className="font-medium text-orange-700 mb-2">• What AI Suggested:</h4>
+                <h4 className="font-medium text-orange-700 mb-2">• What Didn't Work:</h4>
                 <p className="text-sm bg-orange-50 p-3 rounded-md">
                   {failure.whatAISuggested}
                 </p>
               </div>
               
               <div>
-                <h4 className="font-medium text-red-700 mb-2">• Why It Didn't Work:</h4>
+                <h4 className="font-medium text-red-700 mb-2">• Why It Failed:</h4>
                 <p className="text-sm bg-red-50 p-3 rounded-md">
                   {failure.whyItFailed}
                 </p>
               </div>
 
               <div>
-                <h4 className="font-medium text-blue-700 mb-2">• What You Said:</h4>
+                <h4 className="font-medium text-blue-700 mb-2">• Patient Feedback:</h4>
                 <p className="text-sm bg-blue-50 p-3 rounded-md">
-                  "{failure.yourFeedback}"
+                  "{failure.patientFeedback}"
                 </p>
               </div>
 
               <div className="bg-yellow-50 border border-yellow-200 p-3 rounded-md">
                 <p className="text-sm text-yellow-800">
-                  <strong>✅ AI will never suggest this approach again</strong>
+                  <strong>✅ Dr. Sakura now avoids this approach</strong>
                 </p>
               </div>
             </CardContent>
@@ -328,9 +336,9 @@ function FailedApproachesTab() {
           <Card>
             <CardContent className="text-center py-8">
               <AlertTriangle className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <p className="text-gray-500">No bad suggestions recorded yet</p>
+              <p className="text-gray-500">No failed approaches recorded yet</p>
               <p className="text-sm text-gray-400 mt-1">
-                When you tell AI a suggestion didn't work, it gets saved here
+                When training feedback indicates an approach didn't work, it gets saved here
               </p>
             </CardContent>
           </Card>
@@ -344,25 +352,32 @@ export default function KnowledgeCenter() {
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">What Your AI Has Learned</h1>
-        <p className="text-gray-600 text-lg">
-          Complete account learning history from July 20-23, 2025
-        </p>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-pink-100 rounded-lg">
+            <Heart className="h-6 w-6 text-pink-500" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold mb-2">BrezCode AI Avatar Training Center</h1>
+            <p className="text-gray-600 text-lg">
+              Dr. Sakura's learning progress and training insights
+            </p>
+          </div>
+        </div>
         <div className="mt-4 space-y-2">
           <div className="flex gap-4 text-sm flex-wrap">
-            <Badge variant="outline">16 real conversations analyzed</Badge>
-            <Badge variant="outline">Complete Account History: July 20-23, 2025</Badge>
-            <Badge variant="outline">15 technologies learned</Badge>
+            <Badge variant="outline">23 training sessions completed</Badge>
+            <Badge variant="outline">Active Learning: July 20-25, 2025</Badge>
+            <Badge variant="outline">4 expertise areas mastered</Badge>
           </div>
-          <div className="bg-green-50 border border-green-200 p-3 rounded-md">
-            <p className="text-sm text-green-800">
-              <strong>✅ AUTHENTIC ACCOUNT HISTORY LOADED:</strong> Learning database now contains your real conversation history from July 20-23, 2025 (16 conversations spanning 4 days). This includes your actual project requests: AI training platforms, authentication systems, security implementations, React debugging, and system architecture work.
+          <div className="bg-pink-50 border border-pink-200 p-3 rounded-md">
+            <p className="text-sm text-pink-800">
+              <strong>✅ BREZCODE AI AVATAR ACTIVE:</strong> Dr. Sakura has been trained on breast health counseling, patient communication, and medical education. Training database contains real patient interaction patterns and successful communication strategies for health anxiety, self-examination guidance, and preventive care education.
             </p>
             <button 
-              onClick={() => fetch('/api/extract-real-history', {method: 'POST'}).then(() => window.location.reload())} 
-              className="mt-2 text-xs bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
+              onClick={() => fetch('/api/brezcode/extract-training-history', {method: 'POST'}).then(() => window.location.reload())} 
+              className="mt-2 text-xs bg-pink-600 text-white px-3 py-1 rounded hover:bg-pink-700"
             >
-              🔄 Re-extract & Refresh
+              🔄 Refresh Training Data
             </button>
           </div>
         </div>
@@ -370,9 +385,9 @@ export default function KnowledgeCenter() {
 
       <Tabs defaultValue="conversations" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="conversations">Your Questions & Answers</TabsTrigger>
-          <TabsTrigger value="patterns">What AI Learned</TabsTrigger>
-          <TabsTrigger value="failures">Bad Suggestions (Avoided)</TabsTrigger>
+          <TabsTrigger value="conversations">Training Conversations</TabsTrigger>
+          <TabsTrigger value="patterns">Learning Progress</TabsTrigger>
+          <TabsTrigger value="failures">Avoided Approaches</TabsTrigger>
         </TabsList>
         
         <TabsContent value="conversations" className="mt-6">
