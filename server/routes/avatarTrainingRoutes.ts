@@ -56,7 +56,7 @@ const generateAIResponse = async (avatarType: string, customerQuestion: string):
   }
 };
 
-// Start training session endpoint
+// Start training session endpoint (legacy)
 router.post('/start-session', async (req, res) => {
   try {
     const { avatarId, customerId, scenario } = req.body;
@@ -93,6 +93,52 @@ router.post('/start-session', async (req, res) => {
   }
 });
 
+// New sessions/start endpoint for frontend compatibility
+router.post('/sessions/start', async (req, res) => {
+  try {
+    const { avatarId, scenarioId, businessContext } = req.body;
+    
+    console.log('🚀 Starting training session:', { avatarId, scenarioId, businessContext });
+    
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const newSession = {
+      id: sessionId,
+      avatarId,
+      scenarioId,
+      avatarType: avatarId.replace(/_wellness|_specialist|_thunder|_harmony|_techwiz|_strategic|_health_coach/g, ''),
+      businessType: businessContext || 'health_coaching',
+      businessContext: businessContext || 'health_coaching',
+      status: 'active',
+      startTime: new Date().toISOString(),
+      messages: [
+        {
+          id: `msg_${Date.now()}_welcome`,
+          role: 'system',
+          content: `Training session started with ${avatarId} for scenario: ${scenarioId}`,
+          timestamp: new Date().toISOString()
+        }
+      ],
+      performance_metrics: {
+        response_quality: Math.floor(Math.random() * 20) + 80,
+        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+        goal_achievement: Math.floor(Math.random() * 20) + 70,
+        conversation_flow: Math.floor(Math.random() * 15) + 80
+      }
+    };
+    
+    trainingSessions.push(newSession);
+    console.log(`✅ Session created successfully: ${sessionId} (Total sessions: ${trainingSessions.length})`);
+    
+    res.json({
+      success: true,
+      session: newSession
+    });
+  } catch (error: any) {
+    console.error('❌ Session creation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Continue conversation endpoint
 router.post('/sessions/:sessionId/continue', async (req, res) => {
   try {
@@ -113,7 +159,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     let customerQuestion: string;
     if (!customerMessage || customerMessage.trim() === '') {
       // Generate automatic follow-up question based on conversation context
-      const lastAvatarMessage = session.messages.filter(m => m.role === 'avatar').pop();
+      const lastAvatarMessage = session.messages.filter((m: any) => m.role === 'avatar').pop();
       const conversationTopic = lastAvatarMessage?.content || "";
       
       // Generate contextual follow-up questions
