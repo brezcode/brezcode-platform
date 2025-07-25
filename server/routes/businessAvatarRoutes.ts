@@ -251,4 +251,9 @@ router.get('/industry/:industry', (req, res) => {
   }
 });
 
+// Register routes function for server integration
+export function registerBusinessAvatarRoutes(app: any) {
+  app.use('/api/business-avatar', router);
+}
+
 export default router;

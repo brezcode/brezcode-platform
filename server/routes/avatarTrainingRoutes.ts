@@ -634,4 +634,9 @@ router.get('/industry-training/:industry', (req, res) => {
   }
 });
 
+// Register routes function for server integration
+export function registerAvatarTrainingRoutes(app: any) {
+  app.use('/api/avatar-training', router);
+}
+
 export default router;
