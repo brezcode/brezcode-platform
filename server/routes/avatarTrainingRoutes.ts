@@ -109,7 +109,28 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       return res.status(404).json({ error: 'Session not found' });
     }
 
-    const customerQuestion = customerMessage.trim();
+    // Handle automatic conversation continuation when no customer message provided
+    let customerQuestion: string;
+    if (!customerMessage || customerMessage.trim() === '') {
+      // Generate automatic follow-up question based on conversation context
+      const lastAvatarMessage = session.messages.filter(m => m.role === 'avatar').pop();
+      const conversationTopic = lastAvatarMessage?.content || "";
+      
+      // Generate contextual follow-up questions
+      const followUpQuestions = [
+        "Can you provide more specific guidance about what you just explained?",
+        "I'd like to understand this better - can you give me practical steps?",
+        "That's helpful, but I have some concerns about implementing this advice.",
+        "What should I do if I encounter problems with what you've suggested?",
+        "Can you explain how this applies to my specific situation?",
+        "I want to make sure I understand this correctly - can you clarify?"
+      ];
+      
+      customerQuestion = followUpQuestions[Math.floor(Math.random() * followUpQuestions.length)];
+      console.log('🤖 Auto-generated customer question:', customerQuestion);
+    } else {
+      customerQuestion = customerMessage.trim();
+    }
     const sessionAvatarType = session.avatarType || 'dr_sakura';
 
     console.log(`🎯 Customer input debug:`);
