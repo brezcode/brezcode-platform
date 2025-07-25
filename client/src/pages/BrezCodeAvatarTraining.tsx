@@ -340,12 +340,25 @@ export default function BrezCodeAvatarTraining() {
   // Add continue conversation functionality - PRESERVE COMMENTS AND IMPROVEMENTS
   const continueConversation = useMutation({
     mutationFn: async ({ sessionId, customerMessage }: { sessionId: string; customerMessage?: string }) => {
-      const requestBody = customerMessage ? { customerMessage } : {};
+      console.log('🔄 Continue conversation request:', { sessionId, customerMessage });
+      const requestBody = customerMessage !== undefined ? { customerMessage } : {};
+      
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`, requestBody);
-      if (!response.ok) throw new Error('Failed to continue conversation');
-      return response.json();
+      console.log('📡 Continue response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ Continue conversation failed:', errorData);
+        throw new Error(`Failed to continue conversation: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Continue conversation success:', data.success);
+      return data;
     },
     onSuccess: (data) => {
+      console.log('🎯 Continue conversation onSuccess:', data);
+      
       // Check if conversation has ended naturally
       if (data.conversationEnded) {
         toast({
@@ -355,7 +368,12 @@ export default function BrezCodeAvatarTraining() {
         return;
       }
       
-      const sessionMessages = data.session.messages || [];
+      // Update active session with latest data
+      if (data.session) {
+        setActiveSession(data.session);
+      }
+      
+      const sessionMessages = data.session?.messages || [];
       const existingMessages = messages;
       
       // Create map of existing message data to preserve comments and improvements
@@ -400,7 +418,16 @@ export default function BrezCodeAvatarTraining() {
       
       toast({
         title: "Conversation Continued",
-        description: `AI conversation proceeding with preserved feedback`,
+        description: `Dr. Sakura responded with ${sessionMessages.length} total messages`,
+      });
+      console.log('✅ Messages updated, total count:', sessionMessages.length);
+    },
+    onError: (error) => {
+      console.error('❌ Continue conversation error:', error);
+      toast({
+        title: "Continue Failed",
+        description: `Failed to continue conversation: ${error.message}`,
+        variant: "destructive"
       });
     }
   });
@@ -563,8 +590,20 @@ export default function BrezCodeAvatarTraining() {
   };
   
   const handleContinueConversation = () => {
-    if (!activeSession) return;
-    continueConversation.mutate({ sessionId: activeSession.id });
+    if (!activeSession) {
+      toast({
+        title: "No Active Session",
+        description: "Please start a training session first",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Trigger continue conversation with explicit empty customer message for auto-generation
+    continueConversation.mutate({ 
+      sessionId: activeSession.id, 
+      customerMessage: '' // Empty string triggers auto-generated customer questions
+    });
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
