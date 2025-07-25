@@ -1,5 +1,6 @@
 import express from 'express';
 import { ClaudeAvatarService } from '../services/claudeAvatarService';
+import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
 
 const router = express.Router();
 
@@ -287,6 +288,94 @@ router.get('/sessions/:sessionId', (req, res) => {
     res.json({
       success: true,
       session: session
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get all training sessions
+router.get('/sessions', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      sessions: trainingSessions
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get training scenarios
+router.get('/scenarios', (req, res) => {
+  try {
+    const { avatarType } = req.query;
+    
+    let scenarios = TRAINING_SCENARIOS || [];
+    if (avatarType) {
+      scenarios = scenarios.filter((s: any) => s.avatarType === avatarType);
+    }
+    
+    res.json({
+      success: true,
+      scenarios: scenarios
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get avatar types
+router.get('/avatar-types', (req, res) => {
+  try {
+    res.json({
+      success: true,
+      avatarTypes: AVATAR_TYPES || []
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get training recommendations
+router.get('/recommendations/:avatarType', (req, res) => {
+  try {
+    const { avatarType } = req.params;
+    
+    // Generate AI-powered recommendations
+    const recommendations = {
+      beginner: ['Start with basic customer service scenarios', 'Focus on active listening skills'],
+      intermediate: ['Practice objection handling', 'Work on product knowledge'],
+      advanced: ['Master complex problem resolution', 'Lead difficult conversations']
+    };
+    
+    res.json({
+      success: true,
+      recommendations: recommendations
+    });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Industry-specific training endpoint
+router.get('/industry-training/:industry', (req, res) => {
+  try {
+    const { industry } = req.params;
+    
+    const relevantAvatars = AVATAR_TYPES.filter((avatar: any) => 
+      avatar.industries?.includes(industry) || avatar.expertise?.includes(industry.toLowerCase())
+    );
+    
+    const industryScenarios = TRAINING_SCENARIOS.filter((scenario: any) => 
+      scenario.industry === industry
+    );
+    
+    res.json({
+      success: true,
+      industry,
+      relevantAvatars,
+      industryScenarios
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
