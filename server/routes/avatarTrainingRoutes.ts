@@ -8,23 +8,7 @@ const router = express.Router();
 let trainingSessions: any[] = [];
 let universalKnowledgeBase: { [avatarType: string]: any[] } = {};
 
-// Generate intelligent multiple choice options using Claude
-async function generateClaudeMultipleChoiceOptions(
-  customerQuestion: string, 
-  avatarType: string
-): Promise<string[]> {
-  try {
-    console.log('🎯 Generating Claude multiple choice options...');
-    return await ClaudeAvatarService.generateMultipleChoiceOptions(customerQuestion, avatarType);
-  } catch (error) {
-    console.error('❌ Multiple choice generation failed:', error);
-    return [
-      "Can you provide more specific guidance for my situation?",
-      "What are the key steps I should focus on first?", 
-      "How do I measure success in this area?"
-    ];
-  }
-}
+// Multiple choice functionality removed to streamline user experience
 
 // DYNAMIC AI-ONLY RESPONSE SYSTEM - NO HARDCODED CONTENT
 const generateAIResponse = async (avatarType: string, customerQuestion: string): Promise<{ content: string, quality_score: number }> => {
@@ -218,8 +202,8 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     // Use AI-only response generation
     const aiResponse = await generateAIResponse(sessionAvatarType, customerQuestion);
     
-    // Generate multiple choice options
-    const multipleChoiceOptions = await generateClaudeMultipleChoiceOptions(customerQuestion, sessionAvatarType);
+    // Multiple choice functionality removed to streamline experience
+    const multipleChoiceOptions: string[] = [];
     
     // Add new customer message with Claude-generated emotion
     const newCustomerMessage = {

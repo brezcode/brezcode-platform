@@ -93,7 +93,7 @@ interface ChatMessage {
   id?: string;
   userRating?: 'thumbs_up' | 'thumbs_down' | null;
   userComment?: string;
-  multiple_choice_options?: string[];
+  // Multiple choice removed for streamlined experience
   is_choice_selection?: boolean;
   // Improved response fields for comment feedback
   user_comment?: string;
@@ -935,35 +935,7 @@ export default function BrezCodeAvatarTraining() {
                                 
 
                                 
-                                {/* Multiple Choice Options - Only for Dr. Sakura responses */}
-                                {message.role === 'avatar' && (message as any).multiple_choice_options && Array.isArray((message as any).multiple_choice_options) && (message as any).multiple_choice_options.length > 0 && (
-                                  <div className="mt-3 sm:mt-4 p-2 sm:p-3 bg-pink-50 border border-pink-200 rounded-lg">
-                                    <div className="text-xs sm:text-sm font-medium text-pink-700 mb-2 sm:mb-3">Choose what you'd like to know more about:</div>
-                                    <div className="space-y-1 sm:space-y-2">
-                                      {(message as any).multiple_choice_options.map((option: string, optionIndex: number) => (
-                                        <Button
-                                          key={optionIndex}
-                                          variant="outline"
-                                          size="sm"
-                                          className="w-full text-left justify-start h-auto p-2 sm:p-3 hover:bg-pink-50 hover:border-pink-300 border-pink-200"
-                                          onClick={() => handleMultipleChoice.mutate(option)}
-                                          disabled={handleMultipleChoice.isPending}
-                                        >
-                                          <div className="flex items-start gap-1 sm:gap-2">
-                                            <span className="text-pink-600 font-semibold mt-0.5 text-xs sm:text-sm">{optionIndex + 1})</span>
-                                            <span className="text-xs sm:text-sm text-gray-700 leading-relaxed">{option}</span>
-                                          </div>
-                                        </Button>
-                                      ))}
-                                    </div>
-                                    {handleMultipleChoice.isPending && (
-                                      <div className="text-xs text-pink-600 mt-2 flex items-center gap-1">
-                                        <div className="animate-spin rounded-full h-3 w-3 border-2 border-pink-600 border-t-transparent"></div>
-                                        Responding...
-                                      </div>
-                                    )}
-                                  </div>
-                                )}
+                                {/* Multiple choice functionality removed for streamlined experience */}
                                 
                                 {/* Comment and Rating Controls - Only for Dr. Sakura responses */}
                                 {message.role === 'avatar' && message.id && (

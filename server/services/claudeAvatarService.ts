@@ -101,54 +101,8 @@ Respond with a JSON object:
     }
   }
   
-  // Generate intelligent multiple choice options using Claude
-  static async generateMultipleChoiceOptions(
-    customerQuestion: string,
-    avatarType: string
-  ): Promise<string[]> {
-    try {
-      const prompt = `Based on this patient question: "${customerQuestion}"
-
-Generate 3 intelligent follow-up questions that a real patient would naturally ask next. These should:
-1. Show deeper engagement with the medical topic
-2. Reflect genuine patient concerns and anxieties  
-3. Build on the information-seeking behavior
-4. Be specific and actionable
-
-For breast health contexts, patients often want to know about:
-- Specific procedures and what to expect
-- Personal risk assessment and family history
-- Warning signs and symptoms to monitor
-- Lifestyle changes and their effectiveness
-- Timing and frequency recommendations
-- How to manage anxiety and fear
-
-Respond with a JSON array of exactly 3 questions:
-["Question 1", "Question 2", "Question 3"]`;
-
-      const response = await anthropic.messages.create({
-        model: DEFAULT_MODEL_STR, // claude-sonnet-4-20250514
-        max_tokens: 800,
-        messages: [{ role: 'user', content: prompt }]
-      });
-
-      const questions = JSON.parse((response.content[0] as any).text);
-      console.log('🎯 Claude-generated multiple choice options:', questions.length);
-      return Array.isArray(questions) ? questions : [
-        "Can you provide more specific guidance for my situation?",
-        "What are the key steps I should focus on first?", 
-        "How do I measure success in this area?"
-      ];
-
-    } catch (error) {
-      console.error('❌ Claude multiple choice generation failed:', error);
-      return [
-        "Can you provide more specific guidance for my situation?",
-        "What are the key steps I should focus on first?", 
-        "How do I measure success in this area?"
-      ];
-    }
-  }
+  // Multiple choice functionality removed to streamline user experience
+  // Focus on Claude patient intelligence and Dr. Sakura responses
   
   static async generateAvatarResponse(
     avatarType: string,
