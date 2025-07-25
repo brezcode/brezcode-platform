@@ -158,12 +158,13 @@ export default function BrezCodeAvatarTraining() {
 
   // Fetch active training sessions for BrezCode
   const { data: sessionsData } = useQuery({
-    queryKey: ['/api/avatar-training/sessions/brezcode'],
+    queryKey: ['/api/avatar-training/sessions'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/avatar-training/sessions?business=brezcode');
-      if (!response.ok) throw new Error('Failed to fetch BrezCode training sessions');
+      const response = await apiRequest('GET', '/api/avatar-training/sessions');
+      if (!response.ok) throw new Error('Failed to fetch training sessions');
       return response.json();
-    }
+    },
+    refetchInterval: 2000 // Refresh every 2 seconds to show new messages
   });
 
   const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
@@ -180,15 +181,15 @@ export default function BrezCodeAvatarTraining() {
     }
   }, [avatars, selectedAvatar]);
 
-  // Auto-load active session with improved responses on page load
+  // Auto-load active session and refresh messages when session data updates
   useEffect(() => {
-    if (sessions.length > 0 && !activeSession) {
+    if (sessions.length > 0) {
       const activeSessionData = sessions.find(s => s.status === 'active');
       if (activeSessionData) {
-        console.log('Loading active session:', activeSessionData.id);
+        // Always update active session to get latest messages
         setActiveSession(activeSessionData);
         
-        // Load session messages with improved responses
+        // Load session messages with improved responses  
         const sessionMessages = activeSessionData.messages || [];
         const formattedMessages = sessionMessages.map((msg: any) => ({
           id: msg.id,
@@ -207,18 +208,7 @@ export default function BrezCodeAvatarTraining() {
           has_improved_response: msg.has_improved_response
         }));
         
-        console.log('Loading messages with improved responses:', formattedMessages.filter(m => m.improved_response).length);
-        formattedMessages.forEach((msg, index) => {
-          if (msg.improved_response) {
-            console.log(`🎯 Message ${index} has improved response:`, {
-              id: msg.id,
-              hasImproved: !!msg.improved_response,
-              comment: msg.user_comment,
-              improvedLength: msg.improved_response.length
-            });
-          }
-        });
-        
+        // Update messages to show current conversation
         setMessages([
           {
             role: 'system',
@@ -230,7 +220,7 @@ export default function BrezCodeAvatarTraining() {
         ]);
       }
     }
-  }, [sessions, activeSession]);
+  }, [sessions]); // Re-run whenever sessions data changes
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
