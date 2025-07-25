@@ -311,8 +311,7 @@ export default function BrezCodeAvatarTraining() {
           content: data.avatarMessage.content,
           timestamp: data.avatarMessage.timestamp,
           isTraining: true,
-          quality_score: data.avatarMessage.quality_score,
-          multiple_choice_options: data.avatarMessage.multiple_choice_options || []
+          quality_score: data.avatarMessage.quality_score
         };
 
         setMessages(prev => [...prev, userMessage, avatarMessage]);
@@ -693,7 +692,7 @@ export default function BrezCodeAvatarTraining() {
                       <Card 
                         key={scenario.id} 
                         className={`cursor-pointer transition-all hover:shadow-lg ${
-                          selectedScenario && selectedScenario.id === scenario.id ? 'ring-2 ring-pink-500 bg-pink-50' : ''
+                          selectedScenario?.id === scenario.id ? 'ring-2 ring-pink-500 bg-pink-50' : ''
                         }`}
                         onClick={() => setSelectedScenario(scenario)}
                       >
