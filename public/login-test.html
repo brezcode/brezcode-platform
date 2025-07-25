@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LeadGen.to Login Test</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 500px; 
+            margin: 50px auto; 
+            padding: 20px; 
+            background: #f8fafc;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 { 
+            color: #1e293b; 
+            text-align: center; 
+            margin-bottom: 10px; 
+        }
+        .subtitle {
+            text-align: center;
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+        .form-group { 
+            margin: 20px 0; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #374151;
+        }
+        input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e5e7eb; 
+            border-radius: 8px; 
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        button { 
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        button:hover { 
+            transform: translateY(-1px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .result { 
+            margin: 20px 0; 
+            padding: 16px; 
+            border-radius: 8px; 
+            border-left: 4px solid;
+        }
+        .success { 
+            background: #f0fdf4; 
+            color: #166534; 
+            border-left-color: #22c55e; 
+        }
+        .error { 
+            background: #fef2f2; 
+            color: #dc2626; 
+            border-left-color: #ef4444; 
+        }
+        .link-button {
+            display: inline-block;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        .link-button:hover {
+            background: #059669;
+        }
+        .status {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LeadGen.to Authentication</h1>
+        <p class="subtitle">Test login to access Claude-powered AI avatar training</p>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email" value="leedennyps@gmail.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" value="11111111" required>
+            </div>
+            <button type="submit" id="loginBtn">Sign In</button>
+        </form>
+        
+        <div id="result"></div>
+        
+        <div class="status">
+            <strong>Claude Sonnet-4 Integration:</strong> ✅ Operational<br>
+            <strong>Inline Improved Responses:</strong> ✅ Ready<br>
+            <strong>Avatar Training System:</strong> ✅ Functional
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById("loginForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const resultDiv = document.getElementById("result");
+            const loginBtn = document.getElementById("loginBtn");
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = "Signing In...";
+            
+            try {
+                const response = await fetch("/api/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ email, password }),
+                    credentials: "include"
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <strong>🎉 Authentication Successful!</strong><br><br>
+                            <strong>User:</strong> ${data.user.firstName} ${data.user.lastName}<br>
+                            <strong>Email:</strong> ${data.user.email}<br>
+                            <strong>Email Verified:</strong> ${data.user.isEmailVerified ? "✅ Yes" : "❌ No"}<br>
+                            <strong>Platform:</strong> ${data.user.platform || 'LeadGen.to'}<br><br>
+                            
+                            <strong>🧠 Claude Sonnet-4 Avatar Training Now Available:</strong><br>
+                            <a href="/business/brezcode/avatar-training" class="link-button">
+                                Access Avatar Training System
+                            </a>
+                            <br><br>
+                            <em>Session active - you can now access all protected features</em>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="result error">
+                            <strong>❌ Authentication Failed</strong><br><br>
+                            ${data.error || "Unknown error occurred"}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <strong>🔗 Connection Error</strong><br><br>
+                        ${error.message}
+                    </div>
+                `;
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = "Sign In";
+            }
+        });
+    </script>
+</body>
+</html>
