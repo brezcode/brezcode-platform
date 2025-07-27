@@ -10,7 +10,8 @@ export * from "./brezcode-schema";   // BrezCode health platform users & health 
 export * from "./brand-schema";      // Multi-tenant brand management
 export * from "./health-schedule-schema"; // Health scheduling (BrezCode specific)
 export * from "./business-schema";   // Business automation (LeadGen specific)
-export * from "./roleplay-schema";   // AI training scenarios
+export * from "./roleplay-schema";
+export * from "./avatar-training-session-schema";   // AI training scenarios
 export * from "./ai-training-schema"; // New AI training system
 export * from "./coding-assistant-schema"; // AI coding assistant
 export * from "./conversation-history-schema"; // Real conversation learning system

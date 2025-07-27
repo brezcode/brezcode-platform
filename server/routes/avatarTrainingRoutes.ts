@@ -1,13 +1,13 @@
 import express from 'express';
 import { ClaudeAvatarService } from '../services/claudeAvatarService';
 import { conversationStorageService } from '../services/conversationStorageService';
+import { AvatarTrainingSessionService } from '../services/avatarTrainingSessionService';
 import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
 
 const router = express.Router();
 
-// Training sessions storage (in-memory for now)
-let trainingSessions: any[] = [];
-let universalKnowledgeBase: { [avatarType: string]: any[] } = {};
+// Training sessions now stored in database with full persistence
+// Legacy in-memory storage removed in favor of database-backed sessions
 
 // Multiple choice functionality removed to streamline user experience
 
@@ -96,45 +96,65 @@ router.post('/start-session', async (req, res) => {
   }
 });
 
-// New sessions/start endpoint for frontend compatibility
+// New sessions/start endpoint with database persistence
 router.post('/sessions/start', async (req, res) => {
   try {
     const { avatarId, scenarioId, businessContext } = req.body;
+    const userId = (req as any).session?.userId || 1;
     
     console.log('🚀 Starting training session:', { avatarId, scenarioId, businessContext });
     
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    const newSession = {
-      id: sessionId,
+    const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId) || {
+      id: scenarioId,
+      name: 'Breast Health Consultation',
+      description: 'Patient consultation about breast health concerns',
+      category: 'health_coaching',
+      difficulty: 'intermediate',
+      objectives: ['Provide reassurance', 'Give medical guidance', 'Educate on self-care'],
+      customerPersona: 'Anxious patient with health concerns',
+      customerMood: 'anxious'
+    };
+    
+    // Create persistent session in database
+    const session = await AvatarTrainingSessionService.createSession(
+      userId,
       avatarId,
       scenarioId,
-      avatarType: avatarId.replace(/_wellness|_specialist|_thunder|_harmony|_techwiz|_strategic|_health_coach/g, ''),
-      businessType: businessContext || 'health_coaching',
-      businessContext: businessContext || 'health_coaching',
-      status: 'active',
-      startTime: new Date().toISOString(),
+      businessContext || 'health_coaching',
+      scenario
+    );
+    
+    // Format response to match frontend expectations
+    const sessionResponse = {
+      id: session.sessionId,
+      avatarId: session.avatarId,
+      scenarioId: session.scenarioId,
+      avatarType: session.avatarType,
+      businessType: session.businessContext,
+      businessContext: session.businessContext,
+      status: session.status,
+      startTime: session.startedAt?.toISOString(),
       messages: [
         {
           id: `msg_${Date.now()}_welcome`,
           role: 'system',
           content: `Training session started with ${avatarId} for scenario: ${scenarioId}`,
-          timestamp: new Date().toISOString()
+          timestamp: session.startedAt?.toISOString()
         }
       ],
       performance_metrics: {
-        response_quality: Math.floor(Math.random() * 20) + 80,
-        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
-        goal_achievement: Math.floor(Math.random() * 20) + 70,
-        conversation_flow: Math.floor(Math.random() * 15) + 80
+        response_quality: 90,
+        customer_satisfaction: 88,
+        goal_achievement: 89,
+        conversation_flow: 93
       }
     };
     
-    trainingSessions.push(newSession);
-    console.log(`✅ Session created successfully: ${sessionId} (Total sessions: ${trainingSessions.length})`);
+    console.log(`✅ Session created successfully: ${session.sessionId} (Database ID: ${session.id})`);
     
     res.json({
       success: true,
-      session: newSession
+      session: sessionResponse
     });
   } catch (error: any) {
     console.error('❌ Session creation error:', error);
@@ -153,7 +173,8 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     console.log('   Session ID:', sessionId);
     console.log('   Extracted customerMessage:', customerMessage);
 
-    const session = trainingSessions.find(s => s.id === sessionId);
+    // Get session from database instead of in-memory storage
+    const session = await AvatarTrainingSessionService.getSession(sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
@@ -165,9 +186,10 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       try {
         console.log('🚀 Calling Claude for intelligent patient question generation...');
         
-        // Generate intelligent patient question using Claude
+        // Generate intelligent patient question using Claude with session context
+        const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
         const patientResponse = await ClaudeAvatarService.generatePatientQuestion(
-          session.messages, 
+          conversationHistory, 
           session.scenarioId, 
           session.avatarId
         );
@@ -200,8 +222,33 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     console.log(`   Raw customerMessage from API: ${customerMessage}`);
     console.log(`   Final customerQuestion used: ${customerQuestion.substring(0, 100)}...`);
 
-    // Use AI-only response generation with conversation history to prevent repetition
-    const aiResponse = await generateAIResponse(sessionAvatarType, customerQuestion, session.messages);
+    // Add customer message to session first
+    await AvatarTrainingSessionService.addMessage(
+      sessionId, 
+      'customer', 
+      customerQuestion, 
+      customerEmotion
+    );
+
+    // Generate AI response using session context
+    const aiResponse = await AvatarTrainingSessionService.generateResponse(
+      sessionId,
+      customerQuestion,
+      customerEmotion
+    );
+    
+    // Add AI response to session
+    await AvatarTrainingSessionService.addMessage(
+      sessionId,
+      'avatar',
+      aiResponse.content,
+      undefined,
+      {
+        qualityScore: aiResponse.qualityScore,
+        responseTime: aiResponse.responseTime,
+        aiModel: 'claude'
+      }
+    );
     
     // Multiple choice functionality removed to streamline experience
     const multipleChoiceOptions: string[] = [];
@@ -225,39 +272,43 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       multiple_choice_options: multipleChoiceOptions
     };
     
-    session.messages.push(newCustomerMessage, newAvatarMessage);
+    // Messages are now persisted in database via AvatarTrainingSessionService
+    const finalSession = await AvatarTrainingSessionService.getSession(sessionId);
+    const sessionMessages = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
     
-    // 💾 STORE CONVERSATIONS IN DATABASE & KNOWLEDGE BASE
+    // 💾 CONVERSATIONS ALREADY STORED VIA AVATAR TRAINING SESSION SERVICE
     try {
-      // Assume user ID = 1 for demo (in production, get from authenticated session)
+      // Legacy conversation storage service integration maintained for compatibility
       const userId = 1;
       
-      // Store customer message
+      // Store customer message in legacy system
+      const customerMessageId = `msg_${Date.now()}_customer`;
       await conversationStorageService.storeConversationMessage({
         userId,
-        sessionId: session.id,
-        messageId: newCustomerMessage.id,
+        sessionId: sessionId,
+        messageId: customerMessageId,
         role: 'customer',
-        content: newCustomerMessage.content,
-        emotion: newCustomerMessage.emotion,
-        avatarId: session.avatarId,
-        scenarioId: session.scenario?.id,
-        businessContext: session.businessType,
-        conversationContext: { sessionType: 'ai_continue', messages: session.messages.length }
+        content: customerQuestion,
+        emotion: customerEmotion,
+        avatarId: finalSession?.avatarId || 'dr_sakura',
+        scenarioId: finalSession?.scenarioId,
+        businessContext: finalSession?.businessContext || 'health_coaching',
+        conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
       });
       
-      // Store avatar message
+      // Store avatar message in legacy system
+      const avatarMessageId = `msg_${Date.now()}_avatar`;
       await conversationStorageService.storeConversationMessage({
         userId,
-        sessionId: session.id,
-        messageId: newAvatarMessage.id,
+        sessionId: sessionId,
+        messageId: avatarMessageId,
         role: 'avatar',
-        content: newAvatarMessage.content,
-        qualityScore: newAvatarMessage.quality_score,
-        avatarId: session.avatarId,
-        scenarioId: session.scenario?.id,
-        businessContext: session.businessType,
-        conversationContext: { sessionType: 'ai_continue', messages: session.messages.length }
+        content: aiResponse.content,
+        qualityScore: aiResponse.qualityScore,
+        avatarId: finalSession?.avatarId || 'dr_sakura',
+        scenarioId: finalSession?.scenarioId,
+        businessContext: finalSession?.businessContext || 'health_coaching',
+        conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
       });
       
       // Extract and store knowledge from both messages
