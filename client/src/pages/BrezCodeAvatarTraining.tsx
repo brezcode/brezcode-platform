@@ -741,21 +741,23 @@ export default function BrezCodeAvatarTraining() {
                                   {scenarios[currentScenarioIndex]?.description}
                                 </CardDescription>
                               </div>
-                              <div className="flex flex-col items-end gap-2">
+                            </div>
+                          </CardHeader>
+                          <CardContent className="pt-0">
+                            <div className="space-y-6">
+                              {/* Difficulty and Scenario Info - Relocated above Patient Profile */}
+                              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-pink-100 to-rose-100 rounded-lg border border-pink-200">
                                 <div className="flex items-center space-x-2">
                                   {getDifficultyIcon(scenarios[currentScenarioIndex]?.difficulty)}
                                   <Badge className={DIFFICULTY_COLORS[scenarios[currentScenarioIndex]?.difficulty]}>
                                     {scenarios[currentScenarioIndex]?.difficulty}
                                   </Badge>
                                 </div>
-                                <Badge variant="outline" className="text-xs text-gray-600">
+                                <Badge variant="outline" className="text-xs text-gray-600 bg-white">
                                   Scenario {currentScenarioIndex + 1} of {scenarios.length}
                                 </Badge>
                               </div>
-                            </div>
-                          </CardHeader>
-                          <CardContent className="pt-0">
-                            <div className="space-y-6">
+
                               {/* Customer Situation Section */}
                               <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                                 <div className="flex items-center gap-2 mb-3">
@@ -1268,7 +1270,7 @@ export default function BrezCodeAvatarTraining() {
                       <div>
                         <p className="text-sm font-medium text-gray-700">Key Learning Points:</p>
                         <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {scenario.keyLearningPoints.slice(0, 3).map((point, i) => (
+                          {(scenario.keyLearningPoints || []).slice(0, 3).map((point, i) => (
                             <li key={i}>{point}</li>
                           ))}
                         </ul>
