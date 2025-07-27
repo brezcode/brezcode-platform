@@ -286,7 +286,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async (message: string) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/message`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/message`, {
         message: message,
         role: 'customer'
       });
