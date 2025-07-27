@@ -713,5 +713,3 @@ export function registerAvatarTrainingRoutes(app: any) {
 }
 
 export default router;
-// Export the router
-export default router;
