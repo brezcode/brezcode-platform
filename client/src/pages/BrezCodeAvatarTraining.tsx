@@ -1025,7 +1025,7 @@ export default function BrezCodeAvatarTraining() {
                         </div>
                         
                         {/* Manual Chat Input */}
-                        <div className="flex space-x-2">
+                        <div className="flex space-x-2 pr-16">
                           <Input
                             value={currentMessage}
                             onChange={(e) => setCurrentMessage(e.target.value)}
@@ -1038,7 +1038,7 @@ export default function BrezCodeAvatarTraining() {
                             onClick={handleSendMessage} 
                             disabled={isSending || !currentMessage.trim()}
                             size="sm"
-                            className="bg-pink-600 hover:bg-pink-700 px-2 sm:px-3"
+                            className="bg-pink-600 hover:bg-pink-700 px-2 sm:px-3 relative z-10"
                           >
                             <Send className="h-3 w-3 sm:h-4 sm:w-4" />
                           </Button>

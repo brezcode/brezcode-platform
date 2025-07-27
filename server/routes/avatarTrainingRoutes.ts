@@ -3,6 +3,9 @@ import { ClaudeAvatarService } from '../services/claudeAvatarService';
 import { conversationStorageService } from '../services/conversationStorageService';
 import { AvatarTrainingSessionService } from '../services/avatarTrainingSessionService';
 import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
+import { db } from '../db';
+import { avatarTrainingMessages } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 // Simple auth middleware (replace with proper auth in production)
 const requireAuth = (req: any, res: any, next: any) => {
@@ -399,37 +402,47 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
 
     // Generate AI response using session service with actual message content
     console.log(`📝 Calling generateResponse with message: "${message.trim()}"`);
-    const responseSession = await AvatarTrainingSessionService.generateResponse(
+    const aiResponse = await AvatarTrainingSessionService.generateResponse(
       sessionId,
       message.trim()
     );
 
-    console.log(`✅ Manual message processed successfully for session ${sessionId}`);
+    // Save the AI response to the database
+    console.log(`💾 Saving AI response to database: "${aiResponse.content.substring(0, 100)}..."`);
+    const avatarMessage = await AvatarTrainingSessionService.addMessage(
+      sessionId,
+      'avatar',
+      aiResponse.content,
+      'neutral',
+      {
+        qualityScore: aiResponse.qualityScore,
+        responseTime: aiResponse.responseTime,
+        aiModel: 'claude-sonnet-4'
+      }
+    );
+    console.log(`✅ Avatar message saved successfully: ID ${avatarMessage.messageId}`);
 
-    // Get the latest messages for response
-    const finalSession = await AvatarTrainingSessionService.getSession(sessionId);
-    const messages = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
-    const lastTwoMessages = messages.slice(-2);
-    
-    const userMessage = lastTwoMessages.find(m => m.role === 'customer');
-    const avatarMessage = lastTwoMessages.find(m => m.role === 'avatar');
+    console.log(`✅ Manual message processed successfully for session ${sessionId}`);
+    console.log(`🤖 AI Response Content: "${aiResponse.content.substring(0, 100)}..."`);
+    console.log(`💾 Avatar Message Saved: "${avatarMessage.content?.substring(0, 100)}..."`);
 
     res.json({
       success: true,
-      userMessage: userMessage || { 
-        id: `manual_${Date.now()}`, 
-        role: 'customer', 
-        content: message.trim(), 
-        timestamp: new Date().toISOString() 
+      userMessage: {
+        id: customerMessage.messageId,
+        role: 'customer',
+        content: customerMessage.content,
+        timestamp: customerMessage.createdAt,
+        emotion: customerMessage.emotion || 'neutral'
       },
-      avatarMessage: avatarMessage || { 
-        id: `response_${Date.now()}`, 
-        role: 'avatar', 
-        content: 'Response generated successfully', 
-        timestamp: new Date().toISOString(),
-        quality_score: 85
+      avatarMessage: {
+        id: avatarMessage.messageId,
+        role: 'avatar',
+        content: avatarMessage.content,
+        timestamp: avatarMessage.createdAt,
+        quality_score: avatarMessage.qualityScore
       },
-      session: finalSession
+      session: await AvatarTrainingSessionService.getSession(sessionId)
     });
   } catch (error: any) {
     console.error('Manual message error:', error);
