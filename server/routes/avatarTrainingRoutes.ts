@@ -4,7 +4,7 @@ import { conversationStorageService } from '../services/conversationStorageServi
 import { AvatarTrainingSessionService } from '../services/avatarTrainingSessionService';
 import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
 import { db } from '../db';
-import { avatarTrainingMessages } from '@shared/schema';
+import { avatarTrainingMessages, aiTrainingScenarios } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
 // Simple auth middleware (replace with proper auth in production)
@@ -596,20 +596,43 @@ router.get('/sessions', (req, res) => {
 });
 
 // Get training scenarios
-router.get('/scenarios', (req, res) => {
+router.get('/scenarios', async (req, res) => {
   try {
     const { avatarType } = req.query;
 
-    let scenarios = TRAINING_SCENARIOS || [];
+    // Fetch scenarios from database instead of hardcoded array
+    let scenariosQuery = db.select().from(aiTrainingScenarios);
+    
     if (avatarType) {
-      scenarios = scenarios.filter((s: any) => s.avatarType === avatarType);
+      scenariosQuery = scenariosQuery.where(eq(aiTrainingScenarios.scenarioType, avatarType));
     }
+
+    const dbScenarios = await scenariosQuery;
+
+    // Transform database scenarios to match frontend expectations
+    const scenarios = dbScenarios.map(scenario => ({
+      id: scenario.id.toString(),
+      name: scenario.title,
+      description: scenario.description,
+      difficulty: scenario.difficulty,
+      avatarType: scenario.scenarioType,
+      customerPersona: typeof scenario.customerPersona === 'string' 
+        ? scenario.customerPersona 
+        : JSON.stringify(scenario.customerPersona),
+      objectives: Array.isArray(scenario.objectives) 
+        ? scenario.objectives 
+        : (scenario.objectives || []),
+      timeframeMins: 15, // Default duration
+      category: scenario.scenarioType,
+      context: scenario.context || {}
+    }));
 
     res.json({
       success: true,
       scenarios: scenarios
     });
   } catch (error: any) {
+    console.error('❌ Error fetching scenarios:', error);
     res.status(500).json({ error: error.message });
   }
 });
