@@ -398,6 +398,7 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
     );
 
     // Generate AI response using session service with actual message content
+    console.log(`📝 Calling generateResponse with message: "${message.trim()}"`);
     const responseSession = await AvatarTrainingSessionService.generateResponse(
       sessionId,
       message.trim()

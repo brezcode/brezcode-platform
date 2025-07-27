@@ -197,10 +197,11 @@ export class AvatarTrainingSessionService {
     // Build conversation history for AI context
     const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
 
-    console.log(`🔄 Generating AI-only response for ${session.businessContext} - Question: ${customerMessage.substring(0, 50)}...`);
+    console.log(`🔄 Generating AI response for ${session.avatarType} - Customer question: "${customerMessage}"`);
+    console.log(`🎯 Session context: ${session.businessContext}, Avatar: ${session.avatarType}`);
 
     try {
-      // Use Claude with full session context
+      // Use Claude with full session context and actual customer message
       const response = await ClaudeAvatarService.generateAvatarResponse(
         session.avatarType,
         customerMessage,
@@ -209,7 +210,7 @@ export class AvatarTrainingSessionService {
       );
 
       const responseTime = Date.now() - startTime;
-      console.log("🎯 Using Claude for dynamic response");
+      console.log(`🎯 Claude generated response for question: "${customerMessage.substring(0, 100)}..."`);
 
       return {
         content: response.content,
@@ -221,7 +222,7 @@ export class AvatarTrainingSessionService {
       const responseTime = Date.now() - startTime;
 
       return {
-        content: "I apologize, but I'm having technical difficulties right now. Please try again in a moment.",
+        content: `I apologize, but I'm having technical difficulties right now. Regarding your question "${customerMessage}", please try again in a moment when my systems are restored.`,
         qualityScore: 30,
         responseTime
       };
