@@ -817,7 +817,7 @@ export default function BrezCodeAvatarTraining() {
                                   <h3 className="font-semibold text-pink-800">Training Goals</h3>
                                 </div>
                                 <ul className="space-y-2">
-                                  {scenarios[currentScenarioIndex]?.objectives?.map((obj, i) => (
+                                  {(scenarios[currentScenarioIndex]?.objectives || []).map((obj, i) => (
                                     <li key={i} className="flex items-start gap-3">
                                       <div className="w-6 h-6 bg-pink-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
                                         <span className="text-xs font-bold text-pink-700">{i + 1}</span>
@@ -1237,7 +1237,7 @@ export default function BrezCodeAvatarTraining() {
                     </CardHeader>
                     <CardContent>
                       <ul className="text-xs text-gray-600 space-y-1">
-                        {selectedScenario.successCriteria.map((criteria, i) => (
+                        {(selectedScenario?.successCriteria || []).map((criteria, i) => (
                           <li key={i} className="flex items-start">
                             <Heart className="h-3 w-3 mr-1 mt-0.5 text-pink-500" />
                             {criteria}
@@ -1270,7 +1270,7 @@ export default function BrezCodeAvatarTraining() {
                       <div>
                         <p className="text-sm font-medium text-gray-700">Key Learning Points:</p>
                         <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {(scenario.keyLearningPoints || []).slice(0, 3).map((point, i) => (
+                          {(scenario?.keyLearningPoints || []).slice(0, 3).map((point, i) => (
                             <li key={i}>{point}</li>
                           ))}
                         </ul>
