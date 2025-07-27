@@ -622,6 +622,12 @@ router.get('/scenarios', async (req, res) => {
       objectives: Array.isArray(scenario.objectives) 
         ? scenario.objectives 
         : (scenario.objectives || []),
+      successCriteria: Array.isArray(scenario.successCriteria) 
+        ? scenario.successCriteria 
+        : (scenario.successCriteria || []),
+      keyLearningPoints: Array.isArray(scenario.objectives) 
+        ? scenario.objectives.slice(0, 3) 
+        : ['Effective communication', 'Active listening', 'Professional guidance'],
       timeframeMins: 15, // Default duration
       category: scenario.scenarioType,
       context: scenario.context || {}
