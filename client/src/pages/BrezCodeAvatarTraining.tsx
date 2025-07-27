@@ -731,52 +731,110 @@ export default function BrezCodeAvatarTraining() {
                       {/* Scenario Carousel */}
                       <div className="relative">
                         <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white shadow-lg">
-                          <CardHeader>
-                            <div className="flex items-center justify-between">
-                              <CardTitle className="text-xl text-pink-700">
-                                {scenarios[currentScenarioIndex]?.name}
-                              </CardTitle>
-                              <div className="flex items-center space-x-2">
-                                {getDifficultyIcon(scenarios[currentScenarioIndex]?.difficulty)}
-                                <Badge className={DIFFICULTY_COLORS[scenarios[currentScenarioIndex]?.difficulty]}>
-                                  {scenarios[currentScenarioIndex]?.difficulty}
+                          <CardHeader className="pb-4">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1">
+                                <CardTitle className="text-2xl font-bold text-pink-800 mb-2 leading-tight">
+                                  {scenarios[currentScenarioIndex]?.name}
+                                </CardTitle>
+                                <CardDescription className="text-base text-gray-700 leading-relaxed">
+                                  {scenarios[currentScenarioIndex]?.description}
+                                </CardDescription>
+                              </div>
+                              <div className="flex flex-col items-end gap-2">
+                                <div className="flex items-center space-x-2">
+                                  {getDifficultyIcon(scenarios[currentScenarioIndex]?.difficulty)}
+                                  <Badge className={DIFFICULTY_COLORS[scenarios[currentScenarioIndex]?.difficulty]}>
+                                    {scenarios[currentScenarioIndex]?.difficulty}
+                                  </Badge>
+                                </div>
+                                <Badge variant="outline" className="text-xs text-gray-600">
+                                  Scenario {currentScenarioIndex + 1} of {scenarios.length}
                                 </Badge>
                               </div>
                             </div>
-                            <CardDescription className="text-gray-700">
-                              {scenarios[currentScenarioIndex]?.description}
-                            </CardDescription>
                           </CardHeader>
-                          <CardContent>
-                            <div className="space-y-4">
-                              <div>
-                                <p className="text-sm font-medium text-pink-700 mb-2">Customer Situation:</p>
-                                <p className="text-sm text-gray-600 bg-white p-3 rounded-lg border">
-                                  {scenarios[currentScenarioIndex]?.customerPersona}
-                                </p>
+                          <CardContent className="pt-0">
+                            <div className="space-y-6">
+                              {/* Customer Situation Section */}
+                              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <User className="h-4 w-4 text-blue-600" />
+                                  <h3 className="font-semibold text-blue-800">Patient Profile</h3>
+                                </div>
+                                <div className="text-sm text-blue-900 leading-relaxed">
+                                  {(() => {
+                                    const persona = scenarios[currentScenarioIndex]?.customerPersona;
+                                    if (typeof persona === 'string') {
+                                      try {
+                                        const parsed = JSON.parse(persona);
+                                        return (
+                                          <div className="space-y-2">
+                                            {parsed.name && <div><span className="font-medium">Name:</span> {parsed.name}</div>}
+                                            {parsed.age && <div><span className="font-medium">Age:</span> {parsed.age}</div>}
+                                            {parsed.role && <div><span className="font-medium">Occupation:</span> {parsed.role}</div>}
+                                            {parsed.background && <div><span className="font-medium">Background:</span> {parsed.background}</div>}
+                                            {parsed.concerns && Array.isArray(parsed.concerns) && (
+                                              <div>
+                                                <span className="font-medium">Main Concerns:</span>
+                                                <ul className="list-disc list-inside ml-4 mt-1">
+                                                  {parsed.concerns.map((concern: string, i: number) => (
+                                                    <li key={i}>{concern}</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+                                            {parsed.goals && Array.isArray(parsed.goals) && (
+                                              <div>
+                                                <span className="font-medium">Goals:</span>
+                                                <ul className="list-disc list-inside ml-4 mt-1">
+                                                  {parsed.goals.map((goal: string, i: number) => (
+                                                    <li key={i}>{goal}</li>
+                                                  ))}
+                                                </ul>
+                                              </div>
+                                            )}
+                                            {parsed.communicationStyle && (
+                                              <div><span className="font-medium">Communication Style:</span> {parsed.communicationStyle}</div>
+                                            )}
+                                          </div>
+                                        );
+                                      } catch {
+                                        return persona;
+                                      }
+                                    }
+                                    return persona || 'No patient profile available';
+                                  })()}
+                                </div>
                               </div>
-                              <div>
-                                <p className="text-sm font-medium text-pink-700 mb-2">Training Objectives:</p>
-                                <ul className="text-sm text-gray-600 space-y-1">
+
+                              {/* Training Objectives Section */}
+                              <div className="bg-pink-50 rounded-lg p-4 border border-pink-200">
+                                <div className="flex items-center gap-2 mb-3">
+                                  <Target className="h-4 w-4 text-pink-600" />
+                                  <h3 className="font-semibold text-pink-800">Training Goals</h3>
+                                </div>
+                                <ul className="space-y-2">
                                   {scenarios[currentScenarioIndex]?.objectives?.map((obj, i) => (
-                                    <li key={i} className="flex items-start">
-                                      <Target className="h-3 w-3 mr-2 mt-0.5 text-pink-500 flex-shrink-0" />
-                                      {obj}
+                                    <li key={i} className="flex items-start gap-3">
+                                      <div className="w-6 h-6 bg-pink-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <span className="text-xs font-bold text-pink-700">{i + 1}</span>
+                                      </div>
+                                      <span className="text-sm text-pink-900 leading-relaxed">{obj}</span>
                                     </li>
                                   ))}
                                 </ul>
                               </div>
-                              <div className="flex items-center justify-between pt-2">
-                                <Badge variant="outline" className="text-xs">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  {scenarios[currentScenarioIndex]?.timeframeMins} min
+
+                              {/* Session Info */}
+                              <div className="flex items-center justify-center gap-4 pt-2 border-t border-pink-200">
+                                <Badge variant="outline" className="px-3 py-1">
+                                  <Clock className="h-3 w-3 mr-2" />
+                                  {scenarios[currentScenarioIndex]?.timeframeMins} minutes
                                 </Badge>
-                                <Badge variant="outline" className="text-xs bg-pink-50 text-pink-700">
-                                  <Heart className="h-3 w-3 mr-1" />
+                                <Badge variant="outline" className="px-3 py-1 bg-pink-100 text-pink-700 border-pink-300">
+                                  <Heart className="h-3 w-3 mr-2" />
                                   Health Coaching
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  Scenario {currentScenarioIndex + 1} of {scenarios.length}
                                 </Badge>
                               </div>
                             </div>
