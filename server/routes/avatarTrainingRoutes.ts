@@ -35,7 +35,7 @@ let universalKnowledgeBase: {
 
 // DYNAMIC AI-ONLY RESPONSE SYSTEM - NO HARDCODED CONTENT
 const generateAIResponse = async (avatarType: string, customerQuestion: string, conversationHistory: any[] = []): Promise<{ content: string, quality_score: number }> => {
-  console.log(`🔄 Generating AI-only response for ${avatarType} - Question: ${customerQuestion.substring(0, 50)}...`);
+  console.log(`🔄 Generating AI-only response for ${avatarType} - Question: "${customerQuestion.substring(0, 100)}..."`);
 
   try {
     // Try Claude first for superior intelligence
@@ -255,8 +255,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     // Generate AI response using session context
     const aiResponse = await AvatarTrainingSessionService.generateResponse(
       sessionId,
-      customerQuestion,
-      customerEmotion
+      customerQuestion
     );
 
     // Add AI response to session
@@ -398,10 +397,10 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
       'neutral'
     );
 
-    // Generate AI response using session service
+    // Generate AI response using session service with actual message content
     const responseSession = await AvatarTrainingSessionService.generateResponse(
       sessionId,
-      'brezcode'
+      message.trim()
     );
 
     console.log(`✅ Manual message processed successfully for session ${sessionId}`);
