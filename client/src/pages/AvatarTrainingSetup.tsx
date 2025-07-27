@@ -500,3 +500,54 @@ export default function AvatarTrainingSetup() {
     </div>
   );
 }
+const continueConversation = useMutation({
+    mutationFn: async (customerMessage: string = '') => {
+      const sessionIdentifier = currentSession?.sessionId || currentSession?.id;
+      console.log("🔄 Continue conversation request:", {
+        sessionId: sessionIdentifier,
+        customerMessage
+      });
+
+      if (!sessionIdentifier) {
+        throw new Error('No active session');
+      }
+
+      const response = await fetch(`/api/avatar-training/sessions/${sessionIdentifier}/continue`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ customerMessage }),
+      });
+
+      if (!response.ok) {
+        console.error("❌ Error during conversation:", response.status, response.statusText);
+        throw new Error(`Conversation failed: ${response.statusText}`);
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+          console.log("✅ Continue conversation success:", data.success);
+          console.log("🎯 Continue conversation onSuccess:", data);
+
+          if (data.success && data.session) {
+            // Ensure we maintain consistent session ID format
+            const updatedSession = {
+              ...data.session,
+              sessionId: data.session.sessionId || currentSession?.sessionId
+            };
+            setCurrentSession(updatedSession);
+            setMessages(updatedSession.conversationHistory || []);
+            console.log("✅ Messages updated, total count:", (updatedSession.conversationHistory || []).length);
+          }
+        },
+    onError: (error) => {
+      console.error("🔥 Conversation error:", error);
+      toast({
+        title: "Conversation Error",
+        description: "Failed to send message. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });

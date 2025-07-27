@@ -14,7 +14,7 @@ const router = express.Router();
 // DYNAMIC AI-ONLY RESPONSE SYSTEM - NO HARDCODED CONTENT
 const generateAIResponse = async (avatarType: string, customerQuestion: string, conversationHistory: any[] = []): Promise<{ content: string, quality_score: number }> => {
   console.log(`🔄 Generating AI-only response for ${avatarType} - Question: ${customerQuestion.substring(0, 50)}...`);
-  
+
   try {
     // Try Claude first for superior intelligence
     const claudeResponse = await ClaudeAvatarService.generateAvatarResponse(
@@ -27,27 +27,27 @@ const generateAIResponse = async (avatarType: string, customerQuestion: string, 
     return { content: claudeResponse.content, quality_score: claudeResponse.quality_score };
   } catch (claudeError) {
     console.log("🔄 Claude unavailable, trying OpenAI backup...");
-    
+
     try {
       // Use OpenAI as backup for truly dynamic responses
       const { default: OpenAI } = await import('openai');
       const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
-      
+
       const prompt = `You are Dr. Sakura, a professional health educator. Provide a comprehensive, detailed response to this patient question: "${customerQuestion}". Include specific medical guidance, step-by-step instructions when appropriate, and evidence-based recommendations. Be thorough and professional.`;
-      
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 2000,
         temperature: 0.7,
       });
-      
+
       const response = completion.choices[0]?.message?.content || "";
       console.log("🎯 Using OpenAI dynamic response");
       return { content: response, quality_score: 85 };
-      
+
     } catch (openaiError) {
       console.error("Both Claude and OpenAI failed:", openaiError);
       // Only if both AI services fail completely, provide minimal error message
@@ -63,7 +63,7 @@ const generateAIResponse = async (avatarType: string, customerQuestion: string, 
 router.post('/start-session', async (req, res) => {
   try {
     const { avatarId, customerId, scenario } = req.body;
-    
+
     const sessionId = `session_${trainingSessions.length + 1}`;
     const newSession = {
       id: sessionId,
@@ -83,10 +83,10 @@ router.post('/start-session', async (req, res) => {
         conversation_flow: Math.floor(Math.random() * 15) + 80
       }
     };
-    
+
     trainingSessions.push(newSession);
     console.log(`✅ Session created successfully: ${sessionId}`);
-    
+
     res.json({
       success: true,
       session: newSession
@@ -101,9 +101,9 @@ router.post('/sessions/start', async (req, res) => {
   try {
     const { avatarId, scenarioId, businessContext } = req.body;
     const userId = (req as any).session?.userId || 1;
-    
+
     console.log('🚀 Starting training session:', { avatarId, scenarioId, businessContext });
-    
+
     const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId) || {
       id: scenarioId,
       name: 'Breast Health Consultation',
@@ -114,7 +114,7 @@ router.post('/sessions/start', async (req, res) => {
       customerPersona: 'Anxious patient with health concerns',
       customerMood: 'anxious'
     };
-    
+
     // Create persistent session in database
     const session = await AvatarTrainingSessionService.createSession(
       userId,
@@ -123,7 +123,7 @@ router.post('/sessions/start', async (req, res) => {
       businessContext || 'health_coaching',
       scenario
     );
-    
+
     // Format response to match frontend expectations
     const sessionResponse = {
       id: session.sessionId,
@@ -149,9 +149,9 @@ router.post('/sessions/start', async (req, res) => {
         conversation_flow: 93
       }
     };
-    
+
     console.log(`✅ Session created successfully: ${session.sessionId} (Database ID: ${session.id})`);
-    
+
     res.json({
       success: true,
       session: sessionResponse
@@ -167,7 +167,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { customerMessage } = req.body;
-    
+
     console.log('🔍 API Request Debug:');
     console.log('   Request body:', JSON.stringify(req.body, null, 2));
     console.log('   Session ID:', sessionId);
@@ -185,7 +185,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     if (!customerMessage || customerMessage.trim() === '') {
       try {
         console.log('🚀 Calling Claude for intelligent patient question generation...');
-        
+
         // Generate intelligent patient question using Claude with session context
         const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
         const patientResponse = await ClaudeAvatarService.generatePatientQuestion(
@@ -193,7 +193,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
           session.scenarioId, 
           session.avatarId
         );
-        
+
         customerQuestion = patientResponse.question;
         customerEmotion = patientResponse.emotion;
         console.log('🎯 Claude-generated patient question:', customerQuestion.substring(0, 100) + '...');
@@ -236,7 +236,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       customerQuestion,
       customerEmotion
     );
-    
+
     // Add AI response to session
     await AvatarTrainingSessionService.addMessage(
       sessionId,
@@ -249,10 +249,10 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
         aiModel: 'claude'
       }
     );
-    
+
     // Multiple choice functionality removed to streamline experience
     const multipleChoiceOptions: string[] = [];
-    
+
     // Add new customer message with Claude-generated emotion
     const newCustomerMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,
@@ -261,7 +261,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       timestamp: new Date(Date.now() - 30000).toISOString(),
       emotion: customerEmotion || 'concerned'
     };
-    
+
     // Add avatar's response
     const newAvatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 2}`,
@@ -271,16 +271,16 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       quality_score: aiResponse.quality_score,
       multiple_choice_options: multipleChoiceOptions
     };
-    
+
     // Messages are now persisted in database via AvatarTrainingSessionService
     const finalSession = await AvatarTrainingSessionService.getSession(sessionId);
     const sessionMessages = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
-    
+
     // 💾 CONVERSATIONS ALREADY STORED VIA AVATAR TRAINING SESSION SERVICE
     try {
       // Legacy conversation storage service integration maintained for compatibility
       const userId = 1;
-      
+
       // Store customer message in legacy system
       const customerMessageId = `msg_${Date.now()}_customer`;
       await conversationStorageService.storeConversationMessage({
@@ -295,7 +295,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
         businessContext: finalSession?.businessContext || 'health_coaching',
         conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
       });
-      
+
       // Store avatar message in legacy system
       const avatarMessageId = `msg_${Date.now()}_avatar`;
       await conversationStorageService.storeConversationMessage({
@@ -310,7 +310,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
         businessContext: finalSession?.businessContext || 'health_coaching',
         conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
       });
-      
+
       // Extract and store knowledge from both messages
       const customerConversationId = (await conversationStorageService.getUserConversations(userId, 1))[0]?.id;
       if (customerConversationId) {
@@ -322,7 +322,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
           'customer',
           { avatarType: session.avatarType, scenario: session.scenario }
         );
-        
+
         await conversationStorageService.extractKnowledgeFromConversation(
           userId,
           customerConversationId,
@@ -332,12 +332,12 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
           { quality_score: newAvatarMessage.quality_score, avatarType: session.avatarType }
         );
       }
-      
+
       console.log('💾 Conversations stored in database & knowledge base updated');
     } catch (storageError) {
       console.error('❌ Failed to store conversation:', storageError);
     }
-    
+
     // Update performance metrics
     session.performance_metrics = {
       response_quality: Math.floor(Math.random() * 20) + 80,
@@ -345,7 +345,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       goal_achievement: Math.floor(Math.random() * 20) + 70,
       conversation_flow: Math.floor(Math.random() * 15) + 80
     };
-    
+
     res.json({
       success: true,
       session: session
@@ -360,12 +360,12 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { message, role = 'customer' } = req.body;
-    
+
     const session = trainingSessions.find(s => s.id === sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
+
     // Add user message to session
     const userMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,
@@ -374,13 +374,13 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
       timestamp: new Date().toISOString(),
       emotion: 'neutral'
     };
-    
+
     session.messages.push(userMessage);
-    
+
     // Generate AI response with conversation context to prevent repetition
     const sessionAvatarType = session.avatarType || 'dr_sakura';
     const aiResponse = await generateAIResponse(sessionAvatarType, message.trim(), session.messages);
-    
+
     const avatarMessage = {
       id: `msg_${Date.now()}_${session.messages.length + 1}`,
       role: 'avatar',
@@ -389,14 +389,14 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
       quality_score: aiResponse.quality_score,
       multiple_choice_options: [] // Streamlined - no multiple choice
     };
-    
+
     session.messages.push(avatarMessage);
-    
+
     // 💾 STORE MANUAL CONVERSATION IN DATABASE & KNOWLEDGE BASE
     try {
       // Assume user ID = 1 for demo (in production, get from authenticated session)
       const userId = 1;
-      
+
       // Store user message
       await conversationStorageService.storeConversationMessage({
         userId,
@@ -410,7 +410,7 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
         businessContext: session.businessType,
         conversationContext: { sessionType: 'manual_input', messages: session.messages.length }
       });
-      
+
       // Store avatar response
       await conversationStorageService.storeConversationMessage({
         userId,
@@ -424,7 +424,7 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
         businessContext: session.businessType,
         conversationContext: { sessionType: 'manual_input', messages: session.messages.length }
       });
-      
+
       // Extract and store knowledge from both messages
       const latestConversations = await conversationStorageService.getUserConversations(userId, 2);
       if (latestConversations.length > 0) {
@@ -436,7 +436,7 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
           'customer',
           { avatarType: session.avatarType, scenario: session.scenario }
         );
-        
+
         await conversationStorageService.extractKnowledgeFromConversation(
           userId,
           latestConversations[0].id,
@@ -446,12 +446,12 @@ router.post('/sessions/:sessionId/message', async (req, res) => {
           { quality_score: avatarMessage.quality_score, avatarType: session.avatarType }
         );
       }
-      
+
       console.log('💾 Manual conversation stored in database & knowledge base updated');
     } catch (storageError) {
       console.error('❌ Failed to store manual conversation:', storageError);
     }
-    
+
     res.json({
       success: true,
       userMessage,
@@ -469,33 +469,33 @@ router.post('/sessions/:sessionId/comment', async (req, res) => {
   try {
     const { sessionId } = req.params;
     const { messageId, comment, rating } = req.body;
-    
+
     const session = trainingSessions.find(s => s.id === sessionId);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
+
     // Find the message that was commented on
     const messageIndex = session.messages.findIndex((m: any) => m.id === messageId);
     if (messageIndex === -1) {
       return res.status(404).json({ error: 'Message not found' });
     }
-    
+
     const commentedMessage = session.messages[messageIndex];
-    
+
     // Get the conversation context
     const conversationHistory = session.messages.filter((m: any) => m.role === 'customer' || m.role === 'avatar');
     const latestPatientMessage = [...conversationHistory].reverse().find((m: any) => m.role === 'customer');
     const patientConcern = latestPatientMessage?.content || "";
-    
+
     console.log('🧠 AI-POWERED LEARNING ANALYSIS:');
     console.log('   Patient asked about:', patientConcern.substring(0, 100) + '...');
     console.log('   Trainer feedback:', comment);
     console.log('   My previous response:', commentedMessage.content.substring(0, 100) + '...');
-    
+
     let improvedResponse = "";
     let improvedQualityScore = 90;
-    
+
     try {
       // Use Claude to generate improved response
       const claudeResponse = await ClaudeAvatarService.generateImprovedResponse(
@@ -505,12 +505,12 @@ router.post('/sessions/:sessionId/comment', async (req, res) => {
         session.avatarType || 'dr_sakura',
         session.businessType || 'health_coaching'
       );
-      
+
       improvedResponse = claudeResponse.content;
       improvedQualityScore = claudeResponse.quality_score;
-      
+
       console.log('🎯 Claude generated improvement:', improvedResponse.substring(0, 100) + '...');
-      
+
     } catch (error) {
       console.error('Claude improvement error:', error);
       // Use OpenAI as backup for improvements
@@ -519,27 +519,27 @@ router.post('/sessions/:sessionId/comment', async (req, res) => {
         const openai = new OpenAI({
           apiKey: process.env.OPENAI_API_KEY,
         });
-        
+
         const prompt = `You are Dr. Sakura. A trainer said: "${comment}" about your response: "${commentedMessage.content}". The patient originally asked: "${patientConcern}". Provide an improved response that addresses the trainer's feedback while answering the patient's question better.`;
-        
+
         const completion = await openai.chat.completions.create({
           model: "gpt-4o",
           messages: [{ role: "user", content: prompt }],
           max_tokens: 2000,
           temperature: 0.7,
         });
-        
+
         improvedResponse = completion.choices[0]?.message?.content || "";
         improvedQualityScore = Math.min(100, (commentedMessage.quality_score || 80) + 15);
         console.log('🔄 Using OpenAI for improvement');
-        
+
       } catch (openaiError) {
         console.error('Both AI services failed for improvement:', openaiError);
         improvedResponse = `I understand your concern about ${comment}. Let me provide a more detailed and helpful response based on your feedback.`;
         improvedQualityScore = Math.min(100, (commentedMessage.quality_score || 80) + 10);
       }
     }
-    
+
     // Update the original message with improved response fields (inline display)
     session.messages[messageIndex] = {
       ...commentedMessage,
@@ -550,13 +550,13 @@ router.post('/sessions/:sessionId/comment', async (req, res) => {
       has_improved_response: true,
       multiple_choice_options: [] // Remove choices after feedback
     };
-    
+
     // Store learning for future responses
     const avatarType = session.avatarType || 'dr_sakura';
     if (!universalKnowledgeBase[avatarType]) {
       universalKnowledgeBase[avatarType] = [];
     }
-    
+
     universalKnowledgeBase[avatarType].push({
       user_feedback: comment,
       improved_response: improvedResponse,
@@ -564,15 +564,15 @@ router.post('/sessions/:sessionId/comment', async (req, res) => {
       patient_concern: patientConcern,
       timestamp: new Date().toISOString()
     });
-    
+
     console.log(`📚 ${avatarType.toUpperCase()} learned new response (Total learned: ${universalKnowledgeBase[avatarType].length})`);
-    
+
     res.json({
       success: true,
       session: session,
       message: 'AI has provided an improved response based on your feedback'
     });
-    
+
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
@@ -583,11 +583,11 @@ router.get('/sessions/:sessionId', (req, res) => {
   try {
     const { sessionId } = req.params;
     const session = trainingSessions.find(s => s.id === sessionId);
-    
+
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
-    
+
     res.json({
       success: true,
       session: session
@@ -613,12 +613,12 @@ router.get('/sessions', (req, res) => {
 router.get('/scenarios', (req, res) => {
   try {
     const { avatarType } = req.query;
-    
+
     let scenarios = TRAINING_SCENARIOS || [];
     if (avatarType) {
       scenarios = scenarios.filter((s: any) => s.avatarType === avatarType);
     }
-    
+
     res.json({
       success: true,
       scenarios: scenarios
@@ -644,14 +644,14 @@ router.get('/avatar-types', (req, res) => {
 router.get('/recommendations/:avatarType', (req, res) => {
   try {
     const { avatarType } = req.params;
-    
+
     // Generate AI-powered recommendations
     const recommendations = {
       beginner: ['Start with basic customer service scenarios', 'Focus on active listening skills'],
       intermediate: ['Practice objection handling', 'Work on product knowledge'],
       advanced: ['Master complex problem resolution', 'Lead difficult conversations']
     };
-    
+
     res.json({
       success: true,
       recommendations: recommendations
@@ -665,15 +665,15 @@ router.get('/recommendations/:avatarType', (req, res) => {
 router.get('/industry-training/:industry', (req, res) => {
   try {
     const { industry } = req.params;
-    
+
     const relevantAvatars = AVATAR_TYPES.filter((avatar: any) => 
       avatar.industries?.includes(industry) || avatar.expertise?.includes(industry.toLowerCase())
     );
-    
+
     const industryScenarios = TRAINING_SCENARIOS.filter((scenario: any) => 
       scenario.industry === industry
     );
-    
+
     res.json({
       success: true,
       industry,
@@ -691,3 +691,51 @@ export function registerAvatarTrainingRoutes(app: any) {
 }
 
 export default router;
+// GET /api/avatar-training/sessions - Get user's training sessions
+router.get('/sessions', requireAuth, async (req: any, res) => {
+  try {
+    const userId = req.session.userId;
+    console.log(`Fetching training sessions for user ${userId}`);
+
+    // Use the service instead of undefined trainingSessions
+    const sessions = await AvatarTrainingSessionService.getUserSessions(userId);
+    res.json({ sessions });
+  } catch (error) {
+    console.error('Error fetching training sessions:', error);
+    res.status(500).json({ error: error.message || 'Failed to fetch training sessions' });
+  }
+});
+// POST /api/avatar-training/sessions/:sessionId/continue - Continue conversation
+router.post('/sessions/:sessionId/continue', requireAuth, async (req: any, res) => {
+  try {
+    const sessionIdParam = req.params.sessionId;
+    const { customerMessage } = req.body;
+
+    console.log('🔍 API Request Debug:');
+    console.log('   Request body:', JSON.stringify(req.body, null, 2));
+    console.log('   Session ID:', sessionIdParam);
+    console.log('   Extracted customerMessage:', customerMessage);
+
+    // Handle both string and numeric session IDs
+    let sessionId: string;
+    if (typeof sessionIdParam === 'string' && sessionIdParam.startsWith('session_')) {
+      sessionId = sessionIdParam;
+    } else {
+      // If it's a numeric ID, find the corresponding session
+      const numericId = parseInt(sessionIdParam);
+      if (isNaN(numericId)) {
+        return res.status(400).json({ error: 'Invalid session ID format' });
+      }
+      // Look up the session by numeric ID to get the string session ID
+      const sessionRecord = await AvatarTrainingSessionService.getSessionByNumericId(numericId);
+      if (!sessionRecord) {
+        return res.status(404).json({ error: 'Session not found' });
+      }
+      sessionId = sessionRecord.sessionId;
+    }
+
+    // Get the session first to ensure it exists and get details
+    const session = await AvatarTrainingSessionService.getSession(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }

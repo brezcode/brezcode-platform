@@ -13,7 +13,7 @@ import { eq, desc, and } from 'drizzle-orm';
 import { ClaudeAvatarService } from './claudeAvatarService';
 
 export class AvatarTrainingSessionService {
-  
+
   // Create new training session with complete scenario memory
   static async createSession(
     userId: number,
@@ -23,7 +23,7 @@ export class AvatarTrainingSessionService {
     scenarioDetails: any
   ): Promise<AvatarTrainingSession> {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     const sessionData: InsertAvatarTrainingSession = {
       sessionId,
       userId,
@@ -57,10 +57,10 @@ export class AvatarTrainingSessionService {
     };
 
     const [session] = await db.insert(avatarTrainingSessions).values(sessionData).returning();
-    
+
     // Add system message to initialize session
     await this.addSystemMessage(sessionId, `Training session started with ${avatarId} for scenario: ${scenarioDetails.name}`);
-    
+
     console.log(`🚀 Starting training session: ${JSON.stringify({ avatarId, scenarioId, businessContext })}`);
     return session;
   }
@@ -71,20 +71,25 @@ export class AvatarTrainingSessionService {
       .select()
       .from(avatarTrainingSessions)
       .where(eq(avatarTrainingSessions.sessionId, sessionId));
-    
+
     if (!session) return null;
-    
+
     // Load all messages for this session
     const messages = await db
       .select()
       .from(avatarTrainingMessages)
       .where(eq(avatarTrainingMessages.sessionId, sessionId))
       .orderBy(avatarTrainingMessages.sequenceNumber);
-    
+
     // Attach messages to session object
     (session as any).messages = messages;
-    
+
     return session;
+  }
+
+    // Get session by numeric ID (for backwards compatibility)
+  static async getSessionByNumericId(numericId: number): Promise<AvatarTrainingSession | null> {
+      return null;
   }
 
   // Add message to session with proper memory management
@@ -100,19 +105,19 @@ export class AvatarTrainingSessionService {
     }
   ): Promise<AvatarTrainingMessage> {
     const messageId = `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+
     // Get current session to update context
     const session = await this.getSession(sessionId);
     if (!session) throw new Error('Session not found');
-    
+
     // Get current message count for sequence number
     const messageCount = await db
       .select({ count: avatarTrainingMessages.sequenceNumber })
       .from(avatarTrainingMessages)
       .where(eq(avatarTrainingMessages.sessionId, sessionId));
-    
+
     const sequenceNumber = (messageCount.length || 0) + 1;
-    
+
     // Prepare message data
     const messageData: InsertAvatarTrainingMessage = {
       sessionId,
@@ -129,10 +134,10 @@ export class AvatarTrainingSessionService {
     };
 
     const [message] = await db.insert(avatarTrainingMessages).values(messageData).returning();
-    
+
     // Update session with new message and context
     await this.updateSessionContext(sessionId, message);
-    
+
     return message;
   }
 
@@ -140,7 +145,7 @@ export class AvatarTrainingSessionService {
   private static async updateSessionContext(sessionId: string, newMessage: AvatarTrainingMessage): Promise<void> {
     const session = await this.getSession(sessionId);
     if (!session) return;
-    
+
     // Update conversation history
     const currentHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
     const updatedHistory = [...currentHistory, {
@@ -150,7 +155,7 @@ export class AvatarTrainingSessionService {
       timestamp: newMessage.createdAt,
       sequenceNumber: newMessage.sequenceNumber
     }];
-    
+
     // Update current context
     const currentContext = session.currentContext || {};
     const updatedContext = {
@@ -163,7 +168,7 @@ export class AvatarTrainingSessionService {
       ].filter((topic, index, arr) => arr.indexOf(topic) === index), // Remove duplicates
       message_count: newMessage.sequenceNumber
     };
-    
+
     // Update session in database
     await db
       .update(avatarTrainingSessions)
@@ -184,16 +189,16 @@ export class AvatarTrainingSessionService {
     emotion: string = 'neutral'
   ): Promise<{ content: string; qualityScore: number; responseTime: number }> {
     const startTime = Date.now();
-    
+
     // Get session with full context
     const session = await this.getSession(sessionId);
     if (!session) throw new Error('Session not found');
-    
+
     // Build conversation history for AI context
     const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
-    
+
     console.log(`🔄 Generating AI-only response for ${session.businessContext} - Question: ${customerMessage.substring(0, 50)}...`);
-    
+
     try {
       // Use Claude with full session context
       const response = await ClaudeAvatarService.generateAvatarResponse(
@@ -202,10 +207,10 @@ export class AvatarTrainingSessionService {
         conversationHistory,
         session.businessContext
       );
-      
+
       const responseTime = Date.now() - startTime;
       console.log("🎯 Using Claude for dynamic response");
-      
+
       return {
         content: response.content,
         qualityScore: response.quality_score,
@@ -214,7 +219,7 @@ export class AvatarTrainingSessionService {
     } catch (error) {
       console.error('AI response generation failed:', error);
       const responseTime = Date.now() - startTime;
-      
+
       return {
         content: "I apologize, but I'm having technical difficulties right now. Please try again in a moment.",
         qualityScore: 30,
@@ -232,13 +237,13 @@ export class AvatarTrainingSessionService {
   static async completeSession(sessionId: string): Promise<void> {
     const session = await this.getSession(sessionId);
     if (!session) return;
-    
+
     // Generate session summary using AI
     const sessionSummary = await this.generateSessionSummary(session);
-    
+
     // Calculate session duration
     const sessionDuration = Math.round((Date.now() - new Date(session.startedAt).getTime()) / (1000 * 60));
-    
+
     // Update session as completed
     await db
       .update(avatarTrainingSessions)
@@ -253,7 +258,7 @@ export class AvatarTrainingSessionService {
         updatedAt: new Date(),
       })
       .where(eq(avatarTrainingSessions.sessionId, sessionId));
-    
+
     console.log(`✅ Session completed successfully: ${sessionId} (Total sessions: ${await this.getTotalSessionsCount()})`);
   }
 
@@ -267,7 +272,7 @@ export class AvatarTrainingSessionService {
     try {
       const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
       const messageCount = conversationHistory.length;
-      
+
       return {
         summary: `Training session with ${session.avatarId} focused on ${session.scenarioName}. ${messageCount} messages exchanged with focus on practical application and skill development.`,
         achievements: [
@@ -320,14 +325,14 @@ export class AvatarTrainingSessionService {
       'anxiety', 'health concerns', 'prevention', 'early detection',
       'medical advice', 'health coaching', 'wellness', 'symptoms'
     ];
-    
+
     const lowerContent = content.toLowerCase();
     topicKeywords.forEach(keyword => {
       if (lowerContent.includes(keyword)) {
         topics.push(keyword);
       }
     });
-    
+
     return topics;
   }
 }
