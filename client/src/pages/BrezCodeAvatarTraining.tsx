@@ -39,6 +39,7 @@ import {
   BarChart3,
   Users,
   ArrowRight,
+  ArrowLeft,
   Zap,
   ThumbsUp,
   ThumbsDown,
@@ -134,6 +135,11 @@ export default function BrezCodeAvatarTraining() {
   const [showCommentDialog, setShowCommentDialog] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>('');
   const [messageRatings, setMessageRatings] = useState<Record<string, { rating: 'thumbs_up' | 'thumbs_down' | null, comment: string }>>({});
+  
+  // Scenario carousel state
+  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
+  const [sessionCounter, setSessionCounter] = useState(1);
+  
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -171,6 +177,34 @@ export default function BrezCodeAvatarTraining() {
   const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
   const scenarios: TrainingScenario[] = (scenariosData as any)?.scenarios || [];
   const sessions: TrainingSession[] = (sessionsData as any)?.sessions || [];
+
+  // Scenario carousel navigation functions
+  const navigateScenario = (direction: 'left' | 'right') => {
+    if (scenarios.length === 0) return;
+    
+    if (direction === 'left') {
+      setCurrentScenarioIndex((prev) => 
+        prev === 0 ? scenarios.length - 1 : prev - 1
+      );
+    } else {
+      setCurrentScenarioIndex((prev) => 
+        prev === scenarios.length - 1 ? 0 : prev + 1
+      );
+    }
+  };
+
+  const selectCurrentScenario = () => {
+    if (scenarios[currentScenarioIndex]) {
+      setSelectedScenario(scenarios[currentScenarioIndex]);
+    }
+  };
+
+  // Generate session ID with counter
+  const generateSessionId = () => {
+    const sessionId = `Training Session #${sessionCounter}`;
+    setSessionCounter(prev => prev + 1);
+    return sessionId;
+  };
 
   // Automatically select Dr. Sakura Wellness if available
   useEffect(() => {
@@ -681,54 +715,120 @@ export default function BrezCodeAvatarTraining() {
             ) : !selectedScenario ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>Ready to Train Dr. Sakura Wellness</CardTitle>
+                  <CardTitle className="flex items-center justify-between">
+                    Ready to Train Dr. Sakura Wellness
+                    <Badge variant="outline" className="text-sm">
+                      Training Session #{sessionCounter} - {new Date().toLocaleDateString()}
+                    </Badge>
+                  </CardTitle>
                   <CardDescription>
-                    Please select a breast health coaching scenario to begin training.
+                    Browse scenarios using the arrows below and select one to begin training.
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {scenarios.map((scenario) => (
-                      <Card 
-                        key={scenario.id} 
-                        className={`cursor-pointer transition-all hover:shadow-lg ${
-                          selectedScenario?.id === scenario.id ? 'ring-2 ring-pink-500 bg-pink-50' : ''
-                        }`}
-                        onClick={() => setSelectedScenario(scenario)}
-                      >
-                        <CardHeader>
-                          <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">{scenario.name}</CardTitle>
-                            <div className="flex items-center space-x-2">
-                              {getDifficultyIcon(scenario.difficulty)}
-                              <Badge className={DIFFICULTY_COLORS[scenario.difficulty]}>
-                                {scenario.difficulty}
-                              </Badge>
-                            </div>
-                          </div>
-                          <CardDescription>{scenario.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="space-y-3">
-                            <div>
-                              <p className="text-sm font-medium text-gray-700">Customer Situation:</p>
-                              <p className="text-sm text-gray-600">{scenario.customerPersona}</p>
-                            </div>
+                <CardContent className="space-y-6">
+                  {scenarios.length > 0 && (
+                    <>
+                      {/* Scenario Carousel */}
+                      <div className="relative">
+                        <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white shadow-lg">
+                          <CardHeader>
                             <div className="flex items-center justify-between">
-                              <Badge variant="outline" className="text-xs">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {scenario.timeframeMins} min
-                              </Badge>
-                              <Badge variant="outline" className="text-xs bg-pink-50 text-pink-700">
-                                <Heart className="h-3 w-3 mr-1" />
-                                Health Coaching
-                              </Badge>
+                              <CardTitle className="text-xl text-pink-700">
+                                {scenarios[currentScenarioIndex]?.name}
+                              </CardTitle>
+                              <div className="flex items-center space-x-2">
+                                {getDifficultyIcon(scenarios[currentScenarioIndex]?.difficulty)}
+                                <Badge className={DIFFICULTY_COLORS[scenarios[currentScenarioIndex]?.difficulty]}>
+                                  {scenarios[currentScenarioIndex]?.difficulty}
+                                </Badge>
+                              </div>
                             </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
+                            <CardDescription className="text-gray-700">
+                              {scenarios[currentScenarioIndex]?.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="space-y-4">
+                              <div>
+                                <p className="text-sm font-medium text-pink-700 mb-2">Customer Situation:</p>
+                                <p className="text-sm text-gray-600 bg-white p-3 rounded-lg border">
+                                  {scenarios[currentScenarioIndex]?.customerPersona}
+                                </p>
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-pink-700 mb-2">Training Objectives:</p>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {scenarios[currentScenarioIndex]?.objectives?.map((obj, i) => (
+                                    <li key={i} className="flex items-start">
+                                      <Target className="h-3 w-3 mr-2 mt-0.5 text-pink-500 flex-shrink-0" />
+                                      {obj}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div className="flex items-center justify-between pt-2">
+                                <Badge variant="outline" className="text-xs">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  {scenarios[currentScenarioIndex]?.timeframeMins} min
+                                </Badge>
+                                <Badge variant="outline" className="text-xs bg-pink-50 text-pink-700">
+                                  <Heart className="h-3 w-3 mr-1" />
+                                  Health Coaching
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  Scenario {currentScenarioIndex + 1} of {scenarios.length}
+                                </Badge>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </div>
+
+                      {/* Navigation Controls */}
+                      <div className="flex items-center justify-center space-x-4">
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={() => navigateScenario('left')}
+                          className="h-12 w-12 rounded-full border-2 border-pink-300 hover:bg-pink-50"
+                        >
+                          <ArrowLeft className="h-5 w-5 text-pink-600" />
+                        </Button>
+                        
+                        <Button
+                          onClick={selectCurrentScenario}
+                          size="lg"
+                          className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 text-lg font-medium"
+                        >
+                          Select Scenario
+                        </Button>
+                        
+                        <Button
+                          variant="outline"
+                          size="lg"
+                          onClick={() => navigateScenario('right')}
+                          className="h-12 w-12 rounded-full border-2 border-pink-300 hover:bg-pink-50"
+                        >
+                          <ArrowRight className="h-5 w-5 text-pink-600" />
+                        </Button>
+                      </div>
+
+                      {/* Scenario Indicators */}
+                      <div className="flex justify-center space-x-2">
+                        {scenarios.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentScenarioIndex(index)}
+                            className={`h-2 w-8 rounded-full transition-all ${
+                              index === currentScenarioIndex 
+                                ? 'bg-pink-600' 
+                                : 'bg-pink-200 hover:bg-pink-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </CardContent>
               </Card>
             ) : !activeSession ? (
