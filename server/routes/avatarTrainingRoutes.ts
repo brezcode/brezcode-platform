@@ -4,12 +4,34 @@ import { conversationStorageService } from '../services/conversationStorageServi
 import { AvatarTrainingSessionService } from '../services/avatarTrainingSessionService';
 import { AVATAR_TYPES, TRAINING_SCENARIOS } from '../avatarTrainingScenarios';
 
+// Simple auth middleware (replace with proper auth in production)
+const requireAuth = (req: any, res: any, next: any) => {
+  if (!req.session?.userId) {
+    req.session = { userId: 1 }; // Demo user
+  }
+  next();
+};
+
 const router = express.Router();
 
 // Training sessions now stored in database with full persistence
 // Legacy in-memory storage removed in favor of database-backed sessions
 
 // Multiple choice functionality removed to streamline user experience
+
+// Mock training sessions storage for legacy compatibility
+let trainingSessions: any[] = [];
+
+// Universal AI Avatar Learning Database - persists across all avatars and sessions
+let universalKnowledgeBase: {
+  [avatarType: string]: Array<{
+    user_feedback: string;
+    improved_response: string;
+    original_response: string;
+    patient_concern: string;
+    timestamp: string;
+  }>;
+} = {};
 
 // DYNAMIC AI-ONLY RESPONSE SYSTEM - NO HARDCODED CONTENT
 const generateAIResponse = async (avatarType: string, customerQuestion: string, conversationHistory: any[] = []): Promise<{ content: string, quality_score: number }> => {
@@ -691,51 +713,5 @@ export function registerAvatarTrainingRoutes(app: any) {
 }
 
 export default router;
-// GET /api/avatar-training/sessions - Get user's training sessions
-router.get('/sessions', requireAuth, async (req: any, res) => {
-  try {
-    const userId = req.session.userId;
-    console.log(`Fetching training sessions for user ${userId}`);
-
-    // Use the service instead of undefined trainingSessions
-    const sessions = await AvatarTrainingSessionService.getUserSessions(userId);
-    res.json({ sessions });
-  } catch (error) {
-    console.error('Error fetching training sessions:', error);
-    res.status(500).json({ error: error.message || 'Failed to fetch training sessions' });
-  }
-});
-// POST /api/avatar-training/sessions/:sessionId/continue - Continue conversation
-router.post('/sessions/:sessionId/continue', requireAuth, async (req: any, res) => {
-  try {
-    const sessionIdParam = req.params.sessionId;
-    const { customerMessage } = req.body;
-
-    console.log('🔍 API Request Debug:');
-    console.log('   Request body:', JSON.stringify(req.body, null, 2));
-    console.log('   Session ID:', sessionIdParam);
-    console.log('   Extracted customerMessage:', customerMessage);
-
-    // Handle both string and numeric session IDs
-    let sessionId: string;
-    if (typeof sessionIdParam === 'string' && sessionIdParam.startsWith('session_')) {
-      sessionId = sessionIdParam;
-    } else {
-      // If it's a numeric ID, find the corresponding session
-      const numericId = parseInt(sessionIdParam);
-      if (isNaN(numericId)) {
-        return res.status(400).json({ error: 'Invalid session ID format' });
-      }
-      // Look up the session by numeric ID to get the string session ID
-      const sessionRecord = await AvatarTrainingSessionService.getSessionByNumericId(numericId);
-      if (!sessionRecord) {
-        return res.status(404).json({ error: 'Session not found' });
-      }
-      sessionId = sessionRecord.sessionId;
-    }
-
-    // Get the session first to ensure it exists and get details
-    const session = await AvatarTrainingSessionService.getSession(sessionId);
-    if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
-    }
+// Export the router
+export default router;
