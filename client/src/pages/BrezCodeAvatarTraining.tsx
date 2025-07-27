@@ -458,7 +458,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async (choice: string) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/choice`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/choice`, {
         choice
       });
       if (!response.ok) throw new Error('Failed to submit choice');
@@ -495,7 +495,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async ({ messageId, comment, rating }: { messageId: string; comment: string; rating: number }) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.id}/comment`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/comment`, {
         messageId,
         comment,
         rating
@@ -622,7 +622,7 @@ export default function BrezCodeAvatarTraining() {
     
     // Trigger continue conversation with explicit empty customer message for auto-generation
     continueConversation.mutate({ 
-      sessionId: activeSession.id, 
+      sessionId: activeSession.sessionId || activeSession.id, 
       customerMessage: '' // Empty string triggers auto-generated customer questions
     });
   };
