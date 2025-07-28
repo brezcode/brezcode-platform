@@ -1236,12 +1236,19 @@ Format your response as JSON with the exact structure:
     }
   });
 
-  // Register AI Training routes
-  registerAiTrainingRoutes(app);
-  
-  // Register avatar training routes
+  // PRIORITY: Register avatar training routes EARLY to avoid Vite conflicts
+  console.log('🚀 Registering avatar training routes with HIGH PRIORITY...');
   const avatarTrainingRoutes = await import('./routes/avatarTrainingRoutes');
   app.use('/api/avatar-training', avatarTrainingRoutes.default);
+  console.log('✅ Avatar training routes registered successfully with priority');
+  
+  // Direct avatar training API routes to bypass any conflicts
+  app.get('/api/avatar-training/direct-test', (req, res) => {
+    res.json({ success: true, message: 'Direct avatar training API working!', timestamp: new Date().toISOString() });
+  });
+  
+  // Register AI Training routes
+  registerAiTrainingRoutes(app);
   
   // Register knowledge base routes for conversation storage
   const knowledgeBaseRoutes = await import('./routes/knowledgeBaseRoutes');

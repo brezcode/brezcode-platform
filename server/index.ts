@@ -13,6 +13,171 @@ app.get('/direct-api/test', (req, res) => {
   res.json({ success: true, message: 'Direct API routing works!' });
 });
 
+// CRITICAL FIX: Direct avatar training routes to bypass Vite conflicts
+app.get('/api/avatar-training/scenarios/:scenarioId', async (req, res) => {
+  try {
+    const { scenarioId } = req.params;
+    console.log(`🔍 DIRECT: Looking for scenario: ${scenarioId}`);
+    
+    const { TRAINING_SCENARIOS } = await import('./avatarTrainingScenarios');
+    const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId);
+    if (!scenario) {
+      console.log(`❌ DIRECT: Scenario not found: ${scenarioId}`);
+      return res.status(404).json({ error: 'Scenario not found' });
+    }
+    
+    console.log(`✅ DIRECT: Found scenario: ${scenario.name}`);
+    res.json({
+      success: true,
+      scenario: scenario
+    });
+  } catch (error: any) {
+    console.error('❌ DIRECT: Error fetching scenario:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/avatar-training/sessions', async (req, res) => {
+  try {
+    const { avatarType, scenarioId, businessContext, userId } = req.body;
+    
+    console.log('🚀 DIRECT: Creating training session:', { avatarType, scenarioId, businessContext, userId });
+    
+    if (!avatarType || !scenarioId) {
+      return res.status(400).json({ error: 'avatarType and scenarioId are required' });
+    }
+    
+    const { TRAINING_SCENARIOS } = await import('./avatarTrainingScenarios');
+    const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId);
+    if (!scenario) {
+      return res.status(404).json({ error: 'Scenario not found' });
+    }
+    
+    const { AvatarTrainingSessionService } = await import('./services/avatarTrainingSessionService');
+    const session = await AvatarTrainingSessionService.createSession(
+      userId || 1,
+      avatarType,
+      scenarioId,
+      businessContext || 'health_coaching',
+      scenario
+    );
+    
+    console.log(`✅ DIRECT: Session created successfully: ${session.sessionId}`);
+    
+    res.json({
+      success: true,
+      session: {
+        sessionId: session.sessionId,
+        avatarType: session.avatarType,
+        scenarioId: session.scenarioId,
+        businessContext: session.businessContext,
+        status: session.status,
+        startedAt: session.startedAt?.toISOString(),
+        messages: []
+      }
+    });
+  } catch (error: any) {
+    console.error('❌ DIRECT: Session creation error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Manual message endpoint (direct routing to bypass Vite conflicts)
+app.post('/api/avatar-training/sessions/:sessionId/message', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { message, role = 'customer' } = req.body;
+
+    console.log(`🔄 DIRECT: Manual message received for session ${sessionId}: "${message.trim()}"`);
+
+    const { AvatarTrainingSessionService } = await import('./services/avatarTrainingSessionService');
+    const session = await AvatarTrainingSessionService.getSession(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    // Add customer message to database
+    const customerMessage = await AvatarTrainingSessionService.addMessage(
+      sessionId,
+      'customer',
+      message.trim(),
+      'neutral'
+    );
+
+    // Generate AI response 
+    const aiResponse = await AvatarTrainingSessionService.generateResponse(
+      sessionId,
+      message.trim()
+    );
+
+    // Save the AI response to the database
+    const avatarMessage = await AvatarTrainingSessionService.addMessage(
+      sessionId,
+      'avatar',
+      aiResponse.content,
+      'neutral',
+      {
+        qualityScore: aiResponse.qualityScore,
+        responseTime: aiResponse.responseTime,
+        aiModel: 'claude-sonnet-4'
+      }
+    );
+
+    console.log(`✅ DIRECT: Manual message processed successfully for session ${sessionId}`);
+
+    res.json({
+      success: true,
+      response: aiResponse.content,
+      quality_score: aiResponse.qualityScore,
+      userMessage: {
+        id: customerMessage.messageId,
+        role: 'customer',
+        content: customerMessage.content,
+        timestamp: customerMessage.createdAt
+      },
+      avatarMessage: {
+        id: avatarMessage.messageId,
+        role: 'avatar',
+        content: avatarMessage.content,
+        timestamp: avatarMessage.createdAt,
+        quality_score: avatarMessage.qualityScore
+      }
+    });
+  } catch (error: any) {
+    console.error('❌ DIRECT: Manual message error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// AI Continue conversation endpoint (direct routing to bypass Vite conflicts)
+app.post('/api/avatar-training/sessions/:sessionId/continue', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { customerMessage } = req.body;
+
+    console.log('🔍 DIRECT: AI Continue Request for session:', sessionId);
+
+    const { AvatarTrainingSessionService } = await import('./services/avatarTrainingSessionService');
+    const session = await AvatarTrainingSessionService.getSession(sessionId);
+    if (!session) {
+      return res.status(404).json({ error: 'Session not found' });
+    }
+
+    // Continue the conversation with AI-generated patient question and Dr. Sakura response
+    const updatedSession = await AvatarTrainingSessionService.continueConversation(sessionId);
+
+    console.log(`✅ DIRECT: AI Continue processed successfully for session ${sessionId}`);
+
+    res.json({
+      success: true,
+      session: updatedSession
+    });
+  } catch (error: any) {
+    console.error('❌ DIRECT: AI Continue error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 app.post('/direct-api/training/start', (req, res) => {
   try {
     const { avatarId, customerId, scenario } = req.body;

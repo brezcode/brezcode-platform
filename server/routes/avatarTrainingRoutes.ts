@@ -303,9 +303,12 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     // Multiple choice functionality removed to streamline experience
     const multipleChoiceOptions: string[] = [];
 
+    // Get session messages count for proper IDs
+    const sessionMessages = (session as any).messages || [];
+    
     // Add new customer message with Claude-generated emotion
     const newCustomerMessage = {
-      id: `msg_${Date.now()}_${session.messages.length + 1}`,
+      id: `msg_${Date.now()}_${sessionMessages.length + 1}`,
       role: 'customer',
       content: customerQuestion,
       timestamp: new Date(Date.now() - 30000).toISOString(),
@@ -314,7 +317,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
 
     // Add avatar's response
     const newAvatarMessage = {
-      id: `msg_${Date.now()}_${session.messages.length + 2}`,
+      id: `msg_${Date.now()}_${sessionMessages.length + 2}`,
       role: 'avatar', 
       content: aiResponse.content,
       timestamp: new Date().toISOString(),
@@ -324,7 +327,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
 
     // Get the updated session from database
     const finalSession = await AvatarTrainingSessionService.getSession(sessionId);
-    const sessionMessages = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
+    const sessionMessagesFromDB = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
 
     console.log('💾 Messages persisted in database via AvatarTrainingSessionService');
 
@@ -339,7 +342,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       businessContext: finalSession?.businessContext,
       status: finalSession?.status,
       startTime: finalSession?.startedAt?.toISOString(),
-      messages: sessionMessages.map(msg => ({
+      messages: sessionMessagesFromDB.map(msg => ({
         id: msg.messageId || `msg_${msg.sequenceNumber}`,
         role: msg.role,
         content: msg.content,
@@ -596,6 +599,74 @@ router.get('/sessions', (req, res) => {
       sessions: trainingSessions
     });
   } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get individual scenario with patient profile
+router.get('/scenarios/:scenarioId', async (req, res) => {
+  try {
+    const { scenarioId } = req.params;
+    console.log(`🔍 Looking for scenario: ${scenarioId}`);
+    
+    const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId);
+    if (!scenario) {
+      console.log(`❌ Scenario not found: ${scenarioId}`);
+      return res.status(404).json({ error: 'Scenario not found' });
+    }
+    
+    console.log(`✅ Found scenario: ${scenario.name}`);
+    res.json({
+      success: true,
+      scenario: scenario
+    });
+  } catch (error: any) {
+    console.error('❌ Error fetching scenario:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Create training session (main endpoint)
+router.post('/sessions', async (req, res) => {
+  try {
+    const { avatarType, scenarioId, businessContext, userId } = req.body;
+    
+    console.log('🚀 Creating training session:', { avatarType, scenarioId, businessContext, userId });
+    
+    if (!avatarType || !scenarioId) {
+      return res.status(400).json({ error: 'avatarType and scenarioId are required' });
+    }
+    
+    const scenario = TRAINING_SCENARIOS.find(s => s.id === scenarioId);
+    if (!scenario) {
+      return res.status(404).json({ error: 'Scenario not found' });
+    }
+    
+    // Create persistent session in database
+    const session = await AvatarTrainingSessionService.createSession(
+      userId || 1,
+      avatarType,
+      scenarioId,
+      businessContext || 'health_coaching',
+      scenario
+    );
+    
+    console.log(`✅ Session created successfully: ${session.sessionId}`);
+    
+    res.json({
+      success: true,
+      session: {
+        sessionId: session.sessionId,
+        avatarType: session.avatarType,
+        scenarioId: session.scenarioId,
+        businessContext: session.businessContext,
+        status: session.status,
+        startedAt: session.startedAt?.toISOString(),
+        messages: []
+      }
+    });
+  } catch (error: any) {
+    console.error('❌ Session creation error:', error);
     res.status(500).json({ error: error.message });
   }
 });

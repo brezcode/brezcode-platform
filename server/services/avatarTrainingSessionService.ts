@@ -129,7 +129,7 @@ export class AvatarTrainingSessionService {
       qualityScore: aiResponseData?.qualityScore,
       responseTime: aiResponseData?.responseTime,
       aiModel: aiResponseData?.aiModel,
-      conversationContext: session.currentContext,
+      conversationContext: session.currentContext as any,
       topicsDiscussed: this.extractTopics(content),
     };
 
@@ -163,7 +163,7 @@ export class AvatarTrainingSessionService {
       last_message_role: newMessage.role,
       last_message_time: newMessage.createdAt,
       topics_covered: [
-        ...(currentContext.topics_covered || []),
+        ...((currentContext as any).topics_covered || []),
         ...(newMessage.topicsDiscussed || [])
       ].filter((topic, index, arr) => arr.indexOf(topic) === index), // Remove duplicates
       message_count: newMessage.sequenceNumber
@@ -238,6 +238,59 @@ export class AvatarTrainingSessionService {
     return this.addMessage(sessionId, 'system', content);
   }
 
+  // Continue conversation with AI-generated patient question and Dr. Sakura response
+  static async continueConversation(sessionId: string): Promise<AvatarTrainingSession> {
+    const session = await this.getSession(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    const scenario = await this.getScenarioById(session.scenarioId);
+    // Get conversation history from database
+    const conversationHistory = await db
+      .select()
+      .from(avatarTrainingMessages) 
+      .where(eq(avatarTrainingMessages.sessionId, sessionId))
+      .orderBy(avatarTrainingMessages.createdAt);
+
+    // Generate AI patient question using Claude
+    const { ClaudeAvatarService } = await import('./claudeAvatarService');
+    const patientQuestion = await ClaudeAvatarService.generatePatientQuestion(
+      conversationHistory,
+      scenario,
+      session.avatarId
+    );
+
+    // Add the AI-generated patient question to the database
+    const customerMessage = await this.addMessage(
+      sessionId,
+      'customer',
+      patientQuestion.question,
+      patientQuestion.emotion
+    );
+
+    // Generate Dr. Sakura's response to the patient question
+    const aiResponse = await this.generateResponse(sessionId, patientQuestion.question);
+
+    // Save Dr. Sakura's response to the database  
+    const avatarMessage = await this.addMessage(
+      sessionId,
+      'avatar',
+      aiResponse.content,
+      'neutral',
+      {
+        qualityScore: aiResponse.qualityScore,
+        responseTime: aiResponse.responseTime,
+        aiModel: 'claude-sonnet-4'
+      }
+    );
+
+    console.log(`✅ AI Continue conversation completed for session ${sessionId}`);
+
+    // Return updated session
+    return this.getSession(sessionId);
+  }
+
   // Complete training session with summary
   static async completeSession(sessionId: string): Promise<void> {
     const session = await this.getSession(sessionId);
@@ -247,7 +300,7 @@ export class AvatarTrainingSessionService {
     const sessionSummary = await this.generateSessionSummary(session);
 
     // Calculate session duration
-    const sessionDuration = Math.round((Date.now() - new Date(session.startedAt).getTime()) / (1000 * 60));
+    const sessionDuration = Math.round((Date.now() - new Date(session.startedAt || new Date()).getTime()) / (1000 * 60));
 
     // Update session as completed
     await db

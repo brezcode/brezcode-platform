@@ -32,22 +32,11 @@ export class ClaudeAvatarService {
       
       // Extract scenario context and patient persona
       const scenarioContext = scenarioData?.name || 'A general healthcare consultation';
-      const patientPersona = scenarioData?.customerPersona ? 
-        (typeof scenarioData.customerPersona === 'string' ? 
-          JSON.parse(scenarioData.customerPersona) : 
-          scenarioData.customerPersona
-        ) : null;
+      const patientPersona = scenarioData?.customerPersona || 'A patient seeking medical guidance';
 
       const prompt = `You are simulating an intelligent patient in this medical training scenario: "${scenarioContext}"
 
-${patientPersona ? `PATIENT PERSONA:
-Name: ${patientPersona.name || 'Sarah'}
-Age: ${patientPersona.age || '35'}
-Background: ${patientPersona.background || 'General patient'}
-Main Concerns: ${Array.isArray(patientPersona.concerns) ? patientPersona.concerns.join(', ') : 'Health concerns'}
-Goals: ${Array.isArray(patientPersona.goals) ? patientPersona.goals.join(', ') : 'Seek guidance'}
-Communication Style: ${patientPersona.communicationStyle || 'Direct and concerned'}
-` : ''}
+PATIENT PERSONA: ${patientPersona}
 
 Recent conversation:
 ${recentMessages}
@@ -81,7 +70,8 @@ Respond with a JSON object:
         messages: [{ role: 'user', content: prompt }]
       });
 
-      const result = JSON.parse((response.content[0] as any).text);
+      const responseText = (response.content[0] as any).text;
+      const result = JSON.parse(responseText);
       console.log('🎯 Claude-generated patient question:', result.question.substring(0, 100) + '...');
       return result;
 
@@ -219,11 +209,7 @@ Generate an improved response that directly addresses the customer's feedback wh
     
     // Extract scenario context and patient persona for Dr. Sakura responses
     const scenarioContext = scenarioData?.name || '';
-    const patientPersona = scenarioData?.customerPersona ? 
-      (typeof scenarioData.customerPersona === 'string' ? 
-        JSON.parse(scenarioData.customerPersona) : 
-        scenarioData.customerPersona
-      ) : null;
+    const patientPersona = scenarioData?.customerPersona || null;
     
     // Build conversation context with anti-repetition logic
     const recentMessages = conversationHistory.slice(-6); // Use last 6 messages for context
@@ -241,13 +227,7 @@ Business Context: ${businessContext}
 
 ${scenarioContext ? `TRAINING SCENARIO: "${scenarioContext}"` : ''}
 
-${patientPersona ? `PATIENT PROFILE YOU'RE HELPING:
-Name: ${patientPersona.name || 'Patient'}
-Age: ${patientPersona.age || 'Adult'}
-Background: ${patientPersona.background || 'General patient'}
-Main Concerns: ${Array.isArray(patientPersona.concerns) ? patientPersona.concerns.join(', ') : 'Health concerns'}
-Goals: ${Array.isArray(patientPersona.goals) ? patientPersona.goals.join(', ') : 'Seek guidance'}
-Communication Style: ${patientPersona.communicationStyle || 'Direct and concerned'}
+${patientPersona ? `PATIENT PROFILE YOU'RE HELPING: ${patientPersona}
 
 REMEMBER: You are responding to this specific patient with their unique background and concerns.` : ''}
 
