@@ -51,7 +51,17 @@ interface TrainingSession {
 }
 
 export function AiTrainingSession() {
-  const { sessionId } = useParams<{ sessionId: string }>();
+  const params = useParams<{ sessionId: string }>();
+  const sessionId = params.sessionId;
+  
+  // Debug sessionId extraction
+  console.log('🔍 Component Debug:', {
+    params,
+    sessionId,
+    sessionIdType: typeof sessionId,
+    sessionIdValue: sessionId
+  });
+  
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
   const [feedbackForm, setFeedbackForm] = useState({
@@ -67,11 +77,18 @@ export function AiTrainingSession() {
   const { data: session, isLoading: loadingSession } = useQuery({
     queryKey: [`/api/avatar-training/sessions/${sessionId}`],
     queryFn: async () => {
-      if (!sessionId) throw new Error('No session ID');
+      console.log('🔍 Query sessionId:', { sessionId, type: typeof sessionId });
+      if (!sessionId) {
+        console.error('❌ Query: No session ID available');
+        throw new Error('No session ID');
+      }
       const response = await fetch(`/api/avatar-training/sessions/${sessionId}`, {
         credentials: 'include'
       });
-      if (!response.ok) throw new Error('Failed to fetch session');
+      if (!response.ok) {
+        console.error('❌ Query failed:', response.status, response.statusText);
+        throw new Error('Failed to fetch session');
+      }
       const result = await response.json();
       return result.session || result;
     },
@@ -88,6 +105,13 @@ export function AiTrainingSession() {
   // Send message mutation - use continue endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
+      console.log('🔍 SessionId Debug:', {
+        sessionId,
+        type: typeof sessionId,
+        urlParams: useParams(),
+        messageData
+      });
+      
       if (!sessionId) {
         console.error('❌ No session ID available:', { sessionId });
         throw new Error('No session ID available');
