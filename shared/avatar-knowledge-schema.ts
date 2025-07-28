@@ -17,6 +17,11 @@ export const avatarKnowledgeDocuments = pgTable("avatar_knowledge_documents", {
   isProcessed: boolean("is_processed").default(false),
   processingStatus: text("processing_status").default("pending"), // "pending", "processing", "completed", "failed"
   metadata: jsonb("metadata"), // Additional file metadata
+  // NEW: Training Impact Analysis fields
+  trainingImpactTitle: text("training_impact_title"),
+  trainingImpactAnalysis: text("training_impact_analysis"),
+  knowledgeCategory: text("knowledge_category").default("General Knowledge"),
+  isAnalyzed: boolean("is_analyzed").default(false)
 });
 
 export const avatarKnowledgeChunks = pgTable("avatar_knowledge_chunks", {

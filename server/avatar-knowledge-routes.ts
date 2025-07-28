@@ -231,5 +231,31 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
     }
   });
 
+  // NEW: Get training impact analysis for avatar
+  app.get('/api/avatar-knowledge/:avatarId/training-impact', async (req, res) => {
+    try {
+      const { avatarId } = req.params;
+      
+      console.log(`🎯 Fetching training impact for avatar: ${avatarId}`);
+      
+      const { TrainingImpactService } = await import('../services/trainingImpactService');
+      const trainingImpact = await TrainingImpactService.getTrainingImpactForAvatar(avatarId);
+      
+      console.log(`✅ Found training impact with ${Object.keys(trainingImpact).length} categories`);
+      
+      res.json({
+        success: true,
+        trainingImpact: trainingImpact
+      });
+      
+    } catch (error) {
+      console.error('Error fetching training impact:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch training impact'
+      });
+    }
+  });
+
   console.log('✅ Avatar Knowledge Base routes registered successfully');
 };

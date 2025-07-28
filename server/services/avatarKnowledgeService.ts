@@ -7,6 +7,7 @@ import type {
   AvatarKnowledgeChunk,
   InsertAvatarKnowledgeChunk 
 } from "@shared/schema";
+import { TrainingImpactService } from "./trainingImpactService";
 
 export class AvatarKnowledgeService {
   
@@ -60,6 +61,40 @@ export class AvatarKnowledgeService {
         .where(eq(avatarKnowledgeDocuments.id, documentId));
       
       console.log(`✅ Document ${documentId} processed into ${chunks.length} chunks`);
+
+      // 🧠 NEW: Generate Training Impact Analysis
+      try {
+        console.log(`🎯 Generating training impact analysis for document ${documentId}`);
+        
+        // Get document details for analysis
+        const [document] = await db.select({
+          filename: avatarKnowledgeDocuments.filename,
+          processedContent: avatarKnowledgeDocuments.processedContent
+        })
+        .from(avatarKnowledgeDocuments)
+        .where(eq(avatarKnowledgeDocuments.id, documentId));
+
+        if (document) {
+          const impact = await TrainingImpactService.analyzeDocumentImpact(
+            documentId,
+            document.processedContent,
+            document.filename,
+            avatarId
+          );
+
+          await TrainingImpactService.updateDocumentWithAnalysis(
+            documentId,
+            impact.title,
+            impact.analysis,
+            impact.category
+          );
+
+          console.log(`🎯 Training impact analysis completed for document ${documentId}`);
+        }
+      } catch (analysisError) {
+        console.error(`⚠️ Training impact analysis failed for document ${documentId}:`, analysisError);
+        // Don't fail the entire process if analysis fails
+      }
       
     } catch (error) {
       console.error(`❌ Error processing document ${documentId}:`, error);

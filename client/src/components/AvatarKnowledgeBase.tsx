@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import TrainingImpactDisplay from './TrainingImpactDisplay';
 import { 
   Upload, 
   FileText, 
@@ -292,42 +293,8 @@ export function AvatarKnowledgeBase({ avatarId, avatarName }: AvatarKnowledgeBas
         </CardContent>
       </Card>
 
-      {/* Knowledge Stats */}
-      {documents.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Brain className="h-5 w-5" />
-              Training Impact
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-2xl font-bold text-green-700">
-                  {documents.filter(d => d.processingStatus === 'completed').length}
-                </div>
-                <div className="text-sm text-green-600">Documents Processed</div>
-              </div>
-              <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="text-2xl font-bold text-blue-700">
-                  {documents.reduce((sum, d) => sum + d.fileSize, 0) > 1024 * 1024 
-                    ? `${(documents.reduce((sum, d) => sum + d.fileSize, 0) / (1024 * 1024)).toFixed(1)}MB`
-                    : `${(documents.reduce((sum, d) => sum + d.fileSize, 0) / 1024).toFixed(0)}KB`
-                  }
-                </div>
-                <div className="text-sm text-blue-600">Total Knowledge</div>
-              </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="text-2xl font-bold text-purple-700">
-                  {new Set(documents.map(d => d.contentCategory)).size}
-                </div>
-                <div className="text-sm text-purple-600">Knowledge Categories</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      {/* Training Impact Analysis */}
+      <TrainingImpactDisplay avatarId={avatarId} />
     </div>
   );
 }

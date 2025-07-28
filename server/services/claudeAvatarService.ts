@@ -225,14 +225,39 @@ Generate an improved response that directly addresses the customer's feedback wh
     if (avatarId) {
       try {
         console.log(`🔍 Searching knowledge base for avatar ${avatarId} with query: "${customerMessage}"`);
+        const { AvatarKnowledgeService } = await import('./avatarKnowledgeService');
         const knowledgeChunks = await AvatarKnowledgeService.searchKnowledge(avatarId, customerMessage);
         
-        if (knowledgeChunks.length > 0) {
-          knowledgeContext = '\n\nKNOWLEDGE BASE INFORMATION:\n' + 
-            knowledgeChunks.map((chunk, index) => 
-              `${index + 1}. ${chunk.chunkContent}`
-            ).join('\n\n');
-          console.log(`✅ Found ${knowledgeChunks.length} relevant knowledge chunks to use in response`);
+        // 🧠 NEW: Get training impact analysis for enhanced context
+        let trainingImpactContext = '';
+        try {
+          const { TrainingImpactService } = await import('./trainingImpactService');
+          const trainingImpact = await TrainingImpactService.getTrainingImpactForAvatar(avatarId);
+          
+          if (Object.keys(trainingImpact).length > 0) {
+            trainingImpactContext = '\n\nTRAINING IMPACT KNOWLEDGE:\n';
+            Object.entries(trainingImpact).forEach(([category, items]) => {
+              trainingImpactContext += `\n${category} Knowledge:\n`;
+              (items as any[]).slice(0, 2).forEach(item => {
+                trainingImpactContext += `- ${item.title}: ${item.analysis.substring(0, 250)}...\n`;
+              });
+            });
+            console.log(`🎯 Enhanced response with training impact from ${Object.keys(trainingImpact).length} knowledge categories`);
+          }
+        } catch (impactError) {
+          console.warn('⚠️ Could not load training impact:', impactError);
+        }
+        
+        if (knowledgeChunks.length > 0 || trainingImpactContext) {
+          knowledgeContext = trainingImpactContext;
+          
+          if (knowledgeChunks.length > 0) {
+            knowledgeContext += '\n\nSPECIFIC KNOWLEDGE BASE INFORMATION:\n' + 
+              knowledgeChunks.map((chunk, index) => 
+                `${index + 1}. ${chunk.chunkContent}`
+              ).join('\n\n');
+            console.log(`✅ Found ${knowledgeChunks.length} relevant knowledge chunks to use in response`);
+          }
         } else {
           console.log(`📝 No specific knowledge found for query: "${customerMessage}"`);
         }
