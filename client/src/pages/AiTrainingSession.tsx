@@ -52,14 +52,6 @@ interface TrainingSession {
 
 export function AiTrainingSession() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-
-  // Update currentSessionId when sessionId from URL changes
-  useEffect(() => {
-    if (sessionId) {
-      setCurrentSessionId(sessionId);
-    }
-  }, [sessionId]);
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
   const [feedbackForm, setFeedbackForm] = useState({
@@ -96,11 +88,15 @@ export function AiTrainingSession() {
   // Send message mutation - use continue endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
-      if (!sessionId) throw new Error('No session ID available');
+      if (!sessionId) {
+        console.error('❌ No session ID available:', { sessionId });
+        throw new Error('No session ID available');
+      }
       
       console.log('🔄 Continue conversation request:', {
         sessionId: sessionId,
-        customerMessage: messageData.message
+        customerMessage: messageData.message,
+        urlSessionId: sessionId
       });
       
       const response = await fetch(`/api/avatar-training/sessions/${sessionId}/continue`, {
@@ -135,11 +131,11 @@ export function AiTrainingSession() {
   // Add feedback mutation
   const addFeedbackMutation = useMutation({
     mutationFn: async ({ dialogueId, feedback }: { dialogueId: number; feedback: any }) => {
-      const response = await fetch(`/api/ai-training/dialogues/${dialogueId}/feedback`, {
+      const response = await fetch(`/api/avatar-training/sessions/${sessionId}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(feedback)
+        body: JSON.stringify({ dialogueId, feedback })
       });
       if (!response.ok) throw new Error('Failed to add feedback');
       return response.json();
@@ -159,7 +155,7 @@ export function AiTrainingSession() {
   // Complete session mutation
   const completeSessionMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/ai-training/sessions/${sessionId}/complete`, {
+      const response = await fetch(`/api/avatar-training/sessions/${sessionId}/complete`, {
         method: 'POST',
         credentials: 'include'
       });
@@ -167,7 +163,7 @@ export function AiTrainingSession() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/ai-training/sessions/${sessionId}`] });
+      queryClient.invalidateQueries({ queryKey: [`/api/avatar-training/sessions/${sessionId}`] });
       refetchDialogues();
     }
   });
@@ -178,7 +174,8 @@ export function AiTrainingSession() {
 
   // Auto-continue conversation when component loads
   useEffect(() => {
-    if (sessionId && dialogues.length <= 1) {
+    if (sessionId && dialogues.length <= 1 && !sendMessageMutation.isPending) {
+      console.log('🎯 Auto-continue triggered:', { sessionId, dialoguesLength: dialogues.length });
       // Auto-start conversation with empty message to trigger AI
       setTimeout(() => {
         sendMessageMutation.mutate({
