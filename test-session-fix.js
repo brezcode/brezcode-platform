@@ -1,5 +1,5 @@
 
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 async function testSessionFlow() {
   console.log('🧪 Testing Avatar Training Session Flow...');
