@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import multer from 'multer';
 import { AvatarKnowledgeService } from './services/avatarKnowledgeService';
+import { TrainingImpactService } from './services/trainingImpactService';
+import { avatarKnowledgeDocuments, avatarKnowledgeChunks } from '@shared/schema';
+import { eq, like, or } from 'drizzle-orm';
+import { db } from './db';
 
 // Configure multer for file uploads (memory storage)
 const upload = multer({
@@ -50,33 +54,42 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
         if (file.mimetype === 'text/plain' || file.mimetype === 'text/csv' || file.mimetype === 'application/json') {
           textContent = file.buffer.toString('utf-8');
         } else if (file.mimetype === 'application/pdf') {
-          // Enhanced PDF parsing with better error handling
+          // Enhanced PDF parsing with proper text extraction
           try {
-            const pdfParse = await import('pdf-parse');
-            const pdfData = await pdfParse.default(file.buffer);
+            const pdfParse = require('pdf-parse');
+            const pdfData = await pdfParse(file.buffer);
             textContent = pdfData.text;
-            console.log(`📄 Extracted ${pdfData.text.length} characters from PDF using pdf-parse`);
+            console.log(`📄 Successfully extracted ${pdfData.text.length} characters from PDF: ${file.originalname}`);
             
-            // Validate that we got meaningful text content
-            if (!textContent || textContent.length < 50 || textContent.includes('%PDF-') || textContent.includes('endobj')) {
-              throw new Error('PDF extraction returned invalid content');
+            // Validate meaningful text content was extracted
+            if (!textContent || textContent.length < 50) {
+              throw new Error('PDF extraction returned insufficient content');
             }
+            
+            // Clean up PDF text extraction artifacts
+            textContent = textContent
+              .replace(/\s+/g, ' ')
+              .replace(/\n\s*\n/g, '\n')
+              .trim();
+              
           } catch (pdfError) {
-            console.warn('PDF parsing failed, creating fallback content');
-            // For unsupported PDFs, create informative placeholder
-            textContent = `This is a PDF document named "${file.originalname}" that contains important information. 
-            The document appears to contain detailed content but the text extraction is not currently supported for this PDF format. 
-            Please consider converting the PDF to a text file (.txt) or Word document (.docx) for better knowledge extraction.
-            
-            Document details:
-            - Filename: ${file.originalname}
-            - File size: ${(file.size / 1024).toFixed(1)} KB
-            - Upload date: ${new Date().toISOString()}
-            
-            To use this document effectively, please:
-            1. Convert to a text-based format
-            2. Copy key content into a text file
-            3. Upload individual sections as separate documents`;
+            console.error('❌ PDF parsing failed:', pdfError);
+            // Critical: Don't use fallback content - try alternative extraction
+            try {
+              // Alternative: Try extracting raw text
+              const rawText = file.buffer.toString('utf-8');
+              const textMatch = rawText.match(/stream\s+(.*?)\s+endstream/gs);
+              if (textMatch && textMatch.length > 0) {
+                textContent = textMatch.join(' ').replace(/[^\x20-\x7E\s]/g, ' ').trim();
+              } else {
+                throw new Error('Alternative PDF extraction failed');
+              }
+            } catch (altError) {
+              return res.status(400).json({ 
+                error: 'PDF text extraction failed',
+                details: 'This PDF format is not supported for text extraction. Please convert to .txt or .docx format.'
+              });
+            }
           }
         } else if (file.mimetype.includes('word') || file.mimetype.includes('document')) {
           // For Word documents, try basic text extraction with proper encoding
@@ -253,6 +266,61 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
       res.status(500).json({
         success: false,
         error: 'Failed to fetch training impact'
+      });
+    }
+  });
+
+  // NEW: Trigger comprehensive training impact analysis for a document
+  app.post('/api/avatar-knowledge/:avatarId/analyze-document', async (req: Request, res: Response) => {
+    try {
+      const { avatarId } = req.params;
+      const { documentId } = req.body;
+      
+      console.log(`🧠 Starting comprehensive analysis for document ${documentId} in avatar ${avatarId}`);
+      
+      // Get document content
+      const [document] = await db.select()
+        .from(avatarKnowledgeDocuments)
+        .where(eq(avatarKnowledgeDocuments.id, documentId));
+        
+      if (!document) {
+        return res.status(404).json({ error: 'Document not found' });
+      }
+      
+      console.log(`📄 Found document: ${document.filename} (${document.processedContent.length} characters)`);
+      
+      // Run comprehensive training impact analysis
+      const trainingImpact = await TrainingImpactService.analyzeDocumentImpact(
+        documentId,
+        document.processedContent,
+        document.filename,
+        avatarId
+      );
+      
+      // Update document with analysis
+      await TrainingImpactService.updateDocumentWithAnalysis(
+        documentId,
+        trainingImpact.title,
+        trainingImpact.analysis,
+        trainingImpact.category
+      );
+      
+      console.log(`✅ Comprehensive analysis completed:`);
+      console.log(`📊 Title: "${trainingImpact.title}"`);
+      console.log(`📚 Category: "${trainingImpact.category}"`);
+      console.log(`📝 Analysis length: ${trainingImpact.analysis.length} characters`);
+      
+      res.json({
+        success: true,
+        trainingImpact,
+        message: 'Document analysis completed successfully'
+      });
+      
+    } catch (error: any) {
+      console.error('❌ Error analyzing document:', error);
+      res.status(500).json({ 
+        error: 'Failed to analyze document',
+        details: error.message 
       });
     }
   });
