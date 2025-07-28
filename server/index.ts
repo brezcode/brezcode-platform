@@ -2,6 +2,7 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { registerAvatarKnowledgeRoutes } from "./avatar-knowledge-routes";
 
 const app = express();
 // Increase payload limit for image uploads
@@ -410,12 +411,8 @@ app.use((req, res, next) => {
     server = createServer(app);
   }
 
-  // Register additional routes later when they're fixed
-  // TODO: Re-enable these routes after fixing TypeScript errors
-  // registerAvatarTrainingRoutes(app);
-  // app.use('/api/avatar-training', avatarKnowledgeRoutes);
-  // registerBusinessAvatarRoutes(app);
-  // registerKnowledgeUploadRoutes(app);
+  // Register Avatar Knowledge Base routes
+  registerAvatarKnowledgeRoutes(app);
 
   // Register avatar performance routes for completed session display
   try {

@@ -46,6 +46,7 @@ import {
   MessageCircleMore,
   FileText
 } from 'lucide-react';
+import { AvatarKnowledgeBase } from '@/components/AvatarKnowledgeBase';
 
 interface BusinessAvatar {
   id: string;
@@ -793,7 +794,7 @@ export default function BrezCodeAvatarTraining() {
         <Tabs defaultValue="training" className="space-y-4 sm:space-y-6">
           <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto text-xs sm:text-sm">
             <TabsTrigger value="training" className="px-2 py-2">Training</TabsTrigger>
-            <TabsTrigger value="scenarios" className="px-2 py-2">Scenarios</TabsTrigger>
+            <TabsTrigger value="scenarios" className="px-2 py-2">Knowledge Base</TabsTrigger>
             <TabsTrigger value="analytics" className="px-2 py-2">Performance</TabsTrigger>
           </TabsList>
 
@@ -1521,48 +1522,12 @@ export default function BrezCodeAvatarTraining() {
             )}
           </TabsContent>
 
-          {/* Scenarios Tab */}
+          {/* Knowledge Base Tab */}
           <TabsContent value="scenarios" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {scenarios.map((scenario) => (
-                <Card key={scenario.id} className="hover:shadow-lg transition-all">
-                  <CardHeader>
-                    <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg">{scenario.name}</CardTitle>
-                      <Badge className={DIFFICULTY_COLORS[scenario.difficulty]}>
-                        {scenario.difficulty}
-                      </Badge>
-                    </div>
-                    <CardDescription>{scenario.description}</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700">Key Learning Points:</p>
-                        <ul className="text-sm text-gray-600 list-disc list-inside">
-                          {(scenario?.keyLearningPoints || []).slice(0, 3).map((point, i) => (
-                            <li key={i}>{point}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-xs">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {scenario.timeframeMins} min
-                        </Badge>
-                        <Button 
-                          size="sm" 
-                          onClick={() => setSelectedScenario(scenario)}
-                          className="bg-pink-600 hover:bg-pink-700"
-                        >
-                          Select Scenario
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <AvatarKnowledgeBase 
+              avatarId="brezcode_health_coach" 
+              avatarName="Dr. Sakura Wellness"
+            />
           </TabsContent>
 
           {/* Analytics */}
