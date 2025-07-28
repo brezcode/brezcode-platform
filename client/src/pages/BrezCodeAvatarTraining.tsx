@@ -136,11 +136,11 @@ export default function BrezCodeAvatarTraining() {
   const [showCommentDialog, setShowCommentDialog] = useState<string | null>(null);
   const [newComment, setNewComment] = useState<string>('');
   const [messageRatings, setMessageRatings] = useState<Record<string, { rating: 'thumbs_up' | 'thumbs_down' | null, comment: string }>>({});
-  
+
   // Scenario carousel state
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [sessionCounter, setSessionCounter] = useState(1);
-  
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -182,7 +182,7 @@ export default function BrezCodeAvatarTraining() {
   // Scenario carousel navigation functions
   const navigateScenario = (direction: 'left' | 'right') => {
     if (scenarios.length === 0) return;
-    
+
     if (direction === 'left') {
       setCurrentScenarioIndex((prev) => 
         prev === 0 ? scenarios.length - 1 : prev - 1
@@ -224,7 +224,7 @@ export default function BrezCodeAvatarTraining() {
       if (activeSessionData) {
         // Always update active session to get latest messages
         setActiveSession(activeSessionData);
-        
+
         // Load session messages with improved responses  
         const sessionMessages = activeSessionData.messages || [];
         const formattedMessages = sessionMessages.map((msg: any) => ({
@@ -243,7 +243,7 @@ export default function BrezCodeAvatarTraining() {
           improved_message_id: msg.improved_message_id,
           has_improved_response: msg.has_improved_response
         }));
-        
+
         // Update messages to show current conversation
         setMessages([
           {
@@ -279,7 +279,7 @@ export default function BrezCodeAvatarTraining() {
     },
     onSuccess: (data) => {
       setActiveSession(data.session);
-      
+
       // Display automatic AI conversation messages with improved responses
       const sessionMessages = data.session.messages || [];
       const formattedMessages = sessionMessages.map((msg: any) => ({
@@ -298,7 +298,7 @@ export default function BrezCodeAvatarTraining() {
         improved_message_id: msg.improved_message_id,
         has_improved_response: msg.has_improved_response
       }));
-      
+
       setMessages([
         {
           role: 'system',
@@ -308,7 +308,7 @@ export default function BrezCodeAvatarTraining() {
         },
         ...formattedMessages
       ]);
-      
+
       toast({
         title: "Dr. Sakura AI Training Active",
         description: `Observing AI conversation: ${selectedScenario?.name}`,
@@ -320,7 +320,7 @@ export default function BrezCodeAvatarTraining() {
   const sendTrainingMessage = useMutation({
     mutationFn: async (message: string) => {
       if (!activeSession) throw new Error('No active session');
-      
+
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/message`, {
         message: message,
         role: 'customer'
@@ -339,7 +339,7 @@ export default function BrezCodeAvatarTraining() {
           isTraining: true,
           emotion: data.userMessage.emotion
         };
-        
+
         const avatarMessage: ChatMessage = {
           id: data.avatarMessage.id,
           role: 'avatar',
@@ -351,7 +351,7 @@ export default function BrezCodeAvatarTraining() {
 
         setMessages(prev => [...prev, userMessage, avatarMessage]);
         setCurrentMessage('');
-        
+
         toast({
           title: "Manual Message Sent",
           description: "Dr. Sakura responded to your message",
@@ -385,23 +385,23 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async ({ sessionId, customerMessage }: { sessionId: string; customerMessage?: string }) => {
       console.log('🔄 Continue conversation request:', { sessionId, customerMessage });
       const requestBody = customerMessage !== undefined ? { customerMessage } : {};
-      
+
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${sessionId}/continue`, requestBody);
       console.log('📡 Continue response status:', response.status);
-      
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error('❌ Continue conversation failed:', errorData);
         throw new Error(`Failed to continue conversation: ${response.status}`);
       }
-      
+
       const data = await response.json();
       console.log('✅ Continue conversation success:', data.success);
       return data;
     },
     onSuccess: (data) => {
       console.log('🎯 Continue conversation onSuccess:', data);
-      
+
       // Check if conversation has ended naturally
       if (data.conversationEnded) {
         toast({
@@ -410,15 +410,15 @@ export default function BrezCodeAvatarTraining() {
         });
         return;
       }
-      
+
       // Update active session with latest data
       if (data.session) {
         setActiveSession(data.session);
       }
-      
+
       const sessionMessages = data.session?.messages || [];
       const existingMessages = messages;
-      
+
       // Create map of existing message data to preserve comments and improvements
       const existingMessageData = new Map();
       existingMessages.forEach(msg => {
@@ -432,7 +432,7 @@ export default function BrezCodeAvatarTraining() {
           });
         }
       });
-      
+
       // Merge session data with preserved user interaction data
       const formattedMessages = sessionMessages.map((msg: any) => {
         const existingData = existingMessageData.get(msg.id) || {};
@@ -453,7 +453,7 @@ export default function BrezCodeAvatarTraining() {
           has_improved_response: existingData.has_improved_response || msg.has_improved_response
         };
       });
-      
+
       // Update the messages to show latest conversation including preserved data
       setMessages([
         {
@@ -464,17 +464,17 @@ export default function BrezCodeAvatarTraining() {
         },
         ...formattedMessages
       ]);
-      
+
       console.log('✅ Messages updated, total count:', formattedMessages.length + 1);
-      
+
       // Force React re-render by updating refresh key
       setRefreshKey(prev => prev + 1);
-      
+
       // Force UI refresh and scroll to bottom
       setTimeout(() => {
         scrollToBottom();
       }, 100);
-      
+
       // Refresh sessions to show updated state
       queryClient.invalidateQueries({ queryKey: ['/api/avatar-training/sessions'] });
     },
@@ -492,7 +492,7 @@ export default function BrezCodeAvatarTraining() {
   const handleMultipleChoice = useMutation({
     mutationFn: async (choice: string) => {
       if (!activeSession) throw new Error('No active session');
-      
+
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/choice`, {
         choice
       });
@@ -504,12 +504,12 @@ export default function BrezCodeAvatarTraining() {
         // Update session and messages completely
         setMessages(data.session.messages);
         setActiveSession(data.session);
-        
+
         // Force a re-render to ensure multiple choice options show up
         setTimeout(() => {
           setMessages([...data.session.messages]);
         }, 50);
-        
+
         // Scroll to bottom to show new messages
         setTimeout(() => {
           const messagesContainer = document.querySelector('.overflow-y-auto');
@@ -529,7 +529,7 @@ export default function BrezCodeAvatarTraining() {
   const submitCommentFeedback = useMutation({
     mutationFn: async ({ messageId, comment, rating }: { messageId: string; comment: string; rating: number }) => {
       if (!activeSession) throw new Error('No active session');
-      
+
       const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/comment`, {
         messageId,
         comment,
@@ -542,18 +542,18 @@ export default function BrezCodeAvatarTraining() {
       console.log('🎯 Comment feedback successful:', data);
       console.log('Has session:', !!data.session);
       console.log('Has improved_message:', !!data.improved_message);
-      
+
       // Invalidate queries to force refresh
       queryClient.invalidateQueries({ queryKey: ['/api/avatar-training/sessions'] });
-      
+
       // Update session with improved response
       if (data.session) {
         setActiveSession(data.session);
-        
+
         // Update messages from session data to get improved responses
         const sessionMessages = data.session.messages || [];
         console.log('Session messages count:', sessionMessages.length);
-        
+
         // Log improved response details
         const improvedMsg = sessionMessages.find((m: any) => m.improved_response);
         if (improvedMsg) {
@@ -564,7 +564,7 @@ export default function BrezCodeAvatarTraining() {
             userComment: improvedMsg.user_comment
           });
         }
-        
+
         // Update messages state with improved response data
         setMessages(sessionMessages.map((sessionMsg: any) => ({
           id: sessionMsg.id,
@@ -582,21 +582,21 @@ export default function BrezCodeAvatarTraining() {
           improved_message_id: sessionMsg.improved_message_id,
           has_improved_response: sessionMsg.has_improved_response
         })));
-        
+
         // Force re-render and immediate display of improved response
         setTimeout(() => {
           setMessages(prev => [...prev]);
-          
+
           // Scroll to the improved response
           const improvedResponseElement = document.getElementById(`improved-response-${improvedMsg?.id}`);
           if (improvedResponseElement) {
             improvedResponseElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 100);
-        
+
         console.log('🔄 Messages updated with improved responses:', sessionMessages.filter((m: any) => m.improved_response).length);
       }
-      
+
       // Show success notification for improved response
       if (data.session?.messages?.some((m: any) => m.improved_response)) {
         toast({
@@ -604,7 +604,7 @@ export default function BrezCodeAvatarTraining() {
           description: "Enhanced response generated based on your feedback",
         });
       }
-      
+
       // Also handle direct improved_message response
       if (data.improved_message) {
         setMessages(prev => prev.map(msg => {
@@ -620,7 +620,7 @@ export default function BrezCodeAvatarTraining() {
           }
           return msg;
         }));
-        
+
         // Scroll to the improved message
         setTimeout(() => {
           const improvedElement = document.getElementById(`improved-response-${data.improved_message.original_message_id}`);
@@ -629,7 +629,7 @@ export default function BrezCodeAvatarTraining() {
           }
         }, 100);
       }
-      
+
       toast({
         title: "✅ Dr. Sakura Learned & Improved!",
         description: data.message || "Response improved based on your feedback",
@@ -639,12 +639,12 @@ export default function BrezCodeAvatarTraining() {
 
   const handleSendMessage = () => {
     if (!currentMessage.trim() || isSending || !activeSession) return;
-    
+
     setIsSending(true);
     sendTrainingMessage.mutate(currentMessage);
     setTimeout(() => setIsSending(false), 1000);
   };
-  
+
   const handleContinueConversation = () => {
     if (!activeSession) {
       toast({
@@ -654,7 +654,7 @@ export default function BrezCodeAvatarTraining() {
       });
       return;
     }
-    
+
     // Trigger continue conversation with explicit empty customer message for auto-generation
     continueConversation.mutate({ 
       sessionId: activeSession.sessionId, 
@@ -681,7 +681,7 @@ export default function BrezCodeAvatarTraining() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800">
       <TopNavigation />
-      
+
       <div className="container mx-auto py-4 px-2 sm:py-8 sm:px-4 max-w-7xl">
         {/* BrezCode Header */}
         <div className="text-center mb-4 sm:mb-8">
@@ -855,7 +855,7 @@ export default function BrezCodeAvatarTraining() {
                         >
                           <ArrowLeft className="h-5 w-5 text-pink-600" />
                         </Button>
-                        
+
                         <Button
                           onClick={selectCurrentScenario}
                           size="lg"
@@ -863,7 +863,7 @@ export default function BrezCodeAvatarTraining() {
                         >
                           Select Scenario
                         </Button>
-                        
+
                         <Button
                           variant="outline"
                           size="lg"
@@ -1002,7 +1002,7 @@ export default function BrezCodeAvatarTraining() {
                                      : '🎯 System'}
                                 </div>
                                 <p className="text-xs sm:text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
-                                
+
                                 {/* Show user comment if exists */}
                                 {(message as any).user_comment && (
                                   <div className="mt-4 p-3 bg-pink-100 border-l-4 border-pink-300 rounded-r-lg">
@@ -1010,7 +1010,7 @@ export default function BrezCodeAvatarTraining() {
                                     <p className="text-sm text-pink-800 italic">"{(message as any).user_comment}"</p>
                                   </div>
                                 )}
-                                
+
                                 {/* Show improved response if exists */}
                                 {(message as any).improved_response && (
                                   <div id={`improved-response-${message.id}`} className="mt-4 p-4 bg-emerald-50 border-2 border-emerald-200 rounded-lg">
@@ -1028,7 +1028,7 @@ export default function BrezCodeAvatarTraining() {
                                         Quality: {(message as any).improved_quality_score}/100
                                       </div>
                                     )}
-                                    
+
                                     {/* Iterative feedback controls for improved response */}
                                     <div className="flex items-center gap-2 mt-3 pt-2 border-t border-emerald-100">
                                       <div className="flex items-center gap-1">
@@ -1077,7 +1077,7 @@ export default function BrezCodeAvatarTraining() {
                                         {messageRatings[`improved_${message.id}`]?.comment ? 'Edit' : 'Add'} Comment
                                       </Button>
                                     </div>
-                                    
+
                                     {/* Display comment on improved response */}
                                     {messageRatings[`improved_${message.id}`]?.comment && (
                                       <div className="mt-2 p-2 bg-emerald-100 rounded text-xs">
@@ -1087,7 +1087,7 @@ export default function BrezCodeAvatarTraining() {
                                     )}
                                   </div>
                                 )}
-                                
+
                                 {message.quality_score && (
                                   <div className={`text-xs mt-2 font-medium ${
                                     (message as any).improved_from_feedback ? 'text-emerald-600' : 'text-pink-600'
@@ -1100,11 +1100,11 @@ export default function BrezCodeAvatarTraining() {
                                     Emotion: {message.emotion}
                                   </div>
                                 )}
-                                
 
-                                
+
+
                                 {/* Multiple choice functionality removed for streamlined experience */}
-                                
+
                                 {/* Comment and Rating Controls - Only for Dr. Sakura responses */}
                                 {message.role === 'avatar' && message.id && (
                                   <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-2 sm:mt-3 pt-2 border-t border-pink-100">
@@ -1156,7 +1156,7 @@ export default function BrezCodeAvatarTraining() {
                                     </Button>
                                   </div>
                                 )}
-                                
+
                                 {/* Display existing comment */}
                                 {message.id && messageRatings[message.id]?.comment && (
                                   <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
@@ -1170,7 +1170,7 @@ export default function BrezCodeAvatarTraining() {
                         ))}
                         <div ref={messagesEndRef} />
                       </div>
-                      
+
                       <div className="space-y-2">
                         {/* AI-to-AI Conversation Controls */}
                         <div className="flex space-x-2">
@@ -1184,7 +1184,7 @@ export default function BrezCodeAvatarTraining() {
                             <span className="sm:hidden">Continue AI</span>
                           </Button>
                         </div>
-                        
+
                         {/* Manual Chat Input */}
                         <div className="flex space-x-2 pr-16">
                           <Input
@@ -1355,7 +1355,7 @@ export default function BrezCodeAvatarTraining() {
           </TabsContent>
         </Tabs>
       </div>
-      
+
       {/* Comment Dialog */}
       {showCommentDialog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -1397,18 +1397,18 @@ export default function BrezCodeAvatarTraining() {
                         comment: newComment.trim()
                       }
                     }));
-                    
+
                     // Get current rating for scoring
                     const currentRating = messageRatings[showCommentDialog]?.rating;
                     const rating = currentRating === 'thumbs_up' ? 5 : currentRating === 'thumbs_down' ? 1 : 3;
-                    
+
                     // Check if this is feedback on an improved response
                     if (showCommentDialog.startsWith('improved_')) {
                       // Handle iterative feedback on improved response
                       const originalMessageId = showCommentDialog.replace('improved_', '');
                       const message = messages.find(m => m.id === originalMessageId);
                       const improvedMessageId = (message as any)?.improved_message_id;
-                      
+
                       if (improvedMessageId) {
                         // Submit feedback on the improved response
                         submitCommentFeedback.mutate({
@@ -1420,10 +1420,10 @@ export default function BrezCodeAvatarTraining() {
                     } else {
                       // Handle original message feedback - showCommentDialog contains the message ID
                       const messageId = showCommentDialog;
-                      
+
                       console.log('🎯 Submitting comment for message ID:', messageId);
                       console.log('🎯 Comment text:', newComment.trim());
-                      
+
                       if (messageId) {
                         // Submit feedback for immediate learning
                         submitCommentFeedback.mutate({
@@ -1433,7 +1433,7 @@ export default function BrezCodeAvatarTraining() {
                         });
                       }
                     }
-                    
+
                     setShowCommentDialog(null);
                     setNewComment('');
                   }
