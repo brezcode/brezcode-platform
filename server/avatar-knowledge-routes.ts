@@ -45,11 +45,48 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
       
       // Extract text content based on file type
       let textContent = '';
-      if (file.mimetype === 'text/plain' || file.mimetype === 'text/csv' || file.mimetype === 'application/json') {
-        textContent = file.buffer.toString('utf-8');
-      } else {
-        // For now, handle other file types as text (can be enhanced with proper parsers)
-        textContent = file.buffer.toString('utf-8');
+      
+      try {
+        if (file.mimetype === 'text/plain' || file.mimetype === 'text/csv' || file.mimetype === 'application/json') {
+          textContent = file.buffer.toString('utf-8');
+        } else if (file.mimetype === 'application/pdf') {
+          // Enhanced PDF parsing
+          try {
+            const pdfParse = await import('pdf-parse');
+            const pdfData = await pdfParse.default(file.buffer);
+            textContent = pdfData.text;
+            console.log(`📄 Extracted ${pdfData.text.length} characters from PDF`);
+          } catch (pdfError) {
+            console.warn('PDF parsing failed, using fallback:', pdfError);
+            textContent = file.buffer.toString('utf-8');
+          }
+        } else if (file.mimetype.includes('word') || file.mimetype.includes('document')) {
+          // For Word documents, try basic text extraction (can be enhanced later)
+          textContent = file.buffer.toString('utf-8').replace(/[^\x20-\x7E\n\r\t]/g, ' ');
+        } else {
+          // Fallback for other file types
+          textContent = file.buffer.toString('utf-8');
+        }
+        
+        // Clean up extracted text
+        textContent = textContent
+          .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
+          .replace(/\n\s*\n/g, '\n')  // Replace multiple newlines
+          .trim();
+          
+        console.log(`📝 Extracted ${textContent.length} characters from ${file.originalname}`);
+        
+      } catch (extractionError) {
+        console.error('Text extraction error:', extractionError);
+        textContent = `Content extraction failed for ${file.originalname}. File type: ${file.mimetype}`;
+      }
+      
+      // Validate content was extracted successfully
+      if (!textContent || textContent.length < 10) {
+        return res.status(400).json({ 
+          error: 'Could not extract meaningful content from file',
+          details: 'File appears to be empty or in an unsupported format'
+        });
       }
       
       // Create document record
@@ -65,7 +102,9 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
         metadata: {
           uploadedBy: 'user',
           originalFilename: file.originalname,
-          mimeType: file.mimetype
+          mimeType: file.mimetype,
+          contentLength: textContent.length,
+          extractedAt: new Date().toISOString()
         }
       });
       
