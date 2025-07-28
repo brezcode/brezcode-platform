@@ -170,8 +170,8 @@ export default function BrezCodeAvatarTraining() {
       const response = await apiRequest('GET', '/api/avatar-training/sessions');
       if (!response.ok) throw new Error('Failed to fetch training sessions');
       return response.json();
-    },
-    refetchInterval: 2000 // Refresh every 2 seconds to show new messages
+    }
+    // Removed excessive polling - will update manually when needed
   });
 
   const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
