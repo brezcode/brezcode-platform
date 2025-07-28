@@ -199,10 +199,10 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     console.log('   Request body:', JSON.stringify(req.body, null, 2));
     console.log('   Customer message:', customerMessage);
 
-    // Get session from database instead of in-memory storage
+    // Get session from database-backed service
     const session = await AvatarTrainingSessionService.getSession(sessionId);
     if (!session) {
-      console.error('❌ Session not found:', { sessionId, type: typeof sessionId });
+      console.error('❌ Session not found in database:', { sessionId, type: typeof sessionId });
       return res.status(404).json({ 
         error: 'Session not found',
         sessionId: sessionId,
@@ -308,83 +308,42 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       multiple_choice_options: multipleChoiceOptions
     };
 
-    // Messages are now persisted in database via AvatarTrainingSessionService
+    // Get the updated session from database
     const finalSession = await AvatarTrainingSessionService.getSession(sessionId);
     const sessionMessages = Array.isArray(finalSession?.conversationHistory) ? finalSession.conversationHistory : [];
 
-    // 💾 CONVERSATIONS ALREADY STORED VIA AVATAR TRAINING SESSION SERVICE
-    try {
-      // Legacy conversation storage service integration maintained for compatibility
-      const userId = 1;
+    console.log('💾 Messages persisted in database via AvatarTrainingSessionService');
 
-      // Store customer message in legacy system
-      const customerMessageId = `msg_${Date.now()}_customer`;
-      await conversationStorageService.storeConversationMessage({
-        userId,
-        sessionId: sessionId,
-        messageId: customerMessageId,
-        role: 'customer',
-        content: customerQuestion,
-        emotion: customerEmotion,
-        avatarId: finalSession?.avatarId || 'dr_sakura',
-        scenarioId: finalSession?.scenarioId,
-        businessContext: finalSession?.businessContext || 'health_coaching',
-        conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
-      });
-
-      // Store avatar message in legacy system
-      const avatarMessageId = `msg_${Date.now()}_avatar`;
-      await conversationStorageService.storeConversationMessage({
-        userId,
-        sessionId: sessionId,
-        messageId: avatarMessageId,
-        role: 'avatar',
-        content: aiResponse.content,
-        qualityScore: aiResponse.qualityScore,
-        avatarId: finalSession?.avatarId || 'dr_sakura',
-        scenarioId: finalSession?.scenarioId,
-        businessContext: finalSession?.businessContext || 'health_coaching',
-        conversationContext: { sessionType: 'ai_continue', totalMessages: sessionMessages.length }
-      });
-
-      // Extract and store knowledge from both messages
-      const customerConversationId = (await conversationStorageService.getUserConversations(userId, 1))[0]?.id;
-      if (customerConversationId) {
-        await conversationStorageService.extractKnowledgeFromConversation(
-          userId,
-          customerConversationId,
-          session.id,
-          newCustomerMessage.content,
-          'customer',
-          { avatarType: session.avatarType, scenario: session.scenario }
-        );
-
-        await conversationStorageService.extractKnowledgeFromConversation(
-          userId,
-          customerConversationId,
-          session.id,
-          newAvatarMessage.content,
-          'avatar',
-          { quality_score: newAvatarMessage.quality_score, avatarType: session.avatarType }
-        );
+    // Format session response to match frontend expectations
+    const sessionResponse = {
+      id: finalSession?.sessionId,
+      sessionId: finalSession?.sessionId,
+      avatarId: finalSession?.avatarId,
+      avatarType: finalSession?.avatarType,
+      scenarioId: finalSession?.scenarioId,
+      businessType: finalSession?.businessContext,
+      businessContext: finalSession?.businessContext,
+      status: finalSession?.status,
+      startTime: finalSession?.startedAt?.toISOString(),
+      messages: sessionMessages.map(msg => ({
+        id: msg.messageId || `msg_${msg.sequenceNumber}`,
+        role: msg.role,
+        content: msg.content,
+        timestamp: msg.timestamp || msg.createdAt,
+        emotion: msg.emotion,
+        quality_score: msg.qualityScore
+      })),
+      performance_metrics: {
+        response_quality: Math.floor(Math.random() * 20) + 80,
+        customer_satisfaction: Math.floor(Math.random() * 15) + 75,
+        goal_achievement: Math.floor(Math.random() * 20) + 70,
+        conversation_flow: Math.floor(Math.random() * 15) + 80
       }
-
-      console.log('💾 Conversations stored in database & knowledge base updated');
-    } catch (storageError) {
-      console.error('❌ Failed to store conversation:', storageError);
-    }
-
-    // Update performance metrics
-    session.performance_metrics = {
-      response_quality: Math.floor(Math.random() * 20) + 80,
-      customer_satisfaction: Math.floor(Math.random() * 15) + 75,
-      goal_achievement: Math.floor(Math.random() * 20) + 70,
-      conversation_flow: Math.floor(Math.random() * 15) + 80
     };
 
     res.json({
       success: true,
-      session: session
+      session: sessionResponse
     });
   } catch (error: any) {
     res.status(500).json({ error: error.message });
