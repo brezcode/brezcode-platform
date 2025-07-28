@@ -207,14 +207,15 @@ export class AvatarTrainingSessionService {
       // Get all training memory for this avatar
       const allTrainingMemory = await this.getAllTrainingMemoryForAvatar(session.avatarId, session.userId);
 
-      // Use Claude with full session context, customer message, scenario context, and training memory
+      // Use Claude with full session context, customer message, scenario context, training memory, and knowledge base
       const response = await ClaudeAvatarService.generateAvatarResponse(
         session.avatarType,
         customerMessage,
         conversationHistory,
         session.businessContext,
         scenarioData,
-        allTrainingMemory // Pass complete training history
+        allTrainingMemory, // Pass complete training history
+        session.avatarId // Pass avatar ID for knowledge base search
       );
 
       const responseTime = Date.now() - startTime;

@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { AvatarKnowledgeService } from './avatarKnowledgeService';
 
 /*
 <important_code_snippet_instructions>
@@ -205,7 +206,8 @@ Generate an improved response that directly addresses the customer's feedback wh
     conversationHistory: any[] = [],
     businessContext: string = 'general',
     scenarioData?: any,
-    allTrainingMemory: any[] = [] // NEW: Complete training history from all sessions
+    allTrainingMemory: any[] = [], // Complete training history from all sessions
+    avatarId?: string // NEW: Avatar ID for knowledge base search
   ): Promise<{ content: string; quality_score: number }> {
     
     const avatarPersonality = this.getAvatarPersonality(avatarType);
@@ -217,6 +219,27 @@ Generate an improved response that directly addresses the customer's feedback wh
     
     // Build training memory context from all previous sessions
     const trainingMemoryContext = this.buildTrainingMemoryContext(allTrainingMemory);
+    
+    // 🧠 NEW: Search knowledge base for relevant information
+    let knowledgeContext = '';
+    if (avatarId) {
+      try {
+        console.log(`🔍 Searching knowledge base for avatar ${avatarId} with query: "${customerMessage}"`);
+        const knowledgeChunks = await AvatarKnowledgeService.searchKnowledge(avatarId, customerMessage);
+        
+        if (knowledgeChunks.length > 0) {
+          knowledgeContext = '\n\nKNOWLEDGE BASE INFORMATION:\n' + 
+            knowledgeChunks.map((chunk, index) => 
+              `${index + 1}. ${chunk.chunkContent}`
+            ).join('\n\n');
+          console.log(`✅ Found ${knowledgeChunks.length} relevant knowledge chunks to use in response`);
+        } else {
+          console.log(`📝 No specific knowledge found for query: "${customerMessage}"`);
+        }
+      } catch (error) {
+        console.error('Error searching knowledge base:', error);
+      }
+    }
     
     // Build conversation context with anti-repetition logic
     const recentMessages = conversationHistory.slice(-6); // Use last 6 messages for context
@@ -241,6 +264,10 @@ TRAINING MEMORY - KNOWLEDGE FROM ALL PREVIOUS SESSIONS:
 ${trainingMemoryContext}
 
 REMEMBER: You are responding to ${patientName} with their unique background and concerns. Apply all knowledge from your training experience.` : ''}
+
+${knowledgeContext ? `${knowledgeContext}
+
+IMPORTANT: Use the knowledge base information above to provide accurate, detailed responses. Reference specific information from your knowledge base when relevant to the customer's question.` : ''}
 
 ${hasPreivousConversation ? `
 IMPORTANT: Avoid repetitive responses. Here are your previous responses in this conversation:

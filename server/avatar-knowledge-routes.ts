@@ -50,18 +50,33 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
         if (file.mimetype === 'text/plain' || file.mimetype === 'text/csv' || file.mimetype === 'application/json') {
           textContent = file.buffer.toString('utf-8');
         } else if (file.mimetype === 'application/pdf') {
-          // Enhanced PDF parsing
+          // Enhanced PDF parsing with better error handling
           try {
             const pdfParse = await import('pdf-parse');
             const pdfData = await pdfParse.default(file.buffer);
             textContent = pdfData.text;
-            console.log(`📄 Extracted ${pdfData.text.length} characters from PDF`);
+            console.log(`📄 Extracted ${pdfData.text.length} characters from PDF using pdf-parse`);
+            
+            // Validate that we got meaningful text content
+            if (!textContent || textContent.length < 50 || textContent.includes('%PDF-') || textContent.includes('endobj')) {
+              throw new Error('PDF extraction returned invalid content');
+            }
           } catch (pdfError) {
-            console.warn('PDF parsing failed, using fallback text extraction');
-            // Clean fallback extraction for PDFs
-            textContent = file.buffer.toString('utf-8')
-              .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // Remove control chars
-              .replace(/[^\x20-\x7E\n\r\t\u00A0-\uFFFF]/g, ' '); // Keep only valid chars
+            console.warn('PDF parsing failed, creating fallback content');
+            // For unsupported PDFs, create informative placeholder
+            textContent = `This is a PDF document named "${file.originalname}" that contains important information. 
+            The document appears to contain detailed content but the text extraction is not currently supported for this PDF format. 
+            Please consider converting the PDF to a text file (.txt) or Word document (.docx) for better knowledge extraction.
+            
+            Document details:
+            - Filename: ${file.originalname}
+            - File size: ${(file.size / 1024).toFixed(1)} KB
+            - Upload date: ${new Date().toISOString()}
+            
+            To use this document effectively, please:
+            1. Convert to a text-based format
+            2. Copy key content into a text file
+            3. Upload individual sections as separate documents`;
           }
         } else if (file.mimetype.includes('word') || file.mimetype.includes('document')) {
           // For Word documents, try basic text extraction with proper encoding

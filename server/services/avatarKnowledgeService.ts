@@ -84,23 +84,71 @@ export class AvatarKnowledgeService {
     return documents;
   }
   
-  // Search knowledge base for avatar
+  // Search knowledge base for avatar with improved keyword matching
   static async searchKnowledge(avatarId: string, query: string): Promise<AvatarKnowledgeChunk[]> {
     console.log(`🔍 Searching knowledge for ${avatarId}: "${query}"`);
     
-    // Simple text search - can be enhanced with vector search later
-    const chunks = await db.select()
+    // Get all chunks for this avatar
+    const allChunks = await db.select()
       .from(avatarKnowledgeChunks)
-      .where(
-        and(
-          eq(avatarKnowledgeChunks.avatarId, avatarId),
-          like(avatarKnowledgeChunks.chunkContent, `%${query}%`)
-        )
-      )
-      .limit(10);
+      .where(eq(avatarKnowledgeChunks.avatarId, avatarId));
     
-    console.log(`✅ Found ${chunks.length} relevant knowledge chunks`);
-    return chunks;
+    console.log(`📚 Total chunks available: ${allChunks.length}`);
+    
+    if (allChunks.length === 0) {
+      console.log(`❌ No knowledge chunks found for avatar: ${avatarId}`);
+      return [];
+    }
+    
+    // Extract search terms (words longer than 2 characters)
+    const searchTerms = query.toLowerCase()
+      .split(/\s+/)
+      .filter(term => term.length > 2)
+      .map(term => term.replace(/[^\w]/g, ''));
+    
+    console.log(`🎯 Search terms: [${searchTerms.join(', ')}]`);
+    
+    if (searchTerms.length === 0) {
+      // If no valid search terms, return some chunks anyway
+      console.log(`📝 No specific search terms, returning sample chunks`);
+      return allChunks.slice(0, 3);
+    }
+    
+    // Score chunks based on keyword matches
+    const scoredChunks = allChunks.map(chunk => {
+      const content = chunk.chunkContent.toLowerCase();
+      let score = 0;
+      
+      searchTerms.forEach(term => {
+        // Count exact matches
+        const matches = (content.match(new RegExp(term, 'g')) || []).length;
+        score += matches * 10;
+        
+        // Bonus for partial matches
+        if (content.includes(term)) {
+          score += 5;
+        }
+      });
+      
+      return { chunk, score };
+    });
+    
+    // Filter and sort by relevance
+    const relevantChunks = scoredChunks
+      .filter(item => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map(item => item.chunk);
+    
+    console.log(`✅ Found ${relevantChunks.length} relevant knowledge chunks with keyword matches`);
+    
+    // If no matches found, return some chunks anyway to provide context
+    if (relevantChunks.length === 0) {
+      console.log(`📝 No keyword matches, returning first 3 chunks for general context`);
+      return allChunks.slice(0, 3);
+    }
+    
+    return relevantChunks;
   }
   
   // Delete document and its chunks
