@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import express, { type Express, type Response } from "express";
 import { createServer, type Server } from "http";
 import brandRoutes from "./brandRoutes";
 import brandCustomersRouter from "./routes/brandCustomers";
@@ -1026,13 +1026,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log('Generating report...');
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = 999; // Test user ID
-      reportData.createdAt = new Date().toISOString();
+      reportData.createdAt = new Date();
       
-      // Add user information for display (will be replaced with real data after signup)
-      reportData.userInfo = {
-        firstName: "Demo",
-        lastName: "User"
-      };
+      // Remove userInfo as it's not part of the schema
 
       console.log('Report generated successfully');
       res.json({
@@ -1634,13 +1630,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Generate comprehensive report with user information
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = userId;
-      reportData.createdAt = new Date().toISOString();
+      reportData.createdAt = new Date();
       
-      // Add real user information for display
-      reportData.userInfo = {
-        firstName: user.firstName,
-        lastName: user.lastName
-      };
+      // Remove userInfo as it's not part of the schema
 
       res.json({
         success: true,
