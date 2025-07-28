@@ -193,16 +193,28 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     const { sessionId } = req.params;
     const { customerMessage } = req.body;
 
-    console.log('🔍 API Request Debug:');
+    console.log('🔍 API Continue Request:');
+    console.log('   Session ID from params:', sessionId);
+    console.log('   Session ID type:', typeof sessionId);
     console.log('   Request body:', JSON.stringify(req.body, null, 2));
-    console.log('   Session ID:', sessionId);
-    console.log('   Extracted customerMessage:', customerMessage);
+    console.log('   Customer message:', customerMessage);
 
     // Get session from database instead of in-memory storage
     const session = await AvatarTrainingSessionService.getSession(sessionId);
     if (!session) {
-      return res.status(404).json({ error: 'Session not found' });
+      console.error('❌ Session not found:', { sessionId, type: typeof sessionId });
+      return res.status(404).json({ 
+        error: 'Session not found',
+        sessionId: sessionId,
+        details: `No session found with ID: ${sessionId}`
+      });
     }
+    
+    console.log('✅ Session found:', {
+      id: session.id,
+      sessionId: session.sessionId,
+      status: session.status
+    });
 
     // Handle automatic conversation continuation when no customer message provided
     let customerQuestion: string;

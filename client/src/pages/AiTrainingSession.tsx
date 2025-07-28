@@ -51,16 +51,26 @@ interface TrainingSession {
 }
 
 export function AiTrainingSession() {
-  const params = useParams<{ sessionId: string }>();
-  const sessionId = params.sessionId;
+  const { sessionId } = useParams<{ sessionId: string }>();
   
-  // Debug sessionId extraction
+  // Debug sessionId extraction - ensure it's never undefined
   console.log('🔍 Component Debug:', {
-    params,
     sessionId,
     sessionIdType: typeof sessionId,
+    sessionIdDefined: sessionId !== undefined,
     sessionIdValue: sessionId
   });
+  
+  // Early return if no sessionId
+  if (!sessionId) {
+    return <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <AlertCircle className="w-8 h-8 text-red-500 mx-auto mb-2" />
+        <p>Session ID not found in URL</p>
+        <Button onClick={() => window.history.back()}>Go Back</Button>
+      </div>
+    </div>;
+  }
   
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
@@ -105,25 +115,25 @@ export function AiTrainingSession() {
   // Send message mutation - use continue endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
+      const currentSessionId = sessionId; // Capture sessionId in closure
+      
       console.log('🔍 SessionId Debug:', {
-        sessionId,
-        type: typeof sessionId,
-        urlParams: useParams(),
+        currentSessionId,
+        type: typeof currentSessionId,
         messageData
       });
       
-      if (!sessionId) {
-        console.error('❌ No session ID available:', { sessionId });
+      if (!currentSessionId) {
+        console.error('❌ No session ID available:', { currentSessionId });
         throw new Error('No session ID available');
       }
       
       console.log('🔄 Continue conversation request:', {
-        sessionId: sessionId,
-        customerMessage: messageData.message,
-        urlSessionId: sessionId
+        sessionId: currentSessionId,
+        customerMessage: messageData.message
       });
       
-      const response = await fetch(`/api/avatar-training/sessions/${sessionId}/continue`, {
+      const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -155,6 +165,7 @@ export function AiTrainingSession() {
   // Add feedback mutation
   const addFeedbackMutation = useMutation({
     mutationFn: async ({ dialogueId, feedback }: { dialogueId: number; feedback: any }) => {
+      if (!sessionId) throw new Error('Session ID not available');
       const response = await fetch(`/api/avatar-training/sessions/${sessionId}/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -179,6 +190,7 @@ export function AiTrainingSession() {
   // Complete session mutation
   const completeSessionMutation = useMutation({
     mutationFn: async () => {
+      if (!sessionId) throw new Error('Session ID not available');
       const response = await fetch(`/api/avatar-training/sessions/${sessionId}/complete`, {
         method: 'POST',
         credentials: 'include'
