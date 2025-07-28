@@ -57,19 +57,28 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
             textContent = pdfData.text;
             console.log(`📄 Extracted ${pdfData.text.length} characters from PDF`);
           } catch (pdfError) {
-            console.warn('PDF parsing failed, using fallback:', pdfError);
-            textContent = file.buffer.toString('utf-8');
+            console.warn('PDF parsing failed, using fallback text extraction');
+            // Clean fallback extraction for PDFs
+            textContent = file.buffer.toString('utf-8')
+              .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // Remove control chars
+              .replace(/[^\x20-\x7E\n\r\t\u00A0-\uFFFF]/g, ' '); // Keep only valid chars
           }
         } else if (file.mimetype.includes('word') || file.mimetype.includes('document')) {
-          // For Word documents, try basic text extraction (can be enhanced later)
-          textContent = file.buffer.toString('utf-8').replace(/[^\x20-\x7E\n\r\t]/g, ' ');
+          // For Word documents, try basic text extraction with proper encoding
+          textContent = file.buffer.toString('utf-8')
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // Remove control chars
+            .replace(/[^\x20-\x7E\n\r\t\u00A0-\uFFFF]/g, ' ');
         } else {
-          // Fallback for other file types
-          textContent = file.buffer.toString('utf-8');
+          // Fallback for other file types with encoding cleanup
+          textContent = file.buffer.toString('utf-8')
+            .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // Remove control chars
+            .replace(/[^\x20-\x7E\n\r\t\u00A0-\uFFFF]/g, ' ');
         }
         
-        // Clean up extracted text
+        // Clean up extracted text and remove invalid UTF-8 characters
         textContent = textContent
+          .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')  // Remove control characters
+          .replace(/[^\x20-\x7E\n\r\t\u00A0-\uFFFF]/g, ' ')  // Replace non-printable chars
           .replace(/\s+/g, ' ')  // Replace multiple spaces with single space
           .replace(/\n\s*\n/g, '\n')  // Replace multiple newlines
           .trim();
@@ -78,8 +87,11 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
         
       } catch (extractionError) {
         console.error('Text extraction error:', extractionError);
-        textContent = `Content extraction failed for ${file.originalname}. File type: ${file.mimetype}`;
+        textContent = `Content extraction failed for ${file.originalname}. File type: ${file.mimetype}. Please try uploading a text file or a simpler PDF.`;
       }
+      
+      // Final cleanup to ensure valid UTF-8
+      textContent = Buffer.from(textContent, 'utf-8').toString('utf-8');
       
       // Validate content was extracted successfully
       if (!textContent || textContent.length < 10) {
