@@ -196,13 +196,14 @@ Generate an improved response that directly addresses the customer's feedback wh
     return (personalities as any)[avatarType] || personalities['dr_sakura'];
   }
 
-  // Complete implementation of generateAvatarResponse with anti-repetition logic and scenario context
+  // Complete implementation of generateAvatarResponse with comprehensive training memory
   static async generateAvatarResponse(
     avatarType: string,
     customerMessage: string,
     conversationHistory: any[] = [],
     businessContext: string = 'general',
-    scenarioData?: any
+    scenarioData?: any,
+    allTrainingMemory: any[] = [] // NEW: Complete training history from all sessions
   ): Promise<{ content: string; quality_score: number }> {
     
     const avatarPersonality = this.getAvatarPersonality(avatarType);
@@ -210,6 +211,10 @@ Generate an improved response that directly addresses the customer's feedback wh
     // Extract scenario context and patient persona for Dr. Sakura responses
     const scenarioContext = scenarioData?.name || '';
     const patientPersona = scenarioData?.customerPersona || null;
+    const patientName = this.extractPatientName(patientPersona || '', scenarioData);
+    
+    // Build training memory context from all previous sessions
+    const trainingMemoryContext = this.buildTrainingMemoryContext(allTrainingMemory);
     
     // Build conversation context with anti-repetition logic
     const recentMessages = conversationHistory.slice(-6); // Use last 6 messages for context
@@ -228,8 +233,12 @@ Business Context: ${businessContext}
 ${scenarioContext ? `TRAINING SCENARIO: "${scenarioContext}"` : ''}
 
 ${patientPersona ? `PATIENT PROFILE YOU'RE HELPING: ${patientPersona}
+PATIENT NAME: ${patientName}
 
-REMEMBER: You are responding to this specific patient with their unique background and concerns.` : ''}
+TRAINING MEMORY - KNOWLEDGE FROM ALL PREVIOUS SESSIONS:
+${trainingMemoryContext}
+
+REMEMBER: You are responding to ${patientName} with their unique background and concerns. Apply all knowledge from your training experience.` : ''}
 
 ${hasPreivousConversation ? `
 IMPORTANT: Avoid repetitive responses. Here are your previous responses in this conversation:
@@ -271,5 +280,106 @@ Keep responses focused and practical, typically 150-300 words.`
       console.error('Claude avatar response error:', error);
       throw new Error(`Failed to generate avatar response: ${error.message}`);
     }
+  }
+
+  // Extract patient name from persona or scenario data
+  private static extractPatientName(customerPersona: string, scenarioData: any): string {
+    // Try to extract name from persona string
+    const nameMatch = customerPersona.match(/^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/);
+    if (nameMatch) return nameMatch[1];
+    
+    // Try to extract from scenario data
+    if (scenarioData?.patientName) return scenarioData.patientName;
+    
+    // Default fallbacks based on common patterns
+    if (customerPersona.includes('42') || customerPersona.includes('Maria')) return 'Maria Santos';
+    if (customerPersona.includes('35') || customerPersona.includes('Sarah')) return 'Sarah Johnson';
+    if (customerPersona.includes('28') || customerPersona.includes('Emily')) return 'Emily Chen';
+    
+    return 'Patient'; // Generic fallback
+  }
+
+  // Build comprehensive training memory context from all sessions
+  private static buildTrainingMemoryContext(allTrainingMemory: any[]): string {
+    if (!allTrainingMemory || allTrainingMemory.length === 0) {
+      return "This is your first training session. Apply your medical knowledge and empathetic communication skills.";
+    }
+
+    const memoryContext = [];
+    
+    // Summarize key insights from previous sessions
+    const totalSessions = allTrainingMemory.length;
+    const avgQuality = allTrainingMemory.reduce((sum, session) => 
+      sum + (session.performanceMetrics?.average_quality || 0), 0) / totalSessions;
+    
+    memoryContext.push(`TRAINING EXPERIENCE: ${totalSessions} completed sessions (avg quality: ${avgQuality.toFixed(1)}/100)`);
+    
+    // Extract key scenarios practiced
+    const scenarioNames = allTrainingMemory.map(session => session.scenarioName);
+    const uniqueScenarios = scenarioNames.filter((name, index) => scenarioNames.indexOf(name) === index);
+    memoryContext.push(`SCENARIOS PRACTICED: ${uniqueScenarios.join(', ')}`);
+    
+    // Extract key learning points
+    const learningPoints = allTrainingMemory.flatMap(session => 
+      session.learningPoints || []
+    ).slice(0, 5); // Top 5 most recent
+    
+    if (learningPoints.length > 0) {
+      memoryContext.push(`KEY LEARNING POINTS FROM TRAINING:`);
+      learningPoints.forEach((point, index) => {
+        memoryContext.push(`${index + 1}. ${point.title}: ${point.summary || point.content}`);
+      });
+    }
+    
+    // Extract common patient concerns handled
+    const commonConcerns = allTrainingMemory.flatMap(session => 
+      session.currentContext?.topics_covered || []
+    ).slice(0, 3);
+    
+    if (commonConcerns.length > 0) {
+      memoryContext.push(`COMMON PATIENT CONCERNS HANDLED: ${commonConcerns.join(', ')}`);
+    }
+    
+    return memoryContext.join('\n');
+  }
+
+  // Enhanced quality score calculation including training memory application
+  private static calculateQualityScore(
+    responseText: string, 
+    customerMessage: string, 
+    conversationHistory: any[], 
+    allTrainingMemory: any[] = []
+  ): number {
+    let score = 70; // Base score
+
+    // Length and detail check
+    if (responseText.length > 100) score += 10;
+    if (responseText.length > 200) score += 5;
+
+    // Empathy and professionalism indicators
+    const empathyWords = ['understand', 'concerns', 'help', 'support', 'important', 'care'];
+    const empathyCount = empathyWords.filter(word => 
+      responseText.toLowerCase().includes(word)
+    ).length;
+    score += Math.min(empathyCount * 3, 15);
+
+    // Medical accuracy and specificity for Dr. Sakura
+    const medicalTerms = ['screening', 'mammogram', 'examination', 'health', 'medical', 'symptoms'];
+    const medicalCount = medicalTerms.filter(term => 
+      responseText.toLowerCase().includes(term)
+    ).length;
+    score += Math.min(medicalCount * 2, 10);
+
+    // Training memory application bonus
+    if (allTrainingMemory && allTrainingMemory.length > 0) {
+      score += 5; // Bonus for using training memory
+    }
+
+    // Conversation context awareness
+    if (conversationHistory.length > 0) {
+      score += 5; // Bonus for conversation continuity
+    }
+
+    return Math.min(score, 100);
   }
 }

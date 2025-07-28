@@ -14,6 +14,25 @@ app.get('/direct-api/test', (req, res) => {
 });
 
 // CRITICAL FIX: Direct avatar training routes to bypass Vite conflicts
+// Get all scenarios endpoint
+app.get('/api/avatar-training/scenarios', async (req, res) => {
+  try {
+    console.log('🔍 DIRECT: Fetching all training scenarios');
+    
+    const { TRAINING_SCENARIOS } = await import('./avatarTrainingScenarios');
+    console.log(`✅ DIRECT: Found ${TRAINING_SCENARIOS.length} scenarios`);
+    
+    res.json({
+      success: true,
+      scenarios: TRAINING_SCENARIOS
+    });
+  } catch (error: any) {
+    console.error('❌ DIRECT: Error fetching scenarios:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get single scenario endpoint
 app.get('/api/avatar-training/scenarios/:scenarioId', async (req, res) => {
   try {
     const { scenarioId } = req.params;
@@ -388,6 +407,16 @@ app.use((req, res, next) => {
   // app.use('/api/avatar-training', avatarKnowledgeRoutes);
   // registerBusinessAvatarRoutes(app);
   // registerKnowledgeUploadRoutes(app);
+
+  // Register avatar performance routes for completed session display
+  try {
+    console.log('🎯 Registering avatar performance routes...');
+    const { registerAvatarPerformanceRoutes } = await import('./avatar-performance-routes');
+    registerAvatarPerformanceRoutes(app);
+    console.log('✅ Avatar performance routes registered successfully');
+  } catch (error) {
+    console.error('❌ Error registering performance routes:', error);
+  }
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

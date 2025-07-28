@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/queryClient';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 import TopNavigation from "@/components/TopNavigation";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -645,6 +645,69 @@ export default function BrezCodeAvatarTraining() {
     setTimeout(() => setIsSending(false), 1000);
   };
 
+  // Complete session mutation for performance tracking
+  const completeSession = useMutation({
+    mutationFn: async (sessionId: string) => {
+      console.log('🏁 Completing training session:', sessionId);
+      const response = await apiRequest('POST', `/api/performance/complete-session/${sessionId}`, {});
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ Complete session failed:', errorData);
+        throw new Error(`Failed to complete session: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ Session completed successfully:', data);
+      return data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "🎯 Training Session Completed!",
+        description: "Session saved to your performance history. View your progress in the Performance tab.",
+      });
+      
+      // Reset the active session to return to scenario selection
+      setActiveSession(null);
+      setMessages([]);
+      setCurrentMessage('');
+      
+      // Invalidate performance queries to refresh the data
+      queryClient.invalidateQueries({ queryKey: ['/api/performance/completed-sessions'] });
+    },
+    onError: (error) => {
+      console.error('❌ Complete session error:', error);
+      toast({
+        title: "Error Completing Session",
+        description: "Failed to save session. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
+  const handleCompleteSession = () => {
+    if (!activeSession) {
+      toast({
+        title: "No Active Session",
+        description: "Please start a training session first",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const sessionId = activeSession.sessionId || activeSession.id;
+    if (!sessionId) {
+      toast({
+        title: "Session ID Missing",
+        description: "Invalid session data. Cannot complete session.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    completeSession.mutate(sessionId);
+  };
+
   const handleContinueConversation = () => {
     if (!activeSession) {
       toast({
@@ -1252,6 +1315,26 @@ export default function BrezCodeAvatarTraining() {
                             <span className="hidden sm:inline">Continue AI Conversation</span>
                             <span className="sm:hidden">Continue AI</span>
                           </Button>
+                          
+                          <Button 
+                            onClick={handleCompleteSession}
+                            disabled={completeSession.isPending}
+                            className="bg-green-600 hover:bg-green-700 text-xs sm:text-sm py-2 px-3 sm:px-4"
+                          >
+                            <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                            {completeSession.isPending ? (
+                              <>
+                                <RefreshCw className="h-3 w-3 sm:h-4 sm:w-4 mr-1 animate-spin" />
+                                <span className="hidden sm:inline">Completing...</span>
+                                <span className="sm:hidden">Done...</span>
+                              </>
+                            ) : (
+                              <>
+                                <span className="hidden sm:inline">Complete Session</span>
+                                <span className="sm:hidden">Complete</span>
+                              </>
+                            )}
+                          </Button>
                         </div>
 
                         {/* Manual Chat Input */}
@@ -1516,12 +1599,28 @@ export default function BrezCodeAvatarTraining() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Recent BrezCode Training Sessions</CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Recent BrezCode Training Sessions</CardTitle>
+                  <Link href="/performance">
+                    <Button variant="outline" size="sm">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      View Full Performance
+                    </Button>
+                  </Link>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-center py-8 text-gray-500">
                   <Heart className="w-12 h-12 mx-auto mb-3 text-pink-400" />
-                  <p>No training sessions completed yet. Start your first BrezCode training session!</p>
+                  <p>Complete training sessions to track your progress!</p>
+                  <div className="mt-4">
+                    <Link href="/performance">
+                      <Button className="bg-pink-600 hover:bg-pink-700">
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Performance History
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </CardContent>
             </Card>

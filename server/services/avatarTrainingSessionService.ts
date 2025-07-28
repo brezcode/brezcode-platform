@@ -164,7 +164,7 @@ export class AvatarTrainingSessionService {
       last_message_time: newMessage.createdAt,
       topics_covered: [
         ...((currentContext as any).topics_covered || []),
-        ...(newMessage.topicsDiscussed || [])
+        ...(Array.isArray(newMessage.topicsDiscussed) ? newMessage.topicsDiscussed : [])
       ].filter((topic, index, arr) => arr.indexOf(topic) === index), // Remove duplicates
       message_count: newMessage.sequenceNumber
     };
@@ -204,13 +204,17 @@ export class AvatarTrainingSessionService {
       // Fetch scenario data for context
       const scenarioData = await this.getScenarioById(session.scenarioId);
       
-      // Use Claude with full session context, customer message, and scenario context
+      // Get all training memory for this avatar
+      const allTrainingMemory = await this.getAllTrainingMemoryForAvatar(session.avatarId, session.userId);
+
+      // Use Claude with full session context, customer message, scenario context, and training memory
       const response = await ClaudeAvatarService.generateAvatarResponse(
         session.avatarType,
         customerMessage,
         conversationHistory,
         session.businessContext,
-        scenarioData
+        scenarioData,
+        allTrainingMemory // Pass complete training history
       );
 
       const responseTime = Date.now() - startTime;
@@ -288,7 +292,9 @@ export class AvatarTrainingSessionService {
     console.log(`✅ AI Continue conversation completed for session ${sessionId}`);
 
     // Return updated session
-    return this.getSession(sessionId);
+    const updatedSession = await this.getSession(sessionId);
+    if (!updatedSession) throw new Error('Failed to retrieve updated session');
+    return updatedSession;
   }
 
   // Complete training session with summary
@@ -398,5 +404,91 @@ export class AvatarTrainingSessionService {
     });
 
     return topics;
+  }
+
+  // Get all training memory for a specific avatar and user (for memory integration)
+  static async getAllTrainingMemoryForAvatar(avatarId: string, userId: number): Promise<any[]> {
+    try {
+      const sessions = await db
+        .select()
+        .from(avatarTrainingSessions)
+        .where(and(
+          eq(avatarTrainingSessions.avatarId, avatarId),
+          eq(avatarTrainingSessions.userId, userId),
+          eq(avatarTrainingSessions.status, 'completed')
+        ))
+        .orderBy(desc(avatarTrainingSessions.completedAt));
+
+      console.log(`🧠 Retrieved ${sessions.length} completed training sessions for avatar ${avatarId}`);
+      return sessions;
+    } catch (error) {
+      console.error('Error retrieving training memory:', error);
+      return [];
+    }
+  }
+
+  // Get completed sessions for Performance page display
+  static async getCompletedSessionsForPerformance(userId: number, businessContext: string = 'brezcode'): Promise<{
+    sessionId: string;
+    sessionNumber: number;
+    scenarioName: string;
+    avatarType: string;
+    completedAt: Date | null;
+    sessionDuration: number | null;
+    averageQuality: number;
+    totalMessages: number | null;
+  }[]> {
+    const sessions = await db
+      .select()
+      .from(avatarTrainingSessions)
+      .where(and(
+        eq(avatarTrainingSessions.userId, userId),
+        eq(avatarTrainingSessions.businessContext, businessContext),
+        eq(avatarTrainingSessions.status, 'completed')
+      ))
+      .orderBy(avatarTrainingSessions.completedAt);
+
+    return sessions.map((session, index) => {
+      const performanceMetrics = session.performanceMetrics as any || {};
+      return {
+        sessionId: session.sessionId,
+        sessionNumber: index + 1,
+        scenarioName: session.scenarioName || 'Training Session',
+        avatarType: session.avatarType,
+        completedAt: session.completedAt,
+        sessionDuration: session.sessionDuration,
+        averageQuality: performanceMetrics.average_quality || 0,
+        totalMessages: session.totalMessages
+      };
+    });
+  }
+
+  // Get full session details for Performance page click-through
+  static async getSessionDetailsForPerformance(sessionId: string): Promise<{
+    session: AvatarTrainingSession;
+    messages: AvatarTrainingMessage[];
+    scenarioDetails: any;
+  } | null> {
+    try {
+      const session = await this.getSession(sessionId);
+      if (!session) return null;
+
+      const messages = await db
+        .select()
+        .from(avatarTrainingMessages)
+        .where(eq(avatarTrainingMessages.sessionId, sessionId))
+        .orderBy(avatarTrainingMessages.sequenceNumber);
+
+      const scenarioDetails = session.scenarioDetails;
+
+      return {
+        session,
+        messages,
+        scenarioDetails
+      };
+    } catch (error) {
+      console.error('Error retrieving session details:', error);
+      return null;
+    }
   }
 }
