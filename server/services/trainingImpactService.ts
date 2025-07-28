@@ -37,7 +37,7 @@ DOCUMENT FILENAME: ${filename}
 AVATAR CONTEXT: ${avatarId} (health coaching avatar)
 
 FULL DOCUMENT CONTENT TO ANALYZE:
-${documentContent}
+${documentContent.length > 150000 ? documentContent.substring(0, 150000) + "\n\n[Document truncated for analysis - full content stored in knowledge base]" : documentContent}
 
 Please provide a comprehensive analysis in this JSON format:
 {

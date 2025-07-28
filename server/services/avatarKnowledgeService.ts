@@ -186,18 +186,20 @@ export class AvatarKnowledgeService {
     return relevantChunks;
   }
   
-  // Delete document and its chunks
+  // Delete document and its chunks - also removes training impact analysis
   static async deleteDocument(documentId: number): Promise<boolean> {
     try {
-      // Delete chunks first
+      console.log(`🗑️ Deleting document ${documentId}, chunks, and training impact analysis`);
+      
+      // Delete chunks first (foreign key constraint)
       await db.delete(avatarKnowledgeChunks)
         .where(eq(avatarKnowledgeChunks.documentId, documentId));
       
-      // Delete document
+      // Delete document (this will also remove training impact analysis)
       await db.delete(avatarKnowledgeDocuments)
         .where(eq(avatarKnowledgeDocuments.id, documentId));
       
-      console.log(`✅ Document ${documentId} and its chunks deleted`);
+      console.log(`✅ Document ${documentId}, its chunks, and training impact analysis deleted`);
       return true;
     } catch (error) {
       console.error(`❌ Error deleting document ${documentId}:`, error);

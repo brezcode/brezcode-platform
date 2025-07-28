@@ -56,8 +56,8 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
         } else if (file.mimetype === 'application/pdf') {
           // Enhanced PDF parsing with proper text extraction
           try {
-            const pdfParse = require('pdf-parse');
-            const pdfData = await pdfParse(file.buffer);
+            const pdfParse = await import('pdf-parse');
+            const pdfData = await pdfParse.default(file.buffer);
             textContent = pdfData.text;
             console.log(`📄 Successfully extracted ${pdfData.text.length} characters from PDF: ${file.originalname}`);
             
