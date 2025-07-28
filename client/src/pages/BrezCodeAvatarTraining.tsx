@@ -141,6 +141,16 @@ export default function BrezCodeAvatarTraining() {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [sessionCounter, setSessionCounter] = useState(1);
 
+  // Fetch completed sessions count to calculate next session number
+  const { data: completedSessionsData } = useQuery({
+    queryKey: ['/api/avatar-performance/completed-sessions'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/avatar-performance/completed-sessions');
+      if (!response.ok) throw new Error('Failed to fetch completed sessions');
+      return response.json();
+    }
+  });
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
@@ -178,6 +188,10 @@ export default function BrezCodeAvatarTraining() {
   const avatars: BusinessAvatar[] = (avatarsData as any)?.avatars || [];
   const scenarios: TrainingScenario[] = (scenariosData as any)?.scenarios || [];
   const sessions: TrainingSession[] = (sessionsData as any)?.sessions || [];
+  const completedSessions = (completedSessionsData as any)?.sessions || [];
+
+  // Calculate next session number based on completed sessions
+  const nextSessionNumber = completedSessions.length + 1;
 
   // Scenario carousel navigation functions
   const navigateScenario = (direction: 'left' | 'right') => {
@@ -200,10 +214,9 @@ export default function BrezCodeAvatarTraining() {
     }
   };
 
-  // Generate session ID with counter
+  // Generate session ID with proper increment based on completed sessions
   const generateSessionId = () => {
-    const sessionId = `Training Session #${sessionCounter}`;
-    setSessionCounter(prev => prev + 1);
+    const sessionId = `Training Session #${nextSessionNumber}`;
     return sessionId;
   };
 

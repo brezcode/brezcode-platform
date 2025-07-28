@@ -17,7 +17,7 @@ export interface TrainingScenario {
   name: string;
   description: string;
   customerPersona: string;
-  customerMood: 'calm' | 'frustrated' | 'confused' | 'angry' | 'excited' | 'skeptical' | 'urgent';
+  customerMood: 'calm' | 'frustrated' | 'confused' | 'angry' | 'excited' | 'skeptical' | 'urgent' | 'anxious' | 'discouraged';
   objectives: string[];
   timeframeMins: number;
   difficulty: 'beginner' | 'intermediate' | 'advanced';
@@ -392,41 +392,221 @@ export const TRAINING_SCENARIOS: TrainingScenario[] = [
     ]
   },
 
-  // ===== HEALTH COACH SCENARIOS =====
+  // ===== DR. SAKURA BREAST HEALTH COACHING SCENARIOS =====
   {
-    id: 'health_breast_screening',
+    id: 'breast_screening_anxiety',
     avatarType: 'health_coach',
-    name: 'Breast Health Screening Anxiety',
-    description: 'Patient is anxious about upcoming mammogram and asks about what to expect and pain management',
-    customerPersona: 'Maria Santos, 42, mother of two, first mammogram, anxious about process and potential findings',
+    name: 'First Mammogram Anxiety',
+    description: 'Patient is terrified about her first mammogram and considering cancelling due to fear and anxiety',
+    customerPersona: 'Sarah Chen, 40, marketing manager, no family history, heard painful stories from friends, very anxious about the unknown',
     customerMood: 'anxious',
     objectives: [
-      'Provide accurate information about mammogram process',
-      'Address anxiety with empathy and reassurance',
-      'Offer practical preparation tips',
-      'Encourage regular screening compliance'
+      'Validate anxiety while providing reassurance',
+      'Explain mammogram process in simple terms',
+      'Address pain and discomfort concerns',
+      'Emphasize importance of early detection'
     ],
     timeframeMins: 15,
-    difficulty: 'intermediate',
-    tags: ['breast_health', 'screening', 'anxiety', 'education'],
+    difficulty: 'beginner',
+    tags: ['mammogram', 'anxiety', 'first_screening', 'fear'],
     industry: 'Healthcare',
     successCriteria: [
-      'Provided accurate medical information',
-      'Demonstrated empathy for patient concerns',
-      'Offered practical preparation advice',
-      'Patient expressed reduced anxiety'
+      'Patient feels heard and understood',
+      'Provided clear explanation of procedure',
+      'Offered practical comfort tips',
+      'Patient commits to keeping appointment'
     ],
     commonMistakes: [
-      'Minimizing legitimate concerns',
-      'Providing medical advice beyond scope',
-      'Not addressing emotional aspects',
-      'Using too much medical terminology'
+      'Dismissing fears as irrational',
+      'Using medical jargon',
+      'Not acknowledging discomfort reality',
+      'Rushing through explanation'
     ],
     keyLearningPoints: [
-      'Validation reduces anxiety',
-      'Education empowers patients',
-      'Stay within professional scope',
-      'Emotional support is crucial'
+      'Acknowledge fear before education',
+      'Use empathetic, gentle language',
+      'Provide practical coping strategies',
+      'Focus on empowerment through knowledge'
+    ]
+  },
+  {
+    id: 'family_history_concern',
+    avatarType: 'health_coach', 
+    name: 'Family History Breast Cancer Worry',
+    description: 'Patient just learned her sister was diagnosed with breast cancer and is panicked about her own risk',
+    customerPersona: 'Lisa Thompson, 35, teacher, sister recently diagnosed, feeling overwhelmed and scared about genetic risk',
+    customerMood: 'urgent',
+    objectives: [
+      'Provide emotional support during crisis',
+      'Explain family history risk factors clearly',
+      'Discuss genetic testing options',
+      'Create action plan for screening'
+    ],
+    timeframeMins: 20,
+    difficulty: 'intermediate',
+    tags: ['family_history', 'genetics', 'risk_assessment', 'crisis_support'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Emotional state stabilized',
+      'Risk factors explained accurately',
+      'Clear next steps provided',
+      'Patient feels empowered not helpless'
+    ],
+    commonMistakes: [
+      'Providing false reassurance',
+      'Overwhelming with statistics',
+      'Not addressing emotional impact',
+      'Delaying necessary referrals'
+    ],
+    keyLearningPoints: [
+      'Balance hope with realistic information',
+      'Family history increases but doesn\'t guarantee risk',
+      'Early detection saves lives',
+      'Support system is crucial'
+    ]
+  },
+  {
+    id: 'self_exam_guidance',
+    avatarType: 'health_coach',
+    name: 'Breast Self-Examination Teaching',
+    description: 'Patient wants to learn proper self-examination technique but feels embarrassed and unsure',
+    customerPersona: 'Amanda Rodriguez, 28, nurse, wants to be proactive but lacks confidence in technique, feels awkward about self-touch',
+    customerMood: 'confused',
+    objectives: [
+      'Create comfortable learning environment',
+      'Teach proper self-examination technique',
+      'Address embarrassment and discomfort',
+      'Establish regular self-exam routine'
+    ],
+    timeframeMins: 25,
+    difficulty: 'beginner',
+    tags: ['self_examination', 'technique', 'education', 'routine'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Patient comfortable with discussion',
+      'Demonstrated proper technique',
+      'Addressed normal variations',
+      'Committed to monthly routine'
+    ],
+    commonMistakes: [
+      'Not addressing embarrassment',
+      'Teaching too quickly',
+      'Not explaining normal changes',
+      'Skipping follow-up planning'
+    ],
+    keyLearningPoints: [
+      'Normalize body awareness',
+      'Technique matters for effectiveness',
+      'Know your normal to detect changes',
+      'Monthly routine after menstruation'
+    ]
+  },
+  {
+    id: 'lump_discovery_panic',
+    avatarType: 'health_coach',
+    name: 'Found a Lump - Crisis Management',
+    description: 'Patient found a lump during self-exam and is in complete panic, needs immediate guidance and support',
+    customerPersona: 'Jennifer Walsh, 45, mother of two, found lump yesterday, couldn\'t sleep, assuming the worst, needs urgent support',
+    customerMood: 'urgent',
+    objectives: [
+      'Provide immediate emotional support',
+      'Guide through next steps calmly',
+      'Explain that most lumps are benign',
+      'Facilitate prompt medical evaluation'
+    ],
+    timeframeMins: 20,
+    difficulty: 'advanced',
+    tags: ['lump_discovery', 'crisis', 'urgent_care', 'emotional_support'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Panic level reduced significantly',
+      'Clear action plan established',
+      'Appointment scheduled promptly',
+      'Support system activated'
+    ],
+    commonMistakes: [
+      'False reassurance without examination',
+      'Not validating extreme fear',
+      'Delaying medical referral',
+      'Providing diagnostic opinions'
+    ],
+    keyLearningPoints: [
+      'Most breast lumps are not cancer',
+      'Immediate evaluation is important',
+      'Support system crucial during waiting',
+      'Stay within scope of practice'
+    ]
+  },
+  {
+    id: 'menopause_breast_changes',
+    avatarType: 'health_coach',
+    name: 'Menopause and Breast Health Changes',
+    description: 'Patient experiencing breast changes during menopause and worried about increased cancer risk',
+    customerPersona: 'Patricia Kim, 52, executive, going through menopause, noticing breast density changes, concerned about hormone therapy effects',
+    customerMood: 'skeptical',
+    objectives: [
+      'Explain normal menopausal breast changes',
+      'Discuss hormone therapy implications',
+      'Address screening modifications needed',
+      'Provide lifestyle recommendations'
+    ],
+    timeframeMins: 18,
+    difficulty: 'intermediate',
+    tags: ['menopause', 'hormones', 'breast_density', 'lifestyle'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Normal changes explained clearly',
+      'Hormone risks/benefits discussed',
+      'Screening plan updated',
+      'Lifestyle modifications planned'
+    ],
+    commonMistakes: [
+      'Not explaining hormone complexity',
+      'Dismissing valid concerns',
+      'Generic lifestyle advice',
+      'Not coordinating with physician'
+    ],
+    keyLearningPoints: [
+      'Menopause affects breast tissue',
+      'Personalized risk assessment needed',
+      'Collaborative care approach',
+      'Lifestyle factors matter at any age'
+    ]
+  },
+  {
+    id: 'young_adult_education',
+    avatarType: 'health_coach',
+    name: 'Young Adult Breast Health Education',
+    description: 'College student wants to learn about breast health but feels it\'s not relevant at her age',
+    customerPersona: 'Emma Johnson, 20, college student, thinks breast cancer only affects older women, wants basic education',
+    customerMood: 'calm',
+    objectives: [
+      'Provide age-appropriate education',
+      'Establish healthy habits early',
+      'Address young adult risk factors',
+      'Create foundation for lifelong awareness'
+    ],
+    timeframeMins: 15,
+    difficulty: 'beginner',
+    tags: ['young_adult', 'prevention', 'education', 'habits'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Age-appropriate information provided',
+      'Early habits encouraged',
+      'Risk factors understood',
+      'Foundation for future awareness'
+    ],
+    commonMistakes: [
+      'Too much focus on cancer risk',
+      'Not making it relevant to age',
+      'Overwhelming with information',
+      'Not encouraging questions'
+    ],
+    keyLearningPoints: [
+      'Early education builds lifelong habits',
+      'Young women can develop breast awareness',
+      'Risk factors exist at all ages',
+      'Prevention starts early'
     ]
   },
 
@@ -509,8 +689,12 @@ export const TRAINING_PATHS = {
     // Add more scenarios
   ],
   health_coach: [
-    'health_breast_screening',
-    // Add more scenarios
+    'breast_screening_anxiety',
+    'family_history_concern',
+    'self_exam_guidance',
+    'lump_discovery_panic',
+    'menopause_breast_changes',
+    'young_adult_education'
   ],
   education_specialist: [
     'edu_struggling_learner',
