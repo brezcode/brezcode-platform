@@ -199,14 +199,25 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
     console.log('   Request body:', JSON.stringify(req.body, null, 2));
     console.log('   Customer message:', customerMessage);
 
-    // Get session from database-backed service
-    const session = await AvatarTrainingSessionService.getSession(sessionId);
+    // Get session from database-backed service with better error handling
+    let session;
+    try {
+      session = await AvatarTrainingSessionService.getSession(sessionId);
+      console.log('🔍 Session lookup result:', { found: !!session, sessionId });
+    } catch (dbError) {
+      console.error('❌ Database error during session lookup:', dbError);
+      return res.status(500).json({ 
+        error: 'Database error',
+        details: 'Failed to query session from database'
+      });
+    }
+
     if (!session) {
       console.error('❌ Session not found in database:', { sessionId, type: typeof sessionId });
       return res.status(404).json({ 
         error: 'Session not found',
         sessionId: sessionId,
-        details: `No session found with ID: ${sessionId}`
+        details: `No session found with ID: ${sessionId}. Make sure you have started a training session first.`
       });
     }
 
