@@ -209,7 +209,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
         details: `No session found with ID: ${sessionId}`
       });
     }
-    
+
     console.log('✅ Session found:', {
       id: session.id,
       sessionId: session.sessionId,
@@ -345,8 +345,28 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       success: true,
       session: sessionResponse
     });
-  } catch (error: any) {
-    res.status(500).json({ error: error.message });
+  } catch (error) {
+    console.error('❌ Continue conversation error:', error);
+
+    // Handle specific error types
+    if (error instanceof Error) {
+      if (error.message.includes('Session not found')) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Session not found',
+          details: `Session ${sessionId} does not exist or has expired`,
+          code: 'SESSION_NOT_FOUND'
+        });
+      }
+    }
+
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to continue conversation',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      sessionId: sessionId,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
@@ -573,7 +593,7 @@ router.get('/scenarios', async (req, res) => {
 
     // Fetch scenarios from database instead of hardcoded array
     let scenariosQuery = db.select().from(aiTrainingScenarios);
-    
+
     if (avatarType) {
       scenariosQuery = scenariosQuery.where(eq(aiTrainingScenarios.scenarioType, avatarType));
     }

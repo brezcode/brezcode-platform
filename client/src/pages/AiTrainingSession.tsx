@@ -52,7 +52,7 @@ interface TrainingSession {
 
 export function AiTrainingSession() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  
+
   // Debug sessionId extraction - ensure it's never undefined
   console.log('🔍 Component Debug:', {
     sessionId,
@@ -60,7 +60,7 @@ export function AiTrainingSession() {
     sessionIdDefined: sessionId !== undefined,
     sessionIdValue: sessionId
   });
-  
+
   // Early return if no sessionId
   if (!sessionId) {
     return <div className="flex items-center justify-center h-64">
@@ -71,7 +71,7 @@ export function AiTrainingSession() {
       </div>
     </div>;
   }
-  
+
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
   const [feedbackForm, setFeedbackForm] = useState({
@@ -116,38 +116,38 @@ export function AiTrainingSession() {
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
       const currentSessionId = sessionId; // Capture sessionId in closure
-      
+
       console.log('🔍 SessionId Debug:', {
         currentSessionId,
         type: typeof currentSessionId,
         messageData
       });
-      
+
       if (!currentSessionId) {
         console.error('❌ No session ID available:', { currentSessionId });
         throw new Error('No session ID available');
       }
-      
+
       console.log('🔄 Continue conversation request:', {
         sessionId: currentSessionId,
         customerMessage: messageData.message
       });
-      
+
       const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ customerMessage: messageData.message })
       });
-      
+
       console.log('📡 Continue response status:', response.status);
-      
+
       if (!response.ok) {
         const errorData = await response.text();
         console.error('❌ Continue conversation failed:', errorData);
         throw new Error('Failed to continue conversation');
       }
-      
+
       const result = await response.json();
       console.log('✅ Continue conversation success:', result.success);
       return result;
