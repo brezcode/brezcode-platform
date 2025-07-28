@@ -106,6 +106,7 @@ interface ChatMessage {
 
 interface TrainingSession {
   id: string;
+  sessionId: string; // Add sessionId field to match database schema
   avatarId: string;
   scenarioId: string;
   status: 'active' | 'paused' | 'completed';
@@ -320,7 +321,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async (message: string) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/message`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/message`, {
         message: message,
         role: 'customer'
       });
@@ -492,7 +493,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async (choice: string) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/choice`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/choice`, {
         choice
       });
       if (!response.ok) throw new Error('Failed to submit choice');
@@ -529,7 +530,7 @@ export default function BrezCodeAvatarTraining() {
     mutationFn: async ({ messageId, comment, rating }: { messageId: string; comment: string; rating: number }) => {
       if (!activeSession) throw new Error('No active session');
       
-      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId || activeSession.id}/comment`, {
+      const response = await apiRequest('POST', `/api/avatar-training/sessions/${activeSession.sessionId}/comment`, {
         messageId,
         comment,
         rating
@@ -656,7 +657,7 @@ export default function BrezCodeAvatarTraining() {
     
     // Trigger continue conversation with explicit empty customer message for auto-generation
     continueConversation.mutate({ 
-      sessionId: activeSession.sessionId || activeSession.id, 
+      sessionId: activeSession.sessionId, 
       customerMessage: '' // Empty string triggers auto-generated customer questions
     });
   };
