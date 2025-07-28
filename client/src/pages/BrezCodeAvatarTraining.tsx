@@ -1278,42 +1278,146 @@ export default function BrezCodeAvatarTraining() {
                   </Card>
                 </div>
 
-                {/* Session Info */}
+                {/* Scenario Information Panel */}
                 <div className="lg:col-span-1 order-1 lg:order-2 space-y-3 sm:space-y-4">
-                  <Card>
+                  {/* Scenario Overview */}
+                  <Card className="border-2 border-pink-200 bg-gradient-to-br from-pink-50 to-white">
                     <CardHeader className="pb-2 sm:pb-3">
-                      <CardTitle className="text-sm">Training Progress</CardTitle>
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Target className="h-4 w-4 text-pink-600" />
+                        Scenario Information
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-3">
+                      <div className="space-y-3 text-xs">
                         <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Exchanges</span>
-                            <span>{messages.filter(m => m.role !== 'system').length / 2}</span>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="font-semibold text-pink-800">{selectedScenario?.name}</span>
+                            <Badge className={DIFFICULTY_COLORS[selectedScenario?.difficulty]}>
+                              {selectedScenario?.difficulty}
+                            </Badge>
                           </div>
-                          <Progress value={Math.min((messages.length / 10) * 100, 100)} className="bg-pink-100" />
+                          <p className="text-gray-700 text-xs leading-relaxed">{selectedScenario?.description}</p>
                         </div>
-                        <div className="text-xs text-gray-600">
-                          <p><strong>Scenario:</strong> {selectedScenario?.difficulty || 'N/A'}</p>
-                          <p><strong>Focus:</strong> Breast health coaching</p>
+                        
+                        <div className="flex items-center gap-4 pt-2 border-t border-pink-200">
+                          <Badge variant="outline" className="text-xs">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {selectedScenario?.timeframeMins || 15} min
+                          </Badge>
+                          <Badge variant="outline" className="text-xs bg-pink-100 text-pink-700 border-pink-300">
+                            <Heart className="h-3 w-3 mr-1" />
+                            Health Coaching
+                          </Badge>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
 
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-sm">Success Criteria</CardTitle>
+                  {/* Patient Profile */}
+                  <Card className="border-blue-200 bg-blue-50">
+                    <CardHeader className="pb-2 sm:pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <User className="h-4 w-4 text-blue-600" />
+                        Patient Profile
+                      </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <ul className="text-xs text-gray-600 space-y-1">
-                        {(selectedScenario?.successCriteria || []).map((criteria, i) => (
-                          <li key={i} className="flex items-start">
-                            <Heart className="h-3 w-3 mr-1 mt-0.5 text-pink-500" />
-                            {criteria}
+                      <div className="text-xs text-blue-900 leading-relaxed">
+                        {(() => {
+                          const persona = selectedScenario?.customerPersona;
+                          if (typeof persona === 'string') {
+                            try {
+                              const parsed = JSON.parse(persona);
+                              return (
+                                <div className="space-y-2">
+                                  {parsed.name && <div><span className="font-medium">Name:</span> {parsed.name}</div>}
+                                  {parsed.age && <div><span className="font-medium">Age:</span> {parsed.age}</div>}
+                                  {parsed.role && <div><span className="font-medium">Occupation:</span> {parsed.role}</div>}
+                                  {parsed.background && <div><span className="font-medium">Background:</span> {parsed.background}</div>}
+                                  {parsed.mood && <div><span className="font-medium">Current Mood:</span> {parsed.mood}</div>}
+                                  {parsed.concerns && Array.isArray(parsed.concerns) && (
+                                    <div>
+                                      <span className="font-medium">Main Concerns:</span>
+                                      <ul className="list-disc list-inside ml-3 mt-1">
+                                        {parsed.concerns.slice(0, 2).map((concern: string, i: number) => (
+                                          <li key={i}>{concern}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            } catch {
+                              return persona;
+                            }
+                          }
+                          return persona || selectedScenario?.customerMood || 'Patient with health concerns';
+                        })()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Sakura's Role */}
+                  <Card className="border-pink-200 bg-pink-50">
+                    <CardHeader className="pb-2 sm:pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Bot className="h-4 w-4 text-pink-600" />
+                        Dr. Sakura's Role
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-xs text-pink-900 leading-relaxed">
+                        <p><span className="font-medium">Expertise:</span> Breast health coaching & patient communication</p>
+                        <p><span className="font-medium">Approach:</span> Empathetic, evidence-based guidance</p>
+                        <p><span className="font-medium">Focus:</span> Patient anxiety reduction & health education</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Training Objectives */}
+                  <Card className="border-green-200 bg-green-50">
+                    <CardHeader className="pb-2 sm:pb-3">
+                      <CardTitle className="text-sm flex items-center gap-2">
+                        <Award className="h-4 w-4 text-green-600" />
+                        Training Objectives
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="text-xs text-green-900 space-y-1">
+                        {(selectedScenario?.objectives || selectedScenario?.successCriteria || [
+                          'Provide accurate information about mammogram process',
+                          'Address anxiety with empathy and reassurance', 
+                          'Offer practical preparation tips',
+                          'Encourage regular screening compliance'
+                        ]).map((obj, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <div className="w-4 h-4 bg-green-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                              <span className="text-xs font-bold text-green-700">{i + 1}</span>
+                            </div>
+                            <span className="leading-relaxed">{obj}</span>
                           </li>
                         ))}
                       </ul>
+                    </CardContent>
+                  </Card>
+
+                  {/* Session Progress (Compact) */}
+                  <Card className="border-gray-200">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-xs flex items-center gap-2">
+                        <BarChart3 className="h-3 w-3 text-gray-600" />
+                        Session Progress
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs">
+                          <span>Exchanges</span>
+                          <span>{Math.floor(messages.filter(m => m.role !== 'system').length / 2)}</span>
+                        </div>
+                        <Progress value={Math.min((messages.length / 10) * 100, 100)} className="h-1 bg-pink-100" />
+                      </div>
                     </CardContent>
                   </Card>
                 </div>
