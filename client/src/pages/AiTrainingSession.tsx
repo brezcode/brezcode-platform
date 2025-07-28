@@ -248,9 +248,10 @@ export function AiTrainingSession() {
             </CardHeader>
             
             {/* Messages Area */}
-            <CardContent className="flex-1 overflow-y-auto space-y-4 p-4">
-              {dialogues.map((dialogue: TrainingDialogue) => (
-                <div key={dialogue.id} className={`p-4 rounded-lg border ${getSpeakerColor(dialogue.speaker)}`}>
+            <CardContent className="flex-1 overflow-y-auto space-y-4 p-6">
+              <div className="max-w-full space-y-4">
+                {dialogues.map((dialogue: TrainingDialogue) => (
+                  <div key={dialogue.id} className={`p-4 rounded-lg border max-w-[95%] word-wrap break-words ${getSpeakerColor(dialogue.speaker)}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2 mb-2">
                       {getSpeakerIcon(dialogue.speaker)}
@@ -308,25 +309,27 @@ export function AiTrainingSession() {
                       )}
                     </div>
                   )}
-                </div>
-              ))}
+                  </div>
+                ))}
+              </div>
               <div ref={messagesEndRef} />
             </CardContent>
             
             {/* Message Input */}
-            <div className="border-t p-4">
-              <div className="flex gap-2">
+            <div className="border-t p-6">
+              <div className="flex gap-2 max-w-full">
                 <Input
                   placeholder="Type your message as the customer..."
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage('customer')}
                   disabled={sendMessageMutation.isPending}
+                  className="flex-1 min-w-0"
                 />
                 <Button 
                   onClick={() => sendMessage('customer')}
                   disabled={sendMessageMutation.isPending || !newMessage.trim()}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 flex-shrink-0"
                 >
                   <Send className="w-4 h-4" />
                   Send as Customer

@@ -111,23 +111,23 @@ div[style*="z-index: 999"] {
   .sky-blue {
     color: var(--sky-blue);
   }
-  
+
   .bg-sky-blue {
     background-color: var(--sky-blue);
   }
-  
+
   .sunny-yellow {
     color: var(--sunny-yellow);
   }
-  
+
   .bg-sunny-yellow {
     background-color: var(--sunny-yellow);
   }
-  
+
   .charcoal {
     color: var(--charcoal);
   }
-  
+
   .bg-charcoal {
     background-color: var(--charcoal);
   }
@@ -180,3 +180,25 @@ div[style*="z-index: 999"] {
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Training session dialogue box constraints */
+  .word-wrap {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  /* Ensure dialogue boxes stay within container */
+  .dialogue-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
