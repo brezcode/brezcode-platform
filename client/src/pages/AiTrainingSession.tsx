@@ -52,6 +52,7 @@ interface TrainingSession {
 
 export function AiTrainingSession() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(sessionId || null);
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
   const [feedbackForm, setFeedbackForm] = useState({
@@ -63,47 +64,64 @@ export function AiTrainingSession() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
-  // Fetch session details
+  // Fetch session details - use avatar training routes
   const { data: session, isLoading: loadingSession } = useQuery({
-    queryKey: [`/api/ai-training/sessions/${sessionId}`],
+    queryKey: [`/api/avatar-training/sessions/${currentSessionId}`],
     queryFn: async () => {
-      const response = await fetch(`/api/ai-training/sessions/${sessionId}/dialogues`, {
+      if (!currentSessionId) throw new Error('No session ID');
+      const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}`, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch session');
-      return response.json();
+      const result = await response.json();
+      return result.session || result;
     },
-    enabled: !!sessionId
+    enabled: !!currentSessionId
   });
 
-  // Fetch dialogue history
-  const { data: dialogues = [], isLoading: loadingDialogues, refetch: refetchDialogues } = useQuery({
-    queryKey: [`/api/ai-training/sessions/${sessionId}/dialogues`],
-    queryFn: async () => {
-      const response = await fetch(`/api/ai-training/sessions/${sessionId}/dialogues`, {
-        credentials: 'include'
-      });
-      if (!response.ok) throw new Error('Failed to fetch dialogues');
-      return response.json();
-    },
-    enabled: !!sessionId
+  // Use session messages as dialogues
+  const dialogues = session?.messages || session?.conversationHistory || [];
+  const loadingDialogues = loadingSession;
+  const refetchDialogues = () => queryClient.invalidateQueries({ 
+    queryKey: [`/api/avatar-training/sessions/${currentSessionId}`] 
   });
 
-  // Send message mutation
+  // Send message mutation - use continue endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
-      const response = await fetch(`/api/ai-training/sessions/${sessionId}/messages`, {
+      if (!currentSessionId) throw new Error('No session ID available');
+      
+      console.log('🔄 Continue conversation request:', {
+        sessionId: currentSessionId,
+        customerMessage: messageData.message
+      });
+      
+      const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify(messageData)
+        body: JSON.stringify({ customerMessage: messageData.message })
       });
-      if (!response.ok) throw new Error('Failed to send message');
-      return response.json();
+      
+      console.log('📡 Continue response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ Continue conversation failed:', errorData);
+        throw new Error('Failed to continue conversation');
+      }
+      
+      const result = await response.json();
+      console.log('✅ Continue conversation success:', result.success);
+      return result;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log('🎯 Continue conversation onSuccess:', data);
       refetchDialogues();
       setNewMessage('');
+    },
+    onError: (error) => {
+      console.error('❌ Continue conversation error:', error);
     }
   });
 
@@ -150,6 +168,20 @@ export function AiTrainingSession() {
   useEffect(() => {
     scrollToBottom();
   }, [dialogues]);
+
+  // Auto-continue conversation when component loads
+  useEffect(() => {
+    if (currentSessionId && dialogues.length <= 1) {
+      // Auto-start conversation with empty message to trigger AI
+      setTimeout(() => {
+        sendMessageMutation.mutate({
+          speaker: 'customer',
+          message: '',
+          messageType: 'auto_continue'
+        });
+      }, 1000);
+    }
+  }, [currentSessionId, dialogues.length]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -250,16 +282,16 @@ export function AiTrainingSession() {
             {/* Messages Area */}
             <CardContent className="flex-1 overflow-y-auto space-y-4 p-6">
               <div className="max-w-full space-y-4">
-                {dialogues.map((dialogue: TrainingDialogue) => (
-                  <div key={dialogue.id} className={`p-4 rounded-lg border max-w-full break-words ${getSpeakerColor(dialogue.speaker)}`}>
+                {dialogues.map((dialogue: any, index: number) => (
+                  <div key={dialogue.id || `msg-${index}`} className={`p-4 rounded-lg border max-w-full break-words ${getSpeakerColor(dialogue.role || dialogue.speaker)}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2 mb-2">
-                      {getSpeakerIcon(dialogue.speaker)}
+                      {getSpeakerIcon(dialogue.role || dialogue.speaker)}
                       <span className="font-medium capitalize">
-                        {dialogue.speaker.replace('_', ' ')}
+                        {(dialogue.role || dialogue.speaker || 'system').replace('_', ' ')}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {new Date(dialogue.timestamp).toLocaleTimeString()}
+                        {new Date(dialogue.timestamp || dialogue.createdAt || new Date()).toLocaleTimeString()}
                       </span>
                       {dialogue.isReviewed && (
                         <Badge variant="secondary" className="text-xs">
@@ -287,7 +319,7 @@ export function AiTrainingSession() {
                     )}
                   </div>
 
-                  <p className="text-gray-900">{dialogue.message}</p>
+                  <p className="text-gray-900">{dialogue.content || dialogue.message}</p>
 
                   {dialogue.trainerFeedback && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
@@ -336,14 +368,24 @@ export function AiTrainingSession() {
                 </Button>
               </div>
               <div className="flex justify-between mt-2">
-                <Button 
-                  variant="outline"
-                  size="sm"
-                  onClick={() => sendMessage('trainer')}
-                  disabled={sendMessageMutation.isPending || !newMessage.trim()}
-                >
-                  Send as Trainer
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => sendMessage('trainer')}
+                    disabled={sendMessageMutation.isPending || !newMessage.trim()}
+                  >
+                    Send as Trainer
+                  </Button>
+                  <Button 
+                    variant="outline"
+                    size="sm"
+                    onClick={() => sendMessageMutation.mutate({ speaker: 'customer', message: '', messageType: 'continue' })}
+                    disabled={sendMessageMutation.isPending}
+                  >
+                    Continue AI Conversation
+                  </Button>
+                </div>
                 <span className="text-xs text-gray-500">
                   The AI will automatically respond to customer messages
                 </span>
