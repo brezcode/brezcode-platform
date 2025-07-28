@@ -14,17 +14,26 @@ app.get('/direct-api/test', (req, res) => {
 });
 
 // CRITICAL FIX: Direct avatar training routes to bypass Vite conflicts
-// Get all scenarios endpoint
+// Get all scenarios endpoint with avatarType filtering
 app.get('/api/avatar-training/scenarios', async (req, res) => {
   try {
-    console.log('🔍 DIRECT: Fetching all training scenarios');
+    const { avatarType } = req.query;
+    console.log(`🔍 DIRECT: Fetching training scenarios for avatarType: ${avatarType || 'all'}`);
     
     const { TRAINING_SCENARIOS } = await import('./avatarTrainingScenarios');
-    console.log(`✅ DIRECT: Found ${TRAINING_SCENARIOS.length} scenarios`);
+    
+    // Filter scenarios by avatarType if specified
+    let filteredScenarios = TRAINING_SCENARIOS;
+    if (avatarType) {
+      filteredScenarios = TRAINING_SCENARIOS.filter(scenario => scenario.avatarType === avatarType);
+      console.log(`✅ DIRECT: Found ${filteredScenarios.length} scenarios for ${avatarType}`);
+    } else {
+      console.log(`✅ DIRECT: Found ${TRAINING_SCENARIOS.length} total scenarios`);
+    }
     
     res.json({
       success: true,
-      scenarios: TRAINING_SCENARIOS
+      scenarios: filteredScenarios
     });
   } catch (error: any) {
     console.error('❌ DIRECT: Error fetching scenarios:', error);
