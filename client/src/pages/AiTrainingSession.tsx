@@ -251,7 +251,7 @@ export function AiTrainingSession() {
             <CardContent className="flex-1 overflow-y-auto space-y-4 p-6">
               <div className="max-w-full space-y-4">
                 {dialogues.map((dialogue: TrainingDialogue) => (
-                  <div key={dialogue.id} className={`p-4 rounded-lg border max-w-[95%] word-wrap break-words ${getSpeakerColor(dialogue.speaker)}`}>
+                  <div key={dialogue.id} className={`p-4 rounded-lg border max-w-full break-words ${getSpeakerColor(dialogue.speaker)}`}>
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-2 mb-2">
                       {getSpeakerIcon(dialogue.speaker)}
