@@ -234,11 +234,14 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       try {
         console.log('🚀 Calling Claude for intelligent patient question generation...');
 
-        // Generate intelligent patient question using Claude with session context
+        // Fetch full scenario data for context
+        const scenarioData = await AvatarTrainingSessionService.getScenarioById(session.scenarioId);
+        
+        // Generate intelligent patient question using Claude with full scenario context
         const conversationHistory = Array.isArray(session.conversationHistory) ? session.conversationHistory : [];
         const patientResponse = await ClaudeAvatarService.generatePatientQuestion(
           conversationHistory, 
-          session.scenarioId, 
+          scenarioData, 
           session.avatarId
         );
 

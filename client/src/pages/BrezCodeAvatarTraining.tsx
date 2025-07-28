@@ -919,6 +919,58 @@ export default function BrezCodeAvatarTraining() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
+                    {/* Patient Profile Section */}
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <div className="flex items-center gap-2 mb-3">
+                        <User className="h-4 w-4 text-blue-600" />
+                        <h4 className="font-medium text-blue-700">Patient Profile</h4>
+                      </div>
+                      <div className="text-sm text-blue-900 leading-relaxed">
+                        {(() => {
+                          const persona = selectedScenario?.customerPersona;
+                          if (typeof persona === 'string') {
+                            try {
+                              const parsed = JSON.parse(persona);
+                              return (
+                                <div className="space-y-2">
+                                  {parsed.name && <div><span className="font-medium">Name:</span> {parsed.name}</div>}
+                                  {parsed.age && <div><span className="font-medium">Age:</span> {parsed.age}</div>}
+                                  {parsed.role && <div><span className="font-medium">Occupation:</span> {parsed.role}</div>}
+                                  {parsed.background && <div><span className="font-medium">Background:</span> {parsed.background}</div>}
+                                  {parsed.concerns && Array.isArray(parsed.concerns) && (
+                                    <div>
+                                      <span className="font-medium">Main Concerns:</span>
+                                      <ul className="list-disc list-inside ml-4 mt-1">
+                                        {parsed.concerns.map((concern: string, i: number) => (
+                                          <li key={i}>{concern}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {parsed.goals && Array.isArray(parsed.goals) && (
+                                    <div>
+                                      <span className="font-medium">Goals:</span>
+                                      <ul className="list-disc list-inside ml-4 mt-1">
+                                        {parsed.goals.map((goal: string, i: number) => (
+                                          <li key={i}>{goal}</li>
+                                        ))}
+                                      </ul>
+                                    </div>
+                                  )}
+                                  {parsed.communicationStyle && (
+                                    <div><span className="font-medium">Communication Style:</span> {parsed.communicationStyle}</div>
+                                  )}
+                                </div>
+                              );
+                            } catch {
+                              return persona;
+                            }
+                          }
+                          return persona || 'No patient profile available';
+                        })()}
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
                         <h4 className="font-medium mb-2 text-pink-700">Dr. Sakura's Role</h4>

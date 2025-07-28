@@ -21,7 +21,7 @@ export class ClaudeAvatarService {
   // Generate intelligent patient questions using Claude
   static async generatePatientQuestion(
     conversationHistory: any[],
-    scenario: string,
+    scenarioData: any,
     avatarType: string = 'dr_sakura'
   ): Promise<{ question: string; emotion: string; context: string }> {
     try {
@@ -30,16 +30,24 @@ export class ClaudeAvatarService {
         `${msg.role}: ${msg.content}`
       ).join('\n');
       
-      const scenarioContexts = {
-        'breast_health_anxiety': 'A patient anxious about breast health screening, self-exams, and potential findings',
-        'health_breast_screening': 'A patient seeking guidance on mammography, screening schedules, and early detection',
-        'customer_service_complaint': 'A frustrated customer with service issues needing resolution',
-        'sales_pricing_objection': 'A potential client concerned about pricing and value proposition'
-      };
-      
-      const scenarioContext = scenarioContexts[scenario as keyof typeof scenarioContexts] || 'A general healthcare consultation';
+      // Extract scenario context and patient persona
+      const scenarioContext = scenarioData?.name || 'A general healthcare consultation';
+      const patientPersona = scenarioData?.customerPersona ? 
+        (typeof scenarioData.customerPersona === 'string' ? 
+          JSON.parse(scenarioData.customerPersona) : 
+          scenarioData.customerPersona
+        ) : null;
 
-      const prompt = `You are simulating an intelligent patient/customer in a medical training scenario: "${scenarioContext}"
+      const prompt = `You are simulating an intelligent patient in this medical training scenario: "${scenarioContext}"
+
+${patientPersona ? `PATIENT PERSONA:
+Name: ${patientPersona.name || 'Sarah'}
+Age: ${patientPersona.age || '35'}
+Background: ${patientPersona.background || 'General patient'}
+Main Concerns: ${Array.isArray(patientPersona.concerns) ? patientPersona.concerns.join(', ') : 'Health concerns'}
+Goals: ${Array.isArray(patientPersona.goals) ? patientPersona.goals.join(', ') : 'Seek guidance'}
+Communication Style: ${patientPersona.communicationStyle || 'Direct and concerned'}
+` : ''}
 
 Recent conversation:
 ${recentMessages}
@@ -198,15 +206,24 @@ Generate an improved response that directly addresses the customer's feedback wh
     return (personalities as any)[avatarType] || personalities['dr_sakura'];
   }
 
-  // Complete implementation of generateAvatarResponse with anti-repetition logic
+  // Complete implementation of generateAvatarResponse with anti-repetition logic and scenario context
   static async generateAvatarResponse(
     avatarType: string,
     customerMessage: string,
     conversationHistory: any[] = [],
-    businessContext: string = 'general'
+    businessContext: string = 'general',
+    scenarioData?: any
   ): Promise<{ content: string; quality_score: number }> {
     
     const avatarPersonality = this.getAvatarPersonality(avatarType);
+    
+    // Extract scenario context and patient persona for Dr. Sakura responses
+    const scenarioContext = scenarioData?.name || '';
+    const patientPersona = scenarioData?.customerPersona ? 
+      (typeof scenarioData.customerPersona === 'string' ? 
+        JSON.parse(scenarioData.customerPersona) : 
+        scenarioData.customerPersona
+      ) : null;
     
     // Build conversation context with anti-repetition logic
     const recentMessages = conversationHistory.slice(-6); // Use last 6 messages for context
@@ -221,6 +238,18 @@ Generate an improved response that directly addresses the customer's feedback wh
 ${avatarPersonality.systemPrompt}
 
 Business Context: ${businessContext}
+
+${scenarioContext ? `TRAINING SCENARIO: "${scenarioContext}"` : ''}
+
+${patientPersona ? `PATIENT PROFILE YOU'RE HELPING:
+Name: ${patientPersona.name || 'Patient'}
+Age: ${patientPersona.age || 'Adult'}
+Background: ${patientPersona.background || 'General patient'}
+Main Concerns: ${Array.isArray(patientPersona.concerns) ? patientPersona.concerns.join(', ') : 'Health concerns'}
+Goals: ${Array.isArray(patientPersona.goals) ? patientPersona.goals.join(', ') : 'Seek guidance'}
+Communication Style: ${patientPersona.communicationStyle || 'Direct and concerned'}
+
+REMEMBER: You are responding to this specific patient with their unique background and concerns.` : ''}
 
 ${hasPreivousConversation ? `
 IMPORTANT: Avoid repetitive responses. Here are your previous responses in this conversation:

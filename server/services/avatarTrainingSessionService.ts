@@ -201,12 +201,16 @@ export class AvatarTrainingSessionService {
     console.log(`🎯 Session context: ${session.businessContext}, Avatar: ${session.avatarType}`);
 
     try {
-      // Use Claude with full session context and actual customer message
+      // Fetch scenario data for context
+      const scenarioData = await this.getScenarioById(session.scenarioId);
+      
+      // Use Claude with full session context, customer message, and scenario context
       const response = await ClaudeAvatarService.generateAvatarResponse(
         session.avatarType,
         customerMessage,
         conversationHistory,
-        session.businessContext
+        session.businessContext,
+        scenarioData
       );
 
       const responseTime = Date.now() - startTime;
@@ -316,6 +320,12 @@ export class AvatarTrainingSessionService {
   static async getTotalSessionsCount(): Promise<number> {
     const result = await db.select().from(avatarTrainingSessions);
     return result.length;
+  }
+
+  // Get scenario by ID from static training scenarios
+  static async getScenarioById(scenarioId: string): Promise<any> {
+    const { TRAINING_SCENARIOS } = await import('../avatarTrainingScenarios');
+    return TRAINING_SCENARIOS.find(scenario => scenario.id === scenarioId) || null;
   }
 
   // Extract topics from message content
