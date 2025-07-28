@@ -52,7 +52,14 @@ interface TrainingSession {
 
 export function AiTrainingSession() {
   const { sessionId } = useParams<{ sessionId: string }>();
-  const [currentSessionId, setCurrentSessionId] = useState<string | null>(sessionId || null);
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
+
+  // Update currentSessionId when sessionId from URL changes
+  useEffect(() => {
+    if (sessionId) {
+      setCurrentSessionId(sessionId);
+    }
+  }, [sessionId]);
   const [newMessage, setNewMessage] = useState('');
   const [feedbackDialogueId, setFeedbackDialogueId] = useState<number | null>(null);
   const [feedbackForm, setFeedbackForm] = useState({
@@ -66,37 +73,37 @@ export function AiTrainingSession() {
 
   // Fetch session details - use avatar training routes
   const { data: session, isLoading: loadingSession } = useQuery({
-    queryKey: [`/api/avatar-training/sessions/${currentSessionId}`],
+    queryKey: [`/api/avatar-training/sessions/${sessionId}`],
     queryFn: async () => {
-      if (!currentSessionId) throw new Error('No session ID');
-      const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}`, {
+      if (!sessionId) throw new Error('No session ID');
+      const response = await fetch(`/api/avatar-training/sessions/${sessionId}`, {
         credentials: 'include'
       });
       if (!response.ok) throw new Error('Failed to fetch session');
       const result = await response.json();
       return result.session || result;
     },
-    enabled: !!currentSessionId
+    enabled: !!sessionId
   });
 
   // Use session messages as dialogues
   const dialogues = session?.messages || session?.conversationHistory || [];
   const loadingDialogues = loadingSession;
   const refetchDialogues = () => queryClient.invalidateQueries({ 
-    queryKey: [`/api/avatar-training/sessions/${currentSessionId}`] 
+    queryKey: [`/api/avatar-training/sessions/${sessionId}`] 
   });
 
   // Send message mutation - use continue endpoint
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { speaker: string; message: string; messageType?: string }) => {
-      if (!currentSessionId) throw new Error('No session ID available');
+      if (!sessionId) throw new Error('No session ID available');
       
       console.log('🔄 Continue conversation request:', {
-        sessionId: currentSessionId,
+        sessionId: sessionId,
         customerMessage: messageData.message
       });
       
-      const response = await fetch(`/api/avatar-training/sessions/${currentSessionId}/continue`, {
+      const response = await fetch(`/api/avatar-training/sessions/${sessionId}/continue`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -171,7 +178,7 @@ export function AiTrainingSession() {
 
   // Auto-continue conversation when component loads
   useEffect(() => {
-    if (currentSessionId && dialogues.length <= 1) {
+    if (sessionId && dialogues.length <= 1) {
       // Auto-start conversation with empty message to trigger AI
       setTimeout(() => {
         sendMessageMutation.mutate({
@@ -181,7 +188,7 @@ export function AiTrainingSession() {
         });
       }, 1000);
     }
-  }, [currentSessionId, dialogues.length]);
+  }, [sessionId, dialogues.length]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
