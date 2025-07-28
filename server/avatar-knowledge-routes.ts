@@ -232,13 +232,13 @@ export const registerAvatarKnowledgeRoutes = (app: any) => {
   });
 
   // NEW: Get training impact analysis for avatar
-  app.get('/api/avatar-knowledge/:avatarId/training-impact', async (req, res) => {
+  app.get('/api/avatar-knowledge/:avatarId/training-impact', async (req: Request, res: Response) => {
     try {
       const { avatarId } = req.params;
       
       console.log(`🎯 Fetching training impact for avatar: ${avatarId}`);
       
-      const { TrainingImpactService } = await import('../services/trainingImpactService');
+      const { TrainingImpactService } = await import('./services/trainingImpactService');
       const trainingImpact = await TrainingImpactService.getTrainingImpactForAvatar(avatarId);
       
       console.log(`✅ Found training impact with ${Object.keys(trainingImpact).length} categories`);
