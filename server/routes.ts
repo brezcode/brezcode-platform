@@ -1035,7 +1035,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         report: reportData
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating demo health report:', error);
       console.error('Error stack:', error.stack);
       res.status(500).json({ 
@@ -1175,11 +1175,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.pro.feature3': 'Unlimited AI chat support',
           'pricing.pro.feature4': 'Progress tracking & analytics',
           'pricing.premium.name': 'Premium',
-          'pricing.premium.price': '$19.99',
-          'pricing.premium.feature1': 'Advanced genetic risk analysis',
-          'pricing.premium.feature2': 'Priority AI responses',
-          'pricing.premium.feature3': 'Expert consultation scheduling',
-          'pricing.premium.feature4': 'Family sharing (up to 4 members)',
+          'pricing.premium.price_old': '$19.99',
+          'pricing.premium.feature1_old': 'Advanced genetic risk analysis',
+          'pricing.premium.feature2_old': 'Priority AI responses',
+          'pricing.premium.feature3_old': 'Expert consultation scheduling',
+          'pricing.premium.feature4_old': 'Family sharing (up to 4 members)',
           'pricing.button': 'Get Started',
           // App features cards
           'appFeatures.weeklyPlanning.title': 'Weekly planning',
@@ -1376,11 +1376,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
           'pricing.pro.feature3': '無限AI對話支援',
           'pricing.pro.feature4': '進度追蹤與分析',
           'pricing.premium.name': '頂級版',
-          'pricing.premium.price': '$19.99',
-          'pricing.premium.feature1': '進階基因風險分析',
-          'pricing.premium.feature2': '優先AI回應',
-          'pricing.premium.feature3': '專家諮詢預約',
-          'pricing.premium.feature4': '家庭共享（最多4位成員）',
+          'pricing.premium.price_old': '$19.99',
+          'pricing.premium.feature1_old': '進階基因風險分析',
+          'pricing.premium.feature2_old': '優先AI回應',
+          'pricing.premium.feature3_old': '專家諮詢預約',
+          'pricing.premium.feature4_old': '家庭共享（最多4位成員）',
           'pricing.button': '開始使用',
           // App features cards
           'appFeatures.weeklyPlanning.title': '週計劃',
@@ -1638,7 +1638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: true,
         report: reportData
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating authenticated health report:', error);
       res.status(500).json({ 
         success: false, 

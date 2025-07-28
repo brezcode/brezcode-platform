@@ -315,7 +315,7 @@ router.post('/sessions/:sessionId/continue', async (req, res) => {
       role: 'avatar', 
       content: aiResponse.content,
       timestamp: new Date().toISOString(),
-      quality_score: aiResponse.quality_score,
+      quality_score: aiResponse.qualityScore,
       multiple_choice_options: multipleChoiceOptions
     };
 
