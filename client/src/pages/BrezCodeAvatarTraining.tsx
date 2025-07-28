@@ -655,9 +655,26 @@ export default function BrezCodeAvatarTraining() {
       return;
     }
 
+    // Fix session ID handling - use sessionId or id as fallback
+    const sessionId = activeSession.sessionId || activeSession.id;
+    console.log('🔍 SessionId Debug:', {
+      activeSession: activeSession,
+      sessionId: sessionId,
+      activeSessionKeys: Object.keys(activeSession)
+    });
+
+    if (!sessionId) {
+      toast({
+        title: "Session ID Missing",
+        description: "Invalid session data. Please restart the training session.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     // Trigger continue conversation with explicit empty customer message for auto-generation
     continueConversation.mutate({ 
-      sessionId: activeSession.sessionId, 
+      sessionId: sessionId, 
       customerMessage: '' // Empty string triggers auto-generated customer questions
     });
   };
