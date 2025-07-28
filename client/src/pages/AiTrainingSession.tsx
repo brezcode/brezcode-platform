@@ -157,7 +157,7 @@ export function AiTrainingSession() {
 
   const sendMessage = (speaker: 'customer' | 'trainer') => {
     if (!newMessage.trim()) return;
-    
+
     sendMessageMutation.mutate({
       speaker,
       message: newMessage,
@@ -177,7 +177,7 @@ export function AiTrainingSession() {
 
   const submitFeedback = () => {
     if (!feedbackDialogueId) return;
-    
+
     addFeedbackMutation.mutate({
       dialogueId: feedbackDialogueId,
       feedback: feedbackForm
@@ -246,7 +246,7 @@ export function AiTrainingSession() {
                 Training Conversation
               </CardTitle>
             </CardHeader>
-            
+
             {/* Messages Area */}
             <CardContent className="flex-1 overflow-y-auto space-y-4 p-6">
               <div className="max-w-full space-y-4">
@@ -267,7 +267,7 @@ export function AiTrainingSession() {
                         </Badge>
                       )}
                     </div>
-                    
+
                     {dialogue.speaker === 'ai_assistant' && (
                       <div className="flex gap-1">
                         <Button
@@ -286,9 +286,9 @@ export function AiTrainingSession() {
                       </div>
                     )}
                   </div>
-                  
+
                   <p className="text-gray-900">{dialogue.message}</p>
-                  
+
                   {dialogue.trainerFeedback && (
                     <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
                       <div className="flex items-center gap-2 mb-1">
@@ -314,7 +314,7 @@ export function AiTrainingSession() {
               </div>
               <div ref={messagesEndRef} />
             </CardContent>
-            
+
             {/* Message Input */}
             <div className="border-t p-6">
               <div className="flex gap-2 max-w-full">
@@ -372,9 +372,9 @@ export function AiTrainingSession() {
                   {session?.scenario?.customerPersona?.company}
                 </p>
               </div>
-              
+
               <Separator />
-              
+
               <div>
                 <h4 className="font-medium mb-2">Objectives</h4>
                 <ul className="text-sm text-gray-600 space-y-1">
@@ -409,7 +409,7 @@ export function AiTrainingSession() {
                     <span className="text-sm">Needs Improvement</span>
                   </label>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium">Feedback Category</label>
                   <select
@@ -428,7 +428,7 @@ export function AiTrainingSession() {
                     <option value="problem_solving">Problem Solving</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium">Trainer Feedback</label>
                   <Textarea
@@ -442,7 +442,7 @@ export function AiTrainingSession() {
                     rows={3}
                   />
                 </div>
-                
+
                 <div>
                   <label className="text-sm font-medium">Suggested Response</label>
                   <Textarea
@@ -456,7 +456,7 @@ export function AiTrainingSession() {
                     rows={3}
                   />
                 </div>
-                
+
                 <div className="flex gap-2">
                   <Button 
                     onClick={submitFeedback}
