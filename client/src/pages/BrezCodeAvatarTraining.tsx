@@ -164,15 +164,14 @@ export default function BrezCodeAvatarTraining() {
     }
   });
 
-  // Fetch health coaching training scenarios (force fresh data)
+  // Fetch health coaching training scenarios
   const { data: scenariosData } = useQuery({
-    queryKey: ['/api/avatar-training/scenarios', 'health_coach', Date.now()], // Force cache refresh
+    queryKey: ['/api/avatar-training/scenarios', 'health_coach'],
     queryFn: async () => {
       const response = await apiRequest('GET', '/api/avatar-training/scenarios?avatarType=health_coach');
       if (!response.ok) throw new Error('Failed to fetch health coaching scenarios');
       return response.json();
-    },
-    staleTime: 0 // Always refetch
+    }
   });
 
   // Fetch active training sessions for BrezCode

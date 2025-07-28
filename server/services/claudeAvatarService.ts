@@ -71,7 +71,9 @@ Respond with a JSON object:
       });
 
       const responseText = (response.content[0] as any).text;
-      const result = JSON.parse(responseText);
+      // Clean up JSON response by removing markdown code blocks
+      const cleanContent = responseText.replace(/```json\n?/, '').replace(/\n?```/, '').trim();
+      const result = JSON.parse(cleanContent);
       console.log('🎯 Claude-generated patient question:', result.question.substring(0, 100) + '...');
       return result;
 
