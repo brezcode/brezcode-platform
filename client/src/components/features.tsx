@@ -161,7 +161,7 @@ export default function Features() {
               </div>
 
               <div className="mt-8">
-                <Button onClick={() => setLocation('/quiz')} className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
+                <Button onClick={() => setLocation('/brezcode/quiz')} className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all">
                   {t('features.help.button', 'Take the quiz to start')}
                 </Button>
               </div>
