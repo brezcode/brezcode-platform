@@ -1,9 +1,12 @@
 import Hero from "../components/Hero";
+import Navigation from "../components/Navigation";
+import Features from "../components/Features";
 import { Link } from "wouter";
 
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white">
+      <Navigation />
       <Hero />
       
       {/* How It Works Section */}
@@ -63,7 +66,10 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white">
+      <Features />
+      
+      {/* Reviews Section */}
+      <section id="reviews" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
