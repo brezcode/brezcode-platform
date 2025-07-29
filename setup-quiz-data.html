@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Quiz Data and View Report</title>
+</head>
+<body>
+    <h1>Setting up Quiz Data...</h1>
+    <p>Loading quiz answers and navigating to report...</p>
+    
+    <script>
+        // Set the quiz answers exactly as expected by demo-report.tsx
+        const quizAnswers = {
+            "age": "60",
+            "ethnicity": "White (non-Hispanic)",
+            "family_history": "Yes, I have first-degree relative with BC",
+            "brca_test": "BRCA1/2",
+            "dense_breast": "Yes",
+            "menstrual_age": "Before 12 years old",
+            "pregnancy_age": "Never had a full-term pregnancy",
+            "oral_contraceptives": "Yes, currently using",
+            "menopause": "Yes, at age 55 or later",
+            "weight": "80",
+            "height": "1.6",
+            "hrt": "Yes",
+            "western_diet": "Yes, Western diet",
+            "smoke": "Yes",
+            "alcohol": "2 or more drinks",
+            "night_shift": "Yes",
+            "stressful_events": "Yes, striking life events",
+            "benign_condition": "Yes, Atypical Hyperplasia (ADH/ALH)",
+            "cancer_history": "Yes, I am currently receiving treatment for breast cancer",
+            "cancer_stage": "Stage 4",
+            "mammogram_frequency": "Annually (once a year)",
+            "breast_symptoms": "I have a lump in my breast",
+            "lump_characteristics": "Growing Lump with size over 5cm",
+            "country": "United States",
+            "bmi": 31.2,
+            "obesity": "Yes"
+        };
+        
+        // Set in localStorage with the correct key that demo-report.tsx expects
+        localStorage.setItem('brezcode_quiz_answers', JSON.stringify(quizAnswers));
+        
+        console.log('Quiz data set successfully:', JSON.parse(localStorage.getItem('brezcode_quiz_answers')));
+        
+        // Navigate to demo report page
+        setTimeout(() => {
+            window.location.href = '/brezcode/demo-report';
+        }, 500);
+    </script>
+</body>
+</html>
