@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Quiz from "@/components/quiz";
 import QuizTransition from "@/components/quiz-transition";
-import SimpleSignupFlow from "@/components/simple-signup-flow";
+import CleanSignupFlow from "@/components/CleanSignupFlow";
 import { useLocation } from "wouter";
 
 export default function QuizPage() {
@@ -42,7 +42,7 @@ export default function QuizPage() {
   // Show signup flow after transition
   if (quizCompleted && !showTransition) {
     return (
-      <SimpleSignupFlow 
+      <CleanSignupFlow 
         quizAnswers={quizAnswers} 
         onComplete={handleSignupComplete}
       />
