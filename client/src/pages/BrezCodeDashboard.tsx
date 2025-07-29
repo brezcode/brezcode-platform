@@ -71,7 +71,7 @@ export default function BrezCodeDashboard() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">BrezCode Dashboard</h1>
-            <p className="text-gray-600">AI-powered breast health assessment platform</p>
+            <p className="text-gray-600">Business client on LeadGen.to SaaS platform</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
@@ -88,8 +88,8 @@ export default function BrezCodeDashboard() {
         </div>
       </div>
 
-      {/* Edit Business Profile Section */}
-      <div className="flex items-center justify-center mb-6">
+      {/* Platform Navigation Section */}
+      <div className="flex items-center justify-center space-x-4 mb-6">
         <Button 
           variant="outline" 
           className="flex items-center space-x-2 hover:bg-pink-50 border-pink-200"
@@ -98,16 +98,22 @@ export default function BrezCodeDashboard() {
           <Settings className="h-4 w-4" />
           <span>Edit Business Profile</span>
         </Button>
-      </div>
-
-      {/* BrezCode Landing Page Link */}
-      <div className="flex items-center justify-center mb-6">
+        
+        <Button 
+          variant="outline"
+          className="flex items-center space-x-2 hover:bg-blue-50 border-blue-200"
+          onClick={() => setLocation('/')}
+        >
+          <span className="text-lg font-bold">LeadGen.to</span>
+          <span>Platform</span>
+        </Button>
+        
         <Button 
           className="flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white"
           onClick={() => setLocation('/brezcode')}
         >
           <Heart className="h-4 w-4" />
-          <span>Visit BrezCode Landing Page</span>
+          <span>Public Demo Site</span>
         </Button>
       </div>
 

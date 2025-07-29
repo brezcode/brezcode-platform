@@ -1,17 +1,19 @@
-# Multi-Tenant Health Assessment SAAS Platform
+# LeadGen.to - Ultimate Business AI SaaS Platform
 
 ## Overview
 
-This is the ultimate business AI platform (leadgen.to) that provides comprehensive automation tools for any business vertical. **Current Status: FULLY OPERATIONAL** - Authentication and platform separation completed successfully. The platform offers reusable AI-powered business tools that can be customized for different industries and use cases.
+This is LeadGen.to, the ultimate business AI SaaS platform that provides comprehensive automation tools for any business vertical. **Current Status: FULLY OPERATIONAL** - Multi-tenant architecture with complete business isolation and universal AI tools.
 
-**BrezCode Integration**: BrezCode health coaching is now a specialized feature/tool under LeadGen.to, demonstrating how the platform's AI capabilities can be applied to the health & wellness vertical. All health features (dietary recommendations, food analysis, health coaching, assessment forms) are LeadGen tools customized for health businesses.
+**Platform Evolution**: Originally started as BrezCode (breast health assessment app), but evolved into a comprehensive SaaS platform when we realized the AI tools had broader business applications. BrezCode now serves as a client business demonstrating the health & wellness vertical use case on the LeadGen.to platform.
 
-**Architecture Philosophy**: Any new feature we build becomes part of the LeadGen toolkit that can be used by:
-- Health & wellness businesses (like BrezCode)
-- E-commerce businesses  
-- Service providers
-- Consultants and coaches
-- Any business vertical
+**BrezCode as Client**: BrezCode is now a business client within the LeadGen.to ecosystem, showcasing how the platform's AI capabilities can be applied to health & wellness. It demonstrates the breast health assessment vertical with specialized tools including health coaching, assessment forms, dietary recommendations, and AI avatar training.
+
+**Platform Architecture**: LeadGen.to provides universal AI business tools that any business can customize:
+- **Health & wellness**: BrezCode demonstrates breast health coaching and assessments
+- **E-commerce**: Product catalogs, inventory management, order processing  
+- **Service providers**: Appointment scheduling, service packages, client management
+- **Consultants**: Knowledge base management, client assessments, progress tracking
+- **Any business vertical**: Adaptable AI tools for diverse industries
 
 The platform features AI avatar assistants, landing page builders, lead generation, sales CRM, customer service automation, multi-channel engagement, and specialized vertical tools like health coaching.
 
