@@ -189,9 +189,9 @@ export default function BrezcodeAvatarChat() {
           <Separator />
           
           <CardContent className="flex-1 flex flex-col p-0">
-            {/* Messages */}
+            {/* Messages and Quick Questions - All in one scroll area */}
             <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-              <div className="space-y-4">
+              <div className="space-y-4 min-h-full">
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -204,7 +204,7 @@ export default function BrezcodeAvatarChat() {
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`rounded-lg p-3 max-h-96 overflow-y-auto ${
+                        className={`rounded-lg p-3 ${
                           message.role === 'avatar'
                             ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 text-gray-900'
@@ -249,36 +249,37 @@ export default function BrezcodeAvatarChat() {
                     </div>
                   </div>
                 )}
-              </div>
-              {/* Quick Questions (shown when no conversation yet) */}
-              {messages.filter(m => m.role === 'user').length === 0 && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-                  <h3 className="text-lg font-semibold mb-3 text-gray-800">Quick Questions to Get Started</h3>
-                  <div className="grid grid-cols-1 gap-2">
-                    {[
-                      "How do I perform a proper breast self-examination?",
-                      "What should I know about mammogram screening?",
-                      "I found something unusual during self-exam, what should I do?",
-                      "How can lifestyle changes support breast health?",
-                      "What are the most important risk factors I should know about?",
-                      "How often should I be checking my breasts?"
-                    ].map((question, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        onClick={() => {
-                          setInputMessage(question);
-                          handleSendMessage();
-                        }}
-                        className="text-left h-auto p-3 text-sm justify-start hover:bg-pink-50 whitespace-normal"
-                        disabled={isTyping}
-                      >
-                        {question}
-                      </Button>
-                    ))}
+                
+                {/* Quick Questions (shown when no conversation yet) */}
+                {messages.filter(m => m.role === 'user').length === 0 && (
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <h3 className="text-lg font-semibold mb-3 text-gray-800">Quick Questions to Get Started</h3>
+                    <div className="grid grid-cols-1 gap-2">
+                      {[
+                        "How do I perform a proper breast self-examination?",
+                        "What should I know about mammogram screening?",
+                        "I found something unusual during self-exam, what should I do?",
+                        "How can lifestyle changes support breast health?",
+                        "What are the most important risk factors I should know about?",
+                        "How often should I be checking my breasts?"
+                      ].map((question, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          onClick={() => {
+                            setInputMessage(question);
+                            handleSendMessage();
+                          }}
+                          className="text-left h-auto p-3 text-sm justify-start hover:bg-pink-50 whitespace-normal"
+                          disabled={isTyping}
+                        >
+                          {question}
+                        </Button>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </ScrollArea>
             
             {/* Input */}
