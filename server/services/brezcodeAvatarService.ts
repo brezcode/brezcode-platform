@@ -65,8 +65,70 @@ export class BrezcodeAvatarService {
     return DR_SAKURA_CONFIG;
   }
 
-  // Generate personalized Dr. Sakura response using Claude
+  // Generate personalized Dr. Sakura response using integrated LeadGen avatar training system
   static async generateDrSakuraResponse(
+    userId: number,
+    userMessage: string,
+    conversationHistory: any[] = [],
+    context: {
+      assessmentData?: any;
+      healthProfile?: any;
+      currentConcerns?: string[];
+    } = {}
+  ): Promise<{ content: string; empathyScore: number; medicalAccuracy: number }> {
+    
+    try {
+      console.log('🌸 Dr. Sakura generating response with LeadGen training integration...');
+      
+      // Import the integrated Claude avatar service
+      const { ClaudeAvatarService } = await import('./claudeAvatarService');
+      
+      // Get user's health profile and assessment data for personalized responses
+      const userHealthData = await this.getUserHealthData(userId);
+      
+      // Get training memory for Dr. Sakura from all previous sessions
+      const allTrainingMemory = await this.getDrSakuraTrainingMemory(userId);
+      
+      // Build business context for health coaching
+      const businessContext = this.buildHealthCoachingContext(userHealthData, context);
+      
+      // Use Claude avatar service with Dr. Sakura configuration and training memory
+      const drSakuraAvatarId = 'dr_sakura_brezcode';
+      const avatarResponse = await ClaudeAvatarService.generateAvatarResponse(
+        'health_coach', // Avatar type for Dr. Sakura
+        userMessage,
+        conversationHistory,
+        businessContext,
+        null, // No specific scenario data for regular chat
+        allTrainingMemory, // Complete training history
+        drSakuraAvatarId // Avatar ID for knowledge base search
+      );
+      
+      // Store this conversation in training memory for future learning
+      await this.storeConversationInTrainingMemory(userId, userMessage, avatarResponse.content);
+      
+      // Calculate BrezCode-specific quality scores
+      const empathyScore = this.calculateEmpathyScore(avatarResponse.content);
+      const medicalAccuracy = this.calculateMedicalAccuracy(avatarResponse.content, userMessage);
+
+      console.log(`✅ Dr. Sakura response generated with quality score: ${avatarResponse.quality_score}, empathy: ${empathyScore}, medical accuracy: ${medicalAccuracy}`);
+
+      return {
+        content: avatarResponse.content,
+        empathyScore,
+        medicalAccuracy
+      };
+
+    } catch (error) {
+      console.error('Error generating Dr. Sakura response with training integration:', error);
+      
+      // Fallback to original Dr. Sakura response
+      return await this.generateFallbackDrSakuraResponse(userId, userMessage, conversationHistory, context);
+    }
+  }
+
+  // Generate fallback response using original method
+  static async generateFallbackDrSakuraResponse(
     userId: number,
     userMessage: string,
     conversationHistory: any[] = [],
@@ -118,14 +180,107 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       };
 
     } catch (error) {
-      console.error('Error generating Dr. Sakura response:', error);
+      console.error('Error in fallback Dr. Sakura response:', error);
       
-      // Fallback response with high empathy
+      // Ultimate fallback response with high empathy
       return {
         content: `I understand you're reaching out about your breast health, and I want you to know that taking this step shows great self-care. While I'm having a technical moment, I want to assure you that your concerns are valid and important. Please consider discussing this with your healthcare provider, and remember that being proactive about your health is always the right choice. I'm here to support you on this journey.`,
         empathyScore: 95,
         medicalAccuracy: 85
       };
+    }
+  }
+
+  // Get training memory for Dr. Sakura from all previous sessions
+  static async getDrSakuraTrainingMemory(userId: number): Promise<any[]> {
+    try {
+      // Import avatar training session service to get training history
+      const { AvatarTrainingSessionService } = await import('./avatarTrainingSessionService');
+      
+      // Get all Dr. Sakura training sessions for this user
+      const sessions = await AvatarTrainingSessionService.getUserSessions(userId, 'dr_sakura_brezcode');
+      
+      // Extract training memory from all sessions
+      const trainingMemory: any[] = [];
+      for (const session of sessions) {
+        const sessionData = await AvatarTrainingSessionService.getSession(session.sessionId);
+        if (sessionData && sessionData.messages) {
+          trainingMemory.push(...sessionData.messages);
+        }
+      }
+      
+      console.log(`🧠 Retrieved ${trainingMemory.length} training memories for Dr. Sakura`);
+      return trainingMemory;
+      
+    } catch (error) {
+      console.warn('Could not load Dr. Sakura training memory:', error);
+      return [];
+    }
+  }
+
+  // Build health coaching context for the avatar
+  static buildHealthCoachingContext(userHealthData: any, context: any): string {
+    let healthContext = 'BrezCode Health Coaching Platform - Breast Health Specialization';
+    
+    if (userHealthData) {
+      healthContext += `\n\nUser Health Profile:`;
+      if (userHealthData.user) {
+        healthContext += `\n- Age Range: ${userHealthData.user.age || 'Not specified'}`;
+        healthContext += `\n- Gender: ${userHealthData.user.gender || 'Not specified'}`;
+      }
+      
+      if (userHealthData.healthProfile) {
+        healthContext += `\n- Health Focus: Breast health and wellness`;
+        healthContext += `\n- Previous Assessments: ${userHealthData.assessments?.length || 0}`;
+      }
+    }
+    
+    if (context.currentConcerns?.length) {
+      healthContext += `\n\nCurrent Health Concerns: ${context.currentConcerns.join(', ')}`;
+    }
+    
+    healthContext += `\n\nDr. Sakura Specializations:
+- Breast self-examination guidance  
+- Mammogram screening education
+- Risk factor interpretation
+- Lifestyle recommendations for breast health
+- Emotional support for health anxiety`;
+    
+    return healthContext;
+  }
+
+  // Store conversation in training memory for future learning
+  static async storeConversationInTrainingMemory(userId: number, userMessage: string, avatarResponse: string): Promise<void> {
+    try {
+      // Import avatar training session service
+      const { AvatarTrainingSessionService } = await import('./avatarTrainingSessionService');
+      
+      // Find or create a Dr. Sakura training session for this user
+      let sessions = await AvatarTrainingSessionService.getUserSessions(userId, 'dr_sakura_brezcode');
+      let sessionId: string;
+      
+      if (sessions.length === 0) {
+        // Create new training session for Dr. Sakura
+        const newSession = await AvatarTrainingSessionService.startSession(
+          userId,
+          'dr_sakura_brezcode',
+          'health_coach',
+          'BrezCode Health Coaching'
+        );
+        sessionId = newSession.sessionId;
+      } else {
+        // Use the most recent session
+        sessionId = sessions[0].sessionId;
+      }
+      
+      // Add messages to the training session
+      await AvatarTrainingSessionService.addMessage(sessionId, 'user', userMessage);
+      await AvatarTrainingSessionService.addMessage(sessionId, 'avatar', avatarResponse);
+      
+      console.log(`💾 Stored Dr. Sakura conversation in training memory (session: ${sessionId})`);
+      
+    } catch (error) {
+      console.warn('Could not store conversation in training memory:', error);
     }
   }
 

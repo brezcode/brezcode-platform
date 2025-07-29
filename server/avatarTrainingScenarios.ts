@@ -643,8 +643,226 @@ export const TRAINING_SCENARIOS: TrainingScenario[] = [
     keyLearningPoints: [
       'Adult learners have unique needs',
       'Confidence affects learning ability',
-      'Personalization improves outcomes',
+      'Personalization improves outcomes',  
       'Ongoing support prevents dropout'
+    ]
+  },
+
+  // ===== HEALTH COACH SCENARIOS (DR. SAKURA) =====
+  {
+    id: 'breast_screening_anxiety',
+    avatarType: 'health_coach',
+    name: 'Patient with Mammogram Screening Anxiety',
+    description: 'Patient expressing fear and anxiety about upcoming mammogram screening appointment',
+    customerPersona: 'Maria Santos, 42, working mother, first mammogram, anxious about pain and potential findings',
+    customerMood: 'anxious',
+    objectives: [
+      'Acknowledge and validate screening anxiety',
+      'Provide factual information about mammogram process',
+      'Offer coping strategies for anxiety management',
+      'Encourage keeping the screening appointment'
+    ],
+    timeframeMins: 15,
+    difficulty: 'beginner',
+    tags: ['screening', 'anxiety', 'mammogram', 'education'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Demonstrated empathy for patient anxiety',
+      'Provided clear, accurate information about mammogram process',
+      'Offered practical anxiety management techniques',
+      'Reinforced importance of screening without pressure'
+    ],
+    commonMistakes: [
+      'Dismissing anxiety as "no big deal"',
+      'Providing too much medical detail',
+      'Not offering concrete coping strategies',
+      'Being pushy about appointment scheduling'
+    ],
+    keyLearningPoints: [
+      'Screening anxiety is normal and valid',
+      'Information reduces fear and uncertainty',
+      'Practical coping strategies empower patients',
+      'Supportive encouragement improves compliance'
+    ]
+  },
+  {
+    id: 'family_history_concern',
+    avatarType: 'health_coach',
+    name: 'Patient Worried About Family History',
+    description: 'Patient concerned about breast cancer risk due to family history',
+    customerPersona: 'Sarah Johnson, 35, recently learned her sister was diagnosed with breast cancer, worried about her own risk',
+    customerMood: 'anxious',
+    objectives: [
+      'Assess family history details and patterns',
+      'Explain genetic vs. environmental risk factors',
+      'Recommend appropriate screening timeline',
+      'Provide actionable prevention strategies'
+    ],
+    timeframeMins: 20,
+    difficulty: 'intermediate',
+    tags: ['family_history', 'genetic_risk', 'prevention', 'screening'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Gathered comprehensive family history information',
+      'Explained risk factors in understandable terms',
+      'Provided personalized screening recommendations',
+      'Offered evidence-based prevention strategies'
+    ],
+    commonMistakes: [
+      'Making assumptions about genetic risk',
+      'Providing overly technical explanations',
+      'Not recommending genetic counseling when appropriate',
+      'Causing unnecessary alarm'
+    ],
+    keyLearningPoints: [
+      'Family history requires detailed assessment',
+      'Genetic counseling may be beneficial',
+      'Many risk factors are modifiable',
+      'Early detection strategies are key'
+    ]
+  },
+  {
+    id: 'self_exam_guidance',
+    avatarType: 'health_coach',
+    name: 'Teaching Breast Self-Examination',
+    description: 'Patient requesting guidance on how to perform proper breast self-examination',
+    customerPersona: 'Emily Chen, 28, health-conscious young professional, wants to establish good health habits',
+    customerMood: 'excited',
+    objectives: [
+      'Explain the purpose and limitations of self-exams',
+      'Provide step-by-step examination instructions',
+      'Discuss timing and frequency recommendations',
+      'Address what to do if changes are found'
+    ],
+    timeframeMins: 18,
+    difficulty: 'beginner',
+    tags: ['self_examination', 'education', 'prevention', 'technique'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Clearly explained self-exam technique',
+      'Discussed appropriate timing and frequency',
+      'Addressed normal vs. concerning findings',
+      'Provided follow-up guidance for discoveries'
+    ],
+    commonMistakes: [
+      'Overemphasizing self-exam effectiveness',
+      'Not explaining normal breast tissue variations',
+      'Providing vague examination instructions',
+      'Not addressing what to do with findings'
+    ],
+    keyLearningPoints: [
+      'Self-exams supplement but don\'t replace professional screening',
+      'Normal breast tissue varies significantly',
+      'Consistency in technique and timing matters',
+      'Early reporting of changes improves outcomes'
+    ]
+  },
+  {
+    id: 'lump_discovery_panic',
+    avatarType: 'health_coach',
+    name: 'Patient Found Lump During Self-Exam',
+    description: 'Patient panicking after discovering a lump during breast self-examination',
+    customerPersona: 'Jennifer Williams, 45, found small lump, extremely anxious, jumping to worst-case scenarios',
+    customerMood: 'urgent',
+    objectives: [
+      'Provide immediate emotional support and reassurance',
+      'Explain that most lumps are benign',
+      'Guide through next steps for medical evaluation',
+      'Help manage anxiety while emphasizing importance of follow-up'
+    ],
+    timeframeMins: 12,
+    difficulty: 'advanced',
+    tags: ['lump_discovery', 'anxiety_management', 'urgent_care', 'emotional_support'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Provided immediate emotional support',
+      'Shared reassuring statistics about benign lumps',
+      'Gave clear guidance on seeking medical evaluation',
+      'Helped patient manage immediate anxiety'
+    ],
+    commonMistakes: [
+      'Providing false reassurance without evaluation',
+      'Not acknowledging the emotional impact',
+      'Giving medical advice beyond scope',
+      'Not emphasizing urgency of professional evaluation'
+    ],
+    keyLearningPoints: [
+      'Most breast lumps are benign (80%+)',
+      'Immediate professional evaluation is essential',
+      'Emotional support reduces patient anxiety',
+      'Avoid diagnostic speculation'
+    ]
+  },
+  {
+    id: 'menopause_breast_changes',
+    avatarType: 'health_coach',
+    name: 'Menopause-Related Breast Changes',
+    description: 'Patient experiencing breast changes during menopause and seeking guidance',
+    customerPersona: 'Linda Davis, 52, perimenopausal, noticing breast tenderness and density changes, confused about normal vs. concerning',
+    customerMood: 'confused',
+    objectives: [
+      'Explain normal menopausal breast changes',
+      'Discuss hormone-related symptoms',
+      'Address screening considerations during menopause',
+      'Provide lifestyle management strategies'
+    ],
+    timeframeMins: 16,
+    difficulty: 'intermediate',
+    tags: ['menopause', 'hormonal_changes', 'screening', 'lifestyle'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Explained normal menopausal breast changes',
+      'Distinguished normal from concerning symptoms',
+      'Discussed screening modifications for menopause',
+      'Provided hormone and lifestyle management tips'
+    ],
+    commonMistakes: [
+      'Dismissing all changes as "normal menopause"',
+      'Not addressing individual risk factors',
+      'Overlooking need for continued screening',
+      'Not providing practical management strategies'
+    ],
+    keyLearningPoints: [
+      'Menopause affects breast tissue significantly',
+      'Screening guidelines may change post-menopause',
+      'Hormone changes require ongoing monitoring',
+      'Lifestyle modifications can help manage symptoms'
+    ]
+  },
+  {
+    id: 'young_adult_education',
+    avatarType: 'health_coach',
+    name: 'Young Adult Breast Health Education',
+    description: 'Young adult seeking education about breast health and when to start screenings',
+    customerPersona: 'Ashley Rodriguez, 23, college student, wants to establish healthy habits, mother had breast cancer at 40',
+    customerMood: 'excited',
+    objectives: [
+      'Provide age-appropriate breast health education',
+      'Discuss when to begin screening based on family history',
+      'Explain lifestyle factors that support breast health',
+      'Establish foundation for lifelong health awareness'
+    ],
+    timeframeMins: 14,
+    difficulty: 'beginner',
+    tags: ['young_adult', 'education', 'prevention', 'lifestyle'],
+    industry: 'Healthcare',
+    successCriteria: [
+      'Provided age-appropriate health education',
+      'Discussed personalized screening timeline',
+      'Explained lifestyle factors for breast health',
+      'Encouraged ongoing health awareness'
+    ],
+    commonMistakes: [
+      'Providing overly advanced medical information',
+      'Not considering family history implications',
+      'Focusing too much on rare young adult risks',
+      'Not emphasizing preventive lifestyle factors'
+    ],
+    keyLearningPoints: [
+      'Early education builds lifelong healthy habits',
+      'Family history may advance screening timelines',
+      'Lifestyle factors significantly impact risk',
+      'Age-appropriate information prevents anxiety'
     ]
   }
 ];
