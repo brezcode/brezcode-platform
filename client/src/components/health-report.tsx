@@ -251,7 +251,7 @@ export default function HealthReport({ report }: HealthReportProps) {
           <div>
             <h3 className="font-semibold text-gray-900 mb-3">Primary Coaching Focus Areas</h3>
             <div className="grid gap-3">
-              {personalizedPlan.coachingFocus.map((focus, index) => (
+              {(personalizedPlan.coachingFocus || []).map((focus, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg">
                   <div className="w-6 h-6 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-semibold mt-0.5">
                     {index + 1}

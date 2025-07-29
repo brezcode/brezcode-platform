@@ -146,7 +146,13 @@ function generateRuleBasedReport(quizAnswers: any) {
     personalizedPlan: {
       morning: "Take vitamin D supplement and practice meditation",
       afternoon: "30 minutes of physical activity (walking, swimming, or yoga)",
-      evening: "Practice stress reduction techniques and maintain healthy sleep schedule"
+      evening: "Practice stress reduction techniques and maintain healthy sleep schedule",
+      coachingFocus: [
+        "Regular mammogram screening schedule",
+        "Maintain healthy weight through diet and exercise",
+        "Monthly breast self-examination routine",
+        "Annual clinical breast exams with healthcare provider"
+      ]
     },
     originalQuizAnswers: quizAnswers
   };
