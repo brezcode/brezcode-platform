@@ -56,10 +56,10 @@ export default function ReportPage() {
   }, [quizAnswers]);
 
   // For test mode: Allow access without authentication when quiz answers are available
-  // Redirect to landing only if no quiz answers and not authenticated
+  // Redirect to BrezCode landing only if no quiz answers and not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated && !quizAnswers && !generatedReport) {
-      setLocation('/');
+      setLocation('/brezcode');
     }
   }, [authLoading, isAuthenticated, quizAnswers, generatedReport, setLocation]);
 
@@ -176,21 +176,26 @@ export default function ReportPage() {
 
   if (!reports || reports.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <FileText className="h-5 w-5" />
-              No Reports Found
+              No BrezCode Reports Found
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              You haven't completed any health assessments yet. Take our comprehensive assessment to get your personalized report.
+              You haven't completed any breast health assessments yet. Take our comprehensive BrezCode assessment to get your personalized health report.
             </p>
-            <Button onClick={() => setLocation('/quiz')}>
-              Take Assessment
-            </Button>
+            <div className="space-y-2">
+              <Button onClick={() => setLocation('/brezcode/quiz')} className="w-full">
+                Take BrezCode Assessment
+              </Button>
+              <Button variant="outline" onClick={() => setLocation('/brezcode')} className="w-full">
+                Back to BrezCode Home
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
