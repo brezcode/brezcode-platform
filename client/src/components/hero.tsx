@@ -10,7 +10,7 @@ export default function Hero() {
   const { t } = useTranslation();
 
   const handleTakeQuiz = () => {
-    setLocation("/quiz");
+    setLocation("/brezcode/quiz");
   };
 
   return (
@@ -44,7 +44,7 @@ export default function Hero() {
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
             <Button 
-              onClick={() => setLocation("/quiz")}
+              onClick={() => setLocation("/brezcode/quiz")}
               className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
             >
               {t('hero.cta', 'Take the quiz to start')}
