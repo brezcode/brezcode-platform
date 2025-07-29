@@ -17,6 +17,7 @@ import BusinessLandingCreator from "@/pages/BusinessLandingCreator";
 import QuizPage from "@/pages/quiz";
 import QuizTransition from "@/components/quiz-transition";
 import ReportViewer from "@/pages/report";
+import PersonalizedReportPage from "@/pages/personalized-report";
 import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AITrainer from "@/pages/AITrainer";
 import AITrainerDashboard from "@/pages/AITrainerDashboard";
@@ -115,7 +116,8 @@ function App() {
           <Route path="/brezcode/quiz-transition">
             {() => <QuizTransition onContinue={() => {}} />}
           </Route>
-          <Route path="/brezcode/report" component={ReportViewer} />
+          <Route path="/brezcode/report" component={PersonalizedReportPage} />
+          <Route path="/brezcode/personalized-report" component={PersonalizedReportPage} />
           <Route path="/brezcode/health-preferences" component={HealthPreferences} />
           <Route path="/brezcode/health-calendar" component={HealthCalendar} />
           <Route path="/brezcode/avatar-demo" component={AvatarDemo} />
