@@ -466,7 +466,7 @@ Format your response as JSON with the exact structure:
         report = generateRuleBasedReport(quizAnswers);
       }
       
-      res.json({ report });
+      res.json({ success: true, report });
     } catch (error) {
       console.error("Report generation error:", error);
       res.status(500).json({ error: "Failed to generate health report" });

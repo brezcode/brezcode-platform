@@ -48,6 +48,9 @@ export default function PersonalizedReportPage() {
 
         if (data.success && data.report) {
           setReport(data.report);
+        } else if (data.report) {
+          // Handle legacy format without success flag
+          setReport(data.report);
         } else {
           console.error('Invalid response format:', data);
         }
