@@ -1,141 +1,95 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb, decimal, varchar } from "drizzle-orm/pg-core";
-import { createInsertSchema } from "drizzle-zod";
+import { pgTable, text, integer, timestamp, boolean, json, serial } from "drizzle-orm/pg-core";
+import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// ========================================
-// LEADGEN.TO PLATFORM SCHEMA
-// Separate database structure for leadgen users
-// ========================================
-
-// LeadGen Platform Users (separate from BrezCode users)
+// LeadGen.to Platform Tables
 export const leadgenUsers = pgTable("leadgen_users", {
   id: serial("id").primaryKey(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  email: text("email").notNull().unique(),
+  email: text("email").unique().notNull(),
   password: text("password").notNull(),
-  isEmailVerified: boolean("is_email_verified").default(false),
-  subscriptionTier: text("subscription_tier").$type<"basic" | "pro" | "premium" | null>().default(null),
-  stripeCustomerId: text("stripe_customer_id"),
-  stripeSubscriptionId: text("stripe_subscription_id"),
-  isSubscriptionActive: boolean("is_subscription_active").default(false),
-  createdAt: timestamp("created_at").defaultNow(),
-});
-
-// LeadGen User Profiles (Business-focused, not health)
-export const leadgenProfiles = pgTable("leadgen_profiles", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
-  
-  // Personal Information (Primary for business users)
-  fullName: text("full_name"),
-  location: text("location"),
-  timezone: text("timezone"),
-  phoneNumber: text("phone_number"),
-  workStyle: text("work_style"),
-  communicationPreference: text("communication_preference"),
-  availabilityHours: text("availability_hours"),
-  personalGoals: jsonb("personal_goals"), // Business/personal goals
-  personalChallenges: jsonb("personal_challenges"),
-  
-  // Business Information (Core for LeadGen users)
-  businessName: text("business_name"),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  company: text("company"),
   industry: text("industry"),
-  businessModel: text("business_model"),
+  phone: text("phone"),
+  isEmailVerified: boolean("is_email_verified").default(false),
+  emailVerificationCode: text("email_verification_code"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const leadgenBusinesses = pgTable("leadgen_businesses", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
+  name: text("name").notNull(),
+  industry: text("industry").notNull(),
+  website: text("website"),
+  description: text("description"),
   targetAudience: text("target_audience"),
-  monthlyRevenue: text("monthly_revenue"),
-  teamSize: text("team_size"),
-  marketingChannels: jsonb("marketing_channels"),
-  businessChallenges: jsonb("business_challenges"),
-  businessGoals: jsonb("business_goals"),
-  growthTimeline: text("growth_timeline"),
-  marketingBudget: text("marketing_budget"),
-  businessTools: jsonb("business_tools"),
-  uniqueValue: text("unique_value"),
-  customerAcquisition: text("customer_acquisition"),
-  customerServiceNeeds: text("customer_service_needs"),
-  preferences: jsonb("preferences"),
-  
+  businessGoals: json("business_goals").$type<string[]>(),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// LeadGen Business Tools Usage & Analytics
-export const leadgenDashboardStats = pgTable("leadgen_dashboard_stats", {
+export const leadgenAvatars = pgTable("leadgen_avatars", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
-  
-  // Business automation metrics
-  totalStrategies: integer("total_strategies").default(0),
-  activeTools: integer("active_tools").default(0),
-  completedActions: integer("completed_actions").default(0),
-  customerInteractions: integer("customer_interactions").default(0),
-  leadsGenerated: integer("leads_generated").default(0),
-  salesClosed: integer("sales_closed").default(0),
-  
-  // AI assistant metrics
-  aiConversations: integer("ai_conversations").default(0),
-  avatarTrainingMinutes: integer("avatar_training_minutes").default(0),
-  landingPagesCreated: integer("landing_pages_created").default(0),
-  emailCampaignsSent: integer("email_campaigns_sent").default(0),
-  smsCampaignsSent: integer("sms_campaigns_sent").default(0),
-  
-  lastLoginAt: timestamp("last_login_at"),
-  updatedAt: timestamp("updated_at").defaultNow(),
-});
-
-// LeadGen Tool Usage Tracking
-export const leadgenToolUsage = pgTable("leadgen_tool_usage", {
-  id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
-  toolName: text("tool_name").notNull(), // 'ai_avatar', 'landing_page', 'lead_gen', 'crm', 'email', 'sms', etc.
-  usageCount: integer("usage_count").default(0),
-  lastUsed: timestamp("last_used"),
+  businessId: integer("business_id").references(() => leadgenBusinesses.id).notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // sales, customer_service, technical, etc.
+  personality: text("personality"),
+  expertise: json("expertise").$type<string[]>(),
+  communicationStyle: text("communication_style"),
   isActive: boolean("is_active").default(true),
-  configuration: jsonb("configuration"), // Tool-specific settings
-  performanceMetrics: jsonb("performance_metrics"), // ROI, conversion rates, etc.
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// LeadGen AI Assistant Conversations
-export const leadgenAiChats = pgTable("leadgen_ai_chats", {
+export const leadgenCampaigns = pgTable("leadgen_campaigns", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
-  conversationId: text("conversation_id").notNull(),
-  messages: jsonb("messages").notNull(), // Array of chat messages
-  aiPersonality: text("ai_personality"), // 'business_consultant', 'sales_assistant', etc.
-  purpose: text("purpose"), // 'lead_generation', 'customer_service', 'training', etc.
-  metrics: jsonb("metrics"), // Engagement, satisfaction, conversion data
+  businessId: integer("business_id").references(() => leadgenBusinesses.id).notNull(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // email, sms, linkedin, etc.
+  status: text("status").default("draft"), // draft, active, paused, completed
+  targetAudience: json("target_audience"),
+  content: json("content"),
+  metrics: json("metrics"),
   createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// LeadGen Business Strategies & Recommendations
-export const leadgenStrategies = pgTable("leadgen_strategies", {
+export const leadgenLeads = pgTable("leadgen_leads", {
   id: serial("id").primaryKey(),
-  userId: integer("user_id").references(() => leadgenUsers.id).notNull(),
-  title: text("title").notNull(),
-  category: text("category").notNull(), // 'marketing', 'sales', 'operations', 'growth'
-  description: text("description").notNull(),
-  actionSteps: jsonb("action_steps").notNull(),
-  priority: text("priority").notNull(), // 'high', 'medium', 'low'
-  estimatedImpact: text("estimated_impact"),
-  timeline: text("timeline"),
-  isCompleted: boolean("is_completed").default(false),
-  automationAvailable: boolean("automation_available").default(false),
-  results: jsonb("results"), // Track actual results vs predicted
+  businessId: integer("business_id").references(() => leadgenBusinesses.id).notNull(),
+  email: text("email").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  phone: text("phone"),
+  source: text("source"), // website, linkedin, referral, etc.
+  status: text("status").default("new"), // new, qualified, contacted, converted
+  tags: json("tags").$type<string[]>(),
+  notes: text("notes"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
-// Create insert schemas for form validation
-export const insertLeadgenUser = createInsertSchema(leadgenUsers);
-export const insertLeadgenProfile = createInsertSchema(leadgenProfiles);
-export const insertLeadgenStrategy = createInsertSchema(leadgenStrategies);
+// Insert and Select Schemas
+export const insertLeadgenUserSchema = createInsertSchema(leadgenUsers);
+export const selectLeadgenUserSchema = createSelectSchema(leadgenUsers);
+export type InsertLeadgenUser = z.infer<typeof insertLeadgenUserSchema>;
+export type LeadgenUser = z.infer<typeof selectLeadgenUserSchema>;
 
-// Type exports
-export type LeadgenUser = typeof leadgenUsers.$inferSelect;
-export type InsertLeadgenUser = z.infer<typeof insertLeadgenUser>;
-export type LeadgenProfile = typeof leadgenProfiles.$inferSelect;
-export type LeadgenDashboardStats = typeof leadgenDashboardStats.$inferSelect;
-export type LeadgenToolUsage = typeof leadgenToolUsage.$inferSelect;
-export type LeadgenStrategy = typeof leadgenStrategies.$inferSelect;
+export const insertLeadgenBusinessSchema = createInsertSchema(leadgenBusinesses);
+export const selectLeadgenBusinessSchema = createSelectSchema(leadgenBusinesses);
+export type InsertLeadgenBusiness = z.infer<typeof insertLeadgenBusinessSchema>;
+export type LeadgenBusiness = z.infer<typeof selectLeadgenBusinessSchema>;
+
+export const insertLeadgenAvatarSchema = createInsertSchema(leadgenAvatars);
+export const selectLeadgenAvatarSchema = createSelectSchema(leadgenAvatars);
+export type InsertLeadgenAvatar = z.infer<typeof insertLeadgenAvatarSchema>;
+export type LeadgenAvatar = z.infer<typeof selectLeadgenAvatarSchema>;
+
+export const insertLeadgenCampaignSchema = createInsertSchema(leadgenCampaigns);
+export const selectLeadgenCampaignSchema = createSelectSchema(leadgenCampaigns);
+export type InsertLeadgenCampaign = z.infer<typeof insertLeadgenCampaignSchema>;
+export type LeadgenCampaign = z.infer<typeof selectLeadgenCampaignSchema>;
+
+export const insertLeadgenLeadSchema = createInsertSchema(leadgenLeads);
+export const selectLeadgenLeadSchema = createSelectSchema(leadgenLeads);
+export type InsertLeadgenLead = z.infer<typeof insertLeadgenLeadSchema>;
+export type LeadgenLead = z.infer<typeof selectLeadgenLeadSchema>;
