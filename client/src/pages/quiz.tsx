@@ -30,8 +30,8 @@ export default function QuizPage() {
   };
 
   const handleSignupComplete = () => {
-    // After successful signup, redirect to health setup for personalized scheduling
-    setLocation('/brezcode/health-setup');
+    // After successful signup, redirect to personalized health report with quiz results
+    setLocation('/brezcode/report');
   };
 
   // Show transition page after quiz completion

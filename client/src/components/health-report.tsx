@@ -3,7 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, Heart, Shield, TrendingUp, Calendar, Download } from "lucide-react";
+import { AlertTriangle, Heart, Shield, TrendingUp, Calendar, Download, MessageSquare } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface HealthReportProps {
   report: {
@@ -95,6 +96,7 @@ export default function HealthReport({ report }: HealthReportProps) {
   const healthScore = parseFloat(report.riskScore);
   const { summary, sectionAnalysis, personalizedPlan } = report.reportData;
   const uncontrollableScore = parseFloat(summary.uncontrollableHealthScore || "0");
+  const [, setLocation] = useLocation();
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 p-6">
@@ -108,10 +110,19 @@ export default function HealthReport({ report }: HealthReportProps) {
             Generated on {report.createdAt ? new Date(report.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
           </p>
         </div>
-        <Button variant="outline" className="flex items-center gap-2">
-          <Download className="h-4 w-4" />
-          Download PDF
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            onClick={() => setLocation('/brezcode/avatar-chat')}
+            className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white"
+          >
+            <MessageSquare className="h-4 w-4" />
+            Chat with Dr. Sakura
+          </Button>
+          <Button variant="outline" className="flex items-center gap-2">
+            <Download className="h-4 w-4" />
+            Download PDF
+          </Button>
+        </div>
       </div>
 
       {/* Health Score Overview */}
