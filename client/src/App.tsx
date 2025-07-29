@@ -49,6 +49,7 @@ import AvatarSetup from "@/pages/AvatarSetup";
 import { FeatureShowcase } from "@/pages/FeatureShowcase";
 import CodingAssistant from "@/pages/CodingAssistant";
 import KnowledgeCenter from "@/pages/KnowledgeCenter";
+import LandingPage from "@/pages/landing";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -125,6 +126,9 @@ function App() {
           </Route>
           <Route path="/brezcode/iphone-widget" component={IPhoneWidgetGuide} />
           <Route path="/brezcode/notifications" component={NotificationDemo} />
+          
+          {/* Traditional breast health landing page */}
+          <Route path="/breast-health-landing" component={LandingPage} />
           
           {/* Default fallback */}
           <Route component={LeadGenLanding} />
