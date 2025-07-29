@@ -7,7 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Send, Heart, Brain, User, Stethoscope } from "lucide-react";
+import { Send, Heart, Brain, User, Stethoscope, Bot, MessageSquare } from "lucide-react";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "wouter";
 
 interface Message {
@@ -174,12 +175,15 @@ export default function BrezcodeAvatarChat() {
         </div>
 
         {/* Chat Interface */}
-        <Card className="h-[600px] flex flex-col">
+        <Card className="h-[700px] flex flex-col">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Heart className="w-5 h-5 text-pink-500" />
-              Breast Health Consultation
+              <MessageSquare className="w-5 h-5" />
+              Dr. Sakura Wellness Consultation
             </CardTitle>
+            <p className="text-sm text-gray-600 mt-1">
+              Personalized breast health guidance with medical accuracy and empathetic support
+            </p>
           </CardHeader>
           
           <Separator />
@@ -189,54 +193,58 @@ export default function BrezcodeAvatarChat() {
             <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
               <div className="space-y-4">
                 {messages.map((message) => (
-                  <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-lg p-4 ${
-                      message.role === 'user' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'bg-gradient-to-r from-pink-100 to-rose-100 text-gray-800'
-                    }`}>
-                      <div className="flex items-start gap-3">
-                        {message.role === 'avatar' && (
-                          <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center flex-shrink-0">
-                            <Stethoscope className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        {message.role === 'user' && (
-                          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-white" />
-                          </div>
-                        )}
-                        <div className="flex-1">
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                          
-                          {message.qualityScores && message.role === 'avatar' && (
-                            <div className="flex gap-3 mt-3 text-xs">
-                              <div className="flex items-center gap-1">
-                                <Heart className="w-3 h-3" />
-                                <span>Empathy: {message.qualityScores.empathy}%</span>
-                              </div>
-                              <div className="flex items-center gap-1">
-                                <Brain className="w-3 h-3" />
-                                <span>Medical: {message.qualityScores.medicalAccuracy}%</span>
-                              </div>
-                            </div>
-                          )}
+                  <div
+                    key={message.id}
+                    className={`flex gap-3 ${message.role === 'avatar' ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`flex gap-2 max-w-[80%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback>
+                          {message.role === 'avatar' ? <Stethoscope className="h-4 w-4 text-pink-600" /> : <User className="h-4 w-4" />}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div
+                        className={`rounded-lg p-3 ${
+                          message.role === 'avatar'
+                            ? 'bg-pink-500 text-white'
+                            : 'bg-gray-100 text-gray-900'
+                        }`}
+                      >
+                        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                          {message.content}
                         </div>
+                        
+                        {message.qualityScores && message.role === 'avatar' && (
+                          <div className="flex gap-3 mt-3 text-xs opacity-90">
+                            <div className="flex items-center gap-1">
+                              <Heart className="w-3 h-3" />
+                              <span>Empathy: {message.qualityScores.empathy}%</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Brain className="w-3 h-3" />
+                              <span>Medical: {message.qualityScores.medicalAccuracy}%</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 ))}
                 
                 {isTyping && (
-                  <div className="flex justify-start">
-                    <div className="bg-gradient-to-r from-pink-100 to-rose-100 rounded-lg p-4 flex items-center gap-3">
-                      <div className="w-8 h-8 bg-pink-500 rounded-full flex items-center justify-center">
-                        <Stethoscope className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="flex space-x-1">
-                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce"></div>
-                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="flex gap-3 justify-end">
+                    <div className="flex gap-2 max-w-[80%] flex-row-reverse">
+                      <Avatar className="w-8 h-8">
+                        <AvatarFallback>
+                          <Stethoscope className="h-4 w-4 text-pink-600" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="bg-pink-500 text-white rounded-lg p-3">
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                        </div>
                       </div>
                     </div>
                   </div>
