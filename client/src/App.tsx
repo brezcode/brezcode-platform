@@ -65,8 +65,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Switch>
-          {/* Main platform routes - Breast health landing page first */}
-          <Route path="/" component={LandingPage} />
+          {/* Main platform routes - LeadGen.to landing page first */}
+          <Route path="/" component={LeadGenLanding} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
