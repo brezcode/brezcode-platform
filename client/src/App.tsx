@@ -1,6 +1,7 @@
 import { Route, Switch } from "wouter";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
+import LandingPage from "@/pages/landing";
 import UserProfile from "@/pages/UserProfile";
 import UserProfileTest from "@/pages/UserProfileTest";
 import BusinessDashboard from "@/pages/BusinessDashboard";
@@ -110,6 +111,7 @@ function App() {
           <Route path="/knowledge-center" component={KnowledgeCenter} />
           
           {/* Health platform routes (BrezCode) */}
+          <Route path="/brezcode" component={LandingPage} />
           <Route path="/brezcode/quiz" component={QuizPage} />
           <Route path="/brezcode/quiz-transition">
             {() => <QuizTransition onContinue={() => {}} />}

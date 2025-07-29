@@ -113,7 +113,7 @@ export default function BrezCodeDashboard() {
           onClick={() => setLocation('/brezcode')}
         >
           <Heart className="h-4 w-4" />
-          <span>Public Demo Site</span>
+          <span>Customer Landing Page</span>
         </Button>
       </div>
 
