@@ -64,8 +64,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Switch>
-          {/* Main platform routes - LeadGen homepage first */}
-          <Route path="/" component={LeadGenLanding} />
+          {/* Main platform routes - Breast health landing page first */}
+          <Route path="/" component={LandingPage} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
@@ -127,11 +127,11 @@ function App() {
           <Route path="/brezcode/iphone-widget" component={IPhoneWidgetGuide} />
           <Route path="/brezcode/notifications" component={NotificationDemo} />
           
-          {/* Traditional breast health landing page */}
-          <Route path="/breast-health-landing" component={LandingPage} />
+          {/* LeadGen platform page */}
+          <Route path="/leadgen" component={LeadGenLanding} />
           
-          {/* Default fallback */}
-          <Route component={LeadGenLanding} />
+          {/* Default fallback - breast health landing */}
+          <Route component={LandingPage} />
         </Switch>
         
         {/* Mobile navigation components */}
