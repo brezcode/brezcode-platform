@@ -24,7 +24,6 @@ app.post('/api/reports/generate', (req, res) => {
     riskScore += 25;
     riskFactors.push("Family history of breast cancer");
   }
-  
   if (parseFloat(answers.bmi) >= 30) {
     riskScore += 15;
     riskFactors.push("Obesity increases breast cancer risk");
