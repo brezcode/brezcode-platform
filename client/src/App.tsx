@@ -52,6 +52,7 @@ import CodingAssistant from "@/pages/CodingAssistant";
 import KnowledgeCenter from "@/pages/KnowledgeCenter";
 import LandingPage from "@/pages/landing";
 import HomePage from "@/pages/HomePage";
+import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -129,6 +130,7 @@ function App() {
           </Route>
           <Route path="/brezcode/iphone-widget" component={IPhoneWidgetGuide} />
           <Route path="/brezcode/notifications" component={NotificationDemo} />
+          <Route path="/brezcode/avatar-chat" component={BrezcodeAvatarChat} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

@@ -744,6 +744,16 @@ app.use((req, res, next) => {
   // Register Avatar Knowledge Base routes
   registerAvatarKnowledgeRoutes(app);
 
+  // Register BrezCode Avatar routes
+  try {
+    console.log('🌸 Registering BrezCode avatar routes...');
+    const brezcodeAvatarRoutes = await import('./routes/brezcodeAvatarRoutes');
+    app.use('/api/brezcode/avatar', brezcodeAvatarRoutes.default);
+    console.log('✅ BrezCode avatar routes registered successfully');
+  } catch (error) {
+    console.error('❌ Error registering BrezCode avatar routes:', error);
+  }
+
   // Register avatar performance routes for completed session display
   try {
     console.log('🎯 Registering avatar performance routes...');
