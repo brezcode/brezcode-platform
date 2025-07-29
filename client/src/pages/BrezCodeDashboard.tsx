@@ -100,6 +100,17 @@ export default function BrezCodeDashboard() {
         </Button>
       </div>
 
+      {/* BrezCode Landing Page Link */}
+      <div className="flex items-center justify-center mb-6">
+        <Button 
+          className="flex items-center space-x-2 bg-pink-500 hover:bg-pink-600 text-white"
+          onClick={() => setLocation('/brezcode')}
+        >
+          <Heart className="h-4 w-4" />
+          <span>Visit BrezCode Landing Page</span>
+        </Button>
+      </div>
+
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <Card>
