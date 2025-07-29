@@ -33,7 +33,7 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 }) : null;
 
 // Rule-based health assessment function
-function generateRuleBasedReport(quizAnswers: any) {
+async function generateRuleBasedReport(quizAnswers: any) {
   let riskScore = 20; // Base risk score
   let riskFactors: string[] = [];
   let userProfile = "premenopausal";
@@ -137,10 +137,20 @@ function generateRuleBasedReport(quizAnswers: any) {
         }
       ],
       sectionSummaries: {
-        "Demographics & Age": age >= 50 ? "Age is a significant risk factor for breast cancer, with risk increasing after age 50." : "Your current age places you in a lower risk category.",
-        "Family History": quizAnswers.family_history === "Yes" ? "Family history significantly increases breast cancer risk and warrants enhanced screening." : "No family history is a protective factor that reduces your overall risk.",
-        "Lifestyle Factors": "Maintaining healthy lifestyle choices can significantly impact your breast cancer risk.",
-        "Reproductive History": "Your reproductive history shows favorable risk factors."
+        "Demographics & Age": age >= 50 ? 
+          `At age ${age}, you are in the postmenopausal demographic where breast cancer risk naturally increases due to lifetime estrogen exposure. Research shows that approximately 80% of breast cancers occur in women over 50, with risk doubling every 10 years after menopause. While age is a non-modifiable risk factor, early detection through regular screening becomes increasingly important. Your age-related risk is balanced by other protective factors in your profile, and proactive health management can significantly impact long-term outcomes.` :
+          `At age ${age}, you are in a lower-risk demographic for breast cancer. Pre-menopausal women have naturally lower risk due to regular ovarian hormone cycles and generally shorter lifetime estrogen exposure. However, establishing healthy lifestyle habits and awareness of breast health is crucial for long-term wellness. This is an optimal time to establish baseline screening protocols and develop sustainable health practices that will provide protection throughout your lifetime.`,
+        
+        "Family History": quizAnswers.family_history === "Yes" ? 
+          `Your family history of breast cancer places you in a higher-risk category, as hereditary factors account for 5-10% of all breast cancer cases. This suggests possible genetic predisposition through BRCA1, BRCA2, or other hereditary cancer syndromes. However, it's important to note that 90-95% of women with family history never develop breast cancer. Enhanced screening protocols, genetic counseling, and possibly genetic testing should be considered. Your healthcare provider may recommend earlier and more frequent screening, including MRI in addition to mammography.` :
+          `The absence of family history is a significant protective factor in your risk profile. Approximately 85% of breast cancers occur in women with no family history, meaning your lack of hereditary predisposition places you in a favorable category. This doesn't eliminate risk entirely, but it does mean your risk is primarily influenced by age, lifestyle, and reproductive factors - many of which are modifiable. Standard screening guidelines apply, focusing on lifestyle optimization and age-appropriate preventive care.`,
+        
+        "Lifestyle Factors": bmi > 30 ? 
+          `Your current BMI indicates obesity, which is associated with increased breast cancer risk, particularly in postmenopausal women. Excess weight increases estrogen production in fatty tissue and can lead to insulin resistance and chronic inflammation - all of which contribute to cancer risk. However, even modest weight loss of 5-10% can provide significant health benefits. Focus on sustainable dietary changes, regular physical activity, and working with healthcare providers to develop a comprehensive weight management strategy. This is one of the most modifiable risk factors in your profile.` :
+          `Your lifestyle factors show positive elements for breast cancer prevention. ${quizAnswers.exercise !== "No, little or no regular exercise" ? "Regular physical activity" : "Incorporating regular exercise"} can reduce breast cancer risk by 10-20% through multiple mechanisms including weight management, hormone regulation, and immune system enhancement. ${quizAnswers.western_diet !== "Yes, mostly Western diet" ? "Your healthy dietary patterns" : "Adopting a Mediterranean-style diet rich in fruits, vegetables, and healthy fats"} provides additional protective benefits. Continue focusing on maintaining healthy weight, limiting alcohol consumption, and regular physical activity for optimal risk reduction.`,
+        
+        "Reproductive History": 
+          `Your reproductive history contributes to your overall risk assessment through hormonal exposure patterns. ${quizAnswers.pregnancy_age !== "Never pregnant" ? `Having your first pregnancy at ${quizAnswers.pregnancy_age} provides some protective benefit, as pregnancy reduces lifetime estrogen exposure and breast tissue undergoes protective changes during pregnancy and breastfeeding.` : "Nulliparity (never having been pregnant) slightly increases risk due to longer lifetime estrogen exposure, but this factor alone does not significantly impact overall risk."} ${quizAnswers.menopause === "Yes, before age 55" ? "Early menopause provides additional protection by reducing total lifetime estrogen exposure." : quizAnswers.menopause === "No, still menstruating" ? "Continued menstruation means ongoing estrogen exposure, which is normal for your age group." : "Natural menopause timing contributes to your current risk profile."} These factors, combined with your other health characteristics, help determine your individualized screening and prevention strategy.`
       }
     },
     personalizedPlan: {
@@ -526,10 +536,10 @@ Format your response as JSON with the exact structure:
         } catch (aiError) {
           console.error("AI analysis failed, falling back to rule-based:", aiError);
           // Fall back to rule-based assessment
-          report = generateRuleBasedReport(quizAnswers);
+          report = await generateRuleBasedReport(quizAnswers);
         }
       } else {
-        report = generateRuleBasedReport(quizAnswers);
+        report = await generateRuleBasedReport(quizAnswers);
       }
       
       res.json({ success: true, report });
