@@ -9,7 +9,8 @@ import { AlertCircle, FileText, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function ReportPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
+  const isAuthenticated = !!user;
   const [location, setLocation] = useLocation();
   const [quizAnswers, setQuizAnswers] = useState<Record<string, any> | null>(null);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
@@ -38,7 +39,7 @@ export default function ReportPage() {
         body: JSON.stringify({ quizAnswers: answers })
       });
     },
-    onSuccess: (data) => {
+    onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['/api/reports'] });
       setGeneratedReport(data.report); // Store the generated report
       setQuizAnswers(null); // Clear quiz answers after successful generation
@@ -174,7 +175,7 @@ export default function ReportPage() {
     );
   }
 
-  if (!reports || reports.length === 0) {
+  if (!reports || (Array.isArray(reports) && reports.length === 0)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
         <Card className="w-full max-w-md">
@@ -203,7 +204,7 @@ export default function ReportPage() {
   }
 
   // Display the most recent report
-  const latestReport = reports[0];
+  const latestReport = Array.isArray(reports) ? reports[0] : reports;
 
   return (
     <div className="min-h-screen bg-gray-50">
