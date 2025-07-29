@@ -43,10 +43,10 @@
         
         localStorage.setItem('brezcode_quiz_answers', JSON.stringify(quizAnswers));
         
-        // Redirect to report page
-        setTimeout(() => {
-            window.location.href = '/brezcode/report';
-        }, 1000);
+        console.log('Quiz data set:', localStorage.getItem('brezcode_quiz_answers'));
+        
+        // Redirect to report page immediately
+        window.location.href = '/brezcode/report';
     </script>
 </body>
 </html>
