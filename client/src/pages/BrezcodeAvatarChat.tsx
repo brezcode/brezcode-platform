@@ -140,7 +140,7 @@ export default function BrezcodeAvatarChat() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <div className="container mx-auto py-8 px-4 max-w-4xl">
+      <div className="container mx-auto py-8 px-4 max-w-5xl">
         
         {/* Header */}
         <div className="mb-6">
@@ -281,7 +281,7 @@ export default function BrezcodeAvatarChat() {
             <CardTitle className="text-lg">Quick Questions to Get Started</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               {[
                 "How do I perform a proper breast self-examination?",
                 "What should I know about mammogram screening?",
@@ -297,7 +297,7 @@ export default function BrezcodeAvatarChat() {
                     setInputMessage(question);
                     handleSendMessage();
                   }}
-                  className="text-left h-auto p-3 text-sm justify-start hover:bg-pink-50"
+                  className="text-left h-auto p-3 text-sm justify-start hover:bg-pink-50 whitespace-normal"
                   disabled={isTyping}
                 >
                   {question}
