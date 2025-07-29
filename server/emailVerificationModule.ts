@@ -197,8 +197,9 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           subscriptionTier
         });
         
-        // Store in session
+        // Store in session with password (will be hashed when creating real user)
         req.session.pendingUser = pendingUser;
+        req.session.pendingPassword = password;
         
         // Send verification code
         await emailModule.sendVerificationCode(email, pendingUser.verificationCode);
@@ -215,7 +216,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
     },
 
     // Verify email endpoint
-    verifyEmail: (req: any, res: any) => {
+    verifyEmail: async (req: any, res: any) => {
       const { email, code } = req.body;
       
       if (!email || !code) {
@@ -238,18 +239,39 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
         return res.status(400).json({ error: validation.error });
       }
       
-      // Complete verification
-      const verifiedUser = emailModule.completeVerification(pendingUser);
-      
-      // Set authenticated session
-      req.session.userId = verifiedUser.id;
-      req.session.isAuthenticated = true;
-      req.session.pendingUser = null;
-      
-      res.json({
-        user: verifiedUser,
-        message: "Email verified successfully"
-      });
+      try {
+        // Create user in database after successful verification
+        const { storage } = await import('./storage');
+        const password = req.session.pendingPassword;
+        
+        if (!password) {
+          return res.status(400).json({ error: "Password not found. Please register again." });
+        }
+        
+        const newUser = await storage.createUser({
+          firstName: pendingUser.firstName,
+          lastName: pendingUser.lastName,
+          email: pendingUser.email,
+          password: password, // This will be hashed by the storage layer
+          isEmailVerified: true,
+          subscriptionTier: pendingUser.subscriptionTier || 'basic',
+          platform: 'brezcode' // Set platform based on context
+        });
+        
+        // Set authenticated session with database-generated ID
+        req.session.userId = newUser.id;
+        req.session.isAuthenticated = true;
+        req.session.pendingUser = null;
+        req.session.pendingPassword = null; // Clear password from session
+        
+        res.json({
+          user: newUser,
+          message: "Email verified successfully"
+        });
+      } catch (error: any) {
+        console.error('Database user creation error:', error);
+        res.status(500).json({ error: "Failed to complete registration. Please try again." });
+      }
     },
 
     // Resend verification code
