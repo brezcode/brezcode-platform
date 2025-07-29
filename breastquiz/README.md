@@ -1,60 +1,66 @@
 # BreastQuiz - Breast Health Assessment Platform
 
-A comprehensive breast health assessment quiz platform built with modern web technologies.
+## Overview
+BreastQuiz is an independent breast health assessment platform that provides personalized risk analysis and health recommendations based on evidence-based medical guidelines.
 
-## Architecture
+## Key Features
+- **Comprehensive Health Assessment**: Multi-step questionnaire covering age, family history, lifestyle factors
+- **Evidence-Based Risk Analysis**: Risk scoring algorithm considering medical factors
+- **Personalized Recommendations**: Tailored health guidance based on individual risk profile
+- **User-Friendly Interface**: Clean, responsive design with blue gradient hero section
+- **Statistical Foundation**: Based on "1 in 8 women in US will develop breast cancer" medical statistic
 
-- **Frontend**: React 18 + TypeScript + Vite
-- **Backend**: Node.js + Express + TypeScript
+## Technology Stack
+- **Frontend**: React 18 + TypeScript + Tailwind CSS
+- **Backend**: Node.js + Express
 - **Database**: PostgreSQL with Drizzle ORM
-- **Styling**: Tailwind CSS
-- **Authentication**: Session-based with bcrypt
+- **Build Tool**: Vite
+- **Hosting**: Replit-ready with independent deployment
 
 ## Project Structure
-
 ```
 breastquiz/
-├── client/                 # Frontend React application
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/         # Page components
-│   │   ├── hooks/         # Custom React hooks
-│   │   ├── lib/           # Utility libraries
-│   │   └── styles/        # CSS and styling files
-├── server/                # Backend Express application
-│   ├── routes/           # API route handlers
-│   └── services/         # Business logic services
-├── shared/               # Shared types and schemas
-└── public/              # Static assets
+├── client/          # React frontend application
+├── server/          # Express backend API
+├── shared/          # Shared TypeScript schemas
+├── public/          # Static assets
+└── package.json     # Dependencies and scripts
 ```
 
-## Getting Started
+## Development Setup
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
+1. **Install Dependencies**
+```bash
+npm install
+```
 
-2. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   ```
+2. **Setup Environment Variables**
+```bash
+cp .env.example .env
+# Add your DATABASE_URL and other required variables
+```
 
-3. Push database schema:
-   ```bash
-   npm run db:push
-   ```
+3. **Run Database Migration**
+```bash
+npm run db:push
+```
 
-4. Start development server:
-   ```bash
-   npm run dev
-   ```
+4. **Start Development Server**
+```bash
+npm run dev
+```
 
-## Features
+## Database Schema
+- `users`: User authentication and profile data
+- `quiz_responses`: User assessment answers
+- `health_reports`: Generated risk analysis and recommendations
 
-- [ ] User authentication and registration
-- [ ] Comprehensive breast health quiz
-- [ ] Risk assessment and scoring
-- [ ] Personalized health reports
-- [ ] Responsive design
-- [ ] Data privacy and security
+## Deployment
+Ready for deployment on:
+- Replit (recommended for quick setup)
+- Vercel + Neon PostgreSQL
+- Railway
+- Any Node.js hosting platform
+
+## Independent Platform
+This is a completely independent platform separate from LeadGen.to, designed specifically for breast health assessment and education.
