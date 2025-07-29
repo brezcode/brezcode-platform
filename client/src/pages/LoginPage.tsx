@@ -123,8 +123,10 @@ export default function LoginPage() {
 
   const handleEmailVerificationComplete = (user: any) => {
     setShowEmailVerification(false);
-    // Refresh the auth context to get the authenticated user
-    window.location.reload(); // Simple way to refresh and get authenticated state
+    // For BrezCode context, redirect to quiz report; otherwise to dashboard
+    const currentPath = window.location.pathname;
+    const redirectPath = currentPath.includes('/brezcode') ? "/brezcode/report" : "/dashboard";
+    setLocation(redirectPath);
   };
 
   const handleBackFromVerification = () => {

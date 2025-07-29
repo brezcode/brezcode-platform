@@ -16,10 +16,10 @@ export default function ReportPage() {
 
   // Check for quiz answers in localStorage
   useEffect(() => {
-    const storedAnswers = localStorage.getItem('completedQuizAnswers');
+    const storedAnswers = localStorage.getItem('brezcode_quiz_answers');
     if (storedAnswers) {
       setQuizAnswers(JSON.parse(storedAnswers));
-      localStorage.removeItem('completedQuizAnswers'); // Clean up after use
+      localStorage.removeItem('brezcode_quiz_answers'); // Clean up after use
     }
   }, []);
 
