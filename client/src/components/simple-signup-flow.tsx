@@ -32,11 +32,8 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   // Resend verification code mutation
   const resendCodeMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("/api/auth/send-email-verification", {
-        method: "POST",
-        body: JSON.stringify({ email: formData.email }),
-        headers: { "Content-Type": "application/json" }
-      });
+      const response = await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
+      return response.json();
     },
     onSuccess: () => {
       toast({
@@ -82,11 +79,8 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   const signupMutation = useMutation({
     mutationFn: async (data: { firstName: string; lastName: string; email: string; password: string; quizAnswers: Record<string, any> }) => {
       try {
-        return await apiRequest("/api/auth/signup", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
+        const response = await apiRequest("POST", "/api/auth/signup", data);
+        return response.json();
       } catch (error) {
         console.error("Signup error:", error);
         throw error;
@@ -95,11 +89,7 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
     onSuccess: async () => {
       // Send email verification code after account creation
       try {
-        await apiRequest("/api/auth/send-email-verification", {
-          method: "POST",
-          body: JSON.stringify({ email: formData.email }),
-          headers: { "Content-Type": "application/json" }
-        });
+        await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
         toast({
           title: "Account Created",
           description: "Please check your email for a verification code.",
@@ -151,11 +141,8 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: { email: string; code: string }) => {
       try {
-        return await apiRequest("/api/auth/verify-email", {
-          method: "POST",
-          body: JSON.stringify(data),
-          headers: { "Content-Type": "application/json" }
-        });
+        const response = await apiRequest("POST", "/api/auth/verify-email", data);
+        return response.json();
       } catch (error) {
         console.error("Email verification error:", error);
         throw error;

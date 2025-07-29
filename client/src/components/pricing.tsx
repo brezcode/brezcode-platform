@@ -153,7 +153,7 @@ export default function Pricing() {
               </div>
 
               <Button
-                onClick={() => setLocation("/brezcode/quiz")}
+                onClick={() => setLocation("/quiz")}
                 className="w-full py-4 rounded-full font-bold text-xl bg-sunny-yellow text-black hover:bg-yellow-400 hover:shadow-lg transition-all hover:scale-105"
               >
                 {t('pricing.startQuiz', 'Take the quiz to start')}

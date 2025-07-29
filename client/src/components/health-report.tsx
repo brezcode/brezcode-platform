@@ -3,8 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, Heart, Shield, TrendingUp, Calendar, Download, ArrowRight } from "lucide-react";
-import { useLocation } from "wouter";
+import { AlertTriangle, Heart, Shield, TrendingUp, Calendar, Download } from "lucide-react";
 
 interface HealthReportProps {
   report: {
@@ -93,7 +92,6 @@ function getProfileIcon(profile: string) {
 }
 
 export default function HealthReport({ report }: HealthReportProps) {
-  const [, setLocation] = useLocation();
   const healthScore = parseFloat(report.riskScore);
   const { summary, sectionAnalysis, personalizedPlan } = report.reportData;
   const uncontrollableScore = parseFloat(summary.uncontrollableHealthScore || "0");
@@ -355,27 +353,6 @@ export default function HealthReport({ report }: HealthReportProps) {
                 <div className="text-sm text-gray-700">{action}</div>
               </div>
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Start Health Plan Action */}
-      <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready to Begin Your Health Plan?</h3>
-              <p className="text-gray-600">
-                Start your personalized breast health journey with daily activities, reminders, and Dr. Sakura AI coaching.
-              </p>
-            </div>
-            <Button 
-              onClick={() => setLocation('/brezcode/health-calendar')}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3"
-            >
-              Start Health Plan
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
         </CardContent>
       </Card>

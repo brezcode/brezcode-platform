@@ -9,18 +9,17 @@ import { AlertCircle, FileText, Loader2 } from "lucide-react";
 import { useLocation } from "wouter";
 
 export default function ReportPage() {
-  const { user, isLoading: authLoading } = useAuth();
-  const isAuthenticated = !!user;
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [location, setLocation] = useLocation();
   const [quizAnswers, setQuizAnswers] = useState<Record<string, any> | null>(null);
   const [generatedReport, setGeneratedReport] = useState<any>(null);
 
   // Check for quiz answers in localStorage
   useEffect(() => {
-    const storedAnswers = localStorage.getItem('brezcode_quiz_answers');
+    const storedAnswers = localStorage.getItem('completedQuizAnswers');
     if (storedAnswers) {
       setQuizAnswers(JSON.parse(storedAnswers));
-      localStorage.removeItem('brezcode_quiz_answers'); // Clean up after use
+      localStorage.removeItem('completedQuizAnswers'); // Clean up after use
     }
   }, []);
 
@@ -39,7 +38,7 @@ export default function ReportPage() {
         body: JSON.stringify({ quizAnswers: answers })
       });
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['/api/reports'] });
       setGeneratedReport(data.report); // Store the generated report
       setQuizAnswers(null); // Clear quiz answers after successful generation
@@ -57,10 +56,10 @@ export default function ReportPage() {
   }, [quizAnswers]);
 
   // For test mode: Allow access without authentication when quiz answers are available
-  // Redirect to BrezCode landing only if no quiz answers and not authenticated
+  // Redirect to landing only if no quiz answers and not authenticated
   useEffect(() => {
     if (!authLoading && !isAuthenticated && !quizAnswers && !generatedReport) {
-      setLocation('/brezcode');
+      setLocation('/');
     }
   }, [authLoading, isAuthenticated, quizAnswers, generatedReport, setLocation]);
 
@@ -175,28 +174,23 @@ export default function ReportPage() {
     );
   }
 
-  if (!reports || (Array.isArray(reports) && reports.length === 0)) {
+  if (!reports || reports.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+      <div className="min-h-screen flex items-center justify-center">
         <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <CardTitle className="flex items-center justify-center gap-2">
               <FileText className="h-5 w-5" />
-              No BrezCode Reports Found
+              No Reports Found
             </CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-4">
             <p className="text-gray-600">
-              You haven't completed any breast health assessments yet. Take our comprehensive BrezCode assessment to get your personalized health report.
+              You haven't completed any health assessments yet. Take our comprehensive assessment to get your personalized report.
             </p>
-            <div className="space-y-2">
-              <Button onClick={() => setLocation('/brezcode/quiz')} className="w-full">
-                Take BrezCode Assessment
-              </Button>
-              <Button variant="outline" onClick={() => setLocation('/brezcode')} className="w-full">
-                Back to BrezCode Home
-              </Button>
-            </div>
+            <Button onClick={() => setLocation('/quiz')}>
+              Take Assessment
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -204,7 +198,7 @@ export default function ReportPage() {
   }
 
   // Display the most recent report
-  const latestReport = Array.isArray(reports) ? reports[0] : reports;
+  const latestReport = reports[0];
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -34,10 +34,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in - but don't trigger during render
   if (user && !showEmailVerification) {
-    // Check if user came from BrezCode context and redirect to health plan app
-    const currentPath = window.location.pathname;
-    const redirectPath = currentPath.includes('/brezcode') ? "/brezcode/health-calendar" : "/dashboard";
-    setTimeout(() => setLocation(redirectPath), 0);
+    setTimeout(() => setLocation("/dashboard"), 0);
     return null;
   }
 
@@ -47,12 +44,9 @@ export default function LoginPage() {
       await login(loginForm.email, loginForm.password);
       toast({
         title: "Welcome back!",
-        description: "Successfully signed in to your health plan app",
+        description: "Successfully signed in to LeadGen.to",
       });
-      // Check if user came from BrezCode context and redirect to health plan app
-      const currentPath = window.location.pathname;
-      const redirectPath = currentPath.includes('/brezcode') ? "/brezcode/health-calendar" : "/dashboard";
-      setLocation(redirectPath);
+      setLocation("/dashboard");
     } catch (error: any) {
       console.log('Login error caught:', error);
       toast({
@@ -123,10 +117,8 @@ export default function LoginPage() {
 
   const handleEmailVerificationComplete = (user: any) => {
     setShowEmailVerification(false);
-    // For BrezCode context, redirect to quiz report; otherwise to dashboard
-    const currentPath = window.location.pathname;
-    const redirectPath = currentPath.includes('/brezcode') ? "/brezcode/report" : "/dashboard";
-    setLocation(redirectPath);
+    // Refresh the auth context to get the authenticated user
+    window.location.reload(); // Simple way to refresh and get authenticated state
   };
 
   const handleBackFromVerification = () => {

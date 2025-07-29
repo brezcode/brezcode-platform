@@ -1,7 +1,6 @@
 import { Route, Switch } from "wouter";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
-import LandingPage from "@/pages/landing";
 import UserProfile from "@/pages/UserProfile";
 import UserProfileTest from "@/pages/UserProfileTest";
 import BusinessDashboard from "@/pages/BusinessDashboard";
@@ -18,8 +17,6 @@ import BusinessLandingCreator from "@/pages/BusinessLandingCreator";
 import QuizPage from "@/pages/quiz";
 import QuizTransition from "@/components/quiz-transition";
 import ReportViewer from "@/pages/report";
-import DemoReportPage from "@/pages/demo-report";
-import PersonalizedReportPage from "@/pages/personalized-report";
 import KnowledgeCentre from "@/pages/KnowledgeCentre";
 import AITrainer from "@/pages/AITrainer";
 import AITrainerDashboard from "@/pages/AITrainerDashboard";
@@ -113,14 +110,11 @@ function App() {
           <Route path="/knowledge-center" component={KnowledgeCenter} />
           
           {/* Health platform routes (BrezCode) */}
-          <Route path="/brezcode" component={LandingPage} />
           <Route path="/brezcode/quiz" component={QuizPage} />
           <Route path="/brezcode/quiz-transition">
             {() => <QuizTransition onContinue={() => {}} />}
           </Route>
           <Route path="/brezcode/report" component={ReportViewer} />
-          <Route path="/brezcode/demo-report" component={DemoReportPage} />
-          <Route path="/brezcode/personalized-report" component={PersonalizedReportPage} />
           <Route path="/brezcode/health-preferences" component={HealthPreferences} />
           <Route path="/brezcode/health-calendar" component={HealthCalendar} />
           <Route path="/brezcode/avatar-demo" component={AvatarDemo} />
