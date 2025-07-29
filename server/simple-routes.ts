@@ -103,12 +103,45 @@ function generateRuleBasedReport(quizAnswers: any) {
     summary: {
       uncontrollableHealthScore: Math.max(80 - (riskScore - 20), 20).toString(),
       controllableHealthScore: "75",
-      overallHealthScore: riskScore.toString()
+      overallHealthScore: riskScore.toString(),
+      profileDescription: `Based on your age and health profile, you are in the ${userProfile} category.`
     },
     sectionAnalysis: {
       uncontrollableFactors: riskFactors,
       controllableFactors: ["Diet and nutrition", "Physical exercise", "Alcohol consumption", "Body weight management"],
-      recommendations: recommendations
+      recommendations: recommendations,
+      sectionBreakdown: [
+        {
+          name: "Demographics & Age",
+          score: Math.max(80 - (age >= 50 ? 20 : 0), 30),
+          riskLevel: age >= 50 ? "moderate" : "low",
+          riskFactors: age >= 50 ? ["Age over 50"] : []
+        },
+        {
+          name: "Family History",
+          score: quizAnswers.family_history === "Yes" ? 40 : 85,
+          riskLevel: quizAnswers.family_history === "Yes" ? "high" : "low", 
+          riskFactors: quizAnswers.family_history === "Yes" ? ["Family history of breast cancer"] : []
+        },
+        {
+          name: "Lifestyle Factors",
+          score: 75,
+          riskLevel: "moderate",
+          riskFactors: bmi > 30 ? ["Elevated BMI"] : []
+        },
+        {
+          name: "Reproductive History",
+          score: 80,
+          riskLevel: "low",
+          riskFactors: []
+        }
+      ],
+      sectionSummaries: {
+        "Demographics & Age": age >= 50 ? "Age is a significant risk factor for breast cancer, with risk increasing after age 50." : "Your current age places you in a lower risk category.",
+        "Family History": quizAnswers.family_history === "Yes" ? "Family history significantly increases breast cancer risk and warrants enhanced screening." : "No family history is a protective factor that reduces your overall risk.",
+        "Lifestyle Factors": "Maintaining healthy lifestyle choices can significantly impact your breast cancer risk.",
+        "Reproductive History": "Your reproductive history shows favorable risk factors."
+      }
     },
     personalizedPlan: {
       morning: "Take vitamin D supplement and practice meditation",
