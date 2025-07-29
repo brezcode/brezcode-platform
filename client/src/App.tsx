@@ -51,6 +51,7 @@ import { FeatureShowcase } from "@/pages/FeatureShowcase";
 import CodingAssistant from "@/pages/CodingAssistant";
 import KnowledgeCenter from "@/pages/KnowledgeCenter";
 import LandingPage from "@/pages/landing";
+import HomePage from "@/pages/HomePage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -65,13 +66,13 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Switch>
-          {/* Main platform routes - LeadGen.to landing page first */}
-          <Route path="/" component={LeadGenLanding} />
+          {/* Home page with two buttons */}
+          <Route path="/" component={HomePage} />
+          <Route path="/leadgen" component={LeadGenLanding} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />
           <Route path="/profile-test" component={UserProfileTest} />
-          <Route path="/dashboard" component={UserHomepage} />
           <Route path="/leadgen-dashboard" component={LeadGenDashboard} />
           <Route path="/business-dashboard" component={BusinessDashboard} />
           <Route path="/business-selector">
