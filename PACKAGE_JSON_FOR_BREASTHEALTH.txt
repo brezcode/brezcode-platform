@@ -1,0 +1,27 @@
+CREATE THIS FILE AS package.json IN YOUR BREASTHEALTHMIGRATE PROJECT:
+
+{
+  "name": "breast-health-platform",
+  "version": "1.0.0",
+  "description": "Independent breast health assessment platform with WHO statistics",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
+
+INSTRUCTIONS FOR YOUR BREASTHEALTHMIGRATE PROJECT:
+1. Create a new file called "package.json"
+2. Copy the content above (between the { } brackets) into that file
+3. Save the file
+4. Stop the current server (Ctrl+C in Console)
+5. Run: npm start
+
+This will run YOUR breast health platform instead of the old LeadGen server.
