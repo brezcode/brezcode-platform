@@ -1,0 +1,25 @@
+REPLACE YOUR EXISTING package.json WITH THIS SIMPLE VERSION:
+
+{
+  "name": "breast-health-platform",
+  "version": "1.0.0",
+  "description": "Independent breast health assessment platform with WHO statistics",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
+
+INSTRUCTIONS:
+1. In your BreastHealthMigrate project, open the existing package.json file
+2. Delete ALL the current content
+3. Replace it with the simple version above (between the { } brackets)
+4. Save the file
+5. Stop the current server (Ctrl+C in Console)
+6. Run: npm start
+
+This removes all the complex LeadGen dependencies and configurations, keeping only what's needed for your simple breast health platform.
