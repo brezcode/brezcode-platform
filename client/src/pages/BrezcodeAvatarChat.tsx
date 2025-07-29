@@ -197,20 +197,20 @@ export default function BrezcodeAvatarChat() {
                     key={message.id}
                     className={`flex gap-3 ${message.role === 'avatar' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex gap-2 max-w-[80%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`flex gap-2 max-w-[85%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <Avatar className="w-8 h-8">
                         <AvatarFallback>
                           {message.role === 'avatar' ? <Stethoscope className="h-4 w-4 text-pink-600" /> : <User className="h-4 w-4" />}
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`rounded-lg p-3 ${
+                        className={`rounded-lg p-3 max-h-96 overflow-y-auto ${
                           message.role === 'avatar'
                             ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 text-gray-900'
                         }`}
                       >
-                        <div className="text-sm leading-relaxed whitespace-pre-wrap">
+                        <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
                           {message.content}
                         </div>
                         
@@ -233,7 +233,7 @@ export default function BrezcodeAvatarChat() {
                 
                 {isTyping && (
                   <div className="flex gap-3 justify-end">
-                    <div className="flex gap-2 max-w-[80%] flex-row-reverse">
+                    <div className="flex gap-2 max-w-[85%] flex-row-reverse">
                       <Avatar className="w-8 h-8">
                         <AvatarFallback>
                           <Stethoscope className="h-4 w-4 text-pink-600" />
