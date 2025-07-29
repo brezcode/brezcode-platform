@@ -152,7 +152,14 @@ function generateRuleBasedReport(quizAnswers: any) {
         "Maintain healthy weight through diet and exercise",
         "Monthly breast self-examination routine",
         "Annual clinical breast exams with healthcare provider"
-      ]
+      ],
+      followUpTimeline: {
+        "immediate": "Schedule appointment with healthcare provider to discuss results",
+        "1_month": "Begin monthly breast self-examination routine",
+        "3_months": "Follow up on lifestyle changes and weight management progress",
+        "6_months": "Clinical breast exam with healthcare provider",
+        "1_year": "Annual mammogram and comprehensive health review"
+      }
     },
     originalQuizAnswers: quizAnswers
   };
