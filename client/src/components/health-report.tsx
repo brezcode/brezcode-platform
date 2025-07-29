@@ -277,34 +277,25 @@ export default function HealthReport({ report }: HealthReportProps) {
             <div>
               <h4 className="font-semibold text-gray-900 mb-3">Morning</h4>
               <div className="space-y-2">
-                {Object.entries(report.dailyPlan.morning || {}).map(([key, value]) => (
-                  <div key={key} className="text-sm">
-                    <span className="font-medium text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1')}: </span>
-                    <span className="text-gray-600">{value as string}</span>
-                  </div>
-                ))}
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  {report.dailyPlan.morning}
+                </div>
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-3">Afternoon</h4>
               <div className="space-y-2">
-                {Object.entries(report.dailyPlan.afternoon || {}).map(([key, value]) => (
-                  <div key={key} className="text-sm">
-                    <span className="font-medium text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1')}: </span>
-                    <span className="text-gray-600">{value as string}</span>
-                  </div>
-                ))}
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  {report.dailyPlan.afternoon}
+                </div>
               </div>
             </div>
             <div>
               <h4 className="font-semibold text-gray-900 mb-3">Evening</h4>
               <div className="space-y-2">
-                {Object.entries(report.dailyPlan.evening || {}).map(([key, value]) => (
-                  <div key={key} className="text-sm">
-                    <span className="font-medium text-gray-700 capitalize">{key.replace(/([A-Z])/g, ' $1')}: </span>
-                    <span className="text-gray-600">{value as string}</span>
-                  </div>
-                ))}
+                <div className="text-sm text-gray-600 leading-relaxed">
+                  {report.dailyPlan.evening}
+                </div>
               </div>
             </div>
           </div>
