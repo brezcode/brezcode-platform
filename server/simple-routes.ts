@@ -98,6 +98,26 @@ function generateRuleBasedReport(quizAnswers: any) {
     recommendations.push("Discuss genetic counseling with your healthcare provider");
   }
   
+  // Create structured report data for HealthReport component
+  const reportData = {
+    summary: {
+      uncontrollableHealthScore: Math.max(80 - (riskScore - 20), 20).toString(),
+      controllableHealthScore: "75",
+      overallHealthScore: riskScore.toString()
+    },
+    sectionAnalysis: {
+      uncontrollableFactors: riskFactors,
+      controllableFactors: ["Diet and nutrition", "Physical exercise", "Alcohol consumption", "Body weight management"],
+      recommendations: recommendations
+    },
+    personalizedPlan: {
+      morning: "Take vitamin D supplement and practice meditation",
+      afternoon: "30 minutes of physical activity (walking, swimming, or yoga)",
+      evening: "Practice stress reduction techniques and maintain healthy sleep schedule"
+    },
+    originalQuizAnswers: quizAnswers
+  };
+
   return {
     id: Date.now(),
     riskScore,
@@ -110,7 +130,7 @@ function generateRuleBasedReport(quizAnswers: any) {
       afternoon: "30 minutes of physical activity (walking, swimming, or yoga)",
       evening: "Practice stress reduction techniques and maintain healthy sleep schedule"
     },
-    reportData: quizAnswers,
+    reportData,
     createdAt: new Date().toISOString(),
     generatedBy: "rule-based"
   };
