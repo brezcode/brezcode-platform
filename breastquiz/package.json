@@ -4,7 +4,9 @@
   "description": "Breast Health Assessment Quiz Platform",
   "main": "server/index.js",
   "scripts": {
-    "dev": "NODE_ENV=development tsx server/index.ts",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "NODE_ENV=development tsx server/index.ts",
+    "client": "vite",
     "build": "tsc && vite build",
     "start": "node dist/server/index.js",
     "db:generate": "drizzle-kit generate",
