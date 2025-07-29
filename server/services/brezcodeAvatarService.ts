@@ -1,12 +1,8 @@
 import { brezcodeDb } from '../brezcode-db';
-import { 
-  brezcodeUsers,
-  brezcodeHealthProfiles, 
-  brezcodeAssessments,
-  type BrezcodeUser 
-} from '@shared/brezcode-schema';
+import { users } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
 import Anthropic from '@anthropic-ai/sdk';
+import { BrezcodeConversationService } from './brezcodeConversationService';
 
 /*
 <important_code_snippet_instructions>
@@ -107,6 +103,14 @@ export class BrezcodeAvatarService {
       // Store this conversation in training memory for future learning
       await this.storeConversationInTrainingMemory(userId, userMessage, avatarResponse.content);
       
+      // Store in permanent conversation history
+      await BrezcodeConversationService.storeMessage(userId, 'user', userMessage);
+      await BrezcodeConversationService.storeMessage(userId, 'avatar', avatarResponse.content, {
+        empathy: empathyScore,
+        medicalAccuracy: medicalAccuracy,
+        qualityScore: avatarResponse.quality_score || Math.round((empathyScore + medicalAccuracy) / 2)
+      });
+      
       // Calculate BrezCode-specific quality scores
       const empathyScore = this.calculateEmpathyScore(avatarResponse.content);
       const medicalAccuracy = this.calculateMedicalAccuracy(avatarResponse.content, userMessage);
@@ -142,6 +146,9 @@ export class BrezcodeAvatarService {
     try {
       // Get user's health profile and assessment data for personalized responses
       const userHealthData = await this.getUserHealthData(userId);
+      
+      // Get recent conversation context from permanent history
+      const recentContext = await BrezcodeConversationService.getRecentContext(userId, 5);
       
       // Build personalized system prompt for Dr. Sakura
       const systemPrompt = this.buildDrSakuraSystemPrompt(userHealthData, context);
@@ -287,30 +294,39 @@ Provide specific, actionable guidance while being supportive and reassuring.`
   // Get user's health data for personalized responses
   private static async getUserHealthData(userId: number) {
     try {
+      // Get user data from the correct schema structure
       const [user] = await brezcodeDb
         .select()
-        .from(brezcodeUsers)
-        .where(eq(brezcodeUsers.id, userId));
+        .from(users)
+        .where(eq(users.id, userId));
 
       if (!user) return null;
 
-      // Get health profile
-      const [healthProfile] = await brezcodeDb
-        .select()
-        .from(brezcodeHealthProfiles)
-        .where(eq(brezcodeHealthProfiles.userId, userId));
-
-      // Get recent assessments
-      const recentAssessments = await brezcodeDb
-        .select()
-        .from(brezcodeAssessments)
-        .where(eq(brezcodeAssessments.userId, userId))
-        .limit(3);
+      // Parse quiz answers if available
+      const quizData = user.quiz_answers ? JSON.parse(user.quiz_answers as string) : null;
+      
+      // Extract health information from quiz answers
+      const healthInfo = quizData ? {
+        age: quizData.age || null,
+        country: quizData.country || null,
+        ethnicity: quizData.ethnicity || null,
+        familyHistory: quizData.family_history || null,
+        menstrualHistory: quizData.menstrual_history || null,
+        pregnancyHistory: quizData.pregnancy_history || null,
+        breastfeedingHistory: quizData.breastfeeding_history || null,
+        mammogramHistory: quizData.mammogram_history || null,
+        exerciseHabits: quizData.exercise_habits || null,
+        smokingHistory: quizData.smoking_history || null,
+        alcoholConsumption: quizData.alcohol_consumption || null,
+        stressLevel: quizData.stress_level || null,
+        symptoms: quizData.symptoms || null,
+        riskLevel: user.risk_level || null
+      } : null;
 
       return {
         user,
-        healthProfile,
-        recentAssessments
+        healthInfo,
+        quizCompleted: !!quizData
       };
     } catch (error) {
       console.error('Error fetching user health data:', error);
@@ -320,6 +336,33 @@ Provide specific, actionable guidance while being supportive and reassuring.`
 
   // Build Dr. Sakura's personalized system prompt
   private static buildDrSakuraSystemPrompt(userHealthData: any, context: any): string {
+    let personalizedInfo = '';
+    
+    if (userHealthData?.healthInfo) {
+      const health = userHealthData.healthInfo;
+      personalizedInfo = `
+
+📊 USER HEALTH PROFILE (from completed assessment):
+• Age: ${health.age || 'Not specified'}
+• Country: ${health.country || 'Not specified'}
+• Ethnicity: ${health.ethnicity || 'Not specified'}
+• Family History: ${health.familyHistory || 'None reported'}
+• Risk Level: ${health.riskLevel || 'Not assessed'}
+• Exercise Habits: ${health.exerciseHabits || 'Not specified'}
+• Mammogram History: ${health.mammogramHistory || 'Not specified'}
+• Stress Level: ${health.stressLevel || 'Not specified'}
+• Current Symptoms: ${health.symptoms ? JSON.stringify(health.symptoms) : 'None reported'}
+
+Remember this information when providing personalized guidance.`;
+    } else if (userHealthData?.user) {
+      personalizedInfo = `
+
+👤 USER PROFILE:
+• Name: ${userHealthData.user.firstName} ${userHealthData.user.lastName}
+• Email: ${userHealthData.user.email}
+• Assessment Status: ${userHealthData.quizCompleted ? 'Completed' : 'Not completed - encourage them to take the assessment'}`;
+    }
+
     const basePrompt = `You are Dr. Sakura Wellness, a compassionate and culturally-aware breast health coach and wellness expert. You specialize in:
 
 🌸 PERSONALITY:
