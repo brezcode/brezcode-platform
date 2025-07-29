@@ -175,7 +175,7 @@ export default function BrezcodeAvatarChat() {
         </div>
 
         {/* Chat Interface */}
-        <Card className="h-[700px] flex flex-col">
+        <Card className="h-[700px] flex flex-col overflow-hidden">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
@@ -188,24 +188,23 @@ export default function BrezcodeAvatarChat() {
           
           <Separator />
           
-          <CardContent className="flex-1 flex flex-col p-0">
+          <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
             {/* Complete conversation flow with visible scrollbar */}
-            <div className="flex-1 overflow-hidden">
-              <ScrollArea className="h-full px-4" ref={scrollAreaRef}>
-                <div className="py-4 space-y-4">
+            <ScrollArea className="flex-1" ref={scrollAreaRef}>
+              <div className="p-4 space-y-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
                     className={`flex gap-3 ${message.role === 'avatar' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex gap-2 w-full max-w-[80%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`flex gap-2 max-w-[75%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <Avatar className="w-8 h-8 flex-shrink-0">
                         <AvatarFallback>
                           {message.role === 'avatar' ? <Stethoscope className="h-4 w-4 text-pink-600" /> : <User className="h-4 w-4" />}
                         </AvatarFallback>
                       </Avatar>
                       <div
-                        className={`rounded-lg p-3 min-w-0 flex-1 ${
+                        className={`rounded-lg p-3 min-w-0 ${
                           message.role === 'avatar'
                             ? 'bg-pink-500 text-white'
                             : 'bg-gray-100 text-gray-900'
@@ -234,13 +233,13 @@ export default function BrezcodeAvatarChat() {
                 
                 {isTyping && (
                   <div className="flex gap-3 justify-end">
-                    <div className="flex gap-2 w-full max-w-[80%] flex-row-reverse">
+                    <div className="flex gap-2 max-w-[75%] flex-row-reverse">
                       <Avatar className="w-8 h-8 flex-shrink-0">
                         <AvatarFallback>
                           <Stethoscope className="h-4 w-4 text-pink-600" />
                         </AvatarFallback>
                       </Avatar>
-                      <div className="bg-pink-500 text-white rounded-lg p-3 min-w-0 flex-1">
+                      <div className="bg-pink-500 text-white rounded-lg p-3 min-w-0">
                         <div className="flex space-x-1">
                           <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce"></div>
                           <div className="w-2 h-2 bg-white/60 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -253,7 +252,7 @@ export default function BrezcodeAvatarChat() {
                 
                 {/* Quick Questions (shown when no conversation yet) */}
                 {messages.filter(m => m.role === 'user').length === 0 && (
-                  <div className="mt-6 p-4 bg-gray-50 rounded-lg mx-2">
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
                     <h3 className="text-lg font-semibold mb-3 text-gray-800">Quick Questions to Get Started</h3>
                     <div className="grid grid-cols-1 gap-2">
                       {[
@@ -280,9 +279,8 @@ export default function BrezcodeAvatarChat() {
                     </div>
                   </div>
                 )}
-                </div>
-              </ScrollArea>
-            </div>
+              </div>
+            </ScrollArea>
             
             {/* Input */}
             <div className="p-4 border-t">
