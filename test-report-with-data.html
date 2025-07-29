@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test BrezCode Report</title>
+</head>
+<body>
+    <h1>Testing BrezCode Report with Quiz Data</h1>
+    <p>Setting localStorage data and navigating to report...</p>
+    
+    <script>
+        // Set the quiz answers in localStorage using the data from your quiz
+        const quizAnswers = {
+            "age":"50",
+            "country":"United States",
+            "ethnicity":"Asian",
+            "family_history":"Yes, I have both first-degree relative and second-degree relative with BC",
+            "brca_test":"Not tested",
+            "menstrual_age":"12 years old or later",
+            "pregnancy_age":"Age 30 or older",
+            "oral_contraceptives":"Yes, used in the past",
+            "menopause":"Yes, before age 55",
+            "weight":"70",
+            "height":"1.5",
+            "hrt":"No",
+            "breast_symptoms":"No, I don't have any symptoms",
+            "mammogram_frequency":"Irregularly",
+            "dense_breast":"No, I don't have dense breast tissue",
+            "benign_condition":"No benign breast conditions",
+            "cancer_history":"No diagnosed breast conditions",
+            "western_diet":"Yes, mixed diet with some Western elements",
+            "smoke":"No",
+            "alcohol":"1 drink",
+            "night_shift":"No",
+            "stressful_events":"No, no significant stressful events",
+            "chronic_stress":"No, low or no chronic stress",
+            "sugar_diet":"No, low or no added sugar diet",
+            "exercise":"No, little or no regular exercise",
+            "bmi":31.1,
+            "obesity":"Yes"
+        };
+        
+        localStorage.setItem('brezcode_quiz_answers', JSON.stringify(quizAnswers));
+        
+        // Redirect to report page
+        setTimeout(() => {
+            window.location.href = '/brezcode/report';
+        }, 1000);
+    </script>
+</body>
+</html>
