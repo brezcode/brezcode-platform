@@ -5,6 +5,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import mobile dialog fix */
+@import './styles/mobile-dialog-fix.css';
+
 /* Hide Vite development console overlay */
 #vite-plugin-checker-container,
 [id*="vite-plugin"],

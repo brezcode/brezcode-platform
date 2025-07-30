@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -18,6 +18,28 @@ export default function Navigation() {
   const { toast } = useToast();
   const { user, login, register, logout } = useAuth();
   const { t } = useTranslation();
+
+  // Mobile dialog fix - prevent body scroll when dialog is open
+  useEffect(() => {
+    if (showAuthModal) {
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+      document.body.style.overflow = '';
+    };
+  }, [showAuthModal]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -197,7 +219,7 @@ export default function Navigation() {
       </nav>
 
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
-        <DialogContent className="w-[95vw] max-w-md mx-auto fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
+        <DialogContent className="w-full max-w-md">
           <DialogHeader>
             <DialogTitle className="text-center">Welcome to Breast Health Coach AI</DialogTitle>
           </DialogHeader>
