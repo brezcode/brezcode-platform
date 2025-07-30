@@ -42,6 +42,8 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       await login(loginForm.email, loginForm.password);
+      // Set login success flag for BrezCode redirect
+      localStorage.setItem('loginSuccess', 'true');
       toast({
         title: "Welcome back!",
         description: "Successfully signed in to LeadGen.to",
