@@ -9,7 +9,7 @@ import BrezCodeBusinessProfile from "@/pages/BrezCodeBusinessProfile";
 import SubscribePage from "@/pages/subscribe";
 import EmailVerificationModule from "@/components/EmailVerificationModule";
 import BusinessSelector from "@/components/BusinessSelector";
-import BrezCodeDashboard from "@/pages/BrezCodeDashboard";
+import BrezCodeBusinessDashboard from "@/pages/BrezCodeDashboard";
 import UserHomepage from "@/pages/user-homepage";
 import LeadGenDashboard from "@/pages/LeadGenDashboard";
 import ProfileEditor from "@/pages/ProfileEditor";
@@ -83,8 +83,12 @@ function App() {
           <Route path="/business-selector">
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
+          {/* BrezCode Platform Routes */}
           <Route path="/brezcode" component={BrezCodeLanding} />
           <Route path="/brezcode/dashboard" component={BrezCodeUserDashboard} />
+          
+          {/* BrezCode Business Management Routes */}
+          <Route path="/business/brezcode/dashboard" component={BrezCodeBusinessDashboard} />
           <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />

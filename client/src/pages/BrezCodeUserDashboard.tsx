@@ -69,7 +69,7 @@ export default function BrezCodeUserDashboard() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">BrezCode</h1>
-                <p className="text-xs text-gray-600">Breast Health Platform</p>
+                <p className="text-xs text-gray-600">Personal Health Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
