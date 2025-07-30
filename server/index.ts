@@ -16,6 +16,20 @@ app.get('/direct-api/test', (req, res) => {
 
 // Breast Health Platform route (must be BEFORE Vite middleware)
 app.get('/brezcode', (req, res) => {
+  // Check if user is authenticated
+  console.log('BrezCode route - Session check:', {
+    userId: req.session?.userId,
+    isAuthenticated: req.session?.isAuthenticated,
+    sessionID: req.sessionID
+  });
+  
+  if (req.session?.userId && req.session?.isAuthenticated) {
+    console.log('Redirecting authenticated user to BrezCode dashboard');
+    // Redirect authenticated users to BrezCode dashboard
+    return res.redirect('/business/brezcode/dashboard');
+  }
+  
+  // Serve landing page for non-authenticated users
   res.send(`<!DOCTYPE html>
 <html lang="en">
 <head>

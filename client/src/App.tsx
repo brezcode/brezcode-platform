@@ -53,6 +53,7 @@ import KnowledgeCenter from "@/pages/KnowledgeCenter";
 import LandingPage from "@/pages/landing";
 import HomePage from "@/pages/HomePage";
 import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
+import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -132,11 +133,17 @@ function App() {
           <Route path="/brezcode/notifications" component={NotificationDemo} />
           <Route path="/brezcode/avatar-chat" component={BrezcodeAvatarChat} />
           
+          {/* BrezCode Authentication Route - checks login and redirects appropriately */}
+          <Route path="/brezcode" component={AuthenticatedBrezCodeRedirect} />
+          
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />
           
-          {/* Default fallback - breast health landing */}
-          <Route component={LandingPage} />
+          {/* BrezCode Landing Page for unauthenticated users */}
+          <Route path="/landing-page" component={LandingPage} />
+          
+          {/* Default fallback - home page with platform choices */}
+          <Route component={HomePage} />
         </Switch>
         
         {/* Mobile navigation components */}
