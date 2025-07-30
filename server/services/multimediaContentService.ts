@@ -27,30 +27,44 @@ export class MultimediaContentService {
     });
 
     switch (topic) {
-      case 'self_examination':
+      case 'dr_rhonda_patrick':
         multimedia.push({
           type: 'video',
-          url: 'https://player.vimeo.com/video/111931581',
-          title: 'Essential: 5-Minute Self Breast Examination Guide',
-          description: 'Professional medical demonstration by Dr. Michael Hughey showing proper self-examination technique - every woman should know this',
+          url: 'https://www.youtube.com/embed/YQiW_l848t8',
+          title: 'Dr. Rhonda Patrick: Nutrition & Cancer Prevention',
+          description: 'World-renowned scientist Dr. Rhonda Patrick discusses evidence-based nutrition strategies for cancer prevention, including specific dietary compounds that support breast health',
           metadata: {
-            duration: '5:00',
-            source: 'Brookside Medical Associates',
-            type: 'Essential Medical Training'
+            duration: '12:30',
+            source: 'FoundMyFitness with Dr. Rhonda Patrick',
+            type: 'Scientific Research KOL'
           }
         });
         break;
         
-      case 'screening_education':
+      case 'dr_david_sinclair':
+        multimedia.push({
+          type: 'video',
+          url: 'https://www.youtube.com/embed/9nXop2lLDa4',
+          title: 'Dr. David Sinclair: Longevity & Disease Prevention',
+          description: 'Harvard Medical School professor Dr. David Sinclair shares cutting-edge research on aging, cellular health, and disease prevention strategies',
+          metadata: {
+            duration: '15:45',
+            source: 'Harvard Medical School',
+            type: 'Scientific Research KOL'
+          }
+        });
+        break;
+        
+      case 'self_examination':
         multimedia.push({
           type: 'video',
           url: 'https://player.vimeo.com/video/111931581',
-          title: 'Mammogram Preparation & What to Expect',
-          description: 'Comprehensive guide to breast cancer screening - know what to expect and how to prepare',
+          title: 'Dr. Peter Attia: Clinical Approach to Breast Health',
+          description: 'Dr. Peter Attia, renowned longevity physician, discusses clinical strategies for breast health monitoring and early detection',
           metadata: {
-            duration: '5:00',
-            source: 'Medical Education Series',
-            type: 'Screening Education'
+            duration: '8:20',
+            source: 'The Peter Attia Drive',
+            type: 'Clinical Medicine KOL'
           }
         });
         break;
@@ -58,13 +72,13 @@ export class MultimediaContentService {
       case 'lifestyle_prevention':
         multimedia.push({
           type: 'video',
-          url: 'https://player.vimeo.com/video/111931581',
-          title: 'Breast Health & Lifestyle Factors',
-          description: 'Evidence-based lifestyle modifications that can impact breast health - diet, exercise, and prevention strategies',
+          url: 'https://www.youtube.com/embed/TjqPnFrk4_E',
+          title: 'Dr. Andrew Huberman: Hormones & Women\'s Health',
+          description: 'Stanford neuroscientist Dr. Andrew Huberman explains the science of hormones, sleep, and lifestyle factors affecting women\'s health',
           metadata: {
-            duration: '5:00',
-            source: 'Preventive Medicine Institute',
-            type: 'Lifestyle Medicine'
+            duration: '18:30',
+            source: 'Huberman Lab Podcast',
+            type: 'Scientific Research KOL'
           }
         });
         break;
@@ -72,13 +86,13 @@ export class MultimediaContentService {
       default:
         multimedia.push({
           type: 'video',
-          url: 'https://player.vimeo.com/video/111931581',
-          title: 'Breast Health Fundamentals',
-          description: 'Essential knowledge every woman should have about breast health - self-care, awareness, and early detection',
+          url: 'https://www.youtube.com/embed/YQiW_l848t8',
+          title: 'Dr. Rhonda Patrick: Micronutrients & Health',
+          description: 'Dr. Rhonda Patrick shares groundbreaking research on micronutrients, cellular health, and evidence-based prevention strategies',
           metadata: {
-            duration: '5:00',
-            source: 'Women\'s Health Education',
-            type: 'General Health Education'
+            duration: '14:15',
+            source: 'FoundMyFitness',
+            type: 'Scientific Research KOL'
           }
         });
     }

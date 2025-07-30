@@ -55,42 +55,54 @@ export default function BrezcodeAvatarChat() {
   // Proactive research mutations
   const startResearchMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/start-proactive-research', {
-        userId: 1,
-        intervalMinutes: 2
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/start-proactive-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1, intervalMinutes: 0.1 }) // Every 6 seconds for demo
       });
+      if (!response.ok) throw new Error('Failed to start proactive research');
       return response.json();
     },
     onSuccess: () => {
       setProactiveResearchActive(true);
+      console.log('🔍 Proactive research started - featuring Dr. Rhonda Patrick & Dr. David Sinclair');
+    },
+    onError: (error) => {
+      console.error('❌ Error starting proactive research:', error);
     }
   });
 
   const stopResearchMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
-        userId: 1
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1 })
       });
+      if (!response.ok) throw new Error('Failed to stop proactive research');
       return response.json();
     },
     onSuccess: () => {
       setProactiveResearchActive(false);
+      console.log('🛑 Proactive research stopped');
     }
   });
 
   // Query for proactive messages
   const { data: proactiveMessages, refetch: refetchProactiveMessages } = useQuery({
     queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages/1'],
-    refetchInterval: proactiveResearchActive ? 5000 : false, // Poll every 5 seconds when active
+    refetchInterval: proactiveResearchActive ? 3000 : false, // Poll every 3 seconds when active
     enabled: proactiveResearchActive
   });
   
   const markProactiveReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
-        userId: 1,
-        messageId
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1, messageId })
       });
+      if (!response.ok) throw new Error('Failed to mark message as read');
       return response.json();
     },
     onSuccess: () => {
