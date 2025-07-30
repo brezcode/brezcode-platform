@@ -21,13 +21,13 @@ export default function AuthenticatedBrezCodeRedirect() {
         // Check if there's a login success in localStorage (temporary fix)
         const loginSuccess = localStorage.getItem('loginSuccess');
         if (loginSuccess === 'true') {
-          console.log('Login success detected, redirecting to dashboard');
+          console.log('Login success detected, redirecting to BrezCode dashboard');
           localStorage.removeItem('loginSuccess'); // Clean up
           setLocation('/business/brezcode/dashboard');
         } else {
-          // User is not authenticated, show landing page by redirecting to landing
-          console.log('User not authenticated, showing BrezCode landing page');
-          setLocation('/landing-page');
+          // User is not authenticated, show main landing page
+          console.log('User not authenticated, showing main landing page');
+          setLocation('/');
         }
       }
     }

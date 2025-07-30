@@ -54,6 +54,7 @@ import LandingPage from "@/pages/landing";
 import HomePage from "@/pages/HomePage";
 import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
+import ManualRedirect from "@/components/ManualRedirect";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -134,7 +135,7 @@ function App() {
           <Route path="/brezcode/avatar-chat" component={BrezcodeAvatarChat} />
           
           {/* BrezCode Authentication Route - checks login and redirects appropriately */}
-          <Route path="/brezcode" component={AuthenticatedBrezCodeRedirect} />
+          <Route path="/brezcode" component={ManualRedirect} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />
