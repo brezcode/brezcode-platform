@@ -10,11 +10,13 @@ import { apiRequest } from "@/lib/queryClient";
 import { Send, Heart, Brain, User, Stethoscope, Bot, MessageSquare } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "wouter";
+import { MultimediaMessage, MultimediaContent } from "@/components/MultimediaMessage";
 
 interface Message {
   id: string;
   role: 'user' | 'avatar';
   content: string;
+  multimediaContent?: MultimediaContent[]; // Enhanced multimedia support
   timestamp: string;
   qualityScores?: {
     empathy: number;
@@ -25,6 +27,7 @@ interface Message {
 
 interface AvatarResponse {
   content: string;
+  multimediaContent?: MultimediaContent[]; // Enhanced multimedia support
   avatarId: string;
   avatarName: string;
   role: string;
@@ -69,6 +72,7 @@ export default function BrezcodeAvatarChat() {
         id: `msg_${Date.now()}`,
         role: 'avatar',
         content: data.response.content,
+        multimediaContent: data.response.multimediaContent, // Support multimedia content
         timestamp: data.response.timestamp,
         qualityScores: data.response.qualityScores
       };
@@ -136,7 +140,7 @@ export default function BrezcodeAvatarChat() {
     );
   }
 
-  const avatar = avatarConfig?.avatar;
+  const avatar = avatarConfig;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
@@ -210,9 +214,11 @@ export default function BrezcodeAvatarChat() {
                             : 'bg-gray-100 text-gray-900'
                         }`}
                       >
-                        <div className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-                          {message.content}
-                        </div>
+                        <MultimediaMessage 
+                          content={message.multimediaContent || []}
+                          textContent={message.content}
+                          className="text-sm leading-relaxed"
+                        />
                         
                         {message.qualityScores && message.role === 'avatar' && (
                           <div className="flex gap-3 mt-3 text-xs opacity-90">

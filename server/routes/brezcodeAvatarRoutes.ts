@@ -57,12 +57,21 @@ router.post('/dr-sakura/chat', async (req, res) => {
       context
     );
     
-    console.log(`✅ Dr. Sakura response generated (Empathy: ${response.empathyScore}, Medical: ${response.medicalAccuracy})`);
+    // Generate multimedia content based on the user's message and response
+    const { MultimediaContentService } = await import('../services/multimediaContentService');
+    const multimediaContent = MultimediaContentService.generateMultimediaContent(
+      message,
+      response.content,
+      'breast_health'
+    );
+    
+    console.log(`✅ Dr. Sakura response generated (Empathy: ${response.empathyScore}, Medical: ${response.medicalAccuracy}) with ${multimediaContent.length} multimedia items`);
     
     res.json({
       success: true,
       response: {
         content: response.content,
+        multimediaContent: multimediaContent, // Enhanced multimedia support
         avatarId: 'dr_sakura_brezcode',
         avatarName: 'Dr. Sakura Wellness',
         role: 'Breast Health Coach',

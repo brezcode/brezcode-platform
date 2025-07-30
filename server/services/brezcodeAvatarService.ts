@@ -3,6 +3,7 @@ import { users } from '../../shared/schema';
 import { eq } from 'drizzle-orm';
 import Anthropic from '@anthropic-ai/sdk';
 import { BrezcodeConversationService } from './brezcodeConversationService';
+import { MultimediaContentService, MultimediaContent } from './multimediaContentService';
 
 /*
 <important_code_snippet_instructions>
@@ -54,6 +55,20 @@ const DR_SAKURA_CONFIG = {
   ]
 };
 
+export interface AvatarResponse {
+  content: string;
+  multimediaContent?: MultimediaContent[];
+  avatarId: string;
+  avatarName: string;
+  role: string;
+  qualityScores: {
+    empathy: number;
+    medicalAccuracy: number;
+    overall: number;
+  };
+  timestamp: string;
+}
+
 export class BrezcodeAvatarService {
   
   // Get Dr. Sakura avatar configuration
@@ -71,7 +86,7 @@ export class BrezcodeAvatarService {
       healthProfile?: any;
       currentConcerns?: string[];
     } = {}
-  ): Promise<{ content: string; empathyScore: number; medicalAccuracy: number }> {
+  ): Promise<{ content: string; empathyScore: number; medicalAccuracy: number; multimediaContent?: MultimediaContent[] }> {
     
     try {
       console.log('🌸 Dr. Sakura generating response with LeadGen training integration...');
@@ -117,10 +132,18 @@ export class BrezcodeAvatarService {
 
       console.log(`✅ Dr. Sakura response generated with quality score: ${avatarResponse.quality_score}, empathy: ${empathyScore}, medical accuracy: ${medicalAccuracy}`);
 
+      // Generate multimedia content for enhanced user experience
+      const multimediaContent = MultimediaContentService.generateMultimediaContent(
+        userMessage,
+        avatarResponse.content,
+        'breast_health'
+      );
+
       return {
         content: avatarResponse.content,
         empathyScore,
-        medicalAccuracy
+        medicalAccuracy,
+        multimediaContent
       };
 
     } catch (error) {
