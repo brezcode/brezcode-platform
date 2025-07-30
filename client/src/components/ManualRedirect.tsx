@@ -5,9 +5,10 @@ export default function ManualRedirect() {
   const [, setLocation] = useLocation();
 
   useEffect(() => {
-    // Immediately redirect to BrezCode User Dashboard
-    console.log('Manual redirect to BrezCode User Dashboard');
-    setLocation('/business/brezcode/dashboard');
+    // Check if user is logged in, if so go to dashboard, otherwise go to BrezCode landing
+    console.log('Manual redirect to BrezCode platform');
+    // For now, always go to landing - proper auth check would determine dashboard vs landing
+    setLocation('/brezcode');
   }, [setLocation]);
 
   return (

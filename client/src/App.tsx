@@ -56,6 +56,7 @@ import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
 import ManualRedirect from "@/components/ManualRedirect";
 import BrezCodeUserDashboard from "@/pages/BrezCodeUserDashboard";
+import BrezCodeLanding from "@/pages/BrezCodeLanding";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,7 +83,8 @@ function App() {
           <Route path="/business-selector">
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
-          <Route path="/business/brezcode/dashboard" component={BrezCodeUserDashboard} />
+          <Route path="/brezcode" component={BrezCodeLanding} />
+          <Route path="/brezcode/dashboard" component={BrezCodeUserDashboard} />
           <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />

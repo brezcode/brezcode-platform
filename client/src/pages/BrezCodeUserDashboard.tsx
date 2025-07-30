@@ -19,7 +19,7 @@ import {
   Award,
   Zap
 } from "lucide-react";
-import TopNavigation from "@/components/TopNavigation";
+// import TopNavigation from "@/components/TopNavigation";
 
 export default function BrezCodeUserDashboard() {
   const [, setLocation] = useLocation();
@@ -59,7 +59,45 @@ export default function BrezCodeUserDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800">
-      <TopNavigation />
+      {/* BrezCode Independent Navigation */}
+      <nav className="bg-white border-b border-pink-200 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-r from-pink-500 to-rose-600 rounded-lg">
+                <Heart className="h-6 w-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-900">BrezCode</h1>
+                <p className="text-xs text-gray-600">Breast Health Platform</p>
+              </div>
+            </div>
+            <div className="flex items-center space-x-4">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setLocation('/brezcode/assessment')}
+              >
+                Take Assessment
+              </Button>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setLocation('/brezcode/profile')}
+              >
+                Profile
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setLocation('/login')}
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
       
       <div className="container mx-auto py-8 px-4 max-w-7xl">
         {/* Personal Header */}
@@ -81,7 +119,7 @@ export default function BrezCodeUserDashboard() {
               {userData.riskCategory}
             </Badge>
             <Button 
-              onClick={() => setLocation('/brezcode/avatar-chat')}
+              onClick={() => setLocation('/brezcode/chat')}
               className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600"
             >
               <MessageSquare className="h-4 w-4 mr-2" />
@@ -279,7 +317,7 @@ export default function BrezCodeUserDashboard() {
               <div className="mt-6 pt-4 border-t">
                 <Button 
                   className="w-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600"
-                  onClick={() => setLocation('/brezcode/avatar-chat')}
+                  onClick={() => setLocation('/brezcode/chat')}
                 >
                   <MessageSquare className="h-4 w-4 mr-2" />
                   Get Personalized Advice from Dr. Sakura
