@@ -31,18 +31,18 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content - EMBEDDED MEDICAL VIDEO
+    // Breast self-examination content - LOCAL HOSTED VIDEO
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
         type: 'video',
-        url: 'https://brooksidepress.org/brooksidepress/?page_id=103',
+        url: '/videos/demo_breast_self_exam.mp4',
         title: 'Brookside Associates: 5-Minute Self Breast Exam',
-        description: 'Medical-grade self breast exam video from established medical education provider - plays directly in chat',
+        description: 'Medical-grade self breast exam video - optimized for mobile viewing',
         metadata: {
           duration: '5:00',
           source: 'Brookside Medical Associates',
-          type: 'Embedded Medical Video',
-          embedType: 'iframe'
+          type: 'Mobile-Optimized Video',
+          embedType: 'html5'
         }
       });
     }
