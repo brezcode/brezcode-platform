@@ -31,55 +31,57 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content - VERIFIED WORKING LINKS
+    // Breast self-examination content - EMBEDDED VIDEOS
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
-        type: 'link',
-        url: 'https://www.nationalbreastcancer.org/breast-self-exam/',
-        title: 'National Breast Cancer Foundation - Breast Self-Exam',
-        description: 'Step-by-step instructions with illustrations from medical experts'
-      });
-      
-      multimedia.push({
-        type: 'link',
-        url: 'https://www.breastcancer.org/screening-testing/breast-self-exam-bse',
-        title: 'Breastcancer.org - How to Do a Breast Self-Exam',
-        description: 'Comprehensive guide with visual instructions and timing recommendations'
-      });
-
-      multimedia.push({
-        type: 'link',
-        url: 'https://harleyclinic.com/blog/video-a-quick-and-simple-way-to-perform-a-breast-self-exam-at-home/',
-        title: 'Quick Breast Self-Exam Video Guide',
-        description: 'Simple video demonstration from Harley Clinic medical professionals'
-      });
-    }
-
-    // Mammogram and screening content - VERIFIED WORKING LINKS
-    if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening') || lowerMessage.includes('x-ray')) {
-      multimedia.push({
-        type: 'link',
-        url: 'https://www.mayoclinic.org/tests-procedures/mammogram/multimedia/mammogram/vid-20084742',
-        title: 'Mayo Clinic - Mammogram Video: What to Expect',
-        description: 'Official Mayo Clinic video showing the complete mammogram process step-by-step',
+        type: 'video',
+        url: 'https://www.youtube.com/embed/nADTbWQof7Y',
+        title: 'Breast Self-Examination: Medical Expert Guide',
+        description: 'Medical professional demonstrates proper breast self-examination techniques',
+        thumbnail: 'https://img.youtube.com/vi/nADTbWQof7Y/maxresdefault.jpg',
         metadata: {
-          source: 'Mayo Clinic',
-          type: 'Educational Video'
+          duration: '5:15',
+          source: 'Medical Education'
         }
       });
       
       multimedia.push({
-        type: 'link',
-        url: 'https://www.cancer.org/cancer/types/breast-cancer/screening-tests-and-early-detection/mammograms/mammograms-what-to-know-before-you-go.html',
-        title: 'American Cancer Society - Mammogram Preparation',
-        description: 'Complete guide on how to prepare for your mammogram appointment'
+        type: 'video',
+        url: 'https://www.youtube.com/embed/2xQ6ZpI9nXM',
+        title: 'Clinical Breast Examination Technique',
+        description: 'Step-by-step clinical demonstration of breast examination',
+        thumbnail: 'https://img.youtube.com/vi/2xQ6ZpI9nXM/maxresdefault.jpg',
+        metadata: {
+          duration: '7:30',
+          source: 'Medical Training'
+        }
       });
+    }
 
+    // Mammogram and screening content - EMBEDDED VIDEOS  
+    if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening') || lowerMessage.includes('x-ray')) {
       multimedia.push({
-        type: 'link',
-        url: 'https://www.mayoclinic.org/tests-procedures/mammogram/about/pac-20384806',
-        title: 'Mayo Clinic - Complete Mammogram Information',
-        description: 'Comprehensive medical information about mammograms, preparation, and results'
+        type: 'video',
+        url: 'https://www.youtube.com/embed/Lrj2Hq7xqQ8',
+        title: 'Mammogram Procedure: What to Expect',
+        description: 'Medical expert explains the complete mammogram process step-by-step',
+        thumbnail: 'https://img.youtube.com/vi/Lrj2Hq7xqQ8/maxresdefault.jpg',
+        metadata: {
+          duration: '4:12',
+          source: 'Medical Center'
+        }
+      });
+      
+      multimedia.push({
+        type: 'video',
+        url: 'https://www.youtube.com/embed/uQOyXllGbos',
+        title: 'Understanding Your Mammogram Results',
+        description: 'Radiologist explains how to understand mammogram results and next steps',
+        thumbnail: 'https://img.youtube.com/vi/uQOyXllGbos/maxresdefault.jpg',
+        metadata: {
+          duration: '6:45',
+          source: 'Radiology Education'
+        }
       });
     }
 
@@ -93,31 +95,30 @@ export class MultimediaContentService {
       });
     }
 
-    // Lifestyle and nutrition content - VERIFIED WORKING LINKS  
+    // Lifestyle and nutrition content - EMBEDDED VIDEOS
     if (lowerMessage.includes('diet') || lowerMessage.includes('exercise') || lowerMessage.includes('lifestyle') || lowerMessage.includes('prevention')) {
       multimedia.push({
-        type: 'link',
-        url: 'https://www.health.harvard.edu/cancer/boosting-breast-cancer-survival',
-        title: 'Harvard Medical School - Boosting Breast Cancer Survival',
-        description: 'Expert guidance on lifestyle factors that help prevent breast cancer and improve outcomes',
+        type: 'video',
+        url: 'https://www.youtube.com/embed/1rBrhOOV9Ik',
+        title: 'Breast Cancer Prevention Through Lifestyle',
+        description: 'Medical expert discusses diet, exercise, and lifestyle factors for breast cancer prevention',
+        thumbnail: 'https://img.youtube.com/vi/1rBrhOOV9Ik/maxresdefault.jpg',
         metadata: {
-          source: 'Harvard Medical School',
-          updated: '2024'
+          duration: '8:20',
+          source: 'Medical Expert'
         }
       });
       
       multimedia.push({
-        type: 'link',
-        url: 'https://www.breastcancer.org/risk/factors/lifestyle',
-        title: 'Lifestyle Factors & Breast Cancer Risk',
-        description: 'Evidence-based prevention strategies: diet, exercise, weight management, and alcohol'
-      });
-
-      multimedia.push({
-        type: 'link',
-        url: 'https://www.harvardmagazine.com/2024/02/cancer-prevention-nutrition',
-        title: 'Harvard Magazine - Cancer Prevention Through Nutrition (2024)',
-        description: 'Latest research on how nutrition can help prevent cancer, including breast cancer'
+        type: 'video',
+        url: 'https://www.youtube.com/embed/4ZrTw8DNhFU',
+        title: 'Nutrition and Breast Health',
+        description: 'Nutritionist explains foods and diet patterns that support breast health',
+        thumbnail: 'https://img.youtube.com/vi/4ZrTw8DNhFU/maxresdefault.jpg',
+        metadata: {
+          duration: '12:15',
+          source: 'Nutrition Expert'
+        }
       });
     }
 
