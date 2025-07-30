@@ -46,13 +46,15 @@ export default function Navigation() {
     try {
       await login(authForm.email, authForm.password);
       setShowAuthModal(false);
+      setAuthForm({ email: "", username: "", password: "" });
       toast({
         title: "Welcome back!",
-        description: "You have successfully signed in.",
+        description: "Redirecting to Dr. Sakura chat...",
       });
-      setAuthForm({ email: "", username: "", password: "" });
-      // Redirect authenticated users to BrezCode chat  
-      setLocation("/brezcode/chat");
+      // Force redirect to BrezCode chat after small delay
+      setTimeout(() => {
+        window.location.href = "/brezcode/chat";
+      }, 500);
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
@@ -65,7 +67,7 @@ export default function Navigation() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(authForm.username, authForm.email, authForm.password);
+      await register(authForm.username, "", authForm.email, authForm.password);
       setShowAuthModal(false);
       toast({
         title: "Account Created!",

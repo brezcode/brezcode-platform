@@ -5,6 +5,8 @@ import { apiRequest } from "@/lib/queryClient";
 interface User {
   id: number;
   email: string;
+  firstName?: string;
+  lastName?: string;
   subscriptionTier: string | null;
   isSubscriptionActive: boolean;
 }
