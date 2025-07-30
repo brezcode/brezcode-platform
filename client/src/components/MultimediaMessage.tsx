@@ -133,11 +133,14 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
               
               {/* Handle YouTube and Vimeo embed URLs */}
               {(item.url.includes('youtube.com/embed/') || item.url.includes('player.vimeo.com/video/')) && (
-                <div className="video-container-enhanced relative rounded-lg overflow-hidden bg-black" style={{
+                <div className="video-container-enhanced relative rounded-lg bg-black" style={{
                   width: '100%',
                   minHeight: '280px',
                   aspectRatio: '16/9',
-                  touchAction: 'pan-x pan-y pinch-zoom'
+                  touchAction: 'pan-x pan-y pinch-zoom',
+                  overflowX: 'auto',
+                  overflowY: 'hidden',
+                  scrollBehavior: 'smooth'
                 }}>
                   <iframe
                     src={item.url}
@@ -153,9 +156,9 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                       outline: 'none'
                     }}
                   />
-                  {/* Zoom instruction overlay */}
+                  {/* Enhanced instruction overlay */}
                   <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-80 pointer-events-none md:hidden">
-                    Pinch to zoom
+                    Pinch to zoom • Swipe to pan
                   </div>
                 </div>
               )}

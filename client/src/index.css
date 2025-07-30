@@ -46,9 +46,11 @@ body {
   user-select: none;
   -webkit-user-select: none;
   position: relative;
-  overflow: visible !important;
+  overflow: auto !important;
   min-width: 100%;
   width: 100%;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .video-container-enhanced iframe,
@@ -58,6 +60,8 @@ body {
   min-height: 280px !important;
   border: none !important;
   outline: none !important;
+  display: block;
+  margin: 0 auto;
 }
 
 /* Mobile-specific video enhancements */
@@ -67,31 +71,49 @@ body {
     width: 100% !important;
     margin: 0 auto;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: auto !important;
     background: #000;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
   }
   
   .video-container-enhanced iframe {
     width: 100% !important;
     height: 280px !important;
     min-height: 280px !important;
+    max-width: none !important;
+    object-fit: contain;
   }
   
   .video-container-enhanced video {
     width: 100% !important;
     height: 280px !important;
     min-height: 280px !important;
-    object-fit: cover;
+    object-fit: contain;
+    max-width: none !important;
+  }
+  
+  /* Enable horizontal scrolling for video content */
+  .video-container-enhanced {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
   }
 }
 
-/* Allow zooming on video containers specifically */
+/* Allow zooming and panning on video containers specifically */
 @media (max-width: 768px) {
   .video-container-enhanced * {
     touch-action: pan-x pan-y pinch-zoom !important;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     user-select: none;
+  }
+  
+  /* Ensure video content can be scrolled horizontally */
+  .video-container-enhanced iframe,
+  .video-container-enhanced video {
+    min-width: 100% !important;
+    transform-origin: center center;
   }
 }
 
