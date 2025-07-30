@@ -133,15 +133,30 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
               
               {/* Handle YouTube and Vimeo embed URLs */}
               {(item.url.includes('youtube.com/embed/') || item.url.includes('player.vimeo.com/video/')) && (
-                <div className="relative aspect-video rounded-lg overflow-hidden">
+                <div className="video-container-enhanced relative rounded-lg overflow-hidden bg-black" style={{
+                  width: '100%',
+                  minHeight: '280px',
+                  aspectRatio: '16/9',
+                  touchAction: 'pan-x pan-y pinch-zoom'
+                }}>
                   <iframe
                     src={item.url}
                     title={item.title || 'Medical Video'}
-                    className="absolute inset-0 w-full h-full"
+                    className="absolute inset-0 w-full h-full border-0"
                     allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     frameBorder="0"
+                    style={{
+                      minWidth: '100%',
+                      minHeight: '280px',
+                      border: 'none',
+                      outline: 'none'
+                    }}
                   />
+                  {/* Zoom instruction overlay */}
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-80 pointer-events-none md:hidden">
+                    Pinch to zoom
+                  </div>
                 </div>
               )}
               
@@ -150,7 +165,12 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                 <>
                   {/* HTML5 Video Player for local videos */}
                   {item.metadata?.embedType === 'html5' && (
-                    <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900">
+                    <div className="video-container-enhanced relative rounded-lg overflow-hidden bg-gray-900" style={{
+                      width: '100%',
+                      minHeight: '280px',
+                      aspectRatio: '16/9',
+                      touchAction: 'pan-x pan-y pinch-zoom'
+                    }}>
                       <video
                         controls
                         className="w-full h-full object-cover"
@@ -158,27 +178,47 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                         preload="metadata"
                         playsInline
                         controlsList="nodownload"
+                        style={{
+                          minWidth: '100%',
+                          minHeight: '280px'
+                        }}
                       >
                         <source src={item.url} type="video/mp4" />
                         <track kind="captions" src="/videos/brookside_captions.vtt" srcLang="en" label="English" default />
                         Your browser does not support the video tag.
                       </video>
+                      {/* Zoom instruction overlay */}
+                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-80 pointer-events-none md:hidden">
+                        Pinch to zoom
+                      </div>
                     </div>
                   )}
                   
                   {/* Fallback for other video types */}
                   {!item.metadata?.embedType || item.metadata.embedType !== 'html5' && (
-                    <div className="relative rounded-lg overflow-hidden bg-gray-100">
+                    <div className="video-container-enhanced relative rounded-lg overflow-hidden bg-gray-100" style={{
+                      width: '100%',
+                      minHeight: '280px',
+                      touchAction: 'pan-x pan-y pinch-zoom'
+                    }}>
                       <video
                         src={item.url}
                         controls
-                        className="w-full max-h-64"
+                        className="w-full min-h-[280px] object-cover"
                         poster={item.thumbnail}
                         playsInline
                         preload="metadata"
+                        style={{
+                          minHeight: '280px',
+                          width: '100%'
+                        }}
                       >
                         Your browser does not support the video tag.
                       </video>
+                      {/* Zoom instruction overlay */}
+                      <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-80 pointer-events-none md:hidden">
+                        Pinch to zoom
+                      </div>
                     </div>
                   )}
                 </>

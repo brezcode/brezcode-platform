@@ -40,6 +40,61 @@ body {
   }
 }
 
+/* Enhanced video container with pinch-to-zoom support */
+.video-container-enhanced {
+  touch-action: pan-x pan-y pinch-zoom !important;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
+  overflow: visible !important;
+  min-width: 100%;
+  width: 100%;
+}
+
+.video-container-enhanced iframe,
+.video-container-enhanced video {
+  touch-action: pan-x pan-y pinch-zoom !important;
+  width: 100% !important;
+  min-height: 280px !important;
+  border: none !important;
+  outline: none !important;
+}
+
+/* Mobile-specific video enhancements */
+@media (max-width: 768px) {
+  .video-container-enhanced {
+    min-height: 280px !important;
+    width: 100% !important;
+    margin: 0 auto;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #000;
+  }
+  
+  .video-container-enhanced iframe {
+    width: 100% !important;
+    height: 280px !important;
+    min-height: 280px !important;
+  }
+  
+  .video-container-enhanced video {
+    width: 100% !important;
+    height: 280px !important;
+    min-height: 280px !important;
+    object-fit: cover;
+  }
+}
+
+/* Allow zooming on video containers specifically */
+@media (max-width: 768px) {
+  .video-container-enhanced * {
+    touch-action: pan-x pan-y pinch-zoom !important;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
 
 
 /* Hide Vite development console overlay */
