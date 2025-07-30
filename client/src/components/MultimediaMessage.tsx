@@ -143,41 +143,86 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                 </div>
               )}
               
-              {/* Handle medical institution video pages */}
+              {/* Handle medical institution video pages with embedding */}
               {!item.url.includes('youtube.com/embed/') && (
-                <Card className="p-4 border border-pink-200 bg-pink-50">
-                  <div className="flex items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
-                      <Play className="w-5 h-5 text-pink-600" />
+                <div className="space-y-3">
+                  {item.title && (
+                    <div className="text-sm font-medium flex items-center gap-2">
+                      <Play className="w-4 h-4" />
+                      {item.title}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-medium text-pink-900 mb-1">{item.title}</h4>
-                      <p className="text-sm text-pink-700 mb-3">{item.description}</p>
-                      {item.metadata && (
-                        <div className="flex flex-wrap gap-2 mb-3">
-                          {item.metadata.duration && (
-                            <Badge variant="outline" className="text-xs bg-white border-pink-200">
-                              Duration: {item.metadata.duration}
-                            </Badge>
-                          )}
-                          {item.metadata.source && (
-                            <Badge variant="outline" className="text-xs bg-white border-pink-200">
-                              Source: {item.metadata.source}
-                            </Badge>
-                          )}
+                  )}
+                  
+                  {/* Embed the Brookside video directly */}
+                  {item.metadata?.embedType === 'iframe' && (
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-100 border">
+                      <iframe
+                        src={item.url}
+                        title={item.title || 'Medical Video'}
+                        className="absolute inset-0 w-full h-full"
+                        allowFullScreen
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        frameBorder="0"
+                      />
+                    </div>
+                  )}
+                  
+                  {/* Fallback card for non-embeddable videos */}
+                  {!item.metadata?.embedType && (
+                    <Card className="p-4 border border-pink-200 bg-pink-50">
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                          <Play className="w-5 h-5 text-pink-600" />
                         </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-pink-900 mb-1">{item.title}</h4>
+                          <p className="text-sm text-pink-700 mb-3">{item.description}</p>
+                          {item.metadata && (
+                            <div className="flex flex-wrap gap-2 mb-3">
+                              {item.metadata.duration && (
+                                <Badge variant="outline" className="text-xs bg-white border-pink-200">
+                                  Duration: {item.metadata.duration}
+                                </Badge>
+                              )}
+                              {item.metadata.source && (
+                                <Badge variant="outline" className="text-xs bg-white border-pink-200">
+                                  Source: {item.metadata.source}
+                                </Badge>
+                              )}
+                            </div>
+                          )}
+                          <Button
+                            size="sm"
+                            className="bg-pink-600 hover:bg-pink-700 text-white"
+                            onClick={() => window.open(item.url, '_blank')}
+                          >
+                            <Play className="w-4 h-4 mr-1" />
+                            Watch Medical Video
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  )}
+                  
+                  {item.description && (
+                    <p className="text-xs text-gray-600 italic">{item.description}</p>
+                  )}
+                  
+                  {item.metadata && (
+                    <div className="flex flex-wrap gap-2">
+                      {item.metadata.duration && (
+                        <Badge variant="outline" className="text-xs">
+                          Duration: {item.metadata.duration}
+                        </Badge>
                       )}
-                      <Button
-                        size="sm"
-                        className="bg-pink-600 hover:bg-pink-700 text-white"
-                        onClick={() => window.open(item.url, '_blank')}
-                      >
-                        <Play className="w-4 h-4 mr-1" />
-                        Watch Medical Video
-                      </Button>
+                      {item.metadata.source && (
+                        <Badge variant="secondary" className="text-xs">
+                          {item.metadata.source}
+                        </Badge>
+                      )}
                     </div>
-                  </div>
-                </Card>
+                  )}
+                </div>
               )}
             </div>
           )}

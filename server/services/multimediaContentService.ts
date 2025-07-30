@@ -31,29 +31,18 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content - PROFESSIONAL MEDICAL VIDEOS
+    // Breast self-examination content - EMBEDDED MEDICAL VIDEO
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
         type: 'video',
-        url: 'https://www.operationalmedicine.org/ed2/Video/self_breast_exam_video.htm',
-        title: 'US Navy Medical: Breast Self-Examination Training Video',
-        description: 'Professional medical training video demonstrating proper breast self-examination techniques (embedded player)',
-        metadata: {
-          duration: '5:00',
-          source: 'US Navy Medical Training',
-          type: 'Embedded Medical Video'
-        }
-      });
-      
-      multimedia.push({
-        type: 'video', 
         url: 'https://brooksidepress.org/brooksidepress/?page_id=103',
         title: 'Brookside Associates: 5-Minute Self Breast Exam',
-        description: 'Medical-grade self breast exam video from established medical education provider (embedded player)',
+        description: 'Medical-grade self breast exam video from established medical education provider - plays directly in chat',
         metadata: {
           duration: '5:00',
           source: 'Brookside Medical Associates',
-          type: 'Medical Education Video'
+          type: 'Embedded Medical Video',
+          embedType: 'iframe'
         }
       });
     }
