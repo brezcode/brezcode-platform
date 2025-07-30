@@ -16,6 +16,8 @@ export interface MultimediaContent {
     fileSize?: string;
     fileType?: string;
     dimensions?: string;
+    source?: string;
+    type?: string;
   };
 }
 
@@ -127,59 +129,56 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                   {item.title}
                 </div>
               )}
-              <div className="relative rounded-lg overflow-hidden bg-gray-100">
-                {item.url.includes('youtube.com/embed') ? (
+              
+              {/* Handle YouTube embed URLs */}
+              {item.url.includes('youtube.com/embed/') && (
+                <div className="relative aspect-video rounded-lg overflow-hidden">
                   <iframe
                     src={item.url}
-                    title={item.title || 'Video'}
-                    className="w-full h-64 rounded-lg"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    title={item.title || 'Medical Video'}
+                    className="absolute inset-0 w-full h-full"
                     allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   />
-                ) : item.thumbnail ? (
-                  <div className="relative group">
-                    <img
-                      src={item.thumbnail}
-                      alt={item.title || 'Video thumbnail'}
-                      className="w-full h-48 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-colors">
+                </div>
+              )}
+              
+              {/* Handle medical institution video pages */}
+              {!item.url.includes('youtube.com/embed/') && (
+                <Card className="p-4 border border-pink-200 bg-pink-50">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-shrink-0 w-10 h-10 bg-pink-100 rounded-full flex items-center justify-center">
+                      <Play className="w-5 h-5 text-pink-600" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium text-pink-900 mb-1">{item.title}</h4>
+                      <p className="text-sm text-pink-700 mb-3">{item.description}</p>
+                      {item.metadata && (
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {item.metadata.duration && (
+                            <Badge variant="outline" className="text-xs bg-white border-pink-200">
+                              Duration: {item.metadata.duration}
+                            </Badge>
+                          )}
+                          {item.metadata.source && (
+                            <Badge variant="outline" className="text-xs bg-white border-pink-200">
+                              Source: {item.metadata.source}
+                            </Badge>
+                          )}
+                        </div>
+                      )}
                       <Button
-                        size="lg"
-                        className="bg-white/90 hover:bg-white text-black rounded-full h-16 w-16 p-0"
+                        size="sm"
+                        className="bg-pink-600 hover:bg-pink-700 text-white"
                         onClick={() => window.open(item.url, '_blank')}
                       >
-                        <Play className="w-8 h-8 ml-1" />
+                        <Play className="w-4 h-4 mr-1" />
+                        Watch Medical Video
                       </Button>
                     </div>
                   </div>
-                ) : (
-                  <video
-                    src={item.url}
-                    controls
-                    className="w-full max-h-64"
-                    poster={item.thumbnail}
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                )}
-              </div>
-              {item.description && (
-                <p className="text-xs text-gray-600 italic">{item.description}</p>
+                </Card>
               )}
-              <div className="flex gap-2">
-                {item.metadata?.duration && (
-                  <Badge variant="outline" className="text-xs">
-                    Duration: {item.metadata.duration}
-                  </Badge>
-                )}
-                {item.metadata?.source && (
-                  <Badge variant="secondary" className="text-xs">
-                    {item.metadata.source}
-                  </Badge>
-                )}
-              </div>
             </div>
           )}
 
@@ -223,14 +222,14 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                       <p className="text-xs text-gray-600">{item.description}</p>
                     )}
                     <div className="flex gap-2 mt-1">
-                      {item.metadata?.fileType && (
-                        <Badge variant="outline" className="text-xs">
-                          {item.metadata.fileType}
-                        </Badge>
-                      )}
                       {item.metadata?.fileSize && (
                         <Badge variant="outline" className="text-xs">
                           {item.metadata.fileSize}
+                        </Badge>
+                      )}
+                      {item.metadata?.fileType && (
+                        <Badge variant="secondary" className="text-xs">
+                          {item.metadata.fileType.toUpperCase()}
                         </Badge>
                       )}
                     </div>
@@ -239,6 +238,7 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                 <Button
                   size="sm"
                   variant="outline"
+                  className="flex-shrink-0"
                   onClick={() => window.open(item.url, '_blank')}
                 >
                   <Download className="w-3 h-3" />
@@ -248,28 +248,30 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
           )}
 
           {item.type === 'audio' && item.url && (
-            <div className="space-y-2">
-              {item.title && (
-                <div className="text-sm font-medium flex items-center gap-2">
-                  <Play className="w-4 h-4" />
-                  {item.title}
-                </div>
-              )}
-              <audio controls className="w-full">
-                <source src={item.url} type="audio/mpeg" />
-                <source src={item.url} type="audio/wav" />
-                <source src={item.url} type="audio/ogg" />
-                Your browser does not support the audio element.
-              </audio>
-              {item.description && (
-                <p className="text-xs text-gray-600 italic">{item.description}</p>
-              )}
-              {item.metadata?.duration && (
-                <Badge variant="outline" className="text-xs">
-                  {item.metadata.duration}
-                </Badge>
-              )}
-            </div>
+            <Card className="p-3 border-l-4 border-l-purple-500 bg-purple-50/50">
+              <div className="space-y-2">
+                {item.title && (
+                  <div className="text-sm font-medium text-purple-800">
+                    {item.title}
+                  </div>
+                )}
+                <audio
+                  controls
+                  className="w-full"
+                  src={item.url}
+                >
+                  Your browser does not support the audio element.
+                </audio>
+                {item.description && (
+                  <p className="text-xs text-gray-600">{item.description}</p>
+                )}
+                {item.metadata?.duration && (
+                  <Badge variant="outline" className="text-xs">
+                    Duration: {item.metadata.duration}
+                  </Badge>
+                )}
+              </div>
+            </Card>
           )}
         </div>
       ))}
