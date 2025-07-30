@@ -54,7 +54,7 @@ import LandingPage from "@/pages/landing";
 import HomePage from "@/pages/HomePage";
 import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
-import BrezCodeLanding from "@/pages/BrezCodeLanding";
+// BrezCodeLanding removed - using original landing page
 import BrezCodePersonalDashboard from "@/pages/BrezCodePersonalDashboard";
 
 const queryClient = new QueryClient({
@@ -136,7 +136,7 @@ function App() {
           <Route path="/brezcode/avatar-chat" component={BrezcodeAvatarChat} />
           
           {/* BrezCode Platform Routes */}
-          <Route path="/brezcode" component={BrezCodeLanding} />
+          <Route path="/brezcode" component={LandingPage} />
           <Route path="/brezcode/personal-dashboard" component={BrezCodePersonalDashboard} />
           
           {/* LeadGen platform page */}

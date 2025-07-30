@@ -14,13 +14,13 @@ export default function AuthenticatedBrezCodeRedirect() {
   useEffect(() => {
     if (!isLoading) {
       if (user && (user as any).id) {
-        // User is authenticated, redirect to BrezCode Dashboard
-        console.log('Authenticated user detected, redirecting to BrezCode dashboard');
-        setLocation('/business/brezcode/dashboard');
+        // User is authenticated, redirect to BrezCode Personal Dashboard
+        console.log('Authenticated user detected, redirecting to personal dashboard');
+        setLocation('/brezcode/personal-dashboard');
       } else {
-        // User is not authenticated, show landing page by redirecting to landing
+        // User is not authenticated, show BrezCode landing page
         console.log('User not authenticated, showing BrezCode landing page');
-        setLocation('/landing-page');
+        setLocation('/brezcode');
       }
     }
   }, [user, isLoading, setLocation]);

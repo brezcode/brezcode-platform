@@ -43,12 +43,21 @@ export default function Hero() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-            <Button 
-              onClick={() => setLocation("/brezcode/quiz")}
-              className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
-            >
-              {t('hero.cta', 'Take the quiz to start')}
-            </Button>
+            {user ? (
+              <Button 
+                onClick={() => setLocation("/brezcode/personal-dashboard")}
+                className="bg-green-500 text-white px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
+              >
+                {t('hero.dashboard', 'Go to Dashboard')}
+              </Button>
+            ) : (
+              <Button 
+                onClick={() => setLocation("/brezcode/quiz")}
+                className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
+              >
+                {t('hero.cta', 'Take the quiz to start')}
+              </Button>
+            )}
           </div>
 
           <p className="text-white/80 text-lg mb-16">

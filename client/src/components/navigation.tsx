@@ -28,6 +28,8 @@ export default function Navigation() {
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
+      // Redirect authenticated users to BrezCode personal dashboard
+      setLocation("/brezcode/personal-dashboard");
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
