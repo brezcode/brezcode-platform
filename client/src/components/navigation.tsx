@@ -46,15 +46,12 @@ export default function Navigation() {
     try {
       await login(authForm.email, authForm.password);
       setShowAuthModal(false);
-      setAuthForm({ email: "", username: "", password: "" });
       toast({
         title: "Welcome back!",
-        description: "Redirecting to Dr. Sakura chat...",
+        description: "You have successfully signed in.",
       });
-      // Force redirect to BrezCode chat after small delay
-      setTimeout(() => {
-        window.location.href = "/brezcode/chat";
-      }, 500);
+      // Redirect authenticated users to BrezCode personal dashboard
+      setLocation("/brezcode/personal-dashboard");
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
@@ -67,7 +64,7 @@ export default function Navigation() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(authForm.username, "", authForm.email, authForm.password);
+      await register(authForm.username, authForm.email, authForm.password);
       setShowAuthModal(false);
       toast({
         title: "Account Created!",
@@ -118,13 +115,15 @@ export default function Navigation() {
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-yellow-400">Welcome, {user.email || user.firstName || 'User'}!</span>
-                  <Button 
-                    onClick={() => setLocation("/brezcode/chat")}
-                    className="bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors font-semibold"
-                  >
-                    Open Dr. Sakura
-                  </Button>
+                  <span className="text-sm text-yellow-400">Welcome, {user.username}!</span>
+                  {user.isSubscriptionActive && (
+                    <Button 
+                      onClick={() => setLocation("/chat")}
+                      className="bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors font-semibold"
+                    >
+                      Open Chat
+                    </Button>
+                  )}
                   <Button variant="outline" onClick={handleLogout} className="border-white text-white hover:bg-white hover:text-blue-600">
                     {t('nav.logout', 'Sign Out')}
                   </Button>
@@ -180,13 +179,15 @@ export default function Navigation() {
               
               {user ? (
                 <div className="pt-4 border-t border-white/10 space-y-3">
-                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.email || user.firstName || 'User'}!</div>
-                  <Button 
-                    onClick={() => { setLocation("/brezcode/chat"); setShowMobileMenu(false); }}
-                    className="w-full bg-yellow-400 text-black hover:bg-yellow-300 transition-colors font-semibold"
-                  >
-                    Open Dr. Sakura
-                  </Button>
+                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.username}!</div>
+                  {user.isSubscriptionActive && (
+                    <Button 
+                      onClick={() => { setLocation("/chat"); setShowMobileMenu(false); }}
+                      className="w-full bg-yellow-400 text-black hover:bg-yellow-300 transition-colors font-semibold"
+                    >
+                      Open Chat
+                    </Button>
+                  )}
                   <Button 
                     variant="outline" 
                     onClick={() => { handleLogout(); setShowMobileMenu(false); }}
