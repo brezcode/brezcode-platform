@@ -51,8 +51,8 @@ export default function Navigation() {
         description: "You have successfully signed in.",
       });
       setAuthForm({ email: "", username: "", password: "" });
-      // Redirect authenticated users to BrezCode chat
-      setTimeout(() => setLocation("/brezcode/chat"), 1000);
+      // Redirect authenticated users to BrezCode chat  
+      setLocation("/brezcode/chat");
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
