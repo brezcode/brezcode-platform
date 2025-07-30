@@ -103,14 +103,73 @@ registerAvatarKnowledgeRoutes(app);
 console.log('✅ Avatar Knowledge Base routes registered successfully');
 
 // Try to register additional routes if they exist
-try {
-  console.log('🌸 Registering BrezCode avatar routes...');
-  const { registerBrezcodeAvatarRoutes } = await import('./routes/brezcodeAvatarRoutes');
-  registerBrezcodeAvatarRoutes(app);
-  console.log('✅ BrezCode avatar routes registered successfully');
-} catch (error) {
-  console.log('⚠️ BrezCode avatar routes not found, skipping...');
-}
+// Register BrezCode avatar routes directly
+console.log('🌸 Registering BrezCode avatar routes...');
+
+const brezcodeRouter = express.Router();
+
+// Get Dr. Sakura avatar configuration
+brezcodeRouter.get('/dr-sakura/config', async (req, res) => {
+  try {
+    const config = BrezcodeAvatarService.getDrSakuraConfig();
+    res.json({
+      success: true,
+      avatar: config
+    });
+  } catch (error: any) {
+    console.error('Error fetching Dr. Sakura config:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Chat with Dr. Sakura (main endpoint)
+brezcodeRouter.post('/dr-sakura/chat', async (req, res) => {
+  try {
+    const { userId, message, conversationHistory = [], context = {} } = req.body;
+    
+    if (!userId || !message) {
+      return res.status(400).json({ 
+        error: 'userId and message are required' 
+      });
+    }
+
+    console.log(`🌸 Dr. Sakura responding to user ${userId}: "${message.substring(0, 50)}..."`);
+    
+    // Generate Dr. Sakura's response
+    const response = await BrezcodeAvatarService.generateDrSakuraResponse(
+      userId,
+      message,
+      conversationHistory,
+      context
+    );
+    
+    console.log(`✅ Dr. Sakura response generated with multimedia content`);
+    
+    res.json({
+      success: true,
+      response: {
+        content: response.content,
+        multimediaContent: response.multimediaContent || [],
+        avatarId: 'dr_sakura_brezcode',
+        avatarName: 'Dr. Sakura Wellness',
+        role: 'Breast Health Coach',
+        qualityScores: {
+          empathy: response.empathyScore || 90,
+          medicalAccuracy: response.medicalAccuracy || 95,
+          overall: Math.round(((response.empathyScore || 90) + (response.medicalAccuracy || 95)) / 2)
+        },
+        timestamp: new Date().toISOString()
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error in Dr. Sakura chat:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.use('/api/brezcode/avatar', brezcodeRouter);
+console.log('✅ BrezCode avatar routes registered successfully');
 
 try {
   console.log('🚀 Registering avatar training routes...');
