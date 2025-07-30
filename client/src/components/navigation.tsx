@@ -50,8 +50,9 @@ export default function Navigation() {
         title: "Welcome back!",
         description: "You have successfully signed in.",
       });
-      // Redirect authenticated users to BrezCode personal dashboard
-      setLocation("/brezcode/personal-dashboard");
+      setAuthForm({ email: "", username: "", password: "" });
+      // Redirect authenticated users to BrezCode chat
+      setTimeout(() => setLocation("/brezcode/chat"), 1000);
     } catch (error: any) {
       toast({
         title: "Sign In Failed",
@@ -115,15 +116,13 @@ export default function Navigation() {
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-yellow-400">Welcome, {user.username}!</span>
-                  {user.isSubscriptionActive && (
-                    <Button 
-                      onClick={() => setLocation("/chat")}
-                      className="bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors font-semibold"
-                    >
-                      Open Chat
-                    </Button>
-                  )}
+                  <span className="text-sm text-yellow-400">Welcome, {user.email || user.firstName || 'User'}!</span>
+                  <Button 
+                    onClick={() => setLocation("/brezcode/chat")}
+                    className="bg-yellow-400 text-black px-4 py-2 rounded-full hover:bg-yellow-300 transition-colors font-semibold"
+                  >
+                    Open Dr. Sakura
+                  </Button>
                   <Button variant="outline" onClick={handleLogout} className="border-white text-white hover:bg-white hover:text-blue-600">
                     {t('nav.logout', 'Sign Out')}
                   </Button>
@@ -179,15 +178,13 @@ export default function Navigation() {
               
               {user ? (
                 <div className="pt-4 border-t border-white/10 space-y-3">
-                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.username}!</div>
-                  {user.isSubscriptionActive && (
-                    <Button 
-                      onClick={() => { setLocation("/chat"); setShowMobileMenu(false); }}
-                      className="w-full bg-yellow-400 text-black hover:bg-yellow-300 transition-colors font-semibold"
-                    >
-                      Open Chat
-                    </Button>
-                  )}
+                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.email || user.firstName || 'User'}!</div>
+                  <Button 
+                    onClick={() => { setLocation("/brezcode/chat"); setShowMobileMenu(false); }}
+                    className="w-full bg-yellow-400 text-black hover:bg-yellow-300 transition-colors font-semibold"
+                  >
+                    Open Dr. Sakura
+                  </Button>
                   <Button 
                     variant="outline" 
                     onClick={() => { handleLogout(); setShowMobileMenu(false); }}

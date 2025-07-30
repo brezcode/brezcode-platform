@@ -77,7 +77,10 @@ export function useAuth() {
   });
 
   const login = async (email: string, password: string) => {
-    return loginMutation.mutateAsync({ email, password });
+    const result = await loginMutation.mutateAsync({ email, password });
+    // Force refresh of user data after login
+    queryClient.invalidateQueries({ queryKey: ["/api/me"] });
+    return result;
   };
 
   const register = async (firstName: string, lastName: string, email: string, password: string) => {
@@ -93,7 +96,13 @@ export function useAuth() {
   };
 
   const logout = async () => {
-    return logoutMutation.mutateAsync();
+    // Clear user data immediately
+    queryClient.setQueryData(["/api/me"], null);
+    queryClient.clear();
+    const result = await logoutMutation.mutateAsync();
+    // Force page refresh to clear any cached state
+    window.location.reload();
+    return result;
   };
 
   return {

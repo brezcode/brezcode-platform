@@ -141,8 +141,8 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
                     frameBorder="0"
-                    webkitAllowFullScreen
-                    mozAllowFullScreen
+                    webkitallowfullscreen="true"
+                    mozallowfullscreen="true"
                   />
                   {/* Mobile fullscreen button overlay */}
                   <div 

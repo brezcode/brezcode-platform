@@ -5,8 +5,54 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import mobile dialog fix */
-@import './styles/mobile-dialog-fix.css';
+/* Mobile Dialog Fix - Ensures dialog stays centered on mobile devices */
+@media (max-width: 768px) {
+  [data-radix-dialog-content] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 95vw !important;
+    max-width: 400px !important;
+    margin: 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+  }
+
+  /* Prevent keyboard from pushing dialog around */
+  [data-radix-dialog-overlay] {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 9998 !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+  }
+
+  /* Mobile video fullscreen enhancements */
+  iframe[src*="vimeo"],
+  iframe[src*="youtube"] {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 280px !important;
+  }
+
+  /* Enhance video container for mobile */
+  .aspect-video {
+    min-height: 280px !important;
+    border-radius: 12px !important;
+    position: relative !important;
+  }
+
+  /* Make video container fullscreenable */
+  .aspect-video:fullscreen,
+  .aspect-video:-webkit-full-screen,
+  .aspect-video:-moz-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: black !important;
+    border-radius: 0 !important;
+  }
+}
 
 /* Hide Vite development console overlay */
 #vite-plugin-checker-container,
