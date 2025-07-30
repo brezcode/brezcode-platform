@@ -197,7 +197,7 @@ export default function Navigation() {
       </nav>
 
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="w-[95vw] max-w-md mx-auto fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%]">
           <DialogHeader>
             <DialogTitle className="text-center">Welcome to Breast Health Coach AI</DialogTitle>
           </DialogHeader>
