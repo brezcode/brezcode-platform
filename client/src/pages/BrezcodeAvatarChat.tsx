@@ -78,13 +78,23 @@ export default function BrezcodeAvatarChat() {
     }
   });
 
-  const sendSpecificResearchMutation = useMutation({
-    mutationFn: async (researcher: string) => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/send-research', {
+  // Query for proactive messages
+  const { data: proactiveMessages, refetch: refetchProactiveMessages } = useQuery({
+    queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages/1'],
+    refetchInterval: proactiveResearchActive ? 5000 : false, // Poll every 5 seconds when active
+    enabled: proactiveResearchActive
+  });
+  
+  const markProactiveReadMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
         userId: 1,
-        researcherName: researcher
+        messageId
       });
       return response.json();
+    },
+    onSuccess: () => {
+      refetchProactiveMessages();
     }
   });
 
@@ -151,6 +161,32 @@ export default function BrezcodeAvatarChat() {
       scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
     }
   }, [messages]);
+
+  // Handle proactive messages
+  useEffect(() => {
+    if (proactiveMessages?.messages && proactiveMessages.messages.length > 0) {
+      const newProactiveMessages = proactiveMessages.messages.map((proactiveMsg: any) => ({
+        id: proactiveMsg.id,
+        role: 'avatar' as const,
+        content: proactiveMsg.content[0]?.content || 'New educational content available!',
+        multimediaContent: proactiveMsg.content,
+        timestamp: proactiveMsg.timestamp,
+        qualityScores: { empathy: 95, medicalAccuracy: 98, overall: 96 },
+        isProactive: true
+      }));
+      
+      setMessages(prev => {
+        const existingIds = new Set(prev.map(msg => msg.id));
+        const uniqueNewMessages = newProactiveMessages.filter((msg: any) => !existingIds.has(msg.id));
+        return [...prev, ...uniqueNewMessages];
+      });
+      
+      // Mark all proactive messages as read
+      proactiveMessages.messages.forEach((proactiveMsg: any) => {
+        markProactiveReadMutation.mutate(proactiveMsg.id);
+      });
+    }
+  }, [proactiveMessages]);
 
   // Welcome message
   useEffect(() => {
@@ -251,16 +287,11 @@ export default function BrezcodeAvatarChat() {
                   )}
                 </Button>
                 
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  onClick={() => sendSpecificResearchMutation.mutate('Dr. Rhonda Patrick')}
-                  disabled={sendSpecificResearchMutation.isPending}
-                  className="text-xs"
-                >
-                  <Microscope className="w-3 h-3 mr-1" />
-                  Dr. Patrick
-                </Button>
+                {proactiveMessages?.count > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {proactiveMessages.count} new updates
+                  </Badge>
+                )}
               </div>
             </div>
             

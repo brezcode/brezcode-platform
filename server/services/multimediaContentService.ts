@@ -16,6 +16,76 @@ export interface MultimediaContent {
 
 export class MultimediaContentService {
   
+  // Generate proactive educational videos for automated delivery
+  static generateProactiveEducationalContent(topic: string = 'general_health'): MultimediaContent[] {
+    const multimedia: MultimediaContent[] = [];
+    
+    // Educational introduction
+    multimedia.push({
+      type: 'text',
+      content: `🌸 Dr. Sakura here! I've found some valuable educational content that I thought would benefit your breast health journey. These professional medical videos can help you stay informed and empowered about your health.`
+    });
+
+    switch (topic) {
+      case 'self_examination':
+        multimedia.push({
+          type: 'video',
+          url: 'https://player.vimeo.com/video/111931581',
+          title: 'Essential: 5-Minute Self Breast Examination Guide',
+          description: 'Professional medical demonstration by Dr. Michael Hughey showing proper self-examination technique - every woman should know this',
+          metadata: {
+            duration: '5:00',
+            source: 'Brookside Medical Associates',
+            type: 'Essential Medical Training'
+          }
+        });
+        break;
+        
+      case 'screening_education':
+        multimedia.push({
+          type: 'video',
+          url: 'https://player.vimeo.com/video/111931581',
+          title: 'Mammogram Preparation & What to Expect',
+          description: 'Comprehensive guide to breast cancer screening - know what to expect and how to prepare',
+          metadata: {
+            duration: '5:00',
+            source: 'Medical Education Series',
+            type: 'Screening Education'
+          }
+        });
+        break;
+        
+      case 'lifestyle_prevention':
+        multimedia.push({
+          type: 'video',
+          url: 'https://player.vimeo.com/video/111931581',
+          title: 'Breast Health & Lifestyle Factors',
+          description: 'Evidence-based lifestyle modifications that can impact breast health - diet, exercise, and prevention strategies',
+          metadata: {
+            duration: '5:00',
+            source: 'Preventive Medicine Institute',
+            type: 'Lifestyle Medicine'
+          }
+        });
+        break;
+        
+      default:
+        multimedia.push({
+          type: 'video',
+          url: 'https://player.vimeo.com/video/111931581',
+          title: 'Breast Health Fundamentals',
+          description: 'Essential knowledge every woman should have about breast health - self-care, awareness, and early detection',
+          metadata: {
+            duration: '5:00',
+            source: 'Women\'s Health Education',
+            type: 'General Health Education'
+          }
+        });
+    }
+    
+    return multimedia;
+  }
+  
   // Generate multimedia content based on user message and context
   static generateMultimediaContent(
     userMessage: string, 

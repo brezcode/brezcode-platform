@@ -131,6 +131,169 @@ router.get('/users/:userId/health-context', async (req, res) => {
   }
 });
 
+// Proactive Research System - Start automated educational content delivery
+router.post('/dr-sakura/start-proactive-research', async (req, res) => {
+  try {
+    const { userId, intervalMinutes = 2 } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    console.log(`🔍 Starting proactive research for user ${userId} with ${intervalMinutes} minute intervals`);
+    
+    // Store the interval in a simple in-memory store for this demo
+    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
+    
+    // Clear any existing interval for this user
+    if (global.proactiveResearchIntervals[userId]) {
+      clearInterval(global.proactiveResearchIntervals[userId]);
+    }
+    
+    // Educational topics to cycle through
+    const educationalTopics = [
+      'self_examination',
+      'screening_education',
+      'lifestyle_prevention',
+      'general_health'
+    ];
+    
+    let topicIndex = 0;
+    
+    // Set up automated content delivery
+    const interval = setInterval(async () => {
+      try {
+        const currentTopic = educationalTopics[topicIndex % educationalTopics.length];
+        
+        // Generate proactive educational content
+        const { MultimediaContentService } = await import('../services/multimediaContentService');
+        const educationalContent = MultimediaContentService.generateProactiveEducationalContent(currentTopic);
+        
+        console.log(`📚 Proactive research: Delivering ${currentTopic} content to user ${userId}`);
+        
+        // Store this as a proactive message that the frontend can poll
+        global.proactiveMessages = global.proactiveMessages || {};
+        global.proactiveMessages[userId] = global.proactiveMessages[userId] || [];
+        
+        const proactiveMessage = {
+          id: `proactive_${Date.now()}`,
+          type: 'proactive_research',
+          topic: currentTopic,
+          content: educationalContent,
+          timestamp: new Date().toISOString()
+        };
+        
+        global.proactiveMessages[userId].push(proactiveMessage);
+        
+        // Keep only the last 10 proactive messages
+        if (global.proactiveMessages[userId].length > 10) {
+          global.proactiveMessages[userId] = global.proactiveMessages[userId].slice(-10);
+        }
+        
+        topicIndex++;
+      } catch (error) {
+        console.error('Error in proactive research delivery:', error);
+      }
+    }, intervalMinutes * 60 * 1000);
+    
+    global.proactiveResearchIntervals[userId] = interval;
+    
+    res.json({
+      success: true,
+      message: `Proactive research started with ${intervalMinutes} minute intervals`,
+      intervalMinutes,
+      status: 'active'
+    });
+    
+  } catch (error: any) {
+    console.error('Error starting proactive research:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Stop proactive research
+router.post('/dr-sakura/stop-proactive-research', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ error: 'userId is required' });
+    }
+
+    console.log(`🛑 Stopping proactive research for user ${userId}`);
+    
+    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
+    
+    if (global.proactiveResearchIntervals[userId]) {
+      clearInterval(global.proactiveResearchIntervals[userId]);
+      delete global.proactiveResearchIntervals[userId];
+    }
+    
+    res.json({
+      success: true,
+      message: 'Proactive research stopped',
+      status: 'inactive'
+    });
+    
+  } catch (error: any) {
+    console.error('Error stopping proactive research:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get proactive messages for a user
+router.get('/dr-sakura/proactive-messages/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    global.proactiveMessages = global.proactiveMessages || {};
+    const messages = global.proactiveMessages[userId] || [];
+    
+    res.json({
+      success: true,
+      messages,
+      count: messages.length
+    });
+    
+  } catch (error: any) {
+    console.error('Error fetching proactive messages:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Mark proactive message as read
+router.post('/dr-sakura/mark-proactive-read', async (req, res) => {
+  try {
+    const { userId, messageId } = req.body;
+    
+    if (!userId || !messageId) {
+      return res.status(400).json({ error: 'userId and messageId are required' });
+    }
+    
+    global.proactiveMessages = global.proactiveMessages || {};
+    if (global.proactiveMessages[userId]) {
+      global.proactiveMessages[userId] = global.proactiveMessages[userId].filter(
+        (msg: any) => msg.id !== messageId
+      );
+    }
+    
+    res.json({
+      success: true,
+      message: 'Proactive message marked as read'
+    });
+    
+  } catch (error: any) {
+    console.error('Error marking proactive message as read:', error);
+    res.status(500).json({ error: error.message });
+  }
+    });
+    
+  } catch (error: any) {
+    console.error('Error fetching health context:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Training session endpoint for BrezCode
 router.post('/training/start', async (req, res) => {
   try {
@@ -333,6 +496,81 @@ router.get('/research/experts', async (req, res) => {
     
   } catch (error: any) {
     console.error('❌ Error fetching expert list:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Training session endpoint for BrezCode
+router.post('/training/start', async (req, res) => {
+  try {
+    const { scenarioId, userId = 1 } = req.body;
+    
+    const scenarios = BrezcodeAvatarService.getBrezcodeTtrainingScenarios();
+    const scenario = scenarios.find(s => s.id === scenarioId);
+    
+    if (!scenario) {
+      return res.status(404).json({ error: 'Training scenario not found' });
+    }
+    
+    // Create training session
+    const sessionId = `brezcode_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    res.json({
+      success: true,
+      session: {
+        id: sessionId,
+        avatarId: 'dr_sakura_brezcode',
+        scenario: scenario,
+        status: 'active',
+        messages: [],
+        startedAt: new Date().toISOString()
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Error starting training session:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Continue training conversation
+router.post('/training/:sessionId/continue', async (req, res) => {
+  try {
+    const { sessionId } = req.params;
+    const { userMessage, conversationHistory = [] } = req.body;
+    
+    console.log(`🎯 Continuing BrezCode training session: ${sessionId}`);
+    
+    // Generate contextual training response
+    const response = await BrezcodeAvatarService.generateDrSakuraResponse(
+      1, // Default training user
+      userMessage || "Please continue with the breast health consultation...",
+      conversationHistory,
+      { currentConcerns: ['training session'] }
+    );
+    
+    const newMessage = {
+      id: `msg_${Date.now()}`,
+      role: 'avatar',
+      content: response.content,
+      timestamp: new Date().toISOString(),
+      qualityScores: {
+        empathy: response.empathyScore,
+        medicalAccuracy: response.medicalAccuracy
+      }
+    };
+    
+    res.json({
+      success: true,
+      session: {
+        id: sessionId,
+        messages: [...conversationHistory, newMessage],
+        lastMessage: newMessage
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Error continuing training session:', error);
     res.status(500).json({ error: error.message });
   }
 });
