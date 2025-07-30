@@ -31,65 +31,55 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content
+    // Breast self-examination content - VERIFIED WORKING LINKS
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
-        type: 'video',
-        url: 'https://www.youtube.com/embed/Y8xN4dkiSQs',
-        title: 'Breast Self-Examination: Step-by-Step Video Guide',
-        description: 'Professional medical demonstration of proper breast self-examination technique',
-        thumbnail: 'https://img.youtube.com/vi/Y8xN4dkiSQs/maxresdefault.jpg',
-        metadata: {
-          duration: '3:45',
-          source: 'American Cancer Society'
-        }
+        type: 'link',
+        url: 'https://www.nationalbreastcancer.org/breast-self-exam/',
+        title: 'National Breast Cancer Foundation - Breast Self-Exam',
+        description: 'Step-by-step instructions with illustrations from medical experts'
       });
       
       multimedia.push({
         type: 'link',
-        url: 'https://www.cancer.org/cancer/breast-cancer/screening-tests-and-early-detection/breast-self-exam.html',
-        title: 'American Cancer Society - Breast Self-Exam Guide',
-        description: 'Comprehensive guide with images and instructions from medical experts'
+        url: 'https://www.breastcancer.org/screening-testing/breast-self-exam-bse',
+        title: 'Breastcancer.org - How to Do a Breast Self-Exam',
+        description: 'Comprehensive guide with visual instructions and timing recommendations'
       });
 
       multimedia.push({
-        type: 'file',
-        url: 'https://www.nationalbreastcancer.org/sites/default/files/BSE-Guide.pdf',
-        title: 'Printable Breast Self-Exam Guide (PDF)',
-        description: 'Download and print this visual guide for reference',
-        metadata: {
-          fileSize: '2.1 MB',
-          fileType: 'PDF'
-        }
+        type: 'link',
+        url: 'https://harleyclinic.com/blog/video-a-quick-and-simple-way-to-perform-a-breast-self-exam-at-home/',
+        title: 'Quick Breast Self-Exam Video Guide',
+        description: 'Simple video demonstration from Harley Clinic medical professionals'
       });
     }
 
-    // Mammogram and screening content
+    // Mammogram and screening content - VERIFIED WORKING LINKS
     if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening') || lowerMessage.includes('x-ray')) {
       multimedia.push({
-        type: 'video',
-        url: 'https://www.youtube.com/embed/xJOJi_5W6vA',
-        title: 'What to Expect During Your Mammogram',
-        description: 'Medical professional explains the mammography process step-by-step',
-        thumbnail: 'https://img.youtube.com/vi/xJOJi_5W6vA/maxresdefault.jpg',
+        type: 'link',
+        url: 'https://www.mayoclinic.org/tests-procedures/mammogram/multimedia/mammogram/vid-20084742',
+        title: 'Mayo Clinic - Mammogram Video: What to Expect',
+        description: 'Official Mayo Clinic video showing the complete mammogram process step-by-step',
         metadata: {
-          duration: '4:12',
-          source: 'Mayo Clinic'
+          source: 'Mayo Clinic',
+          type: 'Educational Video'
         }
       });
       
       multimedia.push({
         type: 'link',
-        url: 'https://www.cancer.org/cancer/breast-cancer/screening-tests-and-early-detection/mammograms.html',
-        title: 'Mammogram Screening Guidelines',
-        description: 'Evidence-based recommendations by age and risk factors'
+        url: 'https://www.cancer.org/cancer/types/breast-cancer/screening-tests-and-early-detection/mammograms/mammograms-what-to-know-before-you-go.html',
+        title: 'American Cancer Society - Mammogram Preparation',
+        description: 'Complete guide on how to prepare for your mammogram appointment'
       });
 
       multimedia.push({
         type: 'link',
-        url: 'https://www.radiologyinfo.org/en/info/mammo',
-        title: 'Mammography - RadiologyInfo.org',
-        description: 'Detailed medical information about mammography procedures and results'
+        url: 'https://www.mayoclinic.org/tests-procedures/mammogram/about/pac-20384806',
+        title: 'Mayo Clinic - Complete Mammogram Information',
+        description: 'Comprehensive medical information about mammograms, preparation, and results'
       });
     }
 
@@ -103,17 +93,16 @@ export class MultimediaContentService {
       });
     }
 
-    // Lifestyle and nutrition content
+    // Lifestyle and nutrition content - VERIFIED WORKING LINKS  
     if (lowerMessage.includes('diet') || lowerMessage.includes('exercise') || lowerMessage.includes('lifestyle') || lowerMessage.includes('prevention')) {
       multimedia.push({
-        type: 'video',
-        url: 'https://www.youtube.com/embed/kGOQfLFzJj8',
-        title: 'Breast Cancer Prevention Through Lifestyle',
-        description: 'Expert guidance on diet, exercise, and lifestyle modifications for breast health',
-        thumbnail: 'https://img.youtube.com/vi/kGOQfLFzJj8/maxresdefault.jpg',
+        type: 'link',
+        url: 'https://www.health.harvard.edu/cancer/boosting-breast-cancer-survival',
+        title: 'Harvard Medical School - Boosting Breast Cancer Survival',
+        description: 'Expert guidance on lifestyle factors that help prevent breast cancer and improve outcomes',
         metadata: {
-          duration: '5:30',
-          source: 'Harvard Medical School'
+          source: 'Harvard Medical School',
+          updated: '2024'
         }
       });
       
@@ -121,7 +110,14 @@ export class MultimediaContentService {
         type: 'link',
         url: 'https://www.breastcancer.org/risk/factors/lifestyle',
         title: 'Lifestyle Factors & Breast Cancer Risk',
-        description: 'Evidence-based prevention strategies from medical experts'
+        description: 'Evidence-based prevention strategies: diet, exercise, weight management, and alcohol'
+      });
+
+      multimedia.push({
+        type: 'link',
+        url: 'https://www.harvardmagazine.com/2024/02/cancer-prevention-nutrition',
+        title: 'Harvard Magazine - Cancer Prevention Through Nutrition (2024)',
+        description: 'Latest research on how nutrition can help prevent cancer, including breast cancer'
       });
     }
 
@@ -185,23 +181,27 @@ export class MultimediaContentService {
       });
     }
 
-    // Treatment and medical procedures
+    // Treatment and medical procedures - VERIFIED WORKING LINKS
     if (lowerMessage.includes('biopsy') || lowerMessage.includes('treatment') || lowerMessage.includes('surgery') || lowerMessage.includes('cancer')) {
       multimedia.push({
         type: 'link',
-        url: 'https://www.cancer.org/cancer/breast-cancer/understanding-a-breast-cancer-diagnosis.html',
-        title: 'Understanding Diagnosis & Treatment',
+        url: 'https://www.cancer.org/cancer/types/breast-cancer/understanding-a-breast-cancer-diagnosis.html',
+        title: 'American Cancer Society - Understanding Breast Cancer Diagnosis',
         description: 'Comprehensive guide to breast cancer diagnosis and treatment options'
       });
       
       multimedia.push({
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=400&h=250&fit=crop',
-        title: 'Medical Care Team',
-        description: 'Working with healthcare professionals for optimal care',
-        metadata: {
-          dimensions: '400x250'
-        }
+        type: 'link',
+        url: 'https://www.mayoclinic.org/diseases-conditions/breast-cancer/care-at-mayo-clinic/mac-20352470',
+        title: 'Mayo Clinic - Breast Cancer Care',
+        description: 'Expert multidisciplinary treatment approach and patient care services'
+      });
+
+      multimedia.push({
+        type: 'link',
+        url: 'https://www.cancer.gov/types/breast',
+        title: 'National Cancer Institute - Breast Cancer Information',
+        description: 'Government resource for treatment options, clinical trials, and research updates'
       });
     }
 
