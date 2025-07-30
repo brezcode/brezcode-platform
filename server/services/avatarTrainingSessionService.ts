@@ -325,6 +325,15 @@ export class AvatarTrainingSessionService {
       .where(eq(avatarTrainingSessions.sessionId, sessionId));
 
     console.log(`✅ Session completed successfully: ${sessionId} (Total sessions: ${await this.getTotalSessionsCount()})`);
+
+    // EVENT-DRIVEN KNOWLEDGE TRANSFER: Only transfer knowledge when session is completed
+    try {
+      const { KnowledgeTransferService } = await import('./knowledgeTransferService');
+      await KnowledgeTransferService.onTrainingSessionCompleted(sessionId, session.userId);
+    } catch (error) {
+      // Don't fail session completion if knowledge transfer fails
+      console.warn('Knowledge transfer failed but session completed successfully:', error);
+    }
   }
 
   // Generate session summary using AI

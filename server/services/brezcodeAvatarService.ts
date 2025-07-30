@@ -211,7 +211,7 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       const trainingMemory: any[] = [];
       for (const session of sessions) {
         const sessionData = await AvatarTrainingSessionService.getSession(session.sessionId);
-        if (sessionData && sessionData.conversationHistory) {
+        if (sessionData && sessionData.conversationHistory && Array.isArray(sessionData.conversationHistory)) {
           trainingMemory.push(...sessionData.conversationHistory);
         }
       }

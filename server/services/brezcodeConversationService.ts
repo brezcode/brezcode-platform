@@ -1,5 +1,5 @@
 import { brezcodeDb } from '../brezcode-db';
-import { users } from '../../shared/schema';
+import { brezcodeUsers } from '../../shared/brezcode-schema';
 import { eq, desc } from 'drizzle-orm';
 
 export interface ConversationMessage {
@@ -28,8 +28,8 @@ export class BrezcodeConversationService {
       // Get or create user's conversation history
       const [user] = await brezcodeDb
         .select()
-        .from(users)
-        .where(eq(users.id, userId));
+        .from(brezcodeUsers)
+        .where(eq(brezcodeUsers.id, userId));
 
       if (!user) {
         console.warn(`User ${userId} not found for conversation storage`);
@@ -38,9 +38,9 @@ export class BrezcodeConversationService {
 
       // Parse existing conversation history
       let conversationHistory = [];
-      if (user.health_profile) {
+      if (user.healthProfile) {
         try {
-          const healthData = JSON.parse(user.health_profile);
+          const healthData = JSON.parse(user.healthProfile as string);
           conversationHistory = healthData.conversationHistory || [];
         } catch (e) {
           console.warn('Error parsing existing health profile:', e);
@@ -65,16 +65,16 @@ export class BrezcodeConversationService {
       }
 
       // Update user's health profile with conversation history
-      const healthData = user.health_profile ? JSON.parse(user.health_profile) : {};
+      const healthData = user.healthProfile ? JSON.parse(user.healthProfile as string) : {};
       healthData.conversationHistory = conversationHistory;
       healthData.lastConversationUpdate = new Date().toISOString();
 
       await brezcodeDb
-        .update(users)
+        .update(brezcodeUsers)
         .set({ 
-          health_profile: JSON.stringify(healthData)
+          healthProfile: JSON.stringify(healthData)
         })
-        .where(eq(users.id, userId));
+        .where(eq(brezcodeUsers.id, userId));
 
       console.log(`💾 Stored ${role} message for user ${userId} in conversation history`);
     } catch (error) {
@@ -87,14 +87,14 @@ export class BrezcodeConversationService {
     try {
       const [user] = await brezcodeDb
         .select()
-        .from(users)
-        .where(eq(users.id, userId));
+        .from(brezcodeUsers)
+        .where(eq(brezcodeUsers.id, userId));
 
-      if (!user || !user.health_profile) {
+      if (!user || !user.healthProfile) {
         return [];
       }
 
-      const healthData = JSON.parse(user.health_profile);
+      const healthData = JSON.parse(user.healthProfile as string);
       return healthData.conversationHistory || [];
     } catch (error) {
       console.error('Error fetching conversation history:', error);

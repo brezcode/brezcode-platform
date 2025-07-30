@@ -13,6 +13,8 @@ export const brezcodeUsers = pgTable("brezcode_users", {
   phone: text("phone"),
   isEmailVerified: boolean("is_email_verified").default(false),
   emailVerificationCode: text("email_verification_code"),
+  healthProfile: json("health_profile"), // Add health profile for conversation storage
+  conversationHistory: json("conversation_history"), // Direct conversation storage
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
