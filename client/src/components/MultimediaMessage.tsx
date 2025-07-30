@@ -133,32 +133,42 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
               
               {/* Handle YouTube and Vimeo embed URLs */}
               {(item.url.includes('youtube.com/embed/') || item.url.includes('player.vimeo.com/video/')) && (
-                <div className="video-container-enhanced relative rounded-lg bg-black" style={{
+                <div className="video-wrapper-mobile w-full bg-black rounded-lg overflow-hidden relative" style={{
+                  height: '280px',
                   width: '100%',
-                  minHeight: '280px',
-                  aspectRatio: '16/9',
-                  touchAction: 'pan-x pan-y pinch-zoom',
-                  overflowX: 'auto',
-                  overflowY: 'hidden',
-                  scrollBehavior: 'smooth'
+                  position: 'relative'
                 }}>
-                  <iframe
-                    src={item.url}
-                    title={item.title || 'Medical Video'}
-                    className="absolute inset-0 w-full h-full border-0"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    frameBorder="0"
-                    style={{
-                      minWidth: '100%',
-                      minHeight: '280px',
-                      border: 'none',
-                      outline: 'none'
-                    }}
-                  />
+                  <div className="video-container-enhanced" style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '100%',
+                    height: '100%',
+                    minWidth: '100%',
+                    touchAction: 'pan-x pan-y pinch-zoom',
+                    overflow: 'visible'
+                  }}>
+                    <iframe
+                      src={item.url}
+                      title={item.title || 'Medical Video'}
+                      className="w-full h-full border-0"
+                      allowFullScreen
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      frameBorder="0"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        outline: 'none',
+                        display: 'block',
+                        margin: '0 auto'
+                      }}
+                    />
+                  </div>
                   {/* Enhanced instruction overlay */}
-                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-80 pointer-events-none md:hidden">
-                    Pinch to zoom • Swipe to pan
+                  <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded opacity-90 pointer-events-none md:hidden z-10">
+                    Pinch to zoom • Drag to pan
                   </div>
                 </div>
               )}
