@@ -9,7 +9,7 @@ import BrezCodeBusinessProfile from "@/pages/BrezCodeBusinessProfile";
 import SubscribePage from "@/pages/subscribe";
 import EmailVerificationModule from "@/components/EmailVerificationModule";
 import BusinessSelector from "@/components/BusinessSelector";
-import BrezCodeBusinessDashboard from "@/pages/BrezCodeDashboard";
+import BrezCodeDashboard from "@/pages/BrezCodeDashboard";
 import UserHomepage from "@/pages/user-homepage";
 import LeadGenDashboard from "@/pages/LeadGenDashboard";
 import ProfileEditor from "@/pages/ProfileEditor";
@@ -54,9 +54,6 @@ import LandingPage from "@/pages/landing";
 import HomePage from "@/pages/HomePage";
 import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
-import ManualRedirect from "@/components/ManualRedirect";
-import BrezCodeUserDashboard from "@/pages/BrezCodeUserDashboard";
-import BrezCodeLanding from "@/pages/BrezCodeLanding";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -83,12 +80,7 @@ function App() {
           <Route path="/business-selector">
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
-          {/* BrezCode Platform Routes */}
-          <Route path="/brezcode" component={BrezCodeLanding} />
-          <Route path="/brezcode/dashboard" component={BrezCodeUserDashboard} />
-          
-          {/* BrezCode Business Management Routes */}
-          <Route path="/business/brezcode/dashboard" component={BrezCodeBusinessDashboard} />
+          <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
           <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />
@@ -142,7 +134,7 @@ function App() {
           <Route path="/brezcode/avatar-chat" component={BrezcodeAvatarChat} />
           
           {/* BrezCode Authentication Route - checks login and redirects appropriately */}
-          <Route path="/brezcode" component={ManualRedirect} />
+          <Route path="/brezcode" component={AuthenticatedBrezCodeRedirect} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

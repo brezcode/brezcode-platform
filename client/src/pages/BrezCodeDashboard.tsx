@@ -7,7 +7,7 @@ import { Heart, Brain, Users, TrendingUp, MessageSquare, Calendar, BookOpen, Set
 import { useLocation } from "wouter";
 import TopNavigation from "@/components/TopNavigation";
 
-export default function BrezCodeBusinessDashboard() {
+export default function BrezCodeDashboard() {
   const [, setLocation] = useLocation();
 
   // BrezCode business metrics
@@ -70,8 +70,8 @@ export default function BrezCodeBusinessDashboard() {
             <Heart className="h-8 w-8 text-pink-500" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">BrezCode Business Dashboard</h1>
-            <p className="text-gray-600">Business operations & customer overview for BrezCode platform</p>
+            <h1 className="text-3xl font-bold text-gray-900">BrezCode Dashboard</h1>
+            <p className="text-gray-600">AI-powered breast health assessment platform</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">

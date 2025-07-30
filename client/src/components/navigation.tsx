@@ -23,8 +23,6 @@ export default function Navigation() {
     e.preventDefault();
     try {
       await login(authForm.email, authForm.password);
-      // Set login success flag for BrezCode redirect
-      localStorage.setItem('loginSuccess', 'true');
       setShowAuthModal(false);
       toast({
         title: "Welcome back!",
