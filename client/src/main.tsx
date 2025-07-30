@@ -2,25 +2,53 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-// Disable Vite HMR to stop constant reconnections
+// Completely disable Vite HMR and WebSocket connections
 if (import.meta.hot) {
-  import.meta.hot.dispose(() => {
-    // Do nothing - disable HMR cleanup
-  });
-  
-  // Override WebSocket connection attempts
-  const originalWebSocket = window.WebSocket;
-  window.WebSocket = class extends originalWebSocket {
-    constructor(url: string | URL, protocols?: string | string[]) {
-      // Block Vite HMR WebSocket connections
-      if (typeof url === 'string' && url.includes('/@vite/client')) {
-        console.log('Blocking Vite HMR connection to reduce updates');
-        super('ws://localhost:99999'); // Non-existent port to fail immediately
-        return;
-      }
-      super(url, protocols);
+  import.meta.hot.dispose(() => {});
+  import.meta.hot.decline();
+}
+
+// Block ALL WebSocket connections to prevent Vite reconnections
+const originalWebSocket = window.WebSocket;
+let wsBlockCount = 0;
+
+window.WebSocket = class extends originalWebSocket {
+  constructor(url: string | URL, protocols?: string | string[]) {
+    const urlString = typeof url === 'string' ? url : url.toString();
+    
+    // Block all Vite-related WebSocket connections
+    if (urlString.includes('vite') || urlString.includes('/@vite') || 
+        urlString.includes(':5173') || urlString.includes(':24678') ||
+        urlString.includes('ws://localhost') && !urlString.includes('your-app-ws')) {
+      
+      wsBlockCount++;
+      console.log(`Blocked Vite WebSocket #${wsBlockCount}: ${urlString}`);
+      
+      // Create a fake WebSocket that immediately fails
+      const fakeWs = {
+        readyState: 3, // CLOSED
+        close: () => {},
+        send: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+        onopen: null,
+        onclose: null,
+        onerror: null,
+        onmessage: null
+      };
+      
+      // Return fake WebSocket to prevent actual connection
+      return fakeWs as any;
     }
-  };
+    
+    super(url, protocols);
+  }
+};
+
+// Disable Vite client completely
+if ('__vite__' in window) {
+  (window as any).__vite__ = undefined;
 }
 
 // Hide Vite development overlays and connection messages
@@ -42,14 +70,35 @@ const hideViteOverlays = () => {
     }
   });
   
-  // Hide console messages about Vite connections
+  // Block ALL Vite console messages
   const originalConsoleLog = console.log;
+  const originalConsoleWarn = console.warn;
+  const originalConsoleError = console.error;
+  
   console.log = (...args) => {
     const message = args.join(' ');
-    if (message.includes('[vite]') || message.includes('connecting...') || message.includes('connected.')) {
-      return; // Block Vite connection messages
+    if (message.includes('[vite]') || message.includes('connecting') || 
+        message.includes('connected') || message.includes('hmr') ||
+        message.includes('WebSocket') || message.includes('ws://')) {
+      return;
     }
     originalConsoleLog.apply(console, args);
+  };
+  
+  console.warn = (...args) => {
+    const message = args.join(' ');
+    if (message.includes('[vite]') || message.includes('WebSocket') || message.includes('ws://')) {
+      return;
+    }
+    originalConsoleWarn.apply(console, args);
+  };
+  
+  console.error = (...args) => {
+    const message = args.join(' ');
+    if (message.includes('[vite]') || message.includes('WebSocket') || message.includes('ws://')) {
+      return;
+    }
+    originalConsoleError.apply(console, args);
   };
 };
 
