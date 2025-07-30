@@ -70,8 +70,8 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <Switch>
-          {/* Home page with two buttons */}
-          <Route path="/" component={HomePage} />
+          {/* BrezCode landing page as main route */}
+          <Route path="/" component={LandingPage} />
           <Route path="/leadgen" component={LeadGenLanding} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
