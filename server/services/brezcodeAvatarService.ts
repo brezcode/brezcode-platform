@@ -100,6 +100,10 @@ export class BrezcodeAvatarService {
         drSakuraAvatarId // Avatar ID for knowledge base search
       );
       
+      // Calculate BrezCode-specific quality scores
+      const empathyScore = this.calculateEmpathyScore(avatarResponse.content);
+      const medicalAccuracy = this.calculateMedicalAccuracy(avatarResponse.content, userMessage);
+      
       // Store this conversation in training memory for future learning
       await this.storeConversationInTrainingMemory(userId, userMessage, avatarResponse.content);
       
@@ -110,10 +114,6 @@ export class BrezcodeAvatarService {
         medicalAccuracy: medicalAccuracy,
         qualityScore: avatarResponse.quality_score || Math.round((empathyScore + medicalAccuracy) / 2)
       });
-      
-      // Calculate BrezCode-specific quality scores
-      const empathyScore = this.calculateEmpathyScore(avatarResponse.content);
-      const medicalAccuracy = this.calculateMedicalAccuracy(avatarResponse.content, userMessage);
 
       console.log(`✅ Dr. Sakura response generated with quality score: ${avatarResponse.quality_score}, empathy: ${empathyScore}, medical accuracy: ${medicalAccuracy}`);
 
@@ -205,14 +205,14 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       const { AvatarTrainingSessionService } = await import('./avatarTrainingSessionService');
       
       // Get all Dr. Sakura training sessions for this user
-      const sessions = await AvatarTrainingSessionService.getUserSessions(userId, 'dr_sakura_brezcode');
+      const sessions = await AvatarTrainingSessionService.getUserSessions(userId);
       
       // Extract training memory from all sessions
       const trainingMemory: any[] = [];
       for (const session of sessions) {
         const sessionData = await AvatarTrainingSessionService.getSession(session.sessionId);
-        if (sessionData && sessionData.messages) {
-          trainingMemory.push(...sessionData.messages);
+        if (sessionData && sessionData.conversationHistory) {
+          trainingMemory.push(...sessionData.conversationHistory);
         }
       }
       
@@ -263,16 +263,22 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       const { AvatarTrainingSessionService } = await import('./avatarTrainingSessionService');
       
       // Find or create a Dr. Sakura training session for this user
-      let sessions = await AvatarTrainingSessionService.getUserSessions(userId, 'dr_sakura_brezcode');
+      let sessions = await AvatarTrainingSessionService.getUserSessions(userId);
       let sessionId: string;
       
       if (sessions.length === 0) {
         // Create new training session for Dr. Sakura
-        const newSession = await AvatarTrainingSessionService.startSession(
+        const newSession = await AvatarTrainingSessionService.createSession(
           userId,
           'dr_sakura_brezcode',
-          'health_coach',
-          'BrezCode Health Coaching'
+          'health_coaching_scenario',
+          'BrezCode Health Coaching Platform',
+          {
+            name: 'BrezCode Health Coaching',
+            description: 'General health coaching and breast health consultation',
+            customerMood: 'concerned',
+            objectives: ['Provide empathetic health guidance', 'Answer breast health questions', 'Offer evidence-based recommendations']
+          }
         );
         sessionId = newSession.sessionId;
       } else {
@@ -281,7 +287,7 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       }
       
       // Add messages to the training session
-      await AvatarTrainingSessionService.addMessage(sessionId, 'user', userMessage);
+      await AvatarTrainingSessionService.addMessage(sessionId, 'patient', userMessage);
       await AvatarTrainingSessionService.addMessage(sessionId, 'avatar', avatarResponse);
       
       console.log(`💾 Stored Dr. Sakura conversation in training memory (session: ${sessionId})`);
@@ -303,7 +309,7 @@ Provide specific, actionable guidance while being supportive and reassuring.`
       if (!user) return null;
 
       // Parse quiz answers if available
-      const quizData = user.quiz_answers ? JSON.parse(user.quiz_answers as string) : null;
+      const quizData = user.quizAnswers ? JSON.parse(user.quizAnswers as string) : null;
       
       // Extract health information from quiz answers
       const healthInfo = quizData ? {
@@ -320,7 +326,7 @@ Provide specific, actionable guidance while being supportive and reassuring.`
         alcoholConsumption: quizData.alcohol_consumption || null,
         stressLevel: quizData.stress_level || null,
         symptoms: quizData.symptoms || null,
-        riskLevel: user.risk_level || null
+        riskLevel: null // Risk level calculated separately
       } : null;
 
       return {
