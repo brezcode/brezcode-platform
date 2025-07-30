@@ -1,13 +1,23 @@
-# BrezCode Dashboard Architecture Guide
+# Platform Architecture Guide
 
-## 🏥 Two Distinct Dashboard Systems
+## 📊 **LeadGen.to - Universal Business Management Platform**
+**Route:** `/` (Root platform)  
+**Purpose:** Business and personal management app that contains multiple businesses  
+**User:** Business owners and entrepreneurs managing various ventures  
 
-### 1. **BrezCode Business Dashboard** 
+**Contains Multiple Businesses:**
+- BrezCode (breast health coaching)
+- Other businesses (e-commerce, consulting, etc.)
+
+---
+
+## 🏢 **BrezCode Business Dashboard (Within LeadGen.to)**
 **Route:** `/business/brezcode/dashboard`  
-**Purpose:** Business Operations & Management  
-**User:** BrezCode platform operators/administrators  
+**Location:** Inside LeadGen.to platform as one of the businesses  
+**Purpose:** Manage BrezCode as a business venture within LeadGen  
+**User:** Business operators managing BrezCode operations  
 
-**Features:**
+**Business Metrics:**
 - Total platform users (1,247 users)
 - Active assessments monitoring (89 active)
 - Completion rates tracking (94%)
@@ -16,7 +26,7 @@
 - Customer satisfaction (4.8/5)
 - AI training progress (85%)
 
-**Business Management Tools:**
+**Management Tools:**
 - AI Training (Train Dr. Sakura with breast health scenarios)
 - Knowledge Center (Upload files to train AI avatars)
 - User Analytics (View user engagement and health outcomes)
@@ -25,12 +35,12 @@
 
 ---
 
-### 2. **BrezCode Personal Health Dashboard**
-**Route:** `/brezcode/dashboard`  
-**Purpose:** Individual User Health Management & Coaching  
-**User:** Individual users who took the breast health assessment  
+## 🩺 **BrezCode - Independent Breast Health Coaching App**
+**Route:** `/brezcode` (Completely separate app)  
+**Purpose:** Standalone breast health coaching and wellness management  
+**User:** Individual users seeking breast health guidance and coaching  
 
-**Features:**
+**Personal Health Features:**
 - Personal health score (85/100)
 - Current wellness streak (12 days)
 - Weekly goal progress (75%)
@@ -38,7 +48,7 @@
 - Risk category status (Low Risk)
 - Assessment completion tracking (3 completed)
 
-**Personal Health Tools:**
+**Coaching Tools:**
 - Interactive Health Calendar
 - Daily wellness plans (morning, afternoon, evening activities)
 - Activity completion tracking
@@ -48,20 +58,22 @@
 
 ---
 
-## 🎯 Navigation Structure
+## 🎯 Platform Structure
 
 ```
-BrezCode Platform:
-├── /brezcode → Landing page (WHO statistics, features, CTA)
-├── /brezcode/dashboard → Personal Health Dashboard (individual users)
+LeadGen.to (Universal Business Management):
+├── / → LeadGen.to homepage (business management platform)
+├── /business-dashboard → Main business dashboard
+├── /business/brezcode/dashboard → BrezCode business management
+├── /business/brezcode/profile → BrezCode business profile
+└── /business/brezcode/avatar-training → AI training for BrezCode
+
+BrezCode (Independent Breast Health App):
+├── /brezcode → BrezCode landing page (WHO statistics, features)
+├── /brezcode/dashboard → Personal health dashboard (users)
 ├── /brezcode/chat → Dr. Sakura AI Coach
 ├── /brezcode/assessment → Breast health quiz
-└── /brezcode/profile → User profile
-
-LeadGen Business Management:
-├── /business/brezcode/dashboard → Business Dashboard (operators)
-├── /business/brezcode/profile → Business profile management
-└── /business/brezcode/avatar-training → AI training system
+└── /brezcode/profile → User health profile
 ```
 
 ## 🔄 User Journey
