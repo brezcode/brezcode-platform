@@ -1,5 +1,7 @@
 import express from 'express';
 import { BrezcodeAvatarService } from '../services/brezcodeAvatarService';
+import { ProactiveContentService } from '../services/proactiveContentService';
+import { HealthResearchService } from '../services/healthResearchService';
 import { brezcodeDb } from '../brezcode-db';
 import { brezcodeUsers, brezcodeAssessments } from '@shared/brezcode-schema';
 import { eq, desc } from 'drizzle-orm';
@@ -200,6 +202,137 @@ router.post('/training/:sessionId/continue', async (req, res) => {
     
   } catch (error: any) {
     console.error('Error continuing training session:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Start proactive research content delivery
+router.post('/dr-sakura/start-proactive-research', async (req, res) => {
+  try {
+    const { userId, intervalMinutes = 2 } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ 
+        error: 'userId is required' 
+      });
+    }
+
+    console.log(`🔬 Starting proactive research delivery for user ${userId} every ${intervalMinutes} minutes`);
+    
+    // Mock callback for demonstration (in real implementation, you'd use WebSocket or SSE)
+    const callback = (message: any) => {
+      console.log(`📚 Proactive message ready for user ${userId}:`, message.content.substring(0, 100) + '...');
+      // In real implementation, you'd send this via WebSocket to the client
+    };
+    
+    const result = ProactiveContentService.startContentDelivery(userId, callback, intervalMinutes);
+    
+    res.json({
+      success: true,
+      message: `Proactive research delivery started for Dr. Sakura`,
+      details: result,
+      nextDelivery: new Date(Date.now() + 30000).toISOString() // First message in 30 seconds
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error starting proactive research:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Stop proactive research content delivery
+router.post('/dr-sakura/stop-proactive-research', async (req, res) => {
+  try {
+    const { userId } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ 
+        error: 'userId is required' 
+      });
+    }
+
+    const stopped = ProactiveContentService.stopContentDelivery(userId);
+    
+    res.json({
+      success: true,
+      message: stopped 
+        ? 'Proactive research delivery stopped' 
+        : 'No active delivery found for this user'
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error stopping proactive research:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get proactive delivery status
+router.get('/dr-sakura/proactive-status/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const status = ProactiveContentService.getDeliveryStatus(parseInt(userId));
+    
+    res.json({
+      success: true,
+      status
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error getting proactive status:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Send specific researcher content
+router.post('/dr-sakura/send-research', async (req, res) => {
+  try {
+    const { userId, researcherName = 'Dr. Rhonda Patrick' } = req.body;
+    
+    if (!userId) {
+      return res.status(400).json({ 
+        error: 'userId is required' 
+      });
+    }
+
+    const message = await ProactiveContentService.sendSpecificResearch(userId, researcherName);
+    
+    if (!message) {
+      return res.status(404).json({
+        error: 'No content found for the specified researcher'
+      });
+    }
+    
+    res.json({
+      success: true,
+      message: 'Research content sent',
+      preview: message.content.substring(0, 150) + '...',
+      multimediaCount: message.multimediaContent.length
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error sending specific research:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get available researchers and their content
+router.get('/research/experts', async (req, res) => {
+  try {
+    const experts = [
+      { name: 'Dr. Rhonda Patrick', specialty: 'Aging & Nutrition', contentCount: 2 },
+      { name: 'Dr. David Sinclair', specialty: 'Longevity Research', contentCount: 1 },
+      { name: 'Dr. Peter Attia', specialty: 'Longevity Medicine', contentCount: 1 },
+      { name: 'Dr. Sara Gottfried', specialty: 'Hormone Balance', contentCount: 1 }
+    ];
+    
+    res.json({
+      success: true,
+      experts,
+      totalContent: 5
+    });
+    
+  } catch (error: any) {
+    console.error('❌ Error fetching expert list:', error);
     res.status(500).json({ error: error.message });
   }
 });

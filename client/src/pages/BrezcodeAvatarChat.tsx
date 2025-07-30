@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Send, Heart, Brain, User, Stethoscope, Bot, MessageSquare } from "lucide-react";
+import { Send, Heart, Brain, User, Stethoscope, Bot, MessageSquare, Play, Pause, Users, Microscope } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "wouter";
 import { MultimediaMessage, MultimediaContent } from "@/components/MultimediaMessage";
@@ -44,11 +44,48 @@ export default function BrezcodeAvatarChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
+  const [proactiveResearchActive, setProactiveResearchActive] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   // Get Dr. Sakura configuration
   const { data: avatarConfig, isLoading: configLoading } = useQuery({
     queryKey: ['/api/brezcode/avatar/dr-sakura/config'],
+  });
+
+  // Proactive research mutations
+  const startResearchMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/start-proactive-research', {
+        userId: 1,
+        intervalMinutes: 2
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      setProactiveResearchActive(true);
+    }
+  });
+
+  const stopResearchMutation = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
+        userId: 1
+      });
+      return response.json();
+    },
+    onSuccess: () => {
+      setProactiveResearchActive(false);
+    }
+  });
+
+  const sendSpecificResearchMutation = useMutation({
+    mutationFn: async (researcher: string) => {
+      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/send-research', {
+        userId: 1,
+        researcherName: researcher
+      });
+      return response.json();
+    }
   });
 
   // Chat mutation
@@ -181,13 +218,60 @@ export default function BrezcodeAvatarChat() {
         {/* Chat Interface */}
         <Card className="h-[700px] flex flex-col overflow-hidden">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MessageSquare className="w-5 h-5" />
-              Dr. Sakura Wellness Consultation
-            </CardTitle>
-            <p className="text-sm text-gray-600 mt-1">
-              Personalized breast health guidance with medical accuracy and empathetic support
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="w-5 h-5" />
+                  Dr. Sakura Wellness Consultation
+                </CardTitle>
+                <p className="text-sm text-gray-600 mt-1">
+                  Personalized breast health guidance with medical accuracy and empathetic support
+                </p>
+              </div>
+              
+              {/* Proactive Research Controls */}
+              <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant={proactiveResearchActive ? "destructive" : "outline"}
+                  onClick={() => proactiveResearchActive ? stopResearchMutation.mutate() : startResearchMutation.mutate()}
+                  disabled={startResearchMutation.isPending || stopResearchMutation.isPending}
+                  className="text-xs"
+                >
+                  {proactiveResearchActive ? (
+                    <>
+                      <Pause className="w-3 h-3 mr-1" />
+                      Stop Research
+                    </>
+                  ) : (
+                    <>
+                      <Play className="w-3 h-3 mr-1" />
+                      Start Research
+                    </>
+                  )}
+                </Button>
+                
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => sendSpecificResearchMutation.mutate('Dr. Rhonda Patrick')}
+                  disabled={sendSpecificResearchMutation.isPending}
+                  className="text-xs"
+                >
+                  <Microscope className="w-3 h-3 mr-1" />
+                  Dr. Patrick
+                </Button>
+              </div>
+            </div>
+            
+            {proactiveResearchActive && (
+              <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                <p className="text-xs text-green-700 flex items-center gap-1">
+                  <Users className="w-3 h-3" />
+                  Proactive research delivery active - Dr. Sakura will share expert insights every 2 minutes
+                </p>
+              </div>
+            )}
           </CardHeader>
           
           <Separator />
