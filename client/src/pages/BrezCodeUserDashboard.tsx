@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Calendar } from "@/components/ui/calendar";
+// import { Calendar } from "@/components/ui/calendar";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { 
@@ -45,7 +45,7 @@ export default function BrezCodeUserDashboard() {
     lastAssessment: "January 28, 2025"
   };
 
-  const stats = healthStats?.stats || {
+  const stats = (healthStats as any)?.stats || {
     weeklyGoalProgress: 75,
     currentStreak: 12,
     totalActivities: 45,
@@ -55,7 +55,7 @@ export default function BrezCodeUserDashboard() {
     riskImprovementScore: 2.3
   };
 
-  const activities = activitiesData?.activities || [];
+  const activities = (activitiesData as any)?.activities || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-rose-50 dark:from-gray-900 dark:to-gray-800">
@@ -173,12 +173,35 @@ export default function BrezCodeUserDashboard() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col space-y-4">
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="rounded-md border"
-                />
+                <div className="w-full p-4 border rounded-md bg-white">
+                  <div className="grid grid-cols-7 gap-2 text-center text-sm font-medium text-gray-500 mb-4">
+                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+                  </div>
+                  <div className="grid grid-cols-7 gap-2">
+                    {Array.from({ length: 35 }, (_, i) => {
+                      const day = i - 6; // Start from Sunday of previous month
+                      const isToday = day === new Date().getDate();
+                      const isSelected = selectedDate?.getDate() === day;
+                      return (
+                        <button
+                          key={i}
+                          onClick={() => setSelectedDate(new Date(2025, 0, day))}
+                          className={`h-8 w-8 rounded-full text-sm ${
+                            isSelected 
+                              ? 'bg-pink-500 text-white' 
+                              : isToday 
+                                ? 'bg-pink-100 text-pink-600' 
+                                : day > 0 && day <= 31 
+                                  ? 'hover:bg-gray-100 text-gray-900' 
+                                  : 'text-gray-300'
+                          }`}
+                        >
+                          {day > 0 && day <= 31 ? day : ''}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
                 
                 {selectedDate && (
                   <div className="mt-4">
