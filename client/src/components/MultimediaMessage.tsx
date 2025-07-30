@@ -131,8 +131,8 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                 </div>
               )}
               
-              {/* Handle YouTube embed URLs */}
-              {item.url.includes('youtube.com/embed/') && (
+              {/* Handle YouTube and Vimeo embed URLs */}
+              {(item.url.includes('youtube.com/embed/') || item.url.includes('player.vimeo.com/video/')) && (
                 <div className="relative aspect-video rounded-lg overflow-hidden">
                   <iframe
                     src={item.url}
@@ -140,12 +140,13 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                     className="absolute inset-0 w-full h-full"
                     allowFullScreen
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    frameBorder="0"
                   />
                 </div>
               )}
               
               {/* Handle local and external videos */}
-              {!item.url.includes('youtube.com/embed/') && (
+              {!item.url.includes('youtube.com/embed/') && !item.url.includes('player.vimeo.com/video/') && (
                 <>
                   {/* HTML5 Video Player for local videos */}
                   {item.metadata?.embedType === 'html5' && (

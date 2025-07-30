@@ -31,14 +31,18 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content - VIDEO UPLOAD NEEDED
+    // Breast self-examination content - VIMEO EMBEDDED VIDEO
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
-        type: 'text',
-        content: '🎥 **Professional Video Content Needed**\n\nTo complete the multimedia experience, please upload the Brookside Associates breast self-exam video through the LeadGen AI Training system:\n\n1. Go to **LeadGen.to → BrezCode Business Dashboard → AI Training**\n2. Upload the 5-minute Brookside video as training material\n3. Dr. Sakura will automatically integrate video responses\n\nAlternatively, download the video from Brookside Associates and place it in the system videos folder.',
+        type: 'video',
+        url: 'https://player.vimeo.com/video/111931581',
+        title: 'Brookside Associates: 5-Minute Self Breast Exam',
+        description: 'Professional medical demonstration by Dr. Michael Hughey - optimized for mobile viewing',
         metadata: {
-          type: 'Upload Instructions',
-          source: 'System Configuration'
+          duration: '5:00',
+          source: 'Brookside Medical Associates',
+          type: 'Professional Medical Video',
+          embedType: 'vimeo'
         }
       });
     }
