@@ -5,8 +5,42 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import mobile dialog fix */
-@import './styles/mobile-dialog-fix.css';
+/* Mobile zoom and scaling support */
+html {
+  touch-action: manipulation;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Allow pinch to zoom on mobile */
+body {
+  touch-action: pan-x pan-y pinch-zoom;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Ensure chat interface is zoom-friendly */
+.chat-container {
+  width: 100%;
+  max-width: none;
+  overflow-x: auto;
+}
+
+/* Mobile dialog positioning fix */
+@media (max-width: 768px) {
+  [data-radix-dialog-content] {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 95vw !important;
+    max-width: 400px !important;
+    margin: 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+}
+
+
 
 /* Hide Vite development console overlay */
 #vite-plugin-checker-container,
