@@ -123,6 +123,7 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
 
           {item.type === 'video' && item.url && (
             <div className="space-y-2">
+              {/* Single title display only */}
               {item.title && (
                 <div className="text-sm font-medium flex items-center gap-2">
                   <Play className="w-4 h-4" />
@@ -145,14 +146,7 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
               
               {/* Handle local and external videos */}
               {!item.url.includes('youtube.com/embed/') && (
-                <div className="space-y-2">
-                  {item.title && (
-                    <div className="text-sm font-medium flex items-center gap-2">
-                      <Play className="w-4 h-4" />
-                      {item.title}
-                    </div>
-                  )}
-                  
+                <>
                   {/* HTML5 Video Player for local videos */}
                   {item.metadata?.embedType === 'html5' && (
                     <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-900">
@@ -186,25 +180,25 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                       </video>
                     </div>
                   )}
-                  
-                  {item.description && (
-                    <p className="text-xs text-gray-600 italic">{item.description}</p>
-                  )}
-                  
-                  <div className="flex gap-2">
-                    {item.metadata?.duration && (
-                      <Badge variant="outline" className="text-xs">
-                        Duration: {item.metadata.duration}
-                      </Badge>
-                    )}
-                    {item.metadata?.source && (
-                      <Badge variant="secondary" className="text-xs">
-                        {item.metadata.source}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
+                </>
               )}
+              
+              {item.description && (
+                <p className="text-xs text-gray-600 italic">{item.description}</p>
+              )}
+              
+              <div className="flex gap-2">
+                {item.metadata?.duration && (
+                  <Badge variant="outline" className="text-xs">
+                    {item.metadata.duration}
+                  </Badge>
+                )}
+                {item.metadata?.source && (
+                  <Badge variant="secondary" className="text-xs">
+                    {item.metadata.source}
+                  </Badge>
+                )}
+              </div>
             </div>
           )}
 

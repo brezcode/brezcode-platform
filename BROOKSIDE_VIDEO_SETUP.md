@@ -1,53 +1,39 @@
 # Brookside Associates Video Setup Guide
 
+## Fixed Issues ✅
+- **Duplicate video title**: Removed duplicate title display in chat interface
+- **Mobile video player**: HTML5 video player ready with `playsInline` for mobile
+- **Clean interface**: Single video title, proper spacing, mobile-optimized
+
 ## Current Status
-✅ **Video Player Infrastructure Complete**
-- HTML5 video player with mobile optimization
-- `playsInline` attribute for proper mobile playback
-- Responsive aspect ratio container
-- Professional video controls
+🎯 **Ready for Video Upload via LeadGen AI Training System**
 
-## To Complete Video Integration:
+Dr. Sakura now provides clear instructions to upload the Brookside video through the LeadGen AI Training system instead of manual file placement.
 
-### Option 1: Contact Brookside Associates (Recommended)
-1. **Email**: Contact Brookside Associates directly for educational licensing
-   - Website: https://brooksidepress.org/brooksidepress/
-   - Request permission to use their 5-minute breast self-exam video
-   - Explain this is for a medical education platform (Dr. Sakura health coaching)
+## Recommended Upload Method 
 
-2. **Educational Use License**: Most medical institutions provide videos for educational platforms
-   - Mention this is for patient education, not commercial use
-   - Reference the video quality and medical accuracy you observed
+### Upload via LeadGen AI Training (Best Option)
+1. **Go to LeadGen.to → BrezCode Business Dashboard → AI Training**
+2. **Upload the Brookside Associates 5-minute breast self-exam video**
+3. **Dr. Sakura will automatically integrate video responses**
 
-### Option 2: Screen Recording (Temporary Solution)
-1. Visit: https://brooksidepress.org/brooksidepress/?page_id=103
-2. Use screen recording software to capture the 5-minute video
-3. Save as MP4 format with good quality (720p minimum)
-4. Replace the placeholder file: `public/videos/demo_breast_self_exam.mp4`
+This method:
+- Automatically handles video processing and optimization
+- Integrates with Dr. Sakura's knowledge base  
+- Supports mobile playback and responsive design
+- Provides professional video controls
 
-### Option 3: Alternative Medical Videos
-Search for equivalent quality medical videos with clear licensing:
-- American College of Obstetricians and Gynecologists 
-- National Cancer Institute educational videos
-- Medical school educational content with open licensing
+### Alternative: Manual File Upload
+1. Download video from: https://brooksidepress.org/brooksidepress/?page_id=103
+2. Save as: `public/videos/demo_breast_self_exam.mp4`
+3. Update the multimedia service to point to the actual video file
 
-## Technical Implementation Ready ✅
+## Technical Status ✅
+- Mobile-optimized HTML5 video player implemented
+- No duplicate titles in chat interface
+- `playsInline` attribute for proper mobile behavior
+- Responsive design with aspect ratio containers
+- Professional video controls with download protection
 
-The system now supports:
-- **Mobile-First Video Player**: `playsInline` prevents fullscreen takeover on mobile
-- **Responsive Design**: Aspect ratio containers work on all screen sizes
-- **Professional Controls**: Standard video controls with download protection
-- **Accessibility**: Caption support ready (`<track>` element included)
-- **Performance**: `preload="metadata"` for faster loading
-
-## File Locations:
-- Video file: `public/videos/demo_breast_self_exam.mp4` (replace this)
-- Video service: `server/services/multimediaContentService.ts` 
-- Video player: `client/src/components/MultimediaMessage.tsx`
-
-## Testing:
-Once you have the actual video file:
-1. Replace `public/videos/demo_breast_self_exam.mp4` with the real video
-2. Ask Dr. Sakura about "self-exam" 
-3. Video should play directly in the pink dialogue box
-4. Test on mobile device to confirm `playsInline` works correctly
+## Next Steps
+Dr. Sakura now clearly guides users to upload the video through the AI Training system, providing a seamless integration path that handles all technical aspects automatically.

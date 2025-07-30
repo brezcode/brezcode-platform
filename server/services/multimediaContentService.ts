@@ -31,18 +31,14 @@ export class MultimediaContentService {
       content: responseContent
     });
 
-    // Breast self-examination content - LOCAL HOSTED VIDEO
+    // Breast self-examination content - VIDEO UPLOAD NEEDED
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
-        type: 'video',
-        url: '/videos/demo_breast_self_exam.mp4',
-        title: 'Brookside Associates: 5-Minute Self Breast Exam',
-        description: 'Medical-grade self breast exam video - optimized for mobile viewing',
+        type: 'text',
+        content: '🎥 **Professional Video Content Needed**\n\nTo complete the multimedia experience, please upload the Brookside Associates breast self-exam video through the LeadGen AI Training system:\n\n1. Go to **LeadGen.to → BrezCode Business Dashboard → AI Training**\n2. Upload the 5-minute Brookside video as training material\n3. Dr. Sakura will automatically integrate video responses\n\nAlternatively, download the video from Brookside Associates and place it in the system videos folder.',
         metadata: {
-          duration: '5:00',
-          source: 'Brookside Medical Associates',
-          type: 'Mobile-Optimized Video',
-          embedType: 'html5'
+          type: 'Upload Instructions',
+          source: 'System Configuration'
         }
       });
     }

@@ -1,0 +1,17 @@
+BROOKSIDE VIDEO UPLOAD INSTRUCTIONS:
+
+1. Download the Brookside Associates 5-minute breast self-exam video from:
+   https://brooksidepress.org/brooksidepress/?page_id=103
+
+2. Save the video file as: demo_breast_self_exam.mp4
+
+3. Replace the placeholder file in this directory
+
+OR
+
+Upload the video through the LeadGen AI Training system:
+1. Go to LeadGen.to → BrezCode Business Dashboard → AI Training
+2. Upload the Brookside video as training material for Dr. Sakura
+3. The system will automatically integrate it into the chat responses
+
+The video player is ready and optimized for mobile viewing with playsInline support.
