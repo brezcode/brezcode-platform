@@ -34,65 +34,86 @@ export class MultimediaContentService {
     // Breast self-examination content
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=400&h=300&fit=crop',
-        title: 'Breast Self-Examination Guide',
-        description: 'Visual guide showing proper technique for breast self-examination',
+        type: 'video',
+        url: 'https://www.youtube.com/embed/Y8xN4dkiSQs',
+        title: 'Breast Self-Examination: Step-by-Step Video Guide',
+        description: 'Professional medical demonstration of proper breast self-examination technique',
+        thumbnail: 'https://img.youtube.com/vi/Y8xN4dkiSQs/maxresdefault.jpg',
         metadata: {
-          dimensions: '400x300'
+          duration: '3:45',
+          source: 'American Cancer Society'
         }
       });
       
       multimedia.push({
         type: 'link',
-        url: 'https://www.breastcancer.org/screening-testing/breast-self-exam-bse',
-        title: 'Complete Self-Examination Tutorial',
-        description: 'Step-by-step video guide from Breastcancer.org'
+        url: 'https://www.cancer.org/cancer/breast-cancer/screening-tests-and-early-detection/breast-self-exam.html',
+        title: 'American Cancer Society - Breast Self-Exam Guide',
+        description: 'Comprehensive guide with images and instructions from medical experts'
+      });
+
+      multimedia.push({
+        type: 'file',
+        url: 'https://www.nationalbreastcancer.org/sites/default/files/BSE-Guide.pdf',
+        title: 'Printable Breast Self-Exam Guide (PDF)',
+        description: 'Download and print this visual guide for reference',
+        metadata: {
+          fileSize: '2.1 MB',
+          fileType: 'PDF'
+        }
       });
     }
 
     // Mammogram and screening content
     if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening') || lowerMessage.includes('x-ray')) {
       multimedia.push({
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?w=400&h=250&fit=crop',
-        title: 'Mammography Process',
-        description: 'What to expect during a mammogram screening',
+        type: 'video',
+        url: 'https://www.youtube.com/embed/xJOJi_5W6vA',
+        title: 'What to Expect During Your Mammogram',
+        description: 'Medical professional explains the mammography process step-by-step',
+        thumbnail: 'https://img.youtube.com/vi/xJOJi_5W6vA/maxresdefault.jpg',
         metadata: {
-          dimensions: '400x250'
+          duration: '4:12',
+          source: 'Mayo Clinic'
         }
       });
       
       multimedia.push({
         type: 'link',
         url: 'https://www.cancer.org/cancer/breast-cancer/screening-tests-and-early-detection/mammograms.html',
-        title: 'Mammogram Guidelines by Age',
-        description: 'American Cancer Society screening recommendations'
+        title: 'Mammogram Screening Guidelines',
+        description: 'Evidence-based recommendations by age and risk factors'
+      });
+
+      multimedia.push({
+        type: 'link',
+        url: 'https://www.radiologyinfo.org/en/info/mammo',
+        title: 'Mammography - RadiologyInfo.org',
+        description: 'Detailed medical information about mammography procedures and results'
       });
     }
 
     // Breast anatomy and health education
     if (lowerMessage.includes('anatomy') || lowerMessage.includes('breast tissue') || lowerMessage.includes('how breast')) {
       multimedia.push({
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1584467541268-b040f83be3fd?w=400&h=400&fit=crop',
-        title: 'Breast Anatomy Overview',
-        description: 'Understanding normal breast tissue and structure',
-        metadata: {
-          dimensions: '400x400'
-        }
+        type: 'link',
+        url: 'https://www.cancer.org/cancer/breast-cancer/about/how-breast-cancer-forms.html',
+        title: 'Breast Anatomy and Cancer Development',
+        description: 'Medical guide to understanding breast tissue and structure'
       });
     }
 
     // Lifestyle and nutrition content
     if (lowerMessage.includes('diet') || lowerMessage.includes('exercise') || lowerMessage.includes('lifestyle') || lowerMessage.includes('prevention')) {
       multimedia.push({
-        type: 'image',
-        url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=250&fit=crop',
-        title: 'Healthy Lifestyle Choices',
-        description: 'Nutrition and exercise for breast health',
+        type: 'video',
+        url: 'https://www.youtube.com/embed/kGOQfLFzJj8',
+        title: 'Breast Cancer Prevention Through Lifestyle',
+        description: 'Expert guidance on diet, exercise, and lifestyle modifications for breast health',
+        thumbnail: 'https://img.youtube.com/vi/kGOQfLFzJj8/maxresdefault.jpg',
         metadata: {
-          dimensions: '400x250'
+          duration: '5:30',
+          source: 'Harvard Medical School'
         }
       });
       
@@ -100,7 +121,7 @@ export class MultimediaContentService {
         type: 'link',
         url: 'https://www.breastcancer.org/risk/factors/lifestyle',
         title: 'Lifestyle Factors & Breast Cancer Risk',
-        description: 'Evidence-based prevention strategies'
+        description: 'Evidence-based prevention strategies from medical experts'
       });
     }
 

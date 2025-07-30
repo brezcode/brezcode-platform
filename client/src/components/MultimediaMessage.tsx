@@ -128,7 +128,16 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
                 </div>
               )}
               <div className="relative rounded-lg overflow-hidden bg-gray-100">
-                {item.thumbnail ? (
+                {item.url.includes('youtube.com/embed') ? (
+                  <iframe
+                    src={item.url}
+                    title={item.title || 'Video'}
+                    className="w-full h-64 rounded-lg"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : item.thumbnail ? (
                   <div className="relative group">
                     <img
                       src={item.thumbnail}
@@ -159,11 +168,18 @@ export function MultimediaMessage({ content, textContent, className = "" }: Mult
               {item.description && (
                 <p className="text-xs text-gray-600 italic">{item.description}</p>
               )}
-              {item.metadata?.duration && (
-                <Badge variant="outline" className="text-xs">
-                  {item.metadata.duration}
-                </Badge>
-              )}
+              <div className="flex gap-2">
+                {item.metadata?.duration && (
+                  <Badge variant="outline" className="text-xs">
+                    Duration: {item.metadata.duration}
+                  </Badge>
+                )}
+                {item.metadata?.source && (
+                  <Badge variant="secondary" className="text-xs">
+                    {item.metadata.source}
+                  </Badge>
+                )}
+              </div>
             </div>
           )}
 
