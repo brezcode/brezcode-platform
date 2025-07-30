@@ -66,4 +66,43 @@
     height: 100% !important;
     overflow: hidden !important;
   }
+
+  /* Mobile video fullscreen enhancements */
+  iframe[src*="vimeo"],
+  iframe[src*="youtube"] {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 280px !important;
+  }
+
+  /* Enhance video container for mobile */
+  .aspect-video {
+    min-height: 280px !important;
+    border-radius: 12px !important;
+    position: relative !important;
+  }
+
+  /* Make video container fullscreenable */
+  .aspect-video:fullscreen,
+  .aspect-video:-webkit-full-screen,
+  .aspect-video:-moz-full-screen {
+    width: 100vw !important;
+    height: 100vh !important;
+    background: black !important;
+    border-radius: 0 !important;
+  }
+
+  .aspect-video:fullscreen iframe,
+  .aspect-video:-webkit-full-screen iframe,
+  .aspect-video:-moz-full-screen iframe {
+    width: 100vw !important;
+    height: 100vh !important;
+  }
+
+  /* iOS Safari specific fullscreen */
+  @supports (-webkit-touch-callout: none) {
+    .aspect-video {
+      -webkit-playsinline: false !important;
+    }
+  }
 }

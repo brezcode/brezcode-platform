@@ -35,7 +35,7 @@ export class MultimediaContentService {
     if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('how to check')) {
       multimedia.push({
         type: 'video',
-        url: 'https://player.vimeo.com/video/111931581',
+        url: 'https://player.vimeo.com/video/111931581?autoplay=0&controls=1&fullscreen=1&title=0&byline=0&portrait=0&responsive=1',
         title: 'Brookside Associates: 5-Minute Self Breast Exam',
         description: 'Professional medical demonstration by Dr. Michael Hughey - optimized for mobile viewing',
         metadata: {
