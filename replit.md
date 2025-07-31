@@ -1,33 +1,28 @@
-# Universal Multi-Business AI Training Platform
+# Multi-Tenant Health Assessment SAAS Platform
 
 ## Overview
 
-This is a **Universal Business AI Training Platform** that allows users to manage multiple businesses and train AI assistants for each one. **Current Status: ARCHITECTURE RESTRUCTURED** - Platform redesigned as universal multi-business training system with three core modules. Each user can create unlimited businesses and train specialized AI assistants.
+This is the ultimate business AI platform (leadgen.to) that provides comprehensive automation tools for any business vertical. **Current Status: FULLY OPERATIONAL** - Authentication and platform separation completed successfully. The platform offers reusable AI-powered business tools that can be customized for different industries and use cases.
 
-**Universal Training Architecture**: The platform enables users to create unlimited businesses, each with specialized AI assistants trained through three core modules. BrezCode Health is one example business demonstrating health & wellness AI training.
+**BrezCode Integration**: BrezCode health coaching is now a specialized feature/tool under LeadGen.to, demonstrating how the platform's AI capabilities can be applied to the health & wellness vertical. All health features (dietary recommendations, food analysis, health coaching, assessment forms) are LeadGen tools customized for health businesses.
 
-**Three Core Training Modules**:
-1. **Scenario Response Training**: Train AI avatars to handle customer interactions, sales conversations, and support scenarios
-2. **Documentation Learning**: Upload business documents (manuals, SOPs, specs) for AI to learn exact procedures and knowledge  
-3. **Media & Content Creation**: Generate educational content and research industry-relevant materials
-
-**Multi-Business Support**: Users can manage multiple businesses simultaneously:
-- Health & wellness (BrezCode example)
-- E-commerce stores
-- Consulting services  
-- Educational platforms
+**Architecture Philosophy**: Any new feature we build becomes part of the LeadGen toolkit that can be used by:
+- Health & wellness businesses (like BrezCode)
+- E-commerce businesses  
+- Service providers
+- Consultants and coaches
 - Any business vertical
 
-Each business gets its own trained AI assistant with industry-specific knowledge and response patterns.
+The platform features AI avatar assistants, landing page builders, lead generation, sales CRM, customer service automation, multi-channel engagement, and specialized vertical tools like health coaching.
 
 ## System Architecture
 
-### Universal Training Platform Architecture
-- **Multi-Business Management**: Users create and manage unlimited businesses with independent AI training
-- **Three-Module Training System**: Scenario Response, Documentation Learning, Media Creation for each business
-- **Business-Specific AI Assistants**: Each business gets specialized AI trained on their documents and scenarios
-- **Universal Training Interface**: Consistent training experience across all business types and industries
-- **Cross-Business Knowledge**: Users can apply learnings from one business to train others
+### Business Platform Architecture
+- **Ultimate Business App**: Comprehensive AI-powered business automation platform
+- **Modular Tool System**: Reusable AI components (BrezCode health tools, content generation, etc.)
+- **Multi-Tenant Infrastructure**: Complete business isolation with custom domains
+- **AI Avatar Integration**: Claude-powered virtual assistants for customer service and sales
+- **Multi-Channel Engagement**: Email, SMS, WhatsApp, LinkedIn automation
 
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript
@@ -221,7 +216,7 @@ Each business gets its own trained AI assistant with industry-specific knowledge
 
 ## Recent Changes
 
-- **January 31, 2025 - UNIVERSAL MULTI-BUSINESS AI TRAINING PLATFORM COMPLETED**: Successfully restructured the entire platform from single-business focus to universal multi-business AI training system. **Core Architecture**: Three training modules implemented - (1) Scenario Response Training for customer interactions, (2) Documentation Learning from uploaded business materials, (3) Media & Content Creation for educational content. **Multi-Business Support**: Users can now create unlimited businesses with industry-specific AI assistants. **Universal Training Interface**: Created UniversalBusinessTraining.tsx with business selection, module navigation, and training management. **Backend API**: Implemented universalTrainingRoutes.ts with complete business CRUD, training module APIs, and industry-specific content generation. **Business Creation**: Added BusinessCreationDialog component for creating new businesses with business type selection and industry categorization. **Homepage Integration**: Updated homepage with three options - Universal AI Training Platform (primary), LeadGen Landing (business examples), BrezCode Health Demo (health vertical showcase). **Platform Positioning**: BrezCode is now one example business under the universal training system, demonstrating health & wellness AI training capabilities. **Status**: UNIVERSAL PLATFORM OPERATIONAL - Users can manage multiple businesses, each with specialized AI assistants trained through scenario response, documentation learning, and content creation modules.
+- **January 30, 2025 - EVENT-DRIVEN CROSS-PLATFORM KNOWLEDGE TRANSFER COMPLETED**: Successfully fixed constant app reloading issue and implemented stable event-driven knowledge transfer system. **Root Cause Identified**: Constant Vite reconnections were caused by TypeScript compilation errors in BrezCode services and potential infinite loops in knowledge transfer system. **TypeScript Errors Fixed**: Resolved all schema mismatches in brezcodeAvatarService.ts and brezcodeConversationService.ts, updated to use proper brezcode-schema imports with healthProfile fields. **Event-Driven Architecture**: Knowledge transfer now triggers ONLY when LeadGen training sessions are completed via KnowledgeTransferService.onTrainingSessionCompleted(), eliminating constant API polling that caused restarts. **System Stability**: App now runs without constant reconnections, enabling proper testing of Dr. Sakura cross-platform knowledge sharing between LeadGen avatar training and BrezCode health coaching platform. **Production Ready**: Stable codebase with working login (leedennyps@gmail.com/11111111), quiz data integration, and intelligent knowledge transfer only on training completion events.
 
 - **January 29, 2025 - COMPLETE DATABASE SEPARATION IMPLEMENTED**: Successfully separated LeadGen.to and BrezCode platforms into completely independent databases. Created separate database schemas (leadgen-schema.ts and brezcode-schema.ts) with platform-specific tables. LeadGen tables: leadgen_users, leadgen_businesses, leadgen_avatars, leadgen_campaigns, leadgen_leads. BrezCode tables: brezcode_users, brezcode_health_profiles, brezcode_assessments, brezcode_health_reports, brezcode_wellness_plans, brezcode_health_metrics, brezcode_educational_content. Each platform now uses dedicated database connections (leadgen-db.ts and brezcode-db.ts) ensuring complete data isolation. Both platforms can develop independently without any shared data dependencies.
 
