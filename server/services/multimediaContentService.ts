@@ -11,6 +11,7 @@ export interface MultimediaContent {
     fileSize?: string;
     fileType?: string;
     dimensions?: string;
+    source?: string;
   };
 }
 

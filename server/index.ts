@@ -222,11 +222,11 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
     console.log(`🔍 Starting proactive research for user ${userId} with ${intervalMinutes} minute intervals`);
     
     // Store the interval in a simple in-memory store for this demo
-    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
+    (global as any).proactiveResearchIntervals = (global as any).proactiveResearchIntervals || {};
     
     // Clear any existing interval for this user
-    if (global.proactiveResearchIntervals[userId]) {
-      clearInterval(global.proactiveResearchIntervals[userId]);
+    if ((global as any).proactiveResearchIntervals[userId]) {
+      clearInterval((global as any).proactiveResearchIntervals[userId]);
     }
     
     // Educational topics featuring renowned scientists and KOLs
@@ -251,8 +251,8 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
         console.log(`📚 Proactive research: Delivering ${currentTopic} content to user ${userId}`);
         
         // Store this as a proactive message that the frontend can poll
-        global.proactiveMessages = global.proactiveMessages || {};
-        global.proactiveMessages[userId] = global.proactiveMessages[userId] || [];
+        (global as any).proactiveMessages = (global as any).proactiveMessages || {};
+        (global as any).proactiveMessages[userId] = (global as any).proactiveMessages[userId] || [];
         
         const proactiveMessage = {
           id: `proactive_${Date.now()}`,
@@ -262,11 +262,11 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
           timestamp: new Date().toISOString()
         };
         
-        global.proactiveMessages[userId].push(proactiveMessage);
+        (global as any).proactiveMessages[userId].push(proactiveMessage);
         
         // Keep only the last 10 proactive messages
-        if (global.proactiveMessages[userId].length > 10) {
-          global.proactiveMessages[userId] = global.proactiveMessages[userId].slice(-10);
+        if ((global as any).proactiveMessages[userId].length > 10) {
+          (global as any).proactiveMessages[userId] = (global as any).proactiveMessages[userId].slice(-10);
         }
         
         topicIndex++;
@@ -275,7 +275,7 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
       }
     }, intervalMinutes * 60 * 1000);
     
-    global.proactiveResearchIntervals[userId] = interval;
+    (global as any).proactiveResearchIntervals[userId] = interval;
     
     res.json({
       success: true,
@@ -301,11 +301,11 @@ app.post('/api/brezcode/avatar/dr-sakura/stop-proactive-research', async (req, r
 
     console.log(`🛑 Stopping proactive research for user ${userId}`);
     
-    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
+    (global as any).proactiveResearchIntervals = (global as any).proactiveResearchIntervals || {};
     
-    if (global.proactiveResearchIntervals[userId]) {
-      clearInterval(global.proactiveResearchIntervals[userId]);
-      delete global.proactiveResearchIntervals[userId];
+    if ((global as any).proactiveResearchIntervals[userId]) {
+      clearInterval((global as any).proactiveResearchIntervals[userId]);
+      delete (global as any).proactiveResearchIntervals[userId];
     }
     
     res.json({
@@ -325,8 +325,8 @@ app.get('/api/brezcode/avatar/dr-sakura/proactive-messages/:userId', async (req,
   try {
     const { userId } = req.params;
     
-    global.proactiveMessages = global.proactiveMessages || {};
-    const messages = global.proactiveMessages[userId] || [];
+    (global as any).proactiveMessages = (global as any).proactiveMessages || {};
+    const messages = (global as any).proactiveMessages[userId] || [];
     
     res.json({
       success: true,
@@ -349,9 +349,9 @@ app.post('/api/brezcode/avatar/dr-sakura/mark-proactive-read', async (req, res) 
       return res.status(400).json({ error: 'userId and messageId are required' });
     }
     
-    global.proactiveMessages = global.proactiveMessages || {};
-    if (global.proactiveMessages[userId]) {
-      global.proactiveMessages[userId] = global.proactiveMessages[userId].filter(
+    (global as any).proactiveMessages = (global as any).proactiveMessages || {};
+    if ((global as any).proactiveMessages[userId]) {
+      (global as any).proactiveMessages[userId] = (global as any).proactiveMessages[userId].filter(
         (msg: any) => msg.id !== messageId
       );
     }
