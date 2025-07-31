@@ -177,26 +177,44 @@ export default function BrezcodeAvatarChat() {
   // Handle proactive messages
   useEffect(() => {
     if (proactiveMessages?.messages && proactiveMessages.messages.length > 0) {
-      const newProactiveMessages = proactiveMessages.messages.map((proactiveMsg: any) => ({
-        id: proactiveMsg.id,
-        role: 'avatar' as const,
-        content: proactiveMsg.content[0]?.content || 'New educational content available!',
-        multimediaContent: proactiveMsg.content,
-        timestamp: proactiveMsg.timestamp,
-        qualityScores: { empathy: 95, medicalAccuracy: 98, overall: 96 },
-        isProactive: true
-      }));
+      console.log('📚 Processing proactive messages:', proactiveMessages.messages.length);
+      
+      const newProactiveMessages = proactiveMessages.messages.map((proactiveMsg: any) => {
+        const textContent = proactiveMsg.content.find((c: any) => c.type === 'text')?.content || 
+          '🌸 Dr. Sakura here! I have educational content from renowned scientists to share with you.';
+        
+        const multimediaContent = proactiveMsg.content.filter((c: any) => c.type !== 'text');
+        
+        console.log(`📺 Adding proactive content: ${multimediaContent[0]?.title || 'Unknown'}`);
+        
+        return {
+          id: proactiveMsg.id,
+          role: 'avatar' as const,
+          content: textContent,
+          multimediaContent: multimediaContent,
+          timestamp: proactiveMsg.timestamp,
+          qualityScores: { empathy: 95, medicalAccuracy: 98, overall: 96 },
+          isProactive: true
+        };
+      });
       
       setMessages(prev => {
         const existingIds = new Set(prev.map(msg => msg.id));
         const uniqueNewMessages = newProactiveMessages.filter((msg: any) => !existingIds.has(msg.id));
-        return [...prev, ...uniqueNewMessages];
+        
+        if (uniqueNewMessages.length > 0) {
+          console.log(`✅ Adding ${uniqueNewMessages.length} new proactive messages to chat`);
+          return [...prev, ...uniqueNewMessages];
+        }
+        return prev;
       });
       
-      // Mark all proactive messages as read
-      proactiveMessages.messages.forEach((proactiveMsg: any) => {
-        markProactiveReadMutation.mutate(proactiveMsg.id);
-      });
+      // Mark all proactive messages as read after adding them
+      setTimeout(() => {
+        proactiveMessages.messages.forEach((proactiveMsg: any) => {
+          markProactiveReadMutation.mutate(proactiveMsg.id);
+        });
+      }, 1000);
     }
   }, [proactiveMessages]);
 
