@@ -155,14 +155,37 @@ export default function BrezCodeAvatarTraining() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
-  // Fetch BrezCode health coaching avatar specifically
+  // Fetch BrezCode Dr. Sakura avatar specifically
   const { data: avatarsData, isLoading: avatarsLoading } = useQuery({
-    queryKey: ['/api/business-avatars/business-type/health_coaching'],
+    queryKey: ['/api/brezcode/avatar/dr-sakura/config'],
     queryFn: async () => {
-      const response = await apiRequest('GET', '/api/business-avatars/business-type/health_coaching');
-      if (!response.ok) throw new Error('Failed to fetch health coaching avatars');
-      return response.json();
-    }
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/config');
+      if (!response.ok) throw new Error('Failed to fetch Dr. Sakura config');
+      const data = await response.json();
+      
+      // Transform the avatar config to match expected format
+      const avatar = {
+        id: 'dr_sakura_brezcode',
+        name: data.avatar.name,
+        businessType: 'health_coaching',
+        description: 'AI-powered breast health coach specializing in evidence-based guidance, risk assessment interpretation, and empathetic patient support.',
+        appearance: {
+          imageUrl: '/dr-sakura-avatar.png',
+          hairColor: data.avatar.appearance.hairColor,
+          eyeColor: data.avatar.appearance.eyeColor
+        },
+        voiceProfile: {
+          tone: 'warm and professional',
+          pace: 'measured and calming',
+          accent: 'neutral with medical precision'
+        },
+        expertise: data.avatar.expertise,
+        specializations: ['Breast Health Education', 'Risk Assessment', 'Preventive Care', 'Emotional Support']
+      };
+      
+      return { avatars: [avatar] };
+    },
+    retry: false
   });
 
   // Fetch health coaching training scenarios
