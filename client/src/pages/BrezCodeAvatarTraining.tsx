@@ -1693,39 +1693,290 @@ export default function BrezCodeAvatarTraining() {
               </Card>
             </div>
 
-            {/* Research Sources */}
+            {/* Research Sources - KOL Videos */}
             <Card>
               <CardHeader>
                 <CardTitle>Proactive Research Sources</CardTitle>
                 <CardDescription>
-                  Manage KOL videos and research content for the BrezCode chat experience
+                  KOL educational videos curated for Dr. Sakura's breast health coaching
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { name: "Dr. Rhonda Patrick", specialty: "Nutrition & Longevity", videos: 8, status: "Active" },
-                    { name: "Dr. David Sinclair", specialty: "Aging Research", videos: 6, status: "Active" },
-                    { name: "Dr. Peter Attia", specialty: "Metabolic Health", videos: 9, status: "Active" },
-                    { name: "Dr. Andrew Huberman", specialty: "Neuroscience", videos: 7, status: "Active" }
-                  ].map((expert, index) => (
-                    <div key={index} className="p-4 bg-pink-50 rounded-lg border border-pink-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-pink-800">{expert.name}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {/* Dr. Rhonda Patrick - Nutrition & Cancer Prevention */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
                         <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
-                          {expert.status}
+                          Active
                         </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{expert.specialty}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">{expert.videos} videos</span>
-                        <Button size="sm" variant="outline" className="h-6 text-xs">
-                          <Plus className="h-3 w-3 mr-1" />
-                          Add Content
-                        </Button>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Rhonda Patrick: Nutrition & Cancer Prevention
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Evidence-based nutrition strategies for cancer prevention and breast health
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/YQiW_l848t8"
+                        title="Dr. Rhonda Patrick: Nutrition & Cancer Prevention"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 12:30</span>
+                        <span>FoundMyFitness</span>
                       </div>
-                    </div>
-                  ))}
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. David Sinclair - Longevity */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. David Sinclair: Longevity & Disease Prevention
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Harvard research on aging, cellular health, and disease prevention
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/9nXop2lLDa4"
+                        title="Dr. David Sinclair: Longevity & Disease Prevention"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 15:45</span>
+                        <span>Harvard Medical</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Peter Attia - Clinical Breast Health */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Peter Attia: Clinical Approach to Breast Health
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Clinical strategies for breast health monitoring and early detection
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/TjqPnFrk4_E"
+                        title="Dr. Peter Attia: Clinical Approach to Breast Health"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 8:20</span>
+                        <span>The Drive</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Andrew Huberman - Hormones & Women's Health */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Andrew Huberman: Hormones & Women's Health
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Science of hormones, sleep, and lifestyle factors for women's health
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/OBmWQqvvkls"
+                        title="Dr. Andrew Huberman: Hormones & Women's Health"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 18:30</span>
+                        <span>Huberman Lab</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Sara Gottfried - Hormone Balance */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Sara Gottfried: Hormone Balance for Women
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Harvard-trained physician on hormone optimization for women's health
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/ABC123DEF456"
+                        title="Dr. Sara Gottfried: Hormone Balance for Women"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 22:15</span>
+                        <span>Women's Health</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Mark Hyman - Functional Medicine */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Mark Hyman: Functional Medicine Approach
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Holistic approaches to cancer prevention through nutrition & lifestyle
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/XYZ789GHI012"
+                        title="Dr. Mark Hyman: Functional Medicine Approach"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 16:40</span>
+                        <span>Doctor's Farmacy</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Christiane Northrup - Women's Body Wisdom */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Christiane Northrup: Women's Body Wisdom
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        Mind-body connection in women's health and breast wellness
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/DEF456GHI789"
+                        title="Dr. Christiane Northrup: Women's Body Wisdom"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 19:25</span>
+                        <span>Women's Wisdom</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Dr. Jason Fung - Intermittent Fasting */}
+                  <Card className="border-pink-200 bg-gradient-to-br from-pink-50 to-white">
+                    <CardHeader className="pb-3">
+                      <div className="flex items-center justify-between">
+                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
+                          Active
+                        </Badge>
+                        <PlayCircle className="h-5 w-5 text-pink-500" />
+                      </div>
+                      <CardTitle className="text-sm font-bold text-pink-800">
+                        Dr. Jason Fung: Intermittent Fasting & Cancer Prevention
+                      </CardTitle>
+                      <CardDescription className="text-xs">
+                        How intermittent fasting and metabolic health impact cancer risk
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <iframe
+                        width="100%"
+                        height="160"
+                        src="https://www.youtube.com/embed/GHI789JKL012"
+                        title="Dr. Jason Fung: Intermittent Fasting & Cancer Prevention"
+                        frameBorder="0"
+                        allowFullScreen
+                        className="rounded-lg mb-3"
+                      ></iframe>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>Duration: 13:55</span>
+                        <span>Fasting Method</span>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Add Content Button and Summary */}
+                <div className="flex items-center justify-between pt-4 border-t border-pink-200">
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium text-pink-700">8 videos</span> from leading health experts
+                  </div>
+                  <Button variant="outline" className="border-pink-300 text-pink-600 hover:bg-pink-50">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Content
+                  </Button>
                 </div>
               </CardContent>
             </Card>

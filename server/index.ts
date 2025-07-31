@@ -426,6 +426,47 @@ try {
   console.log('⚠️ Avatar performance routes not found, skipping...');
 }
 
+// KOL Videos API endpoints
+app.get('/api/kol-videos', async (req, res) => {
+  try {
+    const { KOLVideoService } = await import('./services/kolVideoService');
+    const videos = KOLVideoService.getAllKOLVideos();
+    
+    res.json({
+      success: true,
+      videos: videos,
+      total: videos.length
+    });
+  } catch (error: any) {
+    console.error('Error fetching KOL videos:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch videos',
+      details: error.message 
+    });
+  }
+});
+
+app.get('/api/kol-videos/by-kol/:kolName', async (req, res) => {
+  try {
+    const { kolName } = req.params;
+    const { KOLVideoService } = await import('./services/kolVideoService');
+    const videos = KOLVideoService.getVideosByKOL(kolName);
+    
+    res.json({
+      success: true,
+      videos: videos,
+      total: videos.length,
+      kol: kolName
+    });
+  } catch (error: any) {
+    console.error('Error fetching KOL videos by name:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch videos by KOL',
+      details: error.message 
+    });
+  }
+});
+
 // Setup Vite middleware (this should be last)
 if (app.get("env") === "development") {
   await setupVite(app);
