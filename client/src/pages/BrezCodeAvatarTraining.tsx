@@ -246,13 +246,34 @@ export default function BrezCodeAvatarTraining() {
 
   // Automatically select Dr. Sakura Wellness if available
   useEffect(() => {
-    if (avatars.length > 0 && !selectedAvatar) {
-      const drSakura = avatars.find(a => a.id === 'brezcode_health_coach');
+    console.log('🔍 Avatar loading debug:', { 
+      avatarsLoading, 
+      avatarsCount: avatars.length, 
+      avatarsData: avatars.map(a => ({ id: a.id, name: a.name })),
+      selectedAvatar: selectedAvatar?.name 
+    });
+    
+    if (!avatarsLoading && avatars.length > 0 && !selectedAvatar) {
+      // Try to find Dr. Sakura by different possible IDs
+      const drSakura = avatars.find(a => 
+        a.id === 'dr_sakura_brezcode' || 
+        a.id === 'brezcode_health_coach' ||
+        a.name?.includes('Dr. Sakura') ||
+        a.name?.includes('Sakura')
+      ) || avatars[0]; // Fallback to first avatar
+      
       if (drSakura) {
         setSelectedAvatar(drSakura);
+        console.log('🌸 Auto-selected Dr. Sakura for training:', drSakura.name, 'ID:', drSakura.id);
+      } else {
+        console.log('⚠️ No Dr. Sakura avatar found in:', avatars);
       }
+    } else if (!avatarsLoading && avatars.length === 0) {
+      console.log('❌ No avatars loaded - check API endpoint');
+    } else if (avatarsLoading) {
+      console.log('⏳ Still loading avatars...');
     }
-  }, [avatars, selectedAvatar]);
+  }, [avatars, selectedAvatar, avatarsLoading]);
 
   // Auto-load active session and refresh messages when session data updates
   useEffect(() => {
@@ -823,11 +844,34 @@ export default function BrezCodeAvatarTraining() {
 
           {/* Training Session */}
           <TabsContent value="training" className="space-y-4 sm:space-y-6">
-            {!selectedAvatar ? (
+            {avatarsLoading ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading Dr. Sakura Wellness...</p>
+                </CardContent>
+              </Card>
+            ) : !selectedAvatar && avatars.length === 0 ? (
+              <Card>
+                <CardContent className="text-center py-12">
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <h3 className="font-medium text-red-800 mb-2">Avatar Loading Failed</h3>
+                    <p className="text-red-600 text-sm mb-4">Could not load Dr. Sakura configuration from BrezCode API.</p>
+                    <Button 
+                      onClick={() => window.location.reload()} 
+                      variant="outline"
+                      className="border-red-300 text-red-600 hover:bg-red-50"
+                    >
+                      Reload Page
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : !selectedAvatar ? (
               <Card>
                 <CardContent className="text-center py-12">
                   <Heart className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Loading Dr. Sakura Wellness...</p>
+                  <p className="text-gray-600">Preparing Dr. Sakura Wellness...</p>
                 </CardContent>
               </Card>
             ) : !selectedScenario ? (
