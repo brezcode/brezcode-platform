@@ -3,11 +3,6 @@ import { createServer } from "http";
 import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerAvatarKnowledgeRoutes } from "./avatar-knowledge-routes";
-// Declare global types inline
-declare global {
-  var proactiveResearchIntervals: Record<string, NodeJS.Timeout> | undefined;
-  var proactiveMessages: Record<string, any[]> | undefined;
-}
 
 const app = express();
 // Increase payload limit for image uploads
@@ -227,11 +222,11 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
     console.log(`🔍 Starting proactive research for user ${userId} with ${intervalMinutes} minute intervals`);
     
     // Store the interval in a simple in-memory store for this demo
-    globalThis.proactiveResearchIntervals = globalThis.proactiveResearchIntervals || {};
+    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
     
     // Clear any existing interval for this user
-    if (globalThis.proactiveResearchIntervals[userId]) {
-      clearInterval(globalThis.proactiveResearchIntervals[userId]);
+    if (global.proactiveResearchIntervals[userId]) {
+      clearInterval(global.proactiveResearchIntervals[userId]);
     }
     
     // Educational topics featuring renowned scientists and KOLs
@@ -256,8 +251,8 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
         console.log(`📚 Proactive research: Delivering ${currentTopic} content to user ${userId}`);
         
         // Store this as a proactive message that the frontend can poll
-        globalThis.proactiveMessages = globalThis.proactiveMessages || {};
-        globalThis.proactiveMessages[userId] = globalThis.proactiveMessages[userId] || [];
+        global.proactiveMessages = global.proactiveMessages || {};
+        global.proactiveMessages[userId] = global.proactiveMessages[userId] || [];
         
         const proactiveMessage = {
           id: `proactive_${Date.now()}`,
@@ -267,11 +262,11 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
           timestamp: new Date().toISOString()
         };
         
-        globalThis.proactiveMessages[userId].push(proactiveMessage);
+        global.proactiveMessages[userId].push(proactiveMessage);
         
         // Keep only the last 10 proactive messages
-        if (globalThis.proactiveMessages[userId].length > 10) {
-          globalThis.proactiveMessages[userId] = globalThis.proactiveMessages[userId].slice(-10);
+        if (global.proactiveMessages[userId].length > 10) {
+          global.proactiveMessages[userId] = global.proactiveMessages[userId].slice(-10);
         }
         
         topicIndex++;
@@ -280,7 +275,7 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
       }
     }, intervalMinutes * 60 * 1000);
     
-    globalThis.proactiveResearchIntervals[userId] = interval;
+    global.proactiveResearchIntervals[userId] = interval;
     
     res.json({
       success: true,
@@ -306,11 +301,11 @@ app.post('/api/brezcode/avatar/dr-sakura/stop-proactive-research', async (req, r
 
     console.log(`🛑 Stopping proactive research for user ${userId}`);
     
-    globalThis.proactiveResearchIntervals = globalThis.proactiveResearchIntervals || {};
+    global.proactiveResearchIntervals = global.proactiveResearchIntervals || {};
     
-    if (globalThis.proactiveResearchIntervals[userId]) {
-      clearInterval(globalThis.proactiveResearchIntervals[userId]);
-      delete globalThis.proactiveResearchIntervals[userId];
+    if (global.proactiveResearchIntervals[userId]) {
+      clearInterval(global.proactiveResearchIntervals[userId]);
+      delete global.proactiveResearchIntervals[userId];
     }
     
     res.json({
@@ -330,8 +325,8 @@ app.get('/api/brezcode/avatar/dr-sakura/proactive-messages/:userId', async (req,
   try {
     const { userId } = req.params;
     
-    globalThis.proactiveMessages = globalThis.proactiveMessages || {};
-    const messages = globalThis.proactiveMessages[userId] || [];
+    global.proactiveMessages = global.proactiveMessages || {};
+    const messages = global.proactiveMessages[userId] || [];
     
     res.json({
       success: true,
@@ -354,9 +349,9 @@ app.post('/api/brezcode/avatar/dr-sakura/mark-proactive-read', async (req, res) 
       return res.status(400).json({ error: 'userId and messageId are required' });
     }
     
-    globalThis.proactiveMessages = globalThis.proactiveMessages || {};
-    if (globalThis.proactiveMessages[userId]) {
-      globalThis.proactiveMessages[userId] = globalThis.proactiveMessages[userId].filter(
+    global.proactiveMessages = global.proactiveMessages || {};
+    if (global.proactiveMessages[userId]) {
+      global.proactiveMessages[userId] = global.proactiveMessages[userId].filter(
         (msg: any) => msg.id !== messageId
       );
     }
@@ -413,57 +408,33 @@ app.get('/api/brezcode/avatar/dr-sakura/config', async (req, res) => {
 
 console.log('✅ BrezCode avatar routes registered successfully');
 
-// Main server setup function  
-async function startServer() {
-  try {
-    console.log('🚀 Registering avatar training routes...');
-    const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
-    registerAvatarTrainingRoutes(app);
-    console.log('✅ Avatar training routes registered successfully');
-  } catch (error) {
-    console.log('⚠️ Avatar training routes not found, skipping...');
-  }
-
-  try {
-    console.log('🎯 Registering Avatar Performance routes...');
-    const { registerAvatarPerformanceRoutes } = await import('./routes/avatarPerformanceRoutes');
-    registerAvatarPerformanceRoutes(app);
-    console.log('✅ Avatar Performance routes registered successfully');
-  } catch (error) {
-    console.log('⚠️ Avatar performance routes not found, skipping...');
-  }
-
-  const server = createServer(app);
-
-  // Setup Vite middleware (this should be last)
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
-  }
-
-  // Properly handle port conflicts
-  server.on('error', (err: any) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log('⚠️ Port 5000 is already in use, trying a different port...');
-      server.listen(0, "0.0.0.0", () => {
-        const address = server.address();
-        const port = typeof address === 'object' && address ? address.port : 'unknown';
-        log(`serving on port ${port}`);
-      });
-    } else {
-      console.error('Server error:', err);
-      process.exit(1);
-    }
-  });
-
-  server.listen(5000, "0.0.0.0", () => {
-    log(`serving on port 5000`);
-  });
+try {
+  console.log('🚀 Registering avatar training routes...');
+  const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
+  registerAvatarTrainingRoutes(app);
+  console.log('✅ Avatar training routes registered successfully');
+} catch (error) {
+  console.log('⚠️ Avatar training routes not found, skipping...');
 }
 
-// Start the server
-startServer().catch((error) => {
-  console.error('Failed to start server:', error);
-  process.exit(1);
+try {
+  console.log('🎯 Registering Avatar Performance routes...');
+  const { registerAvatarPerformanceRoutes } = await import('./routes/avatarPerformanceRoutes');
+  registerAvatarPerformanceRoutes(app);
+  console.log('✅ Avatar Performance routes registered successfully');
+} catch (error) {
+  console.log('⚠️ Avatar performance routes not found, skipping...');
+}
+
+// Setup Vite middleware (this should be last)
+if (app.get("env") === "development") {
+  await setupVite(app);
+} else {
+  serveStatic(app);
+}
+
+const server = createServer(app);
+
+server.listen(5000, "0.0.0.0", () => {
+  log(`serving on port 5000`);
 });
