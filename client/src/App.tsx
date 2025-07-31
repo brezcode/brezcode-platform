@@ -56,6 +56,7 @@ import BrezcodeAvatarChat from "@/pages/BrezcodeAvatarChat";
 import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRedirect";
 // BrezCodeLanding removed - using original landing page
 import BrezCodePersonalDashboard from "@/pages/BrezCodePersonalDashboard";
+import UniversalBusinessTraining from "@/pages/UniversalBusinessTraining";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -73,6 +74,9 @@ function App() {
           {/* Home page with two buttons */}
           <Route path="/" component={HomePage} />
           <Route path="/leadgen" component={LeadGenLanding} />
+          
+          {/* Universal Business Training Platform */}
+          <Route path="/business-training" component={UniversalBusinessTraining} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />
           <Route path="/user-profile" component={UserProfile} />

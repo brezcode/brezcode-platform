@@ -408,6 +408,16 @@ app.get('/api/brezcode/avatar/dr-sakura/config', async (req, res) => {
 
 console.log('✅ BrezCode avatar routes registered successfully');
 
+// Register Universal Training routes
+console.log('🚀 Registering Universal Training routes...');
+try {
+  const { default: universalTrainingRoutes } = await import('./routes/universalTrainingRoutes');
+  app.use('/api/universal-training', universalTrainingRoutes);
+  console.log('✅ Universal Training routes registered successfully');
+} catch (error) {
+  console.log('⚠️ Universal Training routes not found, skipping...');
+}
+
 try {
   console.log('🚀 Registering avatar training routes...');
   const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
