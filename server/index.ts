@@ -370,23 +370,26 @@ app.get('/api/brezcode/avatar/dr-sakura/config', async (req, res) => {
 
 console.log('✅ BrezCode avatar routes registered successfully');
 
-try {
-  console.log('🚀 Registering avatar training routes...');
-  const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
-  registerAvatarTrainingRoutes(app);
-  console.log('✅ Avatar training routes registered successfully');
-} catch (error) {
-  console.log('⚠️ Avatar training routes not found, skipping...');
-}
+// Try to register additional routes if they exist (wrapped in async function)
+(async () => {
+  try {
+    console.log('🚀 Registering avatar training routes...');
+    const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
+    registerAvatarTrainingRoutes(app);
+    console.log('✅ Avatar training routes registered successfully');
+  } catch (error) {
+    console.log('⚠️ Avatar training routes not found, skipping...');
+  }
 
-try {
-  console.log('🎯 Registering Avatar Performance routes...');
-  const { registerAvatarPerformanceRoutes } = await import('./routes/avatarPerformanceRoutes');
-  registerAvatarPerformanceRoutes(app);
-  console.log('✅ Avatar Performance routes registered successfully');
-} catch (error) {
-  console.log('⚠️ Avatar performance routes not found, skipping...');
-}
+  try {
+    console.log('🎯 Registering Avatar Performance routes...');
+    const { registerAvatarPerformanceRoutes } = await import('./routes/avatarPerformanceRoutes');
+    registerAvatarPerformanceRoutes(app);
+    console.log('✅ Avatar Performance routes registered successfully');
+  } catch (error) {
+    console.log('⚠️ Avatar performance routes not found, skipping...');
+  }
+})();
 
 // KOL Videos API endpoints
 app.get('/api/kol-videos', async (req, res) => {
@@ -429,15 +432,23 @@ app.get('/api/kol-videos/by-kol/:kolName', async (req, res) => {
   }
 });
 
-// Setup Vite middleware (this should be last)
-if (app.get("env") === "development") {
-  await setupVite(app);
-} else {
-  serveStatic(app);
-}
-
+// Create server instance first
 const server = createServer(app);
 
-server.listen(5000, "0.0.0.0", () => {
-  log(`serving on port 5000`);
-});
+// Setup Vite middleware and start server (wrapped in async function)
+(async () => {
+  try {
+    if (app.get("env") === "development") {
+      await setupVite(app, server);
+    } else {
+      serveStatic(app);
+    }
+
+    server.listen(5000, "0.0.0.0", () => {
+      log(`serving on port 5000`);
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+})();

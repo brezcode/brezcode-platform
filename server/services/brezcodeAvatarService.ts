@@ -100,7 +100,7 @@ export class BrezcodeAvatarService {
     }
     
     console.log(`✅ User ${userId} found: ${userData.email}`);
-    console.log(`📊 Quiz answers: ${userData.quizAnswers ? 'FOUND' : 'NOT FOUND'}`);
+    console.log(`📊 Quiz answers: ${userData.quizResponses ? 'FOUND' : 'NOT FOUND'}`);
     console.log(`📊 Health report: ${userData.healthReport ? 'FOUND' : 'NOT FOUND'}`);
     
     // Build detailed user profile context
@@ -108,8 +108,8 @@ export class BrezcodeAvatarService {
     let healthSummary = "";
     let riskContext = "";
     
-    if (userData.quizAnswers) {
-      const quiz = userData.quizAnswers;
+    if (userData.quizResponses) {
+      const quiz = userData.quizResponses;
       console.log(`🎯 Quiz data - age: ${quiz.age}, country: ${quiz.country}`);
       
       userProfile = `You are speaking with a ${quiz.age}-year-old from ${quiz.country}. `;
@@ -606,7 +606,7 @@ Communication Style:
             // Use the generated assessment as health report
             latestHealthReport = {
               id: 0,
-              userId: userId,
+              userId,
               ...generatedAssessment,
               createdAt: new Date(),
               updatedAt: new Date()
