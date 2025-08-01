@@ -74,7 +74,8 @@ export default function BrezcodeAvatarChat() {
       const response = await fetch('/api/brezcode/avatar/dr-sakura/start-proactive-research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id, intervalMinutes: 0.1 }) // Every 6 seconds for demo
+        credentials: 'include',
+        body: JSON.stringify({ intervalMinutes: 0.1 }) // Every 6 seconds for demo
       });
       if (!response.ok) throw new Error('Failed to start proactive research');
       return response.json();
@@ -94,7 +95,8 @@ export default function BrezcodeAvatarChat() {
       const response = await fetch('/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id })
+        credentials: 'include',
+        body: JSON.stringify({})
       });
       if (!response.ok) throw new Error('Failed to stop proactive research');
       return response.json();
@@ -107,13 +109,15 @@ export default function BrezcodeAvatarChat() {
 
   // Query for proactive messages with proper typing
   const { data: proactiveMessages, refetch: refetchProactiveMessages } = useQuery({
-    queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages', user?.id],
+    queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages'],
     refetchInterval: proactiveResearchActive ? 3000 : false,
     enabled: proactiveResearchActive && !!user?.id,
     retry: false,
     queryFn: async () => {
       if (!user?.id) throw new Error('User not authenticated');
-      const response = await fetch(`/api/brezcode/avatar/dr-sakura/proactive-messages/${user.id}`);
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/proactive-messages', {
+        credentials: 'include'
+      });
       if (!response.ok) throw new Error('Failed to fetch proactive messages');
       return response.json();
     }
@@ -126,7 +130,8 @@ export default function BrezcodeAvatarChat() {
         const response = await fetch('/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: user.id, messageId })
+          credentials: 'include',
+          body: JSON.stringify({ messageId })
         });
         if (!response.ok) throw new Error('Failed to mark message as read');
         return response.json();
@@ -148,7 +153,6 @@ export default function BrezcodeAvatarChat() {
     mutationFn: async (message: string) => {
       if (!user?.id) throw new Error('User not authenticated');
       const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/chat', {
-        userId: user.id, // Use authenticated user's ID
         message,
         conversationHistory: messages,
         context: {}

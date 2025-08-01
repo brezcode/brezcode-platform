@@ -115,17 +115,25 @@ console.log('🌸 Registering BrezCode avatar routes...');
 // Quick Dr. Sakura response endpoint
 app.post('/api/brezcode/avatar/dr-sakura/chat', async (req, res) => {
   try {
-    const { userId, message, conversationHistory = [], context = {} } = req.body;
+    // Get userId from session (authenticated user)
+    const userId = (req as any).session?.userId;
+    const { message, conversationHistory = [], context = {} } = req.body;
     
-    if (!userId || !message) {
-      return res.status(400).json({ 
-        error: 'userId and message are required' 
+    if (!userId) {
+      return res.status(401).json({ 
+        error: 'Please log in to chat with Dr. Sakura' 
       });
     }
 
-    console.log(`🌸 Dr. Sakura responding to user ${userId}: "${message.substring(0, 50)}..."`);
+    if (!message) {
+      return res.status(400).json({ 
+        error: 'Message is required' 
+      });
+    }
+
+    console.log(`🌸 Dr. Sakura responding to authenticated user ${userId}: "${message.substring(0, 50)}..."`);
     
-    // CRITICAL FIX: Use the proper BrezcodeAvatarService that includes personalization
+    // Use the proper BrezcodeAvatarService that includes personalization
     const { BrezcodeAvatarService } = await import('./services/brezcodeAvatarService');
     
     // Generate Dr. Sakura's personalized response using the enhanced service
@@ -175,10 +183,12 @@ app.post('/api/brezcode/avatar/dr-sakura/chat', async (req, res) => {
 // Proactive Research Endpoints
 app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, res) => {
   try {
-    const { userId, intervalMinutes = 2 } = req.body;
+    // Get userId from session (authenticated user)
+    const userId = (req as any).session?.userId;
+    const { intervalMinutes = 2 } = req.body;
     
     if (!userId) {
-      return res.status(400).json({ error: 'userId is required' });
+      return res.status(401).json({ error: 'Please log in to start proactive research' });
     }
 
     console.log(`🔍 Starting proactive research for user ${userId} with ${intervalMinutes} minute intervals`);
@@ -255,10 +265,11 @@ app.post('/api/brezcode/avatar/dr-sakura/start-proactive-research', async (req, 
 // Stop proactive research
 app.post('/api/brezcode/avatar/dr-sakura/stop-proactive-research', async (req, res) => {
   try {
-    const { userId } = req.body;
+    // Get userId from session (authenticated user)
+    const userId = (req as any).session?.userId;
     
     if (!userId) {
-      return res.status(400).json({ error: 'userId is required' });
+      return res.status(401).json({ error: 'Please log in to stop proactive research' });
     }
 
     console.log(`🛑 Stopping proactive research for user ${userId}`);
@@ -282,10 +293,15 @@ app.post('/api/brezcode/avatar/dr-sakura/stop-proactive-research', async (req, r
   }
 });
 
-// Get proactive messages for a user
-app.get('/api/brezcode/avatar/dr-sakura/proactive-messages/:userId', async (req, res) => {
+// Get proactive messages for the authenticated user
+app.get('/api/brezcode/avatar/dr-sakura/proactive-messages', async (req, res) => {
   try {
-    const { userId } = req.params;
+    // Get userId from session (authenticated user)
+    const userId = (req as any).session?.userId;
+    
+    if (!userId) {
+      return res.status(401).json({ error: 'Please log in to view proactive messages' });
+    }
     
     (global as any).proactiveMessages = (global as any).proactiveMessages || {};
     const messages = (global as any).proactiveMessages[userId] || [];
@@ -305,10 +321,16 @@ app.get('/api/brezcode/avatar/dr-sakura/proactive-messages/:userId', async (req,
 // Mark proactive message as read
 app.post('/api/brezcode/avatar/dr-sakura/mark-proactive-read', async (req, res) => {
   try {
-    const { userId, messageId } = req.body;
+    // Get userId from session (authenticated user)
+    const userId = (req as any).session?.userId;
+    const { messageId } = req.body;
     
-    if (!userId || !messageId) {
-      return res.status(400).json({ error: 'userId and messageId are required' });
+    if (!userId) {
+      return res.status(401).json({ error: 'Please log in to mark messages as read' });
+    }
+    
+    if (!messageId) {
+      return res.status(400).json({ error: 'messageId is required' });
     }
     
     (global as any).proactiveMessages = (global as any).proactiveMessages || {};
