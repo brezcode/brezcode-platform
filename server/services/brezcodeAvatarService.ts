@@ -96,7 +96,7 @@ export class BrezcodeAvatarService {
       const { ClaudeAvatarService } = await import('./claudeAvatarService');
       
       // Get user's health profile and assessment data for personalized responses
-      const userHealthData = await this.getUserHealthData(userId);
+      const userHealthData = await this.getUserHealthDataFromBrezCode(userId);
       
       // Get training memory for Dr. Sakura from all previous sessions
       const allTrainingMemory = await this.getDrSakuraTrainingMemory(userId);
@@ -171,7 +171,7 @@ export class BrezcodeAvatarService {
       console.log(`🎯 Fallback Dr. Sakura response for user ${userId}`);
       
       // Get user's health profile and assessment data for personalized responses
-      const userHealthData = await this.getUserHealthData(userId);
+      const userHealthData = await this.getUserHealthDataFromBrezCode(userId);
       console.log(`📋 Health data retrieved: ${userHealthData ? 'SUCCESS' : 'FAILED'}`);
       
       // Get recent conversation context from permanent history
