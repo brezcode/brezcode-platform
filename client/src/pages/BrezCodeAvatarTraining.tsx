@@ -44,12 +44,7 @@ import {
   ThumbsUp,
   ThumbsDown,
   MessageCircleMore,
-  FileText,
-  PlayCircle,
-  Plus,
-  Camera,
-  ImageIcon,
-  Lightbulb
+  FileText
 } from 'lucide-react';
 import { AvatarKnowledgeBase } from '@/components/AvatarKnowledgeBase';
 
@@ -160,37 +155,14 @@ export default function BrezCodeAvatarTraining() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const queryClient = useQueryClient();
 
-  // Fetch BrezCode Dr. Sakura avatar specifically
+  // Fetch BrezCode health coaching avatar specifically
   const { data: avatarsData, isLoading: avatarsLoading } = useQuery({
-    queryKey: ['/api/brezcode/avatar/dr-sakura/config'],
+    queryKey: ['/api/business-avatars/business-type/health_coaching'],
     queryFn: async () => {
-      const response = await fetch('/api/brezcode/avatar/dr-sakura/config');
-      if (!response.ok) throw new Error('Failed to fetch Dr. Sakura config');
-      const data = await response.json();
-      
-      // Transform the avatar config to match expected format
-      const avatar = {
-        id: 'dr_sakura_brezcode',
-        name: data.avatar.name,
-        businessType: 'health_coaching',
-        description: 'AI-powered breast health coach specializing in evidence-based guidance, risk assessment interpretation, and empathetic patient support.',
-        appearance: {
-          imageUrl: '/dr-sakura-avatar.png',
-          hairColor: data.avatar.appearance.hairColor,
-          eyeColor: data.avatar.appearance.eyeColor
-        },
-        voiceProfile: {
-          tone: 'warm and professional',
-          pace: 'measured and calming',
-          accent: 'neutral with medical precision'
-        },
-        expertise: data.avatar.expertise,
-        specializations: ['Breast Health Education', 'Risk Assessment', 'Preventive Care', 'Emotional Support']
-      };
-      
-      return { avatars: [avatar] };
-    },
-    retry: false
+      const response = await apiRequest('GET', '/api/business-avatars/business-type/health_coaching');
+      if (!response.ok) throw new Error('Failed to fetch health coaching avatars');
+      return response.json();
+    }
   });
 
   // Fetch health coaching training scenarios
@@ -251,34 +223,13 @@ export default function BrezCodeAvatarTraining() {
 
   // Automatically select Dr. Sakura Wellness if available
   useEffect(() => {
-    console.log('🔍 Avatar loading debug:', { 
-      avatarsLoading, 
-      avatarsCount: avatars.length, 
-      avatarsData: avatars.map(a => ({ id: a.id, name: a.name })),
-      selectedAvatar: selectedAvatar?.name 
-    });
-    
-    if (!avatarsLoading && avatars.length > 0 && !selectedAvatar) {
-      // Try to find Dr. Sakura by different possible IDs
-      const drSakura = avatars.find(a => 
-        a.id === 'dr_sakura_brezcode' || 
-        a.id === 'brezcode_health_coach' ||
-        a.name?.includes('Dr. Sakura') ||
-        a.name?.includes('Sakura')
-      ) || avatars[0]; // Fallback to first avatar
-      
+    if (avatars.length > 0 && !selectedAvatar) {
+      const drSakura = avatars.find(a => a.id === 'brezcode_health_coach');
       if (drSakura) {
         setSelectedAvatar(drSakura);
-        console.log('🌸 Auto-selected Dr. Sakura for training:', drSakura.name, 'ID:', drSakura.id);
-      } else {
-        console.log('⚠️ No Dr. Sakura avatar found in:', avatars);
       }
-    } else if (!avatarsLoading && avatars.length === 0) {
-      console.log('❌ No avatars loaded - check API endpoint');
-    } else if (avatarsLoading) {
-      console.log('⏳ Still loading avatars...');
     }
-  }, [avatars, selectedAvatar, avatarsLoading]);
+  }, [avatars, selectedAvatar]);
 
   // Auto-load active session and refresh messages when session data updates
   useEffect(() => {
@@ -844,39 +795,16 @@ export default function BrezCodeAvatarTraining() {
           <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto text-xs sm:text-sm">
             <TabsTrigger value="training" className="px-2 py-2">Training</TabsTrigger>
             <TabsTrigger value="scenarios" className="px-2 py-2">Knowledge Base</TabsTrigger>
-            <TabsTrigger value="analytics" className="px-2 py-2">Media Research</TabsTrigger>
+            <TabsTrigger value="analytics" className="px-2 py-2">Performance</TabsTrigger>
           </TabsList>
 
           {/* Training Session */}
           <TabsContent value="training" className="space-y-4 sm:space-y-6">
-            {avatarsLoading ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Loading Dr. Sakura Wellness...</p>
-                </CardContent>
-              </Card>
-            ) : !selectedAvatar && avatars.length === 0 ? (
-              <Card>
-                <CardContent className="text-center py-12">
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                    <h3 className="font-medium text-red-800 mb-2">Avatar Loading Failed</h3>
-                    <p className="text-red-600 text-sm mb-4">Could not load Dr. Sakura configuration from BrezCode API.</p>
-                    <Button 
-                      onClick={() => window.location.reload()} 
-                      variant="outline"
-                      className="border-red-300 text-red-600 hover:bg-red-50"
-                    >
-                      Reload Page
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ) : !selectedAvatar ? (
+            {!selectedAvatar ? (
               <Card>
                 <CardContent className="text-center py-12">
                   <Heart className="h-12 w-12 text-pink-400 mx-auto mb-4" />
-                  <p className="text-gray-600">Preparing Dr. Sakura Wellness...</p>
+                  <p className="text-gray-600">Loading Dr. Sakura Wellness...</p>
                 </CardContent>
               </Card>
             ) : !selectedScenario ? (
@@ -1592,62 +1520,6 @@ export default function BrezCodeAvatarTraining() {
                 </div>
               </div>
             )}
-
-            {/* Training History Section - moved from Performance tab */}
-            <Card className="mt-6">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>Training Session History</CardTitle>
-                  <Badge variant="outline" className="text-sm">
-                    {completedSessions.length} Sessions Completed
-                  </Badge>
-                </div>
-                <CardDescription>
-                  Track your progress and review past training sessions with Dr. Sakura
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {completedSessions.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <MessageSquare className="w-12 h-12 mx-auto mb-3 text-pink-400" />
-                    <p>No training sessions completed yet!</p>
-                    <p className="text-sm mt-2">Complete your first training session to see history here.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-3">
-                    {completedSessions.slice(0, 5).map((session: any, index: number) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-pink-50 rounded-lg border border-pink-200">
-                        <div className="flex items-center space-x-3">
-                          <div className="p-2 bg-pink-100 rounded-full">
-                            <Heart className="h-4 w-4 text-pink-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-sm">{session.sessionId || `Training Session #${index + 1}`}</p>
-                            <p className="text-xs text-gray-600">{session.scenario || 'Breast health coaching'}</p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-pink-600">
-                            {session.score || '92'}% Score
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {session.date || new Date().toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    {completedSessions.length > 5 && (
-                      <div className="text-center pt-2">
-                        <Button variant="outline" size="sm">
-                          <FileText className="h-4 w-4 mr-2" />
-                          View All {completedSessions.length} Sessions
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Knowledge Base Tab */}
@@ -1658,120 +1530,74 @@ export default function BrezCodeAvatarTraining() {
             />
           </TabsContent>
 
-          {/* Media Research & Content Creation Tab */}
+          {/* Analytics */}
           <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Research Videos</CardTitle>
-                  <PlayCircle className="h-4 w-4 text-pink-600" />
+                  <CardTitle className="text-sm font-medium">BrezCode Sessions</CardTitle>
+                  <Heart className="h-4 w-4 text-pink-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">47</div>
-                  <p className="text-xs text-muted-foreground">KOL videos curated</p>
+                  <div className="text-2xl font-bold">{sessions.length}</div>
+                  <p className="text-xs text-muted-foreground">Health coaching completed</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Content Created</CardTitle>
-                  <FileText className="h-4 w-4 text-pink-600" />
+                  <CardTitle className="text-sm font-medium">Average Score</CardTitle>
+                  <Award className="h-4 w-4 text-pink-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">12</div>
-                  <p className="text-xs text-muted-foreground">Educational articles</p>
+                  <div className="text-2xl font-bold">92</div>
+                  <p className="text-xs text-muted-foreground">Excellent performance</p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Research Impact</CardTitle>
+                  <CardTitle className="text-sm font-medium">Dr. Sakura</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-pink-600" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">Active</div>
+                  <p className="text-xs text-muted-foreground">Ready for training</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Improvement</CardTitle>
                   <TrendingUp className="h-4 w-4 text-pink-600" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">94%</div>
-                  <p className="text-xs text-muted-foreground">User engagement</p>
+                  <div className="text-2xl font-bold">+15%</div>
+                  <p className="text-xs text-muted-foreground">This month</p>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Research Sources */}
             <Card>
               <CardHeader>
-                <CardTitle>Proactive Research Sources</CardTitle>
-                <CardDescription>
-                  Manage KOL videos and research content for the BrezCode chat experience
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[
-                    { name: "Dr. Rhonda Patrick", specialty: "Nutrition & Longevity", videos: 8, status: "Active" },
-                    { name: "Dr. David Sinclair", specialty: "Aging Research", videos: 6, status: "Active" },
-                    { name: "Dr. Peter Attia", specialty: "Metabolic Health", videos: 9, status: "Active" },
-                    { name: "Dr. Andrew Huberman", specialty: "Neuroscience", videos: 7, status: "Active" }
-                  ].map((expert, index) => (
-                    <div key={index} className="p-4 bg-pink-50 rounded-lg border border-pink-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <h4 className="font-medium text-pink-800">{expert.name}</h4>
-                        <Badge variant="outline" className="text-xs bg-green-100 text-green-700">
-                          {expert.status}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-2">{expert.specialty}</p>
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-500">{expert.videos} videos</span>
-                        <Button size="sm" variant="outline" className="h-6 text-xs">
-                          <Plus className="h-3 w-3 mr-1" />
-                          Add Content
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex items-center justify-between">
+                  <CardTitle>Recent BrezCode Training Sessions</CardTitle>
+                  <Link href="/performance">
+                    <Button variant="outline" size="sm">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      View Full Performance
+                    </Button>
+                  </Link>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Content Creation Tools */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Content Creation & Media Tools</CardTitle>
-                <CardDescription>
-                  Generate educational content and manage multimedia resources
-                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Button className="h-20 flex flex-col items-center justify-center bg-pink-600 hover:bg-pink-700">
-                    <Camera className="h-6 w-6 mb-2" />
-                    <span className="text-sm">Create Video</span>
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <FileText className="h-6 w-6 mb-2" />
-                    <span className="text-sm">Write Article</span>
-                  </Button>
-                  <Button variant="outline" className="h-20 flex flex-col items-center justify-center">
-                    <ImageIcon className="h-6 w-6 mb-2" />
-                    <span className="text-sm">Generate Graphics</span>
-                  </Button>
-                </div>
-                
-                <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Lightbulb className="h-4 w-4 text-blue-600" />
-                    <h4 className="font-medium text-blue-800">AI Content Suggestions</h4>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      "Create breast self-examination tutorial video",
-                      "Write article: 'Understanding Breast Density Reports'",
-                      "Generate infographic: 'Lifestyle Factors for Breast Health'"
-                    ].map((suggestion, index) => (
-                      <div key={index} className="flex items-center justify-between text-sm">
-                        <span className="text-blue-700">{suggestion}</span>
-                        <Button size="sm" variant="outline" className="h-6 text-xs">
-                          Create
-                        </Button>
-                      </div>
-                    ))}
+                <div className="text-center py-8 text-gray-500">
+                  <Heart className="w-12 h-12 mx-auto mb-3 text-pink-400" />
+                  <p>Complete training sessions to track your progress!</p>
+                  <div className="mt-4">
+                    <Link href="/performance">
+                      <Button className="bg-pink-600 hover:bg-pink-700">
+                        <FileText className="h-4 w-4 mr-2" />
+                        View Performance History
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </CardContent>
