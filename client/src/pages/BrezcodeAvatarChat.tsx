@@ -262,7 +262,7 @@ export default function BrezcodeAvatarChat() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">
-      <div className="container mx-auto py-8 px-4 max-w-4xl overflow-hidden">
+      <div className="container mx-auto py-2 px-2 sm:py-8 sm:px-4 max-w-4xl overflow-hidden">
         
         {/* Header */}
         <div className="mb-6">
@@ -275,17 +275,17 @@ export default function BrezcodeAvatarChat() {
           </Button>
           
           <Card className="bg-gradient-to-r from-pink-500 to-rose-500 text-white border-0">
-            <CardHeader>
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                  <Stethoscope className="w-8 h-8" />
+            <CardHeader className="pb-3 sm:pb-6">
+              <div className="flex items-center space-x-2 sm:space-x-4">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-full flex items-center justify-center">
+                  <Stethoscope className="w-6 h-6 sm:w-8 sm:h-8" />
                 </div>
-                <div>
-                  <CardTitle className="text-2xl">{avatar?.name}</CardTitle>
-                  <p className="opacity-90">{avatar?.role}</p>
-                  <div className="flex flex-wrap gap-2 mt-2">
+                <div className="min-w-0">
+                  <CardTitle className="text-lg sm:text-2xl">{avatar?.name}</CardTitle>
+                  <p className="opacity-90 text-sm sm:text-base">{avatar?.role}</p>
+                  <div className="hidden sm:flex flex-wrap gap-2 mt-2">
                     {avatar?.expertise?.slice(0, 3).map((skill: string, index: number) => (
-                      <Badge key={index} variant="secondary" className="bg-white/20 text-white">
+                      <Badge key={index} variant="secondary" className="bg-white/20 text-white text-xs">
                         {skill}
                       </Badge>
                     ))}
@@ -297,21 +297,22 @@ export default function BrezcodeAvatarChat() {
         </div>
 
         {/* Chat Interface */}
-        <Card className="h-[700px] flex flex-col overflow-hidden">
+        <Card className="h-[calc(100vh-140px)] sm:h-[700px] flex flex-col overflow-hidden">
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
               <div>
-                <CardTitle className="flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5" />
-                  Dr. Sakura Wellness Consultation
+                <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                  <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="hidden sm:inline">Dr. Sakura Wellness Consultation</span>
+                  <span className="sm:hidden">Dr. Sakura</span>
                 </CardTitle>
-                <p className="text-sm text-gray-600 mt-1">
-                  Personalized breast health guidance with medical accuracy and empathetic support
+                <p className="text-xs sm:text-sm text-gray-600 mt-1">
+                  Personalized breast health guidance
                 </p>
               </div>
               
               {/* Proactive Research Controls */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   size="sm"
                   variant={proactiveResearchActive ? "destructive" : "outline"}
@@ -361,7 +362,7 @@ export default function BrezcodeAvatarChat() {
                     key={message.id}
                     className={`flex gap-3 ${message.role === 'avatar' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex gap-2 max-w-[75%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <div className={`flex gap-2 max-w-[90%] sm:max-w-[75%] ${message.role === 'avatar' ? 'flex-row-reverse' : 'flex-row'}`}>
                       <Avatar className="w-8 h-8 flex-shrink-0">
                         <AvatarFallback>
                           {message.role === 'avatar' ? <Stethoscope className="h-4 w-4 text-pink-600" /> : <User className="h-4 w-4" />}
@@ -449,22 +450,23 @@ export default function BrezcodeAvatarChat() {
             </ScrollArea>
             
             {/* Input */}
-            <div className="p-4 border-t">
+            <div className="p-2 sm:p-4 border-t">
               <div className="flex gap-2">
                 <Input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Ask Dr. Sakura about breast health..."
+                  placeholder="Ask Dr. Sakura..."
                   disabled={isTyping}
-                  className="flex-1"
+                  className="flex-1 text-sm sm:text-base"
                 />
                 <Button 
                   onClick={handleSendMessage}
                   disabled={!inputMessage.trim() || isTyping}
-                  className="bg-pink-500 hover:bg-pink-600"
+                  className="bg-pink-500 hover:bg-pink-600 px-3 sm:px-4"
+                  size="sm"
                 >
-                  <Send className="w-4 h-4" />
+                  <Send className="w-3 h-3 sm:w-4 sm:h-4" />
                 </Button>
               </div>
             </div>
