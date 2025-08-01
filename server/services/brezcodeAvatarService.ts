@@ -296,6 +296,14 @@ Communication Style:
       if (quiz.alcohol) healthContext += `\n- Alcohol: ${quiz.alcohol}`;
       if (quiz.mammogram_frequency) healthContext += `\n- Mammogram History: ${quiz.mammogram_frequency}`;
       
+      // Add risk assessment information if available
+      if (userHealthData.riskScore) {
+        healthContext += `\n\nRisk Assessment Results:`;
+        healthContext += `\n- Overall Risk Score: ${userHealthData.riskScore}/100`;
+        healthContext += `\n- Risk Category: ${userHealthData.riskCategory || 'Not categorized'}`;
+        healthContext += `\n- Assessment completed: Recent data available`;
+      }
+      
       // Provide personalized context based on available data
       if (userHealthData.hasQuizData) {
         healthContext += `\n\nPersonalized Context Available: ✅`;
@@ -335,10 +343,11 @@ Communication Style:
       // Use the main database since that's where user data is stored
       const { db } = await import('../db');
       
-      // Get user data including quiz answers from main users table
-      const userQuery = `SELECT * FROM users WHERE id = $1`;
-      const userResult = await db.execute(userQuery, [userId]);
-      const userData = userResult.rows[0];
+      // Get user data including quiz answers from main users table using Drizzle ORM
+      const [userData] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId));
       
       if (!userData) {
         console.log(`❌ User ${userId} not found in main database`);
@@ -346,31 +355,66 @@ Communication Style:
       }
       
       console.log(`✅ User ${userId} found: ${userData.email}`);
-      console.log(`📊 Quiz answers: ${userData.quiz_answers ? 'FOUND' : 'NOT FOUND'}`);
+      console.log(`📊 Quiz answers: ${userData.quizAnswers ? 'FOUND' : 'NOT FOUND'}`);
+      
+      // Also check for recent health reports using raw SQL with proper parameter binding
+      let healthReport = null;
+      try {
+        // Use the database connection pool directly for raw SQL
+        const { pool } = await import('../db');
+        const healthReportResult = await pool.query(
+          'SELECT * FROM health_reports WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1',
+          [userId]
+        );
+        healthReport = healthReportResult.rows[0];
+        console.log(`📊 Health report: ${healthReport ? 'FOUND' : 'NOT FOUND'}`);
+      } catch (e) {
+        console.log('Health reports table not accessible, using user data only:', e.message);
+      }
       
       let quizData = null;
       let hasQuizData = false;
+      let riskScore = null;
+      let riskCategory = null;
       
-      if (userData.quiz_answers) {
+      // Try health report first (most recent assessment data)
+      if (healthReport?.quiz_answers) {
         try {
-          quizData = typeof userData.quiz_answers === 'string' 
-            ? JSON.parse(userData.quiz_answers) 
-            : userData.quiz_answers;
+          quizData = typeof healthReport.quiz_answers === 'string' 
+            ? JSON.parse(healthReport.quiz_answers) 
+            : healthReport.quiz_answers;
           hasQuizData = true;
-          console.log(`🎯 Quiz data found - age: ${quizData?.age}, country: ${quizData?.country}`);
-          console.log(`📋 Risk level: ${userData.risk_level || 'Not calculated'}`);
+          riskScore = healthReport.risk_score;
+          riskCategory = healthReport.risk_category;
+          console.log(`🎯 Quiz from health report - age: ${quizData?.age}, country: ${quizData?.country}`);
+          console.log(`📋 Risk assessment: ${riskScore}/100 (${riskCategory})`);
         } catch (e) {
-          console.error('Error parsing quiz answers:', e);
+          console.error('Error parsing health report quiz answers:', e);
+        }
+      }
+      // Fallback to user's stored quiz answers
+      else if (userData.quizAnswers) {
+        try {
+          quizData = typeof userData.quizAnswers === 'string' 
+            ? JSON.parse(userData.quizAnswers) 
+            : userData.quizAnswers;
+          hasQuizData = true;
+          console.log(`🎯 Quiz from user table - age: ${quizData?.age}, country: ${quizData?.country}`);
+        } catch (e) {
+          console.error('Error parsing user quiz answers:', e);
         }
       }
       
       return {
         id: userData.id,
         email: userData.email,
-        firstName: userData.first_name,
-        lastName: userData.last_name,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
         hasQuizData,
         quizResponses: quizData,
+        riskScore,
+        riskCategory,
+        healthReport,
         platform: userData.platform
       };
       
