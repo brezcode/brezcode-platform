@@ -771,6 +771,45 @@ export default function BrezCodeAvatarTraining() {
     completeSession.mutate(sessionId);
   };
 
+  // Transfer trained knowledge from LeadGen.to to BrezCode frontend
+  const transferKnowledge = useMutation({
+    mutationFn: async () => {
+      const response = await apiRequest('POST', '/api/knowledge-transfer/transfer-knowledge', {
+        avatarId: selectedAvatar,
+        knowledgeData: messages.filter(m => m.role === 'avatar'),
+        trainingHistory: activeSession ? [activeSession] : [],
+        performanceMetrics: {
+          sessionCount: sessionCounter,
+          averageQuality: messages.filter(m => m.quality_score).reduce((acc, m) => acc + (m.quality_score || 0), 0) / messages.filter(m => m.quality_score).length || 0,
+          improvementRate: messages.filter(m => (m as any).has_improved_response).length
+        },
+        targetPlatform: 'brezcode-frontend'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to transfer knowledge to BrezCode frontend');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "🔄 Knowledge Transfer Complete!",
+        description: "Dr. Sakura's training has been transferred to BrezCode frontend platform for user interactions",
+      });
+      
+      console.log('✅ Knowledge transfer successful:', data.data.transferId);
+    },
+    onError: (error) => {
+      console.error('❌ Knowledge transfer failed:', error);
+      toast({
+        title: "Transfer Failed",
+        description: "Could not transfer knowledge to BrezCode frontend. Please try again.",
+        variant: "destructive"
+      });
+    }
+  });
+
   const handleContinueConversation = () => {
     if (!activeSession) {
       toast({
@@ -884,12 +923,31 @@ export default function BrezCodeAvatarTraining() {
                 <CardHeader>
                   <CardTitle className="flex items-center justify-between">
                     Ready to Train Dr. Sakura Wellness
-                    <Badge variant="outline" className="text-sm">
-                      Training Session #{sessionCounter} - {new Date().toLocaleDateString()}
-                    </Badge>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => transferKnowledge.mutate()}
+                        disabled={transferKnowledge.isPending}
+                        className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 text-xs"
+                      >
+                        {transferKnowledge.isPending ? (
+                          <>
+                            <RefreshCw className="h-3 w-3 mr-1 animate-spin" />
+                            Transferring...
+                          </>
+                        ) : (
+                          <>
+                            <ArrowRight className="h-3 w-3 mr-1" />
+                            Transfer to BrezCode
+                          </>
+                        )}
+                      </Button>
+                      <Badge variant="outline" className="text-sm">
+                        Training Session #{sessionCounter} - {new Date().toLocaleDateString()}
+                      </Badge>
+                    </div>
                   </CardTitle>
                   <CardDescription>
-                    Browse scenarios using the arrows below and select one to begin training.
+                    Browse scenarios using the arrows below and select one to begin training. After training is complete, use "Transfer to BrezCode" to move Dr. Sakura's knowledge to the frontend platform where users interact with her.
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">

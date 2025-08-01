@@ -102,6 +102,12 @@ console.log('📚 Registering Avatar Knowledge Base routes...');
 registerAvatarKnowledgeRoutes(app);
 console.log('✅ Avatar Knowledge Base routes registered successfully');
 
+// Register Knowledge Transfer routes for LeadGen.to to BrezCode transfer
+console.log('🔄 Registering Knowledge Transfer routes...');
+import knowledgeTransferRoutes from './routes/knowledge-transfer';
+app.use('/api/knowledge-transfer', knowledgeTransferRoutes);
+console.log('✅ Knowledge Transfer routes registered successfully');
+
 // Try to register additional routes if they exist
 // Register BrezCode avatar routes directly
 console.log('🌸 Registering BrezCode avatar routes...');
