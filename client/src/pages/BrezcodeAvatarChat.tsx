@@ -11,6 +11,7 @@ import { Send, Heart, Brain, User, Stethoscope, Bot, MessageSquare, Play, Pause,
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useLocation } from "wouter";
 import { MultimediaMessage, MultimediaContent } from "@/components/MultimediaMessage";
+import { useAuth } from "@/hooks/use-auth";
 
 interface Message {
   id: string;
@@ -40,12 +41,20 @@ interface AvatarResponse {
 }
 
 export default function BrezcodeAvatarChat() {
+  const { user, isLoading: authLoading } = useAuth();
   const [, setLocation] = useLocation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [proactiveResearchActive, setProactiveResearchActive] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      setLocation('/login');
+    }
+  }, [user, authLoading, setLocation]);
 
   // Get Dr. Sakura configuration with proper typing
   const { data: avatarConfig, isLoading: configLoading } = useQuery({
@@ -61,10 +70,11 @@ export default function BrezcodeAvatarChat() {
   // Proactive research mutations
   const startResearchMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error('User not authenticated');
       const response = await fetch('/api/brezcode/avatar/dr-sakura/start-proactive-research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1, intervalMinutes: 0.1 }) // Every 6 seconds for demo
+        body: JSON.stringify({ userId: user.id, intervalMinutes: 0.1 }) // Every 6 seconds for demo
       });
       if (!response.ok) throw new Error('Failed to start proactive research');
       return response.json();
@@ -80,10 +90,11 @@ export default function BrezcodeAvatarChat() {
 
   const stopResearchMutation = useMutation({
     mutationFn: async () => {
+      if (!user?.id) throw new Error('User not authenticated');
       const response = await fetch('/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: 1 })
+        body: JSON.stringify({ userId: user.id })
       });
       if (!response.ok) throw new Error('Failed to stop proactive research');
       return response.json();
@@ -96,12 +107,13 @@ export default function BrezcodeAvatarChat() {
 
   // Query for proactive messages with proper typing
   const { data: proactiveMessages, refetch: refetchProactiveMessages } = useQuery({
-    queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages/1'],
+    queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages', user?.id],
     refetchInterval: proactiveResearchActive ? 3000 : false,
-    enabled: proactiveResearchActive,
+    enabled: proactiveResearchActive && !!user?.id,
     retry: false,
     queryFn: async () => {
-      const response = await fetch('/api/brezcode/avatar/dr-sakura/proactive-messages/1');
+      if (!user?.id) throw new Error('User not authenticated');
+      const response = await fetch(`/api/brezcode/avatar/dr-sakura/proactive-messages/${user.id}`);
       if (!response.ok) throw new Error('Failed to fetch proactive messages');
       return response.json();
     }
@@ -110,10 +122,11 @@ export default function BrezcodeAvatarChat() {
   const markProactiveReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
       try {
+        if (!user?.id) throw new Error('User not authenticated');
         const response = await fetch('/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: 1, messageId })
+          body: JSON.stringify({ userId: user.id, messageId })
         });
         if (!response.ok) throw new Error('Failed to mark message as read');
         return response.json();
@@ -133,8 +146,9 @@ export default function BrezcodeAvatarChat() {
   // Chat mutation
   const chatMutation = useMutation({
     mutationFn: async (message: string) => {
+      if (!user?.id) throw new Error('User not authenticated');
       const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/chat', {
-        userId: 1, // Default user for demo
+        userId: user.id, // Use authenticated user's ID
         message,
         conversationHistory: messages,
         context: {}
@@ -165,7 +179,7 @@ export default function BrezcodeAvatarChat() {
   });
 
   const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+    if (!inputMessage.trim() || !user?.id) return;
 
     const userMessage: Message = {
       id: `msg_${Date.now()}`,
