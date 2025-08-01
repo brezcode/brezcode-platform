@@ -368,7 +368,7 @@ Communication Style:
         );
         healthReport = healthReportResult.rows[0];
         console.log(`📊 Health report: ${healthReport ? 'FOUND' : 'NOT FOUND'}`);
-      } catch (e) {
+      } catch (e: any) {
         console.log('Health reports table not accessible, using user data only:', e.message);
       }
       
@@ -388,7 +388,7 @@ Communication Style:
           riskCategory = healthReport.risk_category;
           console.log(`🎯 Quiz from health report - age: ${quizData?.age}, country: ${quizData?.country}`);
           console.log(`📋 Risk assessment: ${riskScore}/100 (${riskCategory})`);
-        } catch (e) {
+        } catch (e: any) {
           console.error('Error parsing health report quiz answers:', e);
         }
       }
@@ -400,7 +400,7 @@ Communication Style:
             : userData.quizAnswers;
           hasQuizData = true;
           console.log(`🎯 Quiz from user table - age: ${quizData?.age}, country: ${quizData?.country}`);
-        } catch (e) {
+        } catch (e: any) {
           console.error('Error parsing user quiz answers:', e);
         }
       }
