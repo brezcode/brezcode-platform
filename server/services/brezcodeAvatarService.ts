@@ -1,6 +1,7 @@
 import { brezcodeDb } from '../brezcode-db';
 import { users } from '../../shared/schema';
-import { eq } from 'drizzle-orm';
+import { brezcodeUsers, brezcodeAssessments, brezcodeHealthProfiles } from '../../shared/brezcode-schema';
+import { eq, desc } from 'drizzle-orm';
 import Anthropic from '@anthropic-ai/sdk';
 import { BrezcodeConversationService } from './brezcodeConversationService';
 import { MultimediaContentService, MultimediaContent } from './multimediaContentService';
@@ -257,21 +258,59 @@ Provide specific, actionable guidance while being supportive and reassuring.`
     }
   }
 
-  // Build health coaching context for the avatar
+  // Build comprehensive health coaching context for Dr. Sakura using BrezCode data
   static buildHealthCoachingContext(userHealthData: any, context: any): string {
-    let healthContext = 'BrezCode Health Coaching Platform - Breast Health Specialization';
-    
-    if (userHealthData) {
-      healthContext += `\n\nUser Health Profile:`;
-      if (userHealthData.user) {
-        healthContext += `\n- Age Range: ${userHealthData.user.age || 'Not specified'}`;
-        healthContext += `\n- Gender: ${userHealthData.user.gender || 'Not specified'}`;
+    let healthContext = `Dr. Sakura Wellness Context:
+You are an empathetic breast health coach specializing in evidence-based guidance, risk assessment interpretation, and emotional support.
+
+Core Responsibilities:
+- Provide personalized breast health education based on user's profile
+- Interpret health assessments and risk factors with empathy
+- Offer evidence-based lifestyle recommendations
+- Support users emotionally through health concerns
+- Guide users on screening protocols and self-examinations
+
+Communication Style:
+- Warm, professional, and culturally sensitive
+- Use simple, non-technical language unless medical precision is needed
+- Show empathy for health anxiety and concerns
+- Provide hope while being medically accurate
+- Reference specific user data when giving personalized advice`;
+
+    // Add user's BrezCode quiz data if available
+    if (userHealthData?.hasQuizData && userHealthData.quizResponses) {
+      const quiz = userHealthData.quizResponses;
+      healthContext += `\n\nUser's Personal Health Profile (from completed assessment):`;
+      
+      if (quiz.age) healthContext += `\n- Age: ${quiz.age} years old`;
+      if (quiz.country) healthContext += `\n- Location: ${quiz.country}`;
+      if (quiz.ethnicity) healthContext += `\n- Ethnicity: ${quiz.ethnicity}`;
+      if (quiz.family_history) healthContext += `\n- Family History: ${quiz.family_history}`;
+      if (quiz.menstrual_age) healthContext += `\n- Menstrual History: Started ${quiz.menstrual_age}`;
+      if (quiz.pregnancy_age) healthContext += `\n- Pregnancy History: ${quiz.pregnancy_age}`;
+      if (quiz.menopause) healthContext += `\n- Menopause Status: ${quiz.menopause}`;
+      if (quiz.height && quiz.weight) healthContext += `\n- Physical: ${quiz.height}m, ${quiz.weight}kg (BMI: ${quiz.bmi})`;
+      if (quiz.exercise) healthContext += `\n- Exercise: ${quiz.exercise}`;
+      if (quiz.western_diet) healthContext += `\n- Diet: ${quiz.western_diet}`;
+      if (quiz.smoke) healthContext += `\n- Smoking: ${quiz.smoke}`;
+      if (quiz.alcohol) healthContext += `\n- Alcohol: ${quiz.alcohol}`;
+      if (quiz.mammogram_frequency) healthContext += `\n- Mammogram History: ${quiz.mammogram_frequency}`;
+      
+      // Add risk assessment if available
+      if (userHealthData.latestAssessment) {
+        healthContext += `\n\nRisk Assessment Results:`;
+        healthContext += `\n- Overall Risk Score: ${userHealthData.latestAssessment.riskScore}/100`;
+        healthContext += `\n- Risk Category: ${userHealthData.latestAssessment.riskCategory}`;
+        
+        if (userHealthData.latestAssessment.recommendations) {
+          const recs = userHealthData.latestAssessment.recommendations;
+          healthContext += `\n- Key Recommendations: ${Array.isArray(recs) ? recs.slice(0, 3).join(', ') : recs}`;
+        }
       }
       
-      if (userHealthData.healthProfile) {
-        healthContext += `\n- Health Focus: Breast health and wellness`;
-        healthContext += `\n- Previous Assessments: ${userHealthData.assessments?.length || 0}`;
-      }
+      healthContext += `\n\nIMPORTANT: Use this personal information to provide specific, tailored advice. Address the user personally and reference their specific situation, age, and risk factors.`;
+    } else {
+      healthContext += `\n\nNote: User profile data not fully available. Ask user for relevant personal information to provide better personalized guidance.`;
     }
     
     if (context.currentConcerns?.length) {
@@ -286,6 +325,61 @@ Provide specific, actionable guidance while being supportive and reassuring.`
 - Emotional support for health anxiety`;
     
     return healthContext;
+  }
+
+  // Get user's BrezCode profile and quiz data for personalized responses
+  static async getUserHealthDataFromBrezCode(userId: number) {
+    try {
+      console.log(`🔍 Fetching BrezCode health data for user ${userId}...`);
+      
+      // Get user and their assessment data from BrezCode schema
+      const [user] = await brezcodeDb
+        .select()
+        .from(brezcodeUsers)
+        .where(eq(brezcodeUsers.id, userId));
+      
+      if (!user) {
+        console.log(`❌ User ${userId} not found in BrezCode schema`);
+        return await this.getUserHealthData(userId); // Fallback to main method
+      }
+      
+      // Get latest assessment data
+      const [latestAssessment] = await brezcodeDb
+        .select()
+        .from(brezcodeAssessments)
+        .where(eq(brezcodeAssessments.userId, userId))
+        .orderBy(desc(brezcodeAssessments.completedAt))
+        .limit(1);
+      
+      // Get health profile
+      const [healthProfile] = await brezcodeDb
+        .select()
+        .from(brezcodeHealthProfiles)
+        .where(eq(brezcodeHealthProfiles.userId, userId))
+        .limit(1);
+      
+      console.log(`✅ BrezCode User ${userId} found: ${user.email}`);
+      console.log(`📊 Assessment data: ${latestAssessment ? 'FOUND' : 'NOT FOUND'}`);
+      console.log(`👤 Health profile: ${healthProfile ? 'FOUND' : 'NOT FOUND'}`);
+      
+      if (latestAssessment) {
+        const responses = latestAssessment.responses as any;
+        console.log(`🎯 Quiz responses include age: ${responses?.age}, country: ${responses?.country}`);
+        console.log(`📋 Risk assessment: ${latestAssessment.riskScore}/100 (${latestAssessment.riskCategory})`);
+      }
+      
+      return {
+        ...user,
+        latestAssessment,
+        healthProfile,
+        hasQuizData: !!latestAssessment,
+        quizResponses: latestAssessment?.responses
+      };
+      
+    } catch (error) {
+      console.error(`⚠️ Error fetching BrezCode health data for user ${userId}:`, error);
+      return await this.getUserHealthData(userId); // Fallback to main method
+    }
   }
 
   // Store conversation in training memory for future learning

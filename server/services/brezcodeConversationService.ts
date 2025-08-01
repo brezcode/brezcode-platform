@@ -72,7 +72,8 @@ export class BrezcodeConversationService {
       await brezcodeDb
         .update(brezcodeUsers)
         .set({ 
-          healthProfile: JSON.stringify(healthData)
+          healthProfile: JSON.stringify(healthData),
+          updatedAt: new Date()
         })
         .where(eq(brezcodeUsers.id, userId));
 
