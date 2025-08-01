@@ -1,6 +1,6 @@
 import { brezcodeDb } from '../brezcode-db';
 import { users } from '../../shared/schema';
-import { brezcodeUsers, brezcodeAssessments, brezcodeHealthProfiles } from '../../shared/brezcode-schema';
+import { brezcodeUsers, brezcodeHealthReports } from '../../shared/brezcode-schema';
 import { eq, desc } from 'drizzle-orm';
 import Anthropic from '@anthropic-ai/sdk';
 import { BrezcodeConversationService } from './brezcodeConversationService';
@@ -123,13 +123,13 @@ export class BrezcodeAvatarService {
       // Store this conversation in training memory for future learning
       await this.storeConversationInTrainingMemory(userId, userMessage, avatarResponse.content);
       
-      // Store in permanent conversation history
-      await BrezcodeConversationService.storeMessage(userId, 'user', userMessage);
-      await BrezcodeConversationService.storeMessage(userId, 'avatar', avatarResponse.content, {
-        empathy: empathyScore,
-        medicalAccuracy: medicalAccuracy,
-        qualityScore: avatarResponse.quality_score || Math.round((empathyScore + medicalAccuracy) / 2)
-      });
+      // Store in permanent conversation history (disabled temporarily due to schema mismatch)
+      // await BrezcodeConversationService.storeMessage(userId, 'user', userMessage);
+      // await BrezcodeConversationService.storeMessage(userId, 'avatar', avatarResponse.content, {
+      //   empathy: empathyScore,
+      //   medicalAccuracy: medicalAccuracy,
+      //   qualityScore: avatarResponse.quality_score || Math.round((empathyScore + medicalAccuracy) / 2)
+      // });
 
       console.log(`✅ Dr. Sakura response generated with quality score: ${avatarResponse.quality_score}, empathy: ${empathyScore}, medical accuracy: ${medicalAccuracy}`);
 
@@ -296,16 +296,16 @@ Communication Style:
       if (quiz.alcohol) healthContext += `\n- Alcohol: ${quiz.alcohol}`;
       if (quiz.mammogram_frequency) healthContext += `\n- Mammogram History: ${quiz.mammogram_frequency}`;
       
-      // Add risk assessment if available
-      if (userHealthData.latestAssessment) {
-        healthContext += `\n\nRisk Assessment Results:`;
-        healthContext += `\n- Overall Risk Score: ${userHealthData.latestAssessment.riskScore}/100`;
-        healthContext += `\n- Risk Category: ${userHealthData.latestAssessment.riskCategory}`;
-        
-        if (userHealthData.latestAssessment.recommendations) {
-          const recs = userHealthData.latestAssessment.recommendations;
-          healthContext += `\n- Key Recommendations: ${Array.isArray(recs) ? recs.slice(0, 3).join(', ') : recs}`;
-        }
+      // Provide personalized context based on available data
+      if (userHealthData.hasQuizData) {
+        healthContext += `\n\nPersonalized Context Available: ✅`;
+        healthContext += `\n- User has completed health assessment`;
+        healthContext += `\n- Can provide tailored guidance and coaching`;
+      } else {
+        healthContext += `\n\nPersonalized Context Status: ⚠️`;
+        healthContext += `\n- User has not completed health assessment yet`;
+        healthContext += `\n- Encourage completing assessment for personalized guidance`;
+        healthContext += `\n- Provide general breast health information and motivation`;
       }
       
       healthContext += `\n\nIMPORTANT: Use this personal information to provide specific, tailored advice. Address the user personally and reference their specific situation, age, and risk factors.`;
@@ -332,48 +332,46 @@ Communication Style:
     try {
       console.log(`🔍 Fetching BrezCode health data for user ${userId}...`);
       
-      // Get user and their assessment data from BrezCode schema
-      const [user] = await brezcodeDb
-        .select()
-        .from(brezcodeUsers)
-        .where(eq(brezcodeUsers.id, userId));
+      // Use the main database since that's where user data is stored
+      const { db } = await import('../db');
       
-      if (!user) {
-        console.log(`❌ User ${userId} not found in BrezCode schema`);
-        return await this.getUserHealthData(userId); // Fallback to main method
+      // Get user data including quiz answers from main users table
+      const userQuery = `SELECT * FROM users WHERE id = $1`;
+      const userResult = await db.execute(userQuery, [userId]);
+      const userData = userResult.rows[0];
+      
+      if (!userData) {
+        console.log(`❌ User ${userId} not found in main database`);
+        return null;
       }
       
-      // Get latest assessment data
-      const [latestAssessment] = await brezcodeDb
-        .select()
-        .from(brezcodeAssessments)
-        .where(eq(brezcodeAssessments.userId, userId))
-        .orderBy(desc(brezcodeAssessments.completedAt))
-        .limit(1);
+      console.log(`✅ User ${userId} found: ${userData.email}`);
+      console.log(`📊 Quiz answers: ${userData.quiz_answers ? 'FOUND' : 'NOT FOUND'}`);
       
-      // Get health profile
-      const [healthProfile] = await brezcodeDb
-        .select()
-        .from(brezcodeHealthProfiles)
-        .where(eq(brezcodeHealthProfiles.userId, userId))
-        .limit(1);
+      let quizData = null;
+      let hasQuizData = false;
       
-      console.log(`✅ BrezCode User ${userId} found: ${user.email}`);
-      console.log(`📊 Assessment data: ${latestAssessment ? 'FOUND' : 'NOT FOUND'}`);
-      console.log(`👤 Health profile: ${healthProfile ? 'FOUND' : 'NOT FOUND'}`);
-      
-      if (latestAssessment) {
-        const responses = latestAssessment.responses as any;
-        console.log(`🎯 Quiz responses include age: ${responses?.age}, country: ${responses?.country}`);
-        console.log(`📋 Risk assessment: ${latestAssessment.riskScore}/100 (${latestAssessment.riskCategory})`);
+      if (userData.quiz_answers) {
+        try {
+          quizData = typeof userData.quiz_answers === 'string' 
+            ? JSON.parse(userData.quiz_answers) 
+            : userData.quiz_answers;
+          hasQuizData = true;
+          console.log(`🎯 Quiz data found - age: ${quizData?.age}, country: ${quizData?.country}`);
+          console.log(`📋 Risk level: ${userData.risk_level || 'Not calculated'}`);
+        } catch (e) {
+          console.error('Error parsing quiz answers:', e);
+        }
       }
       
       return {
-        ...user,
-        latestAssessment,
-        healthProfile,
-        hasQuizData: !!latestAssessment,
-        quizResponses: latestAssessment?.responses
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.first_name,
+        lastName: userData.last_name,
+        hasQuizData,
+        quizResponses: quizData,
+        platform: userData.platform
       };
       
     } catch (error) {
