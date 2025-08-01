@@ -125,83 +125,39 @@ app.post('/api/brezcode/avatar/dr-sakura/chat', async (req, res) => {
 
     console.log(`🌸 Dr. Sakura responding to user ${userId}: "${message.substring(0, 50)}..."`);
     
-    // Import MultimediaContentService for content generation
-    const { MultimediaContentService } = await import('./services/multimediaContentService');
+    // CRITICAL FIX: Use the proper BrezcodeAvatarService that includes personalization
+    const { BrezcodeAvatarService } = await import('./services/brezcodeAvatarService');
     
-    // Generate multimedia content based on the user's message
+    // Generate Dr. Sakura's personalized response using the enhanced service
+    const response = await BrezcodeAvatarService.generateDrSakuraResponse(
+      userId,
+      message,
+      conversationHistory,
+      context
+    );
+    
+    // Generate multimedia content based on the user's message and response
+    const { MultimediaContentService } = await import('./services/multimediaContentService');
     const multimediaContent = MultimediaContentService.generateMultimediaContent(
       message,
-      '',
+      response.content,
       'breast_health'
     );
     
-    // Generate Dr. Sakura's response based on message content
-    let responseContent = '';
-    const lowerMessage = message.toLowerCase();
-    
-    if (lowerMessage.includes('self-exam') || lowerMessage.includes('self exam') || lowerMessage.includes('breast exam')) {
-      responseContent = `Hello! I'm Dr. Sakura, and I'm here to guide you through proper breast self-examination techniques. 
-
-**Monthly Self-Examination Steps:**
-
-1. **Visual Inspection** - Stand in front of a mirror with your arms at your sides, then raised overhead. Look for changes in size, shape, or skin texture.
-
-2. **Manual Examination** - Lie down and use the pads of your three middle fingers to feel for lumps, using small circular motions.
-
-3. **Systematic Coverage** - Start at the outer edge and spiral inward, covering the entire breast and armpit area.
-
-4. **Check Both Breasts** - Repeat the process for both breasts monthly, ideally 3-7 days after your period.
-
-**What to Look For:**
-- New lumps or thickening
-- Changes in breast size or shape
-- Skin dimpling or puckering
-- Nipple discharge or inversion
-
-Remember, 90% of breast lumps are benign, but early detection is key. If you notice any changes, consult your healthcare provider promptly.
-
-The multimedia content I've shared includes visual guides and expert tutorials to help you perform these examinations correctly.`;
-    } else if (lowerMessage.includes('mammogram') || lowerMessage.includes('screening')) {
-      responseContent = `Great question about mammography screening! As Dr. Sakura, I recommend following evidence-based screening guidelines:
-
-**Mammogram Schedule:**
-- Ages 40-49: Discuss with your doctor (individual risk assessment)
-- Ages 50-74: Every 2 years (standard recommendation)
-- High risk: Annual screening may start earlier
-
-**What to Expect:**
-- Brief procedure (15-20 minutes)
-- Mild discomfort during compression
-- Results typically available within days
-
-The multimedia content includes images showing the mammography process and links to authoritative guidelines from cancer organizations.`;
-    } else {
-      responseContent = `Hello! I'm Dr. Sakura Wellness, your breast health coach. I'm here to provide evidence-based guidance on breast health, preventive care, and wellness.
-
-I can help you with:
-- Breast self-examination techniques
-- Understanding screening recommendations  
-- Risk factor education
-- Lifestyle modifications for breast health
-- Emotional support during health concerns
-
-Please feel free to ask me any specific questions about breast health. I'm here to support your wellness journey with compassionate, medically accurate information.`;
-    }
-    
-    console.log(`✅ Dr. Sakura response generated with ${multimediaContent.length} multimedia items`);
+    console.log(`✅ Dr. Sakura personalized response generated (Empathy: ${response.empathyScore}, Medical: ${response.medicalAccuracy}) with ${multimediaContent.length} multimedia items`);
     
     res.json({
       success: true,
       response: {
-        content: responseContent,
-        multimediaContent: multimediaContent,
+        content: response.content,
+        multimediaContent: multimediaContent, // Enhanced multimedia support
         avatarId: 'dr_sakura_brezcode',
         avatarName: 'Dr. Sakura Wellness',
         role: 'Breast Health Coach',
         qualityScores: {
-          empathy: 95,
-          medicalAccuracy: 98,
-          overall: 96
+          empathy: response.empathyScore,
+          medicalAccuracy: response.medicalAccuracy,
+          overall: Math.round((response.empathyScore + response.medicalAccuracy) / 2)
         },
         timestamp: new Date().toISOString()
       }

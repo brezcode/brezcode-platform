@@ -147,9 +147,9 @@ export class BrezcodeAvatarService {
       };
 
     } catch (error) {
-      console.error('Error generating Dr. Sakura response with training integration:', error);
+      console.error('⚠️ Error generating Dr. Sakura response with training integration, falling back to personalized response:', error);
       
-      // Fallback to original Dr. Sakura response
+      // Fallback to original Dr. Sakura response with personalization
       return await this.generateFallbackDrSakuraResponse(userId, userMessage, conversationHistory, context);
     }
   }
@@ -167,11 +167,20 @@ export class BrezcodeAvatarService {
   ): Promise<{ content: string; empathyScore: number; medicalAccuracy: number }> {
     
     try {
+      console.log(`🎯 Fallback Dr. Sakura response for user ${userId}`);
+      
       // Get user's health profile and assessment data for personalized responses
       const userHealthData = await this.getUserHealthData(userId);
+      console.log(`📋 Health data retrieved: ${userHealthData ? 'SUCCESS' : 'FAILED'}`);
       
       // Get recent conversation context from permanent history
-      const recentContext = await BrezcodeConversationService.getRecentContext(userId, 5);
+      let recentContext: any[] = [];
+      try {
+        const { BrezcodeConversationService } = await import('./brezcodeConversationService');
+        recentContext = await BrezcodeConversationService.getRecentContext(userId, 5);
+      } catch (contextError) {
+        console.warn('Could not load conversation context:', contextError);
+      }
       
       // Build personalized system prompt for Dr. Sakura
       const systemPrompt = this.buildDrSakuraSystemPrompt(userHealthData, context);
@@ -323,42 +332,275 @@ Provide specific, actionable guidance while being supportive and reassuring.`
   // Get user's health data for personalized responses
   private static async getUserHealthData(userId: number) {
     try {
-      // Get user data from the correct schema structure
-      const [user] = await brezcodeDb
-        .select()
-        .from(users)
-        .where(eq(users.id, userId));
-
-      if (!user) return null;
-
-      // Parse quiz answers if available
-      const quizData = user.quizAnswers ? JSON.parse(user.quizAnswers as string) : null;
+      console.log(`🔍 Fetching health data for user ${userId}...`);
       
-      // Extract health information from quiz answers
-      const healthInfo = quizData ? {
-        age: quizData.age || null,
-        country: quizData.country || null,
-        ethnicity: quizData.ethnicity || null,
-        familyHistory: quizData.family_history || null,
-        menstrualHistory: quizData.menstrual_history || null,
-        pregnancyHistory: quizData.pregnancy_history || null,
-        breastfeedingHistory: quizData.breastfeeding_history || null,
-        mammogramHistory: quizData.mammogram_history || null,
-        exerciseHabits: quizData.exercise_habits || null,
-        smokingHistory: quizData.smoking_history || null,
-        alcoholConsumption: quizData.alcohol_consumption || null,
-        stressLevel: quizData.stress_level || null,
-        symptoms: quizData.symptoms || null,
-        riskLevel: null // Risk level calculated separately
-      } : null;
+      // Get user from storage system
+      const { storage } = await import('../storage');
+      const user = await storage.getUser(userId);
 
+      if (!user) {
+        console.log(`❌ User ${userId} not found`);
+        return null;
+      }
+
+      console.log(`✅ Found user: ${user.firstName} ${user.lastName} (${user.email})`);
+      console.log(`🔍 Quiz answers type: ${typeof user.quizAnswers}, value: ${user.quizAnswers ? 'EXISTS' : 'NULL'}`);
+      
+      // Parse quiz answers from user data (handle both JSON string and object formats)
+      let quizData = null;
+      if (user.quizAnswers) {
+        try {
+          // Handle case where quizAnswers is already an object
+          if (typeof user.quizAnswers === 'object') {
+            quizData = user.quizAnswers;
+          } else if (typeof user.quizAnswers === 'string') {
+            quizData = JSON.parse(user.quizAnswers);
+          }
+          
+          if (quizData && typeof quizData === 'object') {
+            const keys = Object.keys(quizData);
+            console.log(`📋 Quiz data keys (${keys.length}):`, keys.slice(0, 10));
+            console.log(`🎯 Checking for assessment results in quiz data...`);
+            console.log(`  - riskScore: ${quizData.riskScore || quizData.risk_score || 'NOT FOUND'}`);
+            console.log(`  - riskCategory: ${quizData.riskCategory || quizData.risk_category || 'NOT FOUND'}`);
+            console.log(`  - userProfile: ${quizData.userProfile || quizData.user_profile || 'NOT FOUND'}`);
+          }
+        } catch (error) {
+          console.warn('Could not parse quiz answers:', error);
+          quizData = null;
+        }
+      }
+
+      // Get the user's latest health report 
+      console.log(`🔍 Searching for health reports for user ${userId}...`);
+      let latestHealthReport = await storage.getLatestHealthReport(userId);
+      
+      if (latestHealthReport) {
+        console.log(`📊 Found health report with risk score: ${latestHealthReport.riskScore}, category: ${latestHealthReport.riskCategory}`);
+        console.log(`👤 User profile: ${latestHealthReport.userProfile}`);
+        console.log(`⚠️ Risk factors: ${Array.isArray(latestHealthReport.riskFactors) ? latestHealthReport.riskFactors.length : 0} identified`);
+        console.log(`💡 Recommendations: ${Array.isArray(latestHealthReport.recommendations) ? latestHealthReport.recommendations.length : 0} provided`);
+      } else {
+        console.log(`⚠️ No health report found for user ${userId}`);
+        
+        // Check if they have any health reports at all
+        const allReports = await storage.getHealthReports(userId);
+        console.log(`📋 Total health reports for user: ${allReports.length}`);
+        
+        // If they have quiz answers but no health report, generate assessment from quiz data
+        if (quizData && typeof quizData === 'object' && Object.keys(quizData).length > 5) {
+          console.log(`🔍 Found comprehensive quiz data - generating missing health assessment`);
+          
+          // Generate health assessment from quiz responses
+          const generatedAssessment = this.generateHealthAssessmentFromQuiz(quizData, userId);
+          
+          if (generatedAssessment) {
+            console.log(`✅ Generated health assessment: Risk ${generatedAssessment.riskScore}/100 (${generatedAssessment.riskCategory})`);
+            console.log(`👤 User profile: ${generatedAssessment.userProfile}`);
+            console.log(`⚠️ Risk factors: ${generatedAssessment.riskFactors.length} identified`);
+            console.log(`💡 Recommendations: ${generatedAssessment.recommendations.length} generated`);
+            
+            // Use the generated assessment as health report
+            latestHealthReport = {
+              id: 0,
+              userId: userId,
+              ...generatedAssessment,
+              createdAt: new Date(),
+              updatedAt: new Date()
+            } as any;
+            
+            // Store this assessment for future use
+            try {
+              await storage.createHealthReport(generatedAssessment as any);
+              console.log(`💾 Saved generated health assessment to storage`);
+            } catch (error) {
+              console.warn('Could not save generated assessment:', error);
+            }
+          }
+        }
+      }
+
+      // Comprehensive health profile combining quiz data and assessment report
+      const healthProfile = {
+        // Basic user info
+        name: `${user.firstName} ${user.lastName}`,
+        email: user.email,
+        
+        // Assessment results
+        hasCompletedAssessment: !!latestHealthReport,
+        riskScore: latestHealthReport?.riskScore || null,
+        riskCategory: latestHealthReport?.riskCategory || null,
+        userProfile: latestHealthReport?.userProfile || null, // teenager, premenopausal, postmenopausal, etc.
+        riskFactors: latestHealthReport?.riskFactors || [],
+        recommendations: latestHealthReport?.recommendations || [],
+        dailyPlan: latestHealthReport?.dailyPlan || null,
+        
+        // Detailed quiz responses (if available)
+        quizAnswers: quizData ? {
+          age: quizData.age,
+          country: quizData.country,
+          ethnicity: quizData.ethnicity,
+          familyHistory: quizData.family_history,
+          brcaTest: quizData.brca_test,
+          menstrualAge: quizData.menstrual_age,
+          pregnancyAge: quizData.pregnancy_age,
+          oralContraceptives: quizData.oral_contraceptives,
+          menopause: quizData.menopause,
+          weight: quizData.weight,
+          height: quizData.height,
+          hrt: quizData.hrt,
+          breastSymptoms: quizData.breast_symptoms,
+          mammogramFrequency: quizData.mammogram_frequency,
+          denseBreast: quizData.dense_breast,
+          benignCondition: quizData.benign_condition,
+          cancerHistory: quizData.cancer_history,
+          westernDiet: quizData.western_diet,
+          smoke: quizData.smoke,
+          alcohol: quizData.alcohol,
+          nightShift: quizData.night_shift,
+          stressfulEvents: quizData.stressful_events,
+          chronicStress: quizData.chronic_stress,
+          sugarDiet: quizData.sugar_diet,
+          exercise: quizData.exercise,
+          bmi: quizData.bmi,
+          obesity: quizData.obesity
+        } : null
+      };
+
+      console.log(`📋 Compiled comprehensive health profile for coaching personalization`);
+      
       return {
         user,
-        healthInfo,
-        quizCompleted: !!quizData
+        healthProfile,
+        quizCompleted: !!quizData,
+        assessmentCompleted: !!latestHealthReport
       };
     } catch (error) {
-      console.error('Error fetching user health data:', error);
+      console.error('❌ Error fetching user health data:', error);
+      return null;
+    }
+  }
+
+  // Generate health assessment from quiz responses
+  private static generateHealthAssessmentFromQuiz(quizData: any, userId: number) {
+    try {
+      console.log(`🔬 Generating health assessment from quiz responses...`);
+      
+      // Calculate risk score based on quiz responses
+      let riskScore = 0;
+      const riskFactors: string[] = [];
+      const recommendations: string[] = [];
+      
+      // Age factor
+      if (quizData.age) {
+        const age = parseInt(quizData.age);
+        if (age >= 50) {
+          riskScore += 15;
+          riskFactors.push('Age 50 or older increases breast cancer risk');
+          recommendations.push('Annual mammography screening recommended');
+        } else if (age >= 40) {
+          riskScore += 8;
+          riskFactors.push('Age 40-49 with moderate risk considerations');
+          recommendations.push('Discuss mammography schedule with healthcare provider');
+        }
+      }
+      
+      // Family history
+      if (quizData.family_history && quizData.family_history.toLowerCase().includes('yes')) {
+        riskScore += 20;
+        riskFactors.push('Family history of breast or ovarian cancer');
+        recommendations.push('Consider genetic counseling and earlier screening');
+        recommendations.push('Discuss family history details with healthcare provider');
+      }
+      
+      // Stress level
+      if (quizData.stress_level && quizData.stress_level.toLowerCase().includes('high')) {
+        riskScore += 5;
+        riskFactors.push('High stress levels may impact overall health');
+        recommendations.push('Practice stress management techniques');
+        recommendations.push('Consider meditation, yoga, or counseling support');
+      }
+      
+      // Exercise habits
+      if (quizData.exercise_habits) {
+        if (quizData.exercise_habits.toLowerCase().includes('sedentary') || 
+            quizData.exercise_habits.toLowerCase().includes('rarely')) {
+          riskScore += 8;
+          riskFactors.push('Limited physical activity');
+          recommendations.push('Aim for 150 minutes of moderate exercise weekly');
+          recommendations.push('Start with walking and gradually increase activity');
+        } else if (quizData.exercise_habits.toLowerCase().includes('regular')) {
+          riskScore -= 3; // Protective factor
+          recommendations.push('Continue your excellent exercise routine');
+        }
+      }
+      
+      // Mammogram history
+      if (quizData.mammogram_history) {
+        if (quizData.mammogram_history.toLowerCase().includes('never') && 
+            quizData.age && parseInt(quizData.age) >= 40) {
+          riskScore += 10;
+          riskFactors.push('No previous mammography screening (age 40+)');
+          recommendations.push('Schedule your first mammogram with a healthcare provider');
+        } else if (quizData.mammogram_history.toLowerCase().includes('overdue')) {
+          riskScore += 5;
+          riskFactors.push('Overdue for mammography screening');
+          recommendations.push('Schedule mammogram to maintain regular screening');
+        }
+      }
+      
+      // Determine risk category and user profile
+      let riskCategory: string;
+      let userProfile: string;
+      
+      if (riskScore >= 30) {
+        riskCategory = 'High Risk';
+      } else if (riskScore >= 15) {
+        riskCategory = 'Moderate Risk';  
+      } else {
+        riskCategory = 'Lower Risk';
+      }
+      
+      // Determine user profile based on age and responses
+      const age = parseInt(quizData.age || '0');
+      if (age < 30) {
+        userProfile = 'Young Adult (Under 30)';
+      } else if (age < 40) {
+        userProfile = 'Pre-Screening Age (30-39)';
+      } else if (age < 50) {
+        userProfile = 'Early Screening Age (40-49)';
+      } else if (age < 65) {
+        userProfile = 'Regular Screening Age (50-64)';
+      } else {
+        userProfile = 'Senior Screening Age (65+)';
+      }
+      
+      // Add general recommendations
+      recommendations.push('Perform monthly breast self-examinations');
+      recommendations.push('Maintain a healthy diet rich in fruits and vegetables');
+      recommendations.push('Limit alcohol consumption');
+      recommendations.push('Maintain a healthy weight');
+      
+      // Create daily plan based on profile
+      const dailyPlan = {
+        morning: 'Start day with 10-minute mindful breathing or light stretching',
+        afternoon: 'Take a 20-30 minute walk or engage in moderate physical activity',
+        evening: 'Practice breast self-awareness during evening routine'
+      };
+      
+      return {
+        userId: userId,
+        riskScore: Math.min(riskScore, 100), // Cap at 100
+        riskCategory,
+        userProfile,
+        riskFactors,
+        recommendations,
+        dailyPlan,
+        assessmentDate: new Date().toISOString()
+      };
+      
+    } catch (error) {
+      console.error('Error generating health assessment:', error);
       return null;
     }
   }
@@ -367,29 +609,67 @@ Provide specific, actionable guidance while being supportive and reassuring.`
   private static buildDrSakuraSystemPrompt(userHealthData: any, context: any): string {
     let personalizedInfo = '';
     
-    if (userHealthData?.healthInfo) {
-      const health = userHealthData.healthInfo;
+    if (userHealthData?.healthProfile && userHealthData.assessmentCompleted) {
+      const profile = userHealthData.healthProfile;
       personalizedInfo = `
 
-📊 USER HEALTH PROFILE (from completed assessment):
-• Age: ${health.age || 'Not specified'}
-• Country: ${health.country || 'Not specified'}
-• Ethnicity: ${health.ethnicity || 'Not specified'}
-• Family History: ${health.familyHistory || 'None reported'}
-• Risk Level: ${health.riskLevel || 'Not assessed'}
-• Exercise Habits: ${health.exerciseHabits || 'Not specified'}
-• Mammogram History: ${health.mammogramHistory || 'Not specified'}
-• Stress Level: ${health.stressLevel || 'Not specified'}
-• Current Symptoms: ${health.symptoms ? JSON.stringify(health.symptoms) : 'None reported'}
+🌸 PATIENT PROFILE - ${profile.name}:
 
-Remember this information when providing personalized guidance.`;
+📊 RECENT HEALTH ASSESSMENT RESULTS:
+• Risk Score: ${profile.riskScore}/100 (${profile.riskCategory} risk)
+• User Profile: ${profile.userProfile}
+• Assessment Status: ✅ COMPLETED
+
+⚠️ IDENTIFIED RISK FACTORS:
+${profile.riskFactors?.map((factor: string) => `• ${factor}`).join('\n') || '• None identified'}
+
+💡 CURRENT RECOMMENDATIONS:
+${profile.recommendations?.map((rec: string) => `• ${rec}`).join('\n') || '• None provided'}
+
+📋 DETAILED HEALTH INFORMATION:
+${profile.quizAnswers ? `
+• Age: ${profile.quizAnswers.age}
+• Country: ${profile.quizAnswers.country}
+• Ethnicity: ${profile.quizAnswers.ethnicity}
+• Family History: ${profile.quizAnswers.familyHistory}
+• BRCA Testing: ${profile.quizAnswers.brcaTest}
+• Menopause Status: ${profile.quizAnswers.menopause}
+• BMI: ${profile.quizAnswers.bmi}
+• Exercise: ${profile.quizAnswers.exercise}
+• Alcohol: ${profile.quizAnswers.alcohol}
+• Smoking: ${profile.quizAnswers.smoke}
+• Breast Symptoms: ${profile.quizAnswers.breastSymptoms}
+• Mammogram Frequency: ${profile.quizAnswers.mammogramFrequency}
+• Stress Levels: ${profile.quizAnswers.chronicStress}` : '• Quiz details not available'}
+
+🎯 DAILY PLAN RECOMMENDATIONS:
+${profile.dailyPlan ? `
+• Morning: ${profile.dailyPlan.morning}
+• Afternoon: ${profile.dailyPlan.afternoon}  
+• Evening: ${profile.dailyPlan.evening}` : '• No daily plan generated yet'}
+
+🔥 CRITICAL: Use this personalized information to provide specific, tailored coaching advice. Reference their risk factors, recommendations, and health details in your responses.`;
     } else if (userHealthData?.user) {
       personalizedInfo = `
 
-👤 USER PROFILE:
-• Name: ${userHealthData.user.firstName} ${userHealthData.user.lastName}
+👤 PATIENT PROFILE - ${userHealthData.user.firstName} ${userHealthData.user.lastName}:
 • Email: ${userHealthData.user.email}
-• Assessment Status: ${userHealthData.quizCompleted ? 'Completed' : 'Not completed - encourage them to take the assessment'}`;
+• Assessment Status: ${userHealthData.quizCompleted ? '⚠️ Quiz completed but assessment pending' : '❌ No assessment completed'}
+
+🚨 IMPORTANT: This user has not completed their health assessment yet. Encourage them to:
+1. Complete the breast health risk assessment 
+2. Review their personalized recommendations
+3. Discuss their results with you for personalized coaching
+
+Without their assessment data, provide general breast health education while encouraging them to complete their evaluation.`;
+    } else {
+      personalizedInfo = `
+
+❌ PATIENT PROFILE: Unknown user
+🚨 No health data available. Encourage user to:
+1. Complete user registration
+2. Take the breast health assessment  
+3. Return for personalized coaching based on their results`;
     }
 
     const basePrompt = `You are Dr. Sakura Wellness, a compassionate and culturally-aware breast health coach and wellness expert. You specialize in:
