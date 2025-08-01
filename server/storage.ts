@@ -18,7 +18,12 @@ export interface IStorage {
   // Email verification
   createEmailVerification(email: string, code: string): Promise<EmailVerification>;
   getEmailVerification(email: string, code: string): Promise<EmailVerification | undefined>;
+  getPendingVerification(email: string): Promise<EmailVerification | undefined>;
   verifyEmail(email: string): Promise<User | undefined>;
+  // Pending user storage for email verification
+  storePendingUser(email: string, userData: any): Promise<void>;
+  getPendingUser(email: string): Promise<any>;
+  deletePendingUser(email: string): Promise<void>;
   
   // Health reports
   createHealthReport(report: InsertHealthReport): Promise<HealthReport>;
@@ -38,6 +43,7 @@ export class MemStorage implements IStorage {
   private healthReports: Map<number, HealthReport>;
   private healthMetrics: Map<number, any>;
   private healthDataSync: Map<number, any>;
+  private pendingUsers: Map<string, any>;
   currentId: number;
   currentEmailVerificationId: number;
   currentHealthReportId: number;
@@ -48,6 +54,7 @@ export class MemStorage implements IStorage {
     this.healthReports = new Map();
     this.healthMetrics = new Map();
     this.healthDataSync = new Map();
+    this.pendingUsers = new Map();
     this.currentId = 1;
     this.currentEmailVerificationId = 1;
     this.currentHealthReportId = 1;
@@ -163,15 +170,25 @@ export class MemStorage implements IStorage {
       id,
       email,
       code,
-      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
       createdAt: new Date(),
     };
+    // Store both by email+code and by email only for easier lookup
     this.emailVerifications.set(`${email}:${code}`, verification);
+    this.emailVerifications.set(`pending:${email}`, verification);
     return verification;
   }
 
   async getEmailVerification(email: string, code: string): Promise<EmailVerification | undefined> {
     const verification = this.emailVerifications.get(`${email}:${code}`);
+    if (!verification || verification.expiresAt < new Date()) {
+      return undefined;
+    }
+    return verification;
+  }
+
+  async getPendingVerification(email: string): Promise<EmailVerification | undefined> {
+    const verification = this.emailVerifications.get(`pending:${email}`);
     if (!verification || verification.expiresAt < new Date()) {
       return undefined;
     }
@@ -188,7 +205,24 @@ export class MemStorage implements IStorage {
     };
 
     this.users.set(user.id, updatedUser);
+    
+    // Clean up verification records
+    this.emailVerifications.delete(`pending:${email}`);
+    this.deletePendingUser(email);
     return updatedUser;
+  }
+
+  // Pending user management for email verification
+  async storePendingUser(email: string, userData: any): Promise<void> {
+    this.pendingUsers.set(email, userData);
+  }
+
+  async getPendingUser(email: string): Promise<any> {
+    return this.pendingUsers.get(email);
+  }
+
+  async deletePendingUser(email: string): Promise<void> {
+    this.pendingUsers.delete(email);
   }
 
   // Health Reports

@@ -47,54 +47,86 @@ export default function BrezcodeAvatarChat() {
   const [proactiveResearchActive, setProactiveResearchActive] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
-  // Get Dr. Sakura configuration
+  // Get Dr. Sakura configuration with proper typing
   const { data: avatarConfig, isLoading: configLoading } = useQuery({
     queryKey: ['/api/brezcode/avatar/dr-sakura/config'],
-  });
+    queryFn: async () => {
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/config');
+      if (!response.ok) throw new Error('Failed to fetch avatar config');
+      return response.json();
+    },
+    retry: false
+  }) as { data: { avatar?: any } | undefined; isLoading: boolean };
 
   // Proactive research mutations
   const startResearchMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/start-proactive-research', {
-        userId: 1,
-        intervalMinutes: 2
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/start-proactive-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1, intervalMinutes: 0.1 }) // Every 6 seconds for demo
       });
+      if (!response.ok) throw new Error('Failed to start proactive research');
       return response.json();
     },
     onSuccess: () => {
       setProactiveResearchActive(true);
+      console.log('🔍 Proactive research started - featuring Dr. Rhonda Patrick & Dr. David Sinclair');
+    },
+    onError: (error) => {
+      console.error('❌ Error starting proactive research:', error);
     }
   });
 
   const stopResearchMutation = useMutation({
     mutationFn: async () => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
-        userId: 1
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/stop-proactive-research', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1 })
       });
+      if (!response.ok) throw new Error('Failed to stop proactive research');
       return response.json();
     },
     onSuccess: () => {
       setProactiveResearchActive(false);
+      console.log('🛑 Proactive research stopped');
     }
   });
 
-  // Query for proactive messages
+  // Query for proactive messages with proper typing
   const { data: proactiveMessages, refetch: refetchProactiveMessages } = useQuery({
     queryKey: ['/api/brezcode/avatar/dr-sakura/proactive-messages/1'],
-    refetchInterval: proactiveResearchActive ? 5000 : false, // Poll every 5 seconds when active
-    enabled: proactiveResearchActive
-  });
+    refetchInterval: proactiveResearchActive ? 3000 : false,
+    enabled: proactiveResearchActive,
+    retry: false,
+    queryFn: async () => {
+      const response = await fetch('/api/brezcode/avatar/dr-sakura/proactive-messages/1');
+      if (!response.ok) throw new Error('Failed to fetch proactive messages');
+      return response.json();
+    }
+  }) as { data: { messages?: any[]; count?: number } | undefined; refetch: any };
   
   const markProactiveReadMutation = useMutation({
     mutationFn: async (messageId: string) => {
-      const response = await apiRequest('POST', '/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
-        userId: 1,
-        messageId
-      });
-      return response.json();
+      try {
+        const response = await fetch('/api/brezcode/avatar/dr-sakura/mark-proactive-read', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: 1, messageId })
+        });
+        if (!response.ok) throw new Error('Failed to mark message as read');
+        return response.json();
+      } catch (error) {
+        console.log('Note: Message marking failed, but continuing...', error);
+        return { success: false };
+      }
     },
     onSuccess: () => {
       refetchProactiveMessages();
+    },
+    onError: () => {
+      // Silent error handling to prevent unhandled rejections
     }
   });
 
@@ -162,28 +194,41 @@ export default function BrezcodeAvatarChat() {
     }
   }, [messages]);
 
-  // Handle proactive messages
+  // Handle proactive messages with better error handling
   useEffect(() => {
-    if (proactiveMessages?.messages && proactiveMessages.messages.length > 0) {
-      const newProactiveMessages = proactiveMessages.messages.map((proactiveMsg: any) => ({
-        id: proactiveMsg.id,
-        role: 'avatar' as const,
-        content: proactiveMsg.content[0]?.content || 'New educational content available!',
-        multimediaContent: proactiveMsg.content,
-        timestamp: proactiveMsg.timestamp,
-        qualityScores: { empathy: 95, medicalAccuracy: 98, overall: 96 },
-        isProactive: true
-      }));
+    if (proactiveMessages?.messages && Array.isArray(proactiveMessages.messages) && proactiveMessages.messages.length > 0) {
+      console.log('📚 Processing proactive messages:', proactiveMessages.messages.length);
+      
+      const newProactiveMessages = proactiveMessages.messages.map((proactiveMsg: any) => {
+        const textContent = proactiveMsg.content?.find((c: any) => c.type === 'text')?.content || 
+          '🌸 Dr. Sakura here! I have educational content from renowned scientists to share with you.';
+        
+        const multimediaContent = proactiveMsg.content?.filter((c: any) => c.type !== 'text') || [];
+        
+        console.log(`📺 Adding KOL content: ${multimediaContent[0]?.title || 'Educational Video'}`);
+        
+        return {
+          id: proactiveMsg.id,
+          role: 'avatar' as const,
+          content: textContent,
+          multimediaContent: multimediaContent,
+          timestamp: proactiveMsg.timestamp,
+          qualityScores: { empathy: 95, medicalAccuracy: 98, overall: 96 },
+          avatarId: 'dr_sakura_brezcode',
+          avatarName: 'Dr. Sakura Wellness',
+          isProactive: true
+        };
+      });
       
       setMessages(prev => {
         const existingIds = new Set(prev.map(msg => msg.id));
         const uniqueNewMessages = newProactiveMessages.filter((msg: any) => !existingIds.has(msg.id));
-        return [...prev, ...uniqueNewMessages];
-      });
-      
-      // Mark all proactive messages as read
-      proactiveMessages.messages.forEach((proactiveMsg: any) => {
-        markProactiveReadMutation.mutate(proactiveMsg.id);
+        
+        if (uniqueNewMessages.length > 0) {
+          console.log(`✅ Adding ${uniqueNewMessages.length} KOL videos to chat interface`);
+          return [...prev, ...uniqueNewMessages];
+        }
+        return prev;
       });
     }
   }, [proactiveMessages]);
@@ -213,7 +258,7 @@ export default function BrezcodeAvatarChat() {
     );
   }
 
-  const avatar = avatarConfig;
+  const avatar = avatarConfig?.avatar;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50">

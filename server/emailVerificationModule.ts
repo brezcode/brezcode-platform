@@ -197,8 +197,11 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           subscriptionTier
         });
         
-        // Store in session
-        req.session.pendingUser = pendingUser;
+        // Store in storage system instead of session for better persistence
+        if ('storePendingUser' in storage) {
+          await storage.storePendingUser(email, { ...pendingUser, password });
+        }
+        await storage.createEmailVerification(email, pendingUser.verificationCode);
         
         // Send verification code
         await emailModule.sendVerificationCode(email, pendingUser.verificationCode);
@@ -215,41 +218,64 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
     },
 
     // Verify email endpoint
-    verifyEmail: (req: any, res: any) => {
+    verifyEmail: async (req: any, res: any) => {
       const { email, code } = req.body;
       
       if (!email || !code) {
         return res.status(400).json({ error: "Email and verification code are required" });
       }
       
-      const pendingUser = req.session.pendingUser;
+      try {
+        // Get verification and pending user from storage
+        const { storage } = await import('./storage');
+        const verification = await storage.getEmailVerification(email, code);
+        const pendingUser = 'getPendingUser' in storage ? await storage.getPendingUser(email) : null;
+        
+        if (!verification) {
+          return res.status(400).json({ error: "Invalid or expired verification code." });
+        }
+        
+        if (!pendingUser) {
+          return res.status(400).json({ error: "No pending verification found. Please register again." });
+        }
+        
+        if (pendingUser.email !== email) {
+          return res.status(400).json({ error: "Email mismatch. Please use the email you registered with." });
+        }
       
-      if (!pendingUser) {
-        return res.status(400).json({ error: "No pending verification found. Please register again." });
+        // Hash password and create user in storage
+        const bcrypt = await import('bcrypt');
+        const hashedPassword = await bcrypt.hash(pendingUser.password, 10);
+        
+        const newUser = await storage.createUser({
+          firstName: pendingUser.firstName,
+          lastName: pendingUser.lastName,
+          email: pendingUser.email,
+          password: hashedPassword
+        });
+        
+        // Update the user to be email verified
+        const verifiedCompleteUser = await storage.updateUser(newUser.id, { isEmailVerified: true });
+        
+        // Set authenticated session with the actual user ID from storage
+        req.session.userId = newUser.id;
+        req.session.isAuthenticated = true;
+        
+        // Clean up verification data
+        if ('deletePendingUser' in storage) {
+          await storage.deletePendingUser(email);
+        }
+        
+        // Return the actual user from storage without password
+        const { password: _, ...userWithoutPassword } = verifiedCompleteUser || newUser;
+        res.json({
+          user: userWithoutPassword,
+          message: "Email verified successfully"
+        });
+      } catch (storageError: any) {
+        console.error('Failed to create user in storage:', storageError);
+        res.status(500).json({ error: "Failed to complete account creation" });
       }
-      
-      if (pendingUser.email !== email) {
-        return res.status(400).json({ error: "Email mismatch. Please use the email you registered with." });
-      }
-      
-      const validation = emailModule.validateCode(pendingUser, code);
-      
-      if (!validation.isValid) {
-        return res.status(400).json({ error: validation.error });
-      }
-      
-      // Complete verification
-      const verifiedUser = emailModule.completeVerification(pendingUser);
-      
-      // Set authenticated session
-      req.session.userId = verifiedUser.id;
-      req.session.isAuthenticated = true;
-      req.session.pendingUser = null;
-      
-      res.json({
-        user: verifiedUser,
-        message: "Email verified successfully"
-      });
     },
 
     // Resend verification code

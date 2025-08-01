@@ -150,12 +150,12 @@ router.post('/dr-sakura/start-proactive-research', async (req, res) => {
       clearInterval(global.proactiveResearchIntervals[userId]);
     }
     
-    // Educational topics to cycle through
+    // Educational topics featuring renowned scientists and KOLs
     const educationalTopics = [
+      'dr_rhonda_patrick',
+      'dr_david_sinclair', 
       'self_examination',
-      'screening_education',
-      'lifestyle_prevention',
-      'general_health'
+      'lifestyle_prevention'
     ];
     
     let topicIndex = 0;

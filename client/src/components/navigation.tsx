@@ -64,7 +64,12 @@ export default function Navigation() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await register(authForm.username, authForm.email, authForm.password);
+      // Split username into first and last name for registration
+      const nameParts = authForm.username.split(' ');
+      const firstName = nameParts[0] || authForm.username;
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
+      await register(firstName, lastName, authForm.email, authForm.password);
       setShowAuthModal(false);
       toast({
         title: "Account Created!",
@@ -115,7 +120,7 @@ export default function Navigation() {
               
               {user ? (
                 <div className="flex items-center space-x-4">
-                  <span className="text-sm text-yellow-400">Welcome, {user.username}!</span>
+                  <span className="text-sm text-yellow-400">Welcome, {user.username || user.firstName || user.email}!</span>
                   {user.isSubscriptionActive && (
                     <Button 
                       onClick={() => setLocation("/chat")}
@@ -179,7 +184,7 @@ export default function Navigation() {
               
               {user ? (
                 <div className="pt-4 border-t border-white/10 space-y-3">
-                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.username}!</div>
+                  <div className="text-center text-yellow-400 text-sm">Welcome, {user.username || user.firstName || user.email}!</div>
                   {user.isSubscriptionActive && (
                     <Button 
                       onClick={() => { setLocation("/chat"); setShowMobileMenu(false); }}
