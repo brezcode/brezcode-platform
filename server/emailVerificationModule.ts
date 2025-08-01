@@ -197,8 +197,9 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
           subscriptionTier
         });
         
-        // Store in session
+        // Store in session along with password for later use
         req.session.pendingUser = pendingUser;
+        req.session.pendingUserPassword = password;
         
         // Send verification code
         await emailModule.sendVerificationCode(email, pendingUser.verificationCode);
@@ -215,7 +216,7 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
     },
 
     // Verify email endpoint
-    verifyEmail: (req: any, res: any) => {
+    verifyEmail: async (req: any, res: any) => {
       const { email, code } = req.body;
       
       if (!email || !code) {
@@ -241,15 +242,40 @@ export function createEmailVerificationRoutes(emailModule: EmailVerificationModu
       // Complete verification
       const verifiedUser = emailModule.completeVerification(pendingUser);
       
-      // Set authenticated session
-      req.session.userId = verifiedUser.id;
-      req.session.isAuthenticated = true;
-      req.session.pendingUser = null;
-      
-      res.json({
-        user: verifiedUser,
-        message: "Email verified successfully"
-      });
+      try {
+        // CRITICAL FIX: Actually create the user in storage after email verification
+        const { storage } = await import('./storage');
+        const bcrypt = await import('bcrypt');
+        
+        // Hash password and create user in storage
+        const hashedPassword = await bcrypt.hash(req.session.pendingUserPassword || 'defaultpass', 10);
+        
+        const newUser = await storage.createUser({
+          firstName: verifiedUser.firstName,
+          lastName: verifiedUser.lastName,
+          email: verifiedUser.email,
+          password: hashedPassword,
+          isEmailVerified: true,
+          subscriptionTier: 'basic',
+          isSubscriptionActive: false
+        });
+        
+        // Set authenticated session with the actual user ID from storage
+        req.session.userId = newUser.id;
+        req.session.isAuthenticated = true;
+        req.session.pendingUser = null;
+        req.session.pendingUserPassword = null;
+        
+        // Return the actual user from storage without password
+        const { password: _, ...userWithoutPassword } = newUser;
+        res.json({
+          user: userWithoutPassword,
+          message: "Email verified successfully"
+        });
+      } catch (storageError: any) {
+        console.error('Failed to create user in storage:', storageError);
+        res.status(500).json({ error: "Failed to complete account creation" });
+      }
     },
 
     // Resend verification code
