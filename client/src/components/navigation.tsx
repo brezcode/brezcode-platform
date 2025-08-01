@@ -69,12 +69,28 @@ export default function Navigation() {
       const firstName = nameParts[0] || authForm.username;
       const lastName = nameParts.slice(1).join(' ') || '';
       
-      await register(firstName, lastName, authForm.email, authForm.password);
+      const response = await register(firstName, lastName, authForm.email, authForm.password);
       setShowAuthModal(false);
-      toast({
-        title: "Account Created!",
-        description: "Welcome to Breast Health Coach AI.",
-      });
+      
+      // Check if email verification is required
+      if (response && 'requiresVerification' in response && response.requiresVerification) {
+        toast({
+          title: "Account Created!",
+          description: "Please check your email and verify your account to continue.",
+        });
+        
+        // For now, redirect to quiz immediately since we know registration works
+        // In production, you'd want to show email verification UI first
+        setLocation("/brezcode/quiz");
+      } else {
+        toast({
+          title: "Account Created!",
+          description: "Welcome to BrezCode! Let's start with your health assessment.",
+        });
+        
+        // Redirect new users to quiz after successful registration
+        setLocation("/brezcode/quiz");
+      }
     } catch (error: any) {
       toast({
         title: "Registration Failed",
@@ -224,9 +240,12 @@ export default function Navigation() {
       </nav>
 
       <Dialog open={showAuthModal} onOpenChange={setShowAuthModal}>
-        <DialogContent className="w-full max-w-md">
+        <DialogContent className="w-full max-w-md" aria-describedby="auth-dialog-description">
           <DialogHeader>
             <DialogTitle className="text-center">Welcome to Breast Health Coach AI</DialogTitle>
+            <p id="auth-dialog-description" className="text-sm text-gray-600 text-center">
+              Sign in to your existing account or create a new account to start your personalized health journey.
+            </p>
           </DialogHeader>
           
           <Tabs defaultValue="login" className="w-full">
