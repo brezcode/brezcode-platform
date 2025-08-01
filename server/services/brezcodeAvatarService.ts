@@ -77,7 +77,77 @@ export class BrezcodeAvatarService {
     return DR_SAKURA_CONFIG;
   }
 
-  // Generate personalized Dr. Sakura response using integrated LeadGen avatar training system
+  // ENHANCED: Initialize Dr. Sakura with complete user context before responding
+  static async initializeDrSakuraContext(userId: number): Promise<{
+    userData: any;
+    userProfile: string;
+    healthSummary: string;
+    riskContext: string;
+  }> {
+    console.log(`🌸 Initializing Dr. Sakura context for user ${userId}...`);
+    
+    // Load complete user data from database
+    const userData = await this.getUserHealthDataFromBrezCode(userId);
+    
+    if (!userData) {
+      console.log(`❌ User ${userId} not found - using generic context`);
+      return {
+        userData: null,
+        userProfile: "I don't have your specific profile information yet.",
+        healthSummary: "Please share your health concerns so I can assist you better.",
+        riskContext: "I'll need to learn about your risk factors from our conversation."
+      };
+    }
+    
+    console.log(`✅ User ${userId} found: ${userData.email}`);
+    console.log(`📊 Quiz answers: ${userData.quizAnswers ? 'FOUND' : 'NOT FOUND'}`);
+    console.log(`📊 Health report: ${userData.healthReport ? 'FOUND' : 'NOT FOUND'}`);
+    
+    // Build detailed user profile context
+    let userProfile = "";
+    let healthSummary = "";
+    let riskContext = "";
+    
+    if (userData.quizAnswers) {
+      const quiz = userData.quizAnswers;
+      console.log(`🎯 Quiz data - age: ${quiz.age}, country: ${quiz.country}`);
+      
+      userProfile = `You are speaking with a ${quiz.age}-year-old from ${quiz.country}. `;
+      if (quiz.ethnicity) userProfile += `Ethnicity: ${quiz.ethnicity}. `;
+      if (quiz.family_history) userProfile += `Family history: ${quiz.family_history}. `;
+      
+      healthSummary = `Health profile includes: `;
+      if (quiz.mammogram_frequency) healthSummary += `mammogram frequency: ${quiz.mammogram_frequency}, `;
+      if (quiz.exercise) healthSummary += `exercise habits: ${quiz.exercise}, `;
+      if (quiz.hrt) healthSummary += `HRT status: ${quiz.hrt}, `;
+      if (quiz.menopause) healthSummary += `menopause status: ${quiz.menopause}. `;
+    }
+    
+    if (userData.healthReport) {
+      const report = userData.healthReport;
+      console.log(`📋 Risk assessment: ${report.risk_score}/100 (${report.risk_category})`);
+      
+      riskContext = `Current risk assessment: ${report.risk_score}/100 (${report.risk_category} risk). `;
+      if (report.user_profile) riskContext += `Profile type: ${report.user_profile}. `;
+      if (report.risk_factors) {
+        const factors = Array.isArray(report.risk_factors) ? report.risk_factors : [];
+        if (factors.length > 0) {
+          riskContext += `Key risk factors: ${factors.join(', ')}. `;
+        }
+      }
+    }
+    
+    console.log(`🎯 Context initialized - Profile: ${userProfile.length} chars, Health: ${healthSummary.length} chars, Risk: ${riskContext.length} chars`);
+    
+    return {
+      userData,
+      userProfile: userProfile || "I don't have your complete profile yet.",
+      healthSummary: healthSummary || "Please share your health information so I can assist better.",
+      riskContext: riskContext || "I'll assess your risk factors as we discuss your health."
+    };
+  }
+
+  // Generate Dr. Sakura response with FULL user context loaded first
   static async generateDrSakuraResponse(
     userId: number,
     userMessage: string,
@@ -90,27 +160,32 @@ export class BrezcodeAvatarService {
   ): Promise<{ content: string; empathyScore: number; medicalAccuracy: number; multimediaContent?: MultimediaContent[] }> {
     
     try {
-      console.log('🌸 Dr. Sakura generating response with LeadGen training integration...');
+      console.log('🌸 Dr. Sakura generating response with complete user context initialization...');
       
-      // Import the integrated Claude avatar service
+      // STEP 1: Initialize complete user context BEFORE responding
+      const { userData, userProfile, healthSummary, riskContext } = await this.initializeDrSakuraContext(userId);
+      
+      // STEP 2: Import the integrated Claude avatar service
       const { ClaudeAvatarService } = await import('./claudeAvatarService');
       
-      // Get user's health profile and assessment data for personalized responses
-      const userHealthData = await this.getUserHealthDataFromBrezCode(userId);
-      
-      // Get training memory for Dr. Sakura from all previous sessions
+      // STEP 3: Get training memory for Dr. Sakura from all previous sessions
       const allTrainingMemory = await this.getDrSakuraTrainingMemory(userId);
       
-      // Build business context for health coaching
-      const businessContext = this.buildHealthCoachingContext(userHealthData, context);
+      // STEP 4: Build enhanced business context with complete user data
+      const enhancedBusinessContext = this.buildHealthCoachingContext(userData, {
+        ...context,
+        userProfile,
+        healthSummary,
+        riskContext
+      });
       
-      // Use Claude avatar service with Dr. Sakura configuration and training memory
+      // STEP 5: Use Claude avatar service with Dr. Sakura configuration and complete context
       const drSakuraAvatarId = 'dr_sakura_brezcode';
       const avatarResponse = await ClaudeAvatarService.generateAvatarResponse(
         'health_coach', // Avatar type for Dr. Sakura
         userMessage,
         conversationHistory,
-        businessContext,
+        enhancedBusinessContext,
         null, // No specific scenario data for regular chat
         allTrainingMemory, // Complete training history
         drSakuraAvatarId // Avatar ID for knowledge base search
@@ -123,14 +198,6 @@ export class BrezcodeAvatarService {
       // Store this conversation in training memory for future learning
       await this.storeConversationInTrainingMemory(userId, userMessage, avatarResponse.content);
       
-      // Store in permanent conversation history (disabled temporarily due to schema mismatch)
-      // await BrezcodeConversationService.storeMessage(userId, 'user', userMessage);
-      // await BrezcodeConversationService.storeMessage(userId, 'avatar', avatarResponse.content, {
-      //   empathy: empathyScore,
-      //   medicalAccuracy: medicalAccuracy,
-      //   qualityScore: avatarResponse.quality_score || Math.round((empathyScore + medicalAccuracy) / 2)
-      // });
-
       console.log(`✅ Dr. Sakura response generated with quality score: ${avatarResponse.quality_score}, empathy: ${empathyScore}, medical accuracy: ${medicalAccuracy}`);
 
       // Generate multimedia content for enhanced user experience
@@ -148,7 +215,7 @@ export class BrezcodeAvatarService {
       };
 
     } catch (error) {
-      console.error('⚠️ Error generating Dr. Sakura response with training integration, falling back to personalized response:', error);
+      console.error('⚠️ Error generating Dr. Sakura response with enhanced context, falling back to personalized response:', error);
       
       // Fallback to original Dr. Sakura response with personalization
       return await this.generateFallbackDrSakuraResponse(userId, userMessage, conversationHistory, context);
