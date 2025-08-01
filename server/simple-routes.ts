@@ -473,31 +473,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json([]);
   });
 
-  // Temporary test user creation endpoint for development
-  app.post("/api/create-test-user", async (req, res) => {
-    try {
-      const { storage } = await import('./storage');
-      const bcrypt = await import('bcrypt');
-      
-      const hashedPassword = await bcrypt.hash('test123', 10);
-      
-      const testUser = await storage.createUser({
-        firstName: 'Test',
-        lastName: 'User',
-        email: 'testuser@example.com',
-        password: hashedPassword,
-        isEmailVerified: true,
-        subscriptionTier: 'basic',
-        isSubscriptionActive: true
-      });
-      
-      res.json({ message: 'Test user created', user: { email: testUser.email, id: testUser.id } });
-    } catch (error) {
-      console.error('Test user creation error:', error);
-      res.status(500).json({ error: error.message });
-    }
-  });
-
   app.post("/api/reports/generate", async (req, res) => {
     try {
       const { quizAnswers } = req.body;
