@@ -45,18 +45,27 @@ export default function Hero() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
             {user ? (
               <Button 
-                onClick={() => setLocation("/brezcode/personal-dashboard")}
+                onClick={() => setLocation("/brezcode-frontend-dashboard")}
                 className="bg-green-500 text-white px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
               >
                 {t('hero.dashboard', 'Go to Dashboard')}
               </Button>
             ) : (
-              <Button 
-                onClick={() => setLocation("/brezcode/quiz")}
-                className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
-              >
-                {t('hero.cta', 'Take the quiz to start')}
-              </Button>
+              <>
+                <Button 
+                  onClick={() => setLocation("/brezcode/quiz")}
+                  className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105"
+                >
+                  {t('hero.cta', 'Take the quiz to start')}
+                </Button>
+                <Button 
+                  onClick={() => setLocation("/login")}
+                  variant="outline"
+                  className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-bold transition-all"
+                >
+                  {t('hero.login', 'Already have an account? Sign In')}
+                </Button>
+              </>
             )}
           </div>
 

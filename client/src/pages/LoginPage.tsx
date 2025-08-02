@@ -34,7 +34,7 @@ export default function LoginPage() {
 
   // Redirect if already logged in - but don't trigger during render
   if (user && !showEmailVerification) {
-    setTimeout(() => setLocation("/dashboard"), 0);
+    setTimeout(() => setLocation("/brezcode-frontend-dashboard"), 0);
     return null;
   }
 
@@ -46,7 +46,7 @@ export default function LoginPage() {
         title: "Welcome back!",
         description: "Successfully signed in to LeadGen.to",
       });
-      setLocation("/dashboard");
+      setLocation("/brezcode-frontend-dashboard");
     } catch (error: any) {
       console.log('Login error caught:', error);
       toast({
