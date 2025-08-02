@@ -112,11 +112,11 @@ export default function HealthReport({ report }: HealthReportProps) {
         </div>
         <div className="flex gap-2">
           <Button 
-            onClick={() => setLocation('/brezcode/avatar-chat')}
+            onClick={() => setLocation('/brezcode-frontend-dashboard')}
             className="flex items-center gap-2 bg-pink-600 hover:bg-pink-700 text-white"
           >
             <MessageSquare className="h-4 w-4" />
-            Chat with Dr. Sakura
+            Chat with AI
           </Button>
           <Button variant="outline" className="flex items-center gap-2">
             <Download className="h-4 w-4" />

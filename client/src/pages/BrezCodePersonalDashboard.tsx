@@ -93,7 +93,7 @@ export default function BrezCodePersonalDashboard() {
                 <h1 className="text-xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                   BrezCode
                 </h1>
-                <p className="text-sm text-gray-600">Personal Health Dashboard</p>
+                <p className="text-sm text-gray-600">Frontend Personal Health Dashboard</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -187,24 +187,41 @@ export default function BrezCodePersonalDashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {quickActions.map((action, index) => (
-                    <Button
-                      key={index}
-                      variant="outline"
-                      className="h-auto p-4 justify-start border-gray-200 hover:border-pink-300"
-                      onClick={action.action}
-                    >
-                      <div className={`w-8 h-8 ${action.color} rounded-lg flex items-center justify-center mr-3`}>
-                        {action.icon}
-                      </div>
-                      <div className="text-left">
-                        <div className="font-medium">{action.title}</div>
-                        <div className="text-sm text-gray-500">{action.description}</div>
-                      </div>
-                      <ChevronRight className="h-4 w-4 ml-auto" />
-                    </Button>
-                  ))}
+                <div className="space-y-4">
+                  {/* Featured Chat with AI Button */}
+                  <Button
+                    className="w-full h-16 bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 justify-start p-4"
+                    onClick={() => setLocation('/brezcode/avatar-chat')}
+                  >
+                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center mr-4">
+                      <MessageSquare className="h-6 w-6" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-semibold text-lg">Chat with Dr. Sakura AI</div>
+                      <div className="text-sm text-pink-100">Get personalized health guidance 24/7</div>
+                    </div>
+                    <ChevronRight className="h-5 w-5 ml-auto" />
+                  </Button>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    {quickActions.map((action, index) => (
+                      <Button
+                        key={index}
+                        variant="outline"
+                        className="h-auto p-4 justify-start border-gray-200 hover:border-pink-300"
+                        onClick={action.action}
+                      >
+                        <div className={`w-8 h-8 ${action.color} rounded-lg flex items-center justify-center mr-3`}>
+                          {action.icon}
+                        </div>
+                        <div className="text-left">
+                          <div className="font-medium">{action.title}</div>
+                          <div className="text-sm text-gray-500">{action.description}</div>
+                        </div>
+                        <ChevronRight className="h-4 w-4 ml-auto" />
+                      </Button>
+                    ))}
+                  </div>
                 </div>
               </CardContent>
             </Card>

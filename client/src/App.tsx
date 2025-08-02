@@ -83,6 +83,7 @@ function App() {
             {() => <BusinessSelector userId={1} userEmail="leedennyps@gmail.com" />}
           </Route>
           <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
+          <Route path="/brezcode-backend-dashboard" component={BrezCodeDashboard} />
           <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />
@@ -138,6 +139,7 @@ function App() {
           {/* BrezCode Platform Routes */}
           <Route path="/brezcode" component={LandingPage} />
           <Route path="/brezcode/personal-dashboard" component={BrezCodePersonalDashboard} />
+          <Route path="/brezcode-frontend-dashboard" component={BrezCodePersonalDashboard} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

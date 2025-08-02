@@ -70,8 +70,8 @@ export default function BrezCodeDashboard() {
             <Heart className="h-8 w-8 text-pink-500" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">BrezCode Dashboard</h1>
-            <p className="text-gray-600">AI-powered breast health assessment platform</p>
+            <h1 className="text-3xl font-bold text-gray-900">BrezCode Backend Dashboard</h1>
+            <p className="text-gray-600">Business analytics and AI management platform</p>
           </div>
         </div>
         <div className="flex items-center space-x-2">
