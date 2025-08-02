@@ -26,6 +26,7 @@ import { storage } from "./storage";
 import { insertUserSchema, loginSchema, signupSchema, emailVerificationSchema, type User, type SubscriptionTier } from "@shared/schema";
 import twilio from "twilio";
 import sgMail from "@sendgrid/mail";
+import { defaultEmailVerification, createEmailVerificationRoutes } from './emailVerificationModule';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('Missing required OpenAI API key: OPENAI_API_KEY');
@@ -161,20 +162,20 @@ try {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize notification service
   notificationService.initialize().catch(console.error);
-  
+
   // Set up Express to handle JSON properly for all routes
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-  
+
   // AI Conversation Training Routes (Using /api/conversation to avoid Vite conflicts)
   app.post('/api/conversation/start', async (req, res) => {
     try {
       const { avatarId, customerId, scenario } = req.body;
-      
+
       if (!avatarId || !customerId || !scenario) {
         return res.status(400).json({ error: 'Missing required parameters' });
       }
-      
+
       // AI Customer Personalities
       const customers = {
         frustrated_enterprise: {
@@ -208,7 +209,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           systemPrompt: "You are Jennifer Walsh, a cautious C-level executive who analyzes every decision carefully. You need detailed ROI and risk assessments."
         }
       };
-      
+
       // Training Scenarios  
       const scenarios = {
         pricing_objection: {
@@ -237,14 +238,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           avatarGoal: "Retain customer by addressing concerns and providing solutions"
         }
       };
-      
+
       const customer = customers[customerId as keyof typeof customers];
       const scenarioData = scenarios[scenario as keyof typeof scenarios];
-      
+
       if (!customer || !scenarioData) {
         return res.status(400).json({ error: 'Invalid customer or scenario ID' });
       }
-      
+
       const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
       const session = {
         id: sessionId,
@@ -269,18 +270,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         started_at: new Date().toISOString(),
         duration: 0
       };
-      
+
       res.json(session);
     } catch (error) {
       console.error('Error starting AI conversation:', error);
       res.status(500).json({ error: 'Failed to start conversation' });
     }
   });
-  
+
   app.post('/api/conversation/:sessionId/continue', async (req, res) => {
     try {
       const { sessionId } = req.params;
-      
+
       // Simulate conversation continuation with realistic responses
       const avatarResponses = [
         "I understand your concerns about pricing. Let me show you the specific value we provide that justifies our investment.",
@@ -289,7 +290,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "Compared to our competitors, here are the three key advantages that our clients value most.",
         "I hear your frustration, and I want to make this right. Here's what we can do to improve your experience."
       ];
-      
+
       const customerResponses = [
         "I'm still not convinced the price is worth it. Can you show me concrete ROI examples?",
         "What about integration with our existing systems? That's been a major pain point.",
@@ -297,7 +298,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         "How does your support compare? We've had poor experiences with other vendors.",
         "We're seriously considering switching. What can you offer to keep our business?"
       ];
-      
+
       const session = {
         id: sessionId,
         status: 'running',
@@ -331,18 +332,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
           conversation_flow: Math.floor(Math.random() * 15) + 75
         }
       };
-      
+
       res.json(session);
     } catch (error) {
       console.error('Error continuing conversation:', error);
       res.status(500).json({ error: 'Failed to continue conversation' });
     }
   });
-  
+
   app.post('/api/conversation/:sessionId/stop', async (req, res) => {
     try {
       const { sessionId } = req.params;
-      
+
       const finalSession = {
         id: sessionId,
         status: 'completed',
@@ -355,21 +356,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
         },
         messages: [] // Previous messages would be here
       };
-      
+
       res.json(finalSession);
     } catch (error) {
       console.error('Error stopping conversation:', error);
       res.status(500).json({ error: 'Failed to stop conversation' });
     }
   });
-  
+
   // Apply brand middleware globally 
   app.use(brandMiddleware);
   app.use(defaultBrandMiddleware);
-  
+
   // Register brand routes
   app.use(brandRoutes);
-  
+
   // Brand customer and feature routes (B2B2C multi-tenant)
   app.use('/api/customers', brandCustomersRouter);
   app.use('/api/features', brandFeaturesRouter);
@@ -379,15 +380,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.use('/api/avatar-training', avatarTrainingRoutes);
   app.use('/api/health', healthScheduleRoutes);
   app.use('/api/notifications', notificationRoutes);
-  
+
   // Brand AI routes for multi-brand AI system
   const brandAiRoutes = await import('./routes/brandAiRoutes');
   app.use('/api/brand-ai', brandAiRoutes.default);
-  
+
   // Food Analysis routes
   const foodRoutes = await import('./routes/foodRoutes');
   app.use('/api', foodRoutes.default);
-  
+
   // Dietary Recommendation routes
   const dietaryRoutes = await import('./routes/dietaryRoutes');
   app.use('/api', dietaryRoutes.default);
@@ -408,7 +409,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { HistoricalLearningAnalyzer } = await import('./historicalLearningAnalyzer');
       const analyzer = new HistoricalLearningAnalyzer(1); // User ID 1
-      
+
       const result = await analyzer.analyzeAccountHistory();
       res.json({ 
         success: true, 
@@ -428,7 +429,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { HistoricalLearningAnalyzer } = await import('./historicalLearningAnalyzer');
       const analyzer = new HistoricalLearningAnalyzer(1);
-      
+
       const summary = await analyzer.getLearningSummary();
       res.json({ success: true, data: summary });
     } catch (error) {
@@ -445,7 +446,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { RealHistoryExtractor } = await import('./realHistoryExtractor');
       const extractor = new RealHistoryExtractor(1);
-      
+
       const result = await extractor.extractRealConversationHistory();
       res.json({ 
         success: true, 
@@ -465,7 +466,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { RealHistoryExtractor } = await import('./realHistoryExtractor');
       const extractor = new RealHistoryExtractor(1);
-      
+
       const summary = await extractor.getRealDataSummary();
       res.json({ success: true, data: summary });
     } catch (error) {
@@ -543,7 +544,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Handle username conversion to firstName/lastName if needed
       let firstName = userData.firstName || '';
       let lastName = userData.lastName || '';
-      
+
       if (userData.username && (!firstName || !lastName)) {
         const nameParts = userData.username.trim().split(' ');
         firstName = nameParts[0] || userData.username;
@@ -668,14 +669,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.session.userId;
       console.log("Fetching profile for user ID:", userId);
-      
+
       const user = await storage.getUser(userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
 
       console.log("User data found:", user);
-      
+
       res.json({
         id: user.id,
         firstName: user.firstName,
@@ -750,31 +751,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/reports/generate', async (req: any, res) => {
     try {
       const answers = req.body;
-      
+
       // Simple risk calculation
       let riskScore = 20;
       let riskFactors = [];
-      
+
       if (parseInt(answers.age) >= 50) {
         riskScore += 20;
         riskFactors.push("Age over 50 increases breast cancer risk");
       }
-      
+
       if (answers.family_history === "Yes") {
         riskScore += 25;
         riskFactors.push("Family history of breast cancer");
       }
-      
+
       if (parseFloat(answers.bmi) >= 30) {
         riskScore += 15;
         riskFactors.push("Obesity increases breast cancer risk");
       }
-      
+
       if (answers.exercise === "No, little or no regular exercise") {
         riskScore += 10;
         riskFactors.push("Lack of regular exercise");
       }
-      
+
       const report = {
         id: Date.now(),
         riskScore: Math.min(riskScore, 100),
@@ -793,7 +794,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           evening: "Practice stress reduction techniques and maintain healthy sleep schedule (7-8 hours)"
         }
       };
-      
+
       res.json({ success: true, report });
     } catch (error) {
       console.error('Error generating health report:', error);
@@ -1000,19 +1001,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       <h1>🩺 Breast Health Assessment</h1>
       <p>Evidence-Based Risk Analysis & Personalized Wellness</p>
     </div>
-    
+
     <div class="statistic">
       <h2>"1 in 8 women in US will develop breast cancer in their lifetime"</h2>
       <p>— World Health Organization</p>
     </div>
-    
+
     <div style="text-align: center; margin: 40px 0;">
       <p style="font-size: 1.2rem; color: #2c3e50; margin-bottom: 20px;">
         Take our comprehensive assessment to understand your personal risk factors and receive evidence-based recommendations for optimal breast health.
       </p>
       <button class="cta-button" onclick="showQuiz()">🔍 Start Your Assessment</button>
     </div>
-    
+
     <div id="quiz" class="quiz-form" style="display: none;">
       <h3>📋 Comprehensive Health Assessment</h3>
       <form id="assessmentForm">
@@ -1047,88 +1048,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
         <button type="submit" class="cta-button">📊 Generate My Health Report</button>
       </form>
     </div>
-    
+
     <div id="results" class="results" style="display: none;"></div>
   </div>
-  
+
   <script>
     function showQuiz() {
       document.getElementById('quiz').style.display = 'block';
       document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
     }
-    
+
     document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const formData = new FormData(e.target);
       const answers = Object.fromEntries(formData.entries());
-      
+
       const height = parseFloat(answers.height);
       const weight = parseFloat(answers.weight);
       answers.bmi = (weight / (height * height)).toFixed(1);
-      
+
       try {
         const response = await fetch('/api/reports/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(answers)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           const report = data.report;
           const riskColor = report.riskCategory === 'high' ? '#dc2626' : 
                            report.riskCategory === 'moderate' ? '#d97706' : '#059669';
-          
-          document.getElementById('results').innerHTML = \`
+
+          document.getElementById('results').innerHTML = `
             <h3>📋 Your Personalized Health Report</h3>
-            
+
             <div class="risk-score">
-              <h4 style="color: \${riskColor};">Risk Assessment</h4>
-              <p style="font-size: 1.4rem; font-weight: bold; color: \${riskColor};">
-                Risk Score: \${report.riskScore}/100 (\${report.riskCategory.toUpperCase()} risk)
+              <h4 style="color: ${riskColor};">Risk Assessment</h4>
+              <p style="font-size: 1.4rem; font-weight: bold; color: ${riskColor};">
+                Risk Score: ${report.riskScore}/100 (${report.riskCategory.toUpperCase()} risk)
               </p>
-              <p><strong>BMI:</strong> \${answers.bmi} kg/m²</p>
+              <p><strong>BMI:</strong> ${answers.bmi} kg/m²</p>
             </div>
-            
-            \${report.riskFactors.length > 0 ? \`
+
+            ${report.riskFactors.length > 0 ? `
             <div class="recommendations">
               <h4>⚠️ Identified Risk Factors:</h4>
-              <ul>\${report.riskFactors.map(factor => '<li>' + factor + '</li>').join('')}</ul>
+              <ul>${report.riskFactors.map(factor => '<li>' + factor + '</li>').join('')}</ul>
             </div>
-            \` : ''}
-            
+            ` : ''}
+
             <div class="recommendations">
               <h4>💡 Personalized Recommendations:</h4>
-              <ul>\${report.recommendations.map(rec => '<li>' + rec + '</li>').join('')}</ul>
+              <ul>${report.recommendations.map(rec => '<li>' + rec + '</li>').join('')}</ul>
             </div>
-            
+
             <div class="recommendations">
               <h4>🌅 Daily Wellness Plan:</h4>
               <div class="daily-plan">
                 <div class="plan-item">
                   <h5>🌅 Morning</h5>
-                  <p>\${report.dailyPlan.morning}</p>
+                  <p>${report.dailyPlan.morning}</p>
                 </div>
                 <div class="plan-item">
                   <h5>🌞 Afternoon</h5>
-                  <p>\${report.dailyPlan.afternoon}</p>
+                  <p>${report.dailyPlan.afternoon}</p>
                 </div>
                 <div class="plan-item">
                   <h5>🌙 Evening</h5>
-                  <p>\${report.dailyPlan.evening}</p>
+                  <p>${report.dailyPlan.evening}</p>
                 </div>
               </div>
             </div>
-            
+
             <div style="text-align: center; margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 10px;">
               <p style="font-weight: bold; color: #92400e;">
                 ⚠️ Important: This assessment is for educational purposes only. 
                 Please consult with your healthcare provider for personalized medical advice.
               </p>
             </div>
-          \`;
+          `;
           document.getElementById('results').style.display = 'block';
           document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1330,19 +1331,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       <h1>🩺 Breast Health Assessment</h1>
       <p>Evidence-Based Risk Analysis & Personalized Wellness</p>
     </div>
-    
+
     <div class="statistic">
       <h2>"1 in 8 women in US will develop breast cancer in their lifetime"</h2>
       <p>— World Health Organization</p>
     </div>
-    
+
     <div style="text-align: center; margin: 40px 0;">
       <p style="font-size: 1.2rem; color: #2c3e50; margin-bottom: 20px;">
         Take our comprehensive assessment to understand your personal risk factors and receive evidence-based recommendations for optimal breast health.
       </p>
       <button class="cta-button" onclick="showQuiz()">🔍 Start Your Assessment</button>
     </div>
-    
+
     <div id="quiz" class="quiz-form" style="display: none;">
       <h3>📋 Comprehensive Health Assessment</h3>
       <form id="assessmentForm">
@@ -1377,88 +1378,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
         <button type="submit" class="cta-button">📊 Generate My Health Report</button>
       </form>
     </div>
-    
+
     <div id="results" class="results" style="display: none;"></div>
   </div>
-  
+
   <script>
     function showQuiz() {
       document.getElementById('quiz').style.display = 'block';
       document.getElementById('quiz').scrollIntoView({ behavior: 'smooth' });
     }
-    
+
     document.getElementById('assessmentForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
+
       const formData = new FormData(e.target);
       const answers = Object.fromEntries(formData.entries());
-      
+
       const height = parseFloat(answers.height);
       const weight = parseFloat(answers.weight);
       answers.bmi = (weight / (height * height)).toFixed(1);
-      
+
       try {
         const response = await fetch('/api/reports/generate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(answers)
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           const report = data.report;
           const riskColor = report.riskCategory === 'high' ? '#dc2626' : 
                            report.riskCategory === 'moderate' ? '#d97706' : '#059669';
-          
-          document.getElementById('results').innerHTML = \`
+
+          document.getElementById('results').innerHTML = `
             <h3>📋 Your Personalized Health Report</h3>
-            
+
             <div class="risk-score">
-              <h4 style="color: \${riskColor};">Risk Assessment</h4>
-              <p style="font-size: 1.4rem; font-weight: bold; color: \${riskColor};">
-                Risk Score: \${report.riskScore}/100 (\${report.riskCategory.toUpperCase()} risk)
+              <h4 style="color: ${riskColor};">Risk Assessment</h4>
+              <p style="font-size: 1.4rem; font-weight: bold; color: ${riskColor};">
+                Risk Score: ${report.riskScore}/100 (${report.riskCategory.toUpperCase()} risk)
               </p>
-              <p><strong>BMI:</strong> \${answers.bmi} kg/m²</p>
+              <p><strong>BMI:</strong> ${answers.bmi} kg/m²</p>
             </div>
-            
-            \${report.riskFactors.length > 0 ? \`
+
+            ${report.riskFactors.length > 0 ? `
             <div class="recommendations">
               <h4>⚠️ Identified Risk Factors:</h4>
-              <ul>\${report.riskFactors.map(factor => '<li>' + factor + '</li>').join('')}</ul>
+              <ul>${report.riskFactors.map(factor => '<li>' + factor + '</li>').join('')}</ul>
             </div>
-            \` : ''}
-            
+            ` : ''}
+
             <div class="recommendations">
               <h4>💡 Personalized Recommendations:</h4>
-              <ul>\${report.recommendations.map(rec => '<li>' + rec + '</li>').join('')}</ul>
+              <ul>${report.recommendations.map(rec => '<li>' + rec + '</li>').join('')}</ul>
             </div>
-            
+
             <div class="recommendations">
               <h4>🌅 Daily Wellness Plan:</h4>
               <div class="daily-plan">
                 <div class="plan-item">
                   <h5>🌅 Morning</h5>
-                  <p>\${report.dailyPlan.morning}</p>
+                  <p>${report.dailyPlan.morning}</p>
                 </div>
                 <div class="plan-item">
                   <h5>🌞 Afternoon</h5>
-                  <p>\${report.dailyPlan.afternoon}</p>
+                  <p>${report.dailyPlan.afternoon}</p>
                 </div>
                 <div class="plan-item">
                   <h5>🌙 Evening</h5>
-                  <p>\${report.dailyPlan.evening}</p>
+                  <p>${report.dailyPlan.evening}</p>
                 </div>
               </div>
             </div>
-            
+
             <div style="text-align: center; margin-top: 30px; padding: 20px; background: #fef3c7; border-radius: 10px;">
               <p style="font-weight: bold; color: #92400e;">
                 ⚠️ Important: This assessment is for educational purposes only. 
                 Please consult with your healthcare provider for personalized medical advice.
               </p>
             </div>
-          \`;
+          `;
           document.getElementById('results').style.display = 'block';
           document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
         }
@@ -1578,7 +1579,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         subscriptionTier: user.subscriptionTier,
         isSubscriptionActive: user.isSubscriptionActive,
       });
-    } catch (error: any) {
+    } catch<replit_final_file>
+ (error: any) {
       res.status(400).json({ message: error.message });
     }
   });
@@ -1714,7 +1716,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = 999; // Test user ID
       reportData.createdAt = new Date();
-      
+
       // Remove userInfo as it's not part of the schema
 
       console.log('Report generated successfully');
@@ -1784,7 +1786,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/translations/:languageCode', async (req, res) => {
     try {
       const { languageCode } = req.params;
-      
+
       // If English, return original text
       if (languageCode === 'en') {
         const englishTranslations = {
@@ -2248,7 +2250,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { i18nManager } = await import('./internationalization');
       const { languageCode } = req.body;
-      
+
       await i18nManager.setUserLanguage(req.user.id, languageCode);
       res.json({ success: true });
     } catch (error) {
@@ -2262,14 +2264,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { coachingEngine } = await import('./coachingEngine');
       const { i18nManager } = await import('./internationalization');
-      
+
       const languageCode = await i18nManager.getUserLanguage(req.user.id);
       const coaching = await coachingEngine.getPersonalizedCoaching(
         req.user.id,
         req.user.profile || 'general',
         languageCode
       );
-      
+
       res.json(coaching);
     } catch (error) {
       console.error('Error fetching daily coaching:', error);
@@ -2318,7 +2320,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const reportData = reportGenerator.generateComprehensiveReport(quizAnswers);
       reportData.userId = userId;
       reportData.createdAt = new Date();
-      
+
       // Remove userInfo as it's not part of the schema
 
       res.json({
@@ -2450,6 +2452,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to generate response" });
     }
   });
+
+  const emailRoutes = createEmailVerificationRoutes(defaultEmailVerification);
+
+  app.post("/api/auth/signup", emailRoutes.signup);
+  app.post("/api/auth/verify-email", emailRoutes.verifyEmail);
+  app.post("/api/auth/resend-verification", emailRoutes.resendVerification);
 
   const httpServer = createServer(app);
   return httpServer;

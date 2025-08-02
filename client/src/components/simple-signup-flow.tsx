@@ -66,7 +66,7 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
             <Mail className="w-5 h-5 mr-2" />
             Create Your Account
           </Button>
-          
+
           <p className="text-center text-sm text-gray-500">
             Simple email signup with verification code
           </p>
@@ -77,61 +77,37 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
 
   // Email signup mutation
   const signupMutation = useMutation({
-    mutationFn: async (data: { firstName: string; lastName: string; email: string; password: string; quizAnswers: Record<string, any> }) => {
-      try {
-        const response = await apiRequest("POST", "/api/auth/signup", data);
-        return response.json();
-      } catch (error) {
-        console.error("Signup error:", error);
-        throw error;
+    mutationFn: async (data: typeof formData) => {
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Signup failed");
       }
+
+      return response.json();
     },
-    onSuccess: async () => {
-      // Send email verification code after account creation
-      try {
-        await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
+    onSuccess: (data) => {
+      if (data.requiresVerification) {
+        setStep(3);
         toast({
           title: "Account Created",
           description: "Please check your email for a verification code.",
         });
-        setStep(3);
-      } catch (error: any) {
-        console.error("Failed to send verification email:", error);
-        toast({
-          title: "Account Created, Verification Needed",
-          description: `Account created successfully. ${error.message || "Please try verification again."}`,
-          variant: "default",
-        });
-        setStep(3); // Still proceed to verification step
+      } else {
+        onComplete();
       }
     },
     onError: (error: any) => {
-      // Parse the error message to extract the actual server response
-      let errorMessage = error.message || "Failed to create account";
-      let title = "Signup Failed";
-      
-      // Extract JSON message from error string like "400: {"message":"..."}"
-      if (errorMessage.includes('{"message"')) {
-        try {
-          const jsonMatch = errorMessage.match(/\{.*\}/);
-          if (jsonMatch) {
-            const errorObj = JSON.parse(jsonMatch[0]);
-            errorMessage = errorObj.message;
-          }
-        } catch (parseError) {
-          // Keep original error message if parsing fails
-        }
-      }
-      
-      // Handle specific error types based on the parsed message
-      if (errorMessage?.includes("email address is already registered") || errorMessage?.includes("User already exists")) {
-        title = "Email Already Registered";
-        errorMessage = "This email address is already registered. Please use a different email or try logging in instead.";
-      }
-      
       toast({
-        title,
-        description: errorMessage,
+        title: "Signup Failed",
+        description: error.message || "Failed to create account",
         variant: "destructive",
       });
     },
@@ -140,18 +116,25 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
   // Email verification mutation
   const verifyEmailMutation = useMutation({
     mutationFn: async (data: { email: string; code: string }) => {
-      try {
-        const response = await apiRequest("POST", "/api/auth/verify-email", data);
-        return response.json();
-      } catch (error) {
-        console.error("Email verification error:", error);
-        throw error;
+      const response = await fetch("/api/auth/verify-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Verification failed");
       }
+
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Email Verified",
-        description: "Your account is now active!",
+        description: "Your account has been verified successfully!",
       });
       onComplete();
     },
@@ -178,7 +161,7 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
       <CardContent className="space-y-6">
         <form onSubmit={(e) => {
           e.preventDefault();
-          
+
           // Validate passwords match
           if (formData.password !== formData.confirmPassword) {
             toast({
@@ -188,7 +171,7 @@ export default function SimpleSignupFlow({ quizAnswers, onComplete }: SimpleSign
             });
             return;
           }
-          
+
           signupMutation.mutate({
             firstName: formData.firstName,
             lastName: formData.lastName,
