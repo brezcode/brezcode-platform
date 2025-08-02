@@ -110,7 +110,7 @@ export class MemStorage implements IStorage {
     
     // Also clean up any email verifications for this email
     const keysToDelete: string[] = [];
-    for (const [key, verification] of this.emailVerifications.entries()) {
+    for (const [key, verification] of Array.from(this.emailVerifications.entries())) {
       if (verification.email === email) {
         keysToDelete.push(key);
       }
@@ -488,6 +488,35 @@ export class DatabaseStorage implements IStorage {
       .values({ userId, ...profileData })
       .returning();
     return profile;
+  }
+
+  // Missing methods for email verification - using in-memory storage for pending users
+  private pendingUsers: Map<string, any> = new Map();
+
+  async getPendingVerification(email: string): Promise<EmailVerification | undefined> {
+    const [verification] = await db
+      .select()
+      .from(emailVerifications)
+      .where(eq(emailVerifications.email, email))
+      .orderBy(desc(emailVerifications.createdAt))
+      .limit(1);
+    
+    if (!verification || verification.expiresAt < new Date()) {
+      return undefined;
+    }
+    return verification;
+  }
+
+  async storePendingUser(email: string, userData: any): Promise<void> {
+    this.pendingUsers.set(email, userData);
+  }
+
+  async getPendingUser(email: string): Promise<any> {
+    return this.pendingUsers.get(email);
+  }
+
+  async deletePendingUser(email: string): Promise<void> {
+    this.pendingUsers.delete(email);
   }
 }
 
