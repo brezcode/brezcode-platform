@@ -59,7 +59,7 @@ export default function Hero() {
                   {t('hero.cta', 'Take the quiz to start')}
                 </Button>
                 <Button 
-                  onClick={() => setLocation("/login")}
+                  onClick={() => setLocation("/brezcode-login")}
                   variant="outline"
                   className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-bold transition-all"
                 >

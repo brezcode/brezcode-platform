@@ -1,6 +1,7 @@
 import { Route, Switch } from "wouter";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
+import BrezCodeLogin from "@/pages/BrezCodeLogin";
 import UserProfile from "@/pages/UserProfile";
 import UserProfileTest from "@/pages/UserProfileTest";
 import BusinessDashboard from "@/pages/BusinessDashboard";
@@ -140,6 +141,7 @@ function App() {
           <Route path="/brezcode" component={LandingPage} />
           <Route path="/brezcode/personal-dashboard" component={BrezCodePersonalDashboard} />
           <Route path="/brezcode-frontend-dashboard" component={BrezCodePersonalDashboard} />
+          <Route path="/brezcode-login" component={BrezCodeLogin} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

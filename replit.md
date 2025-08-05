@@ -8,8 +8,9 @@ This platform (leadgen.to) is a comprehensive AI-powered business automation too
 
 Preferred communication style: Simple, everyday language.
 Platform approach: Personal-first tools with business features as optional additions.
-Authentication preference: Simple login using existing infrastructure, no complex onboarding.
+Authentication preference: Separate login systems for different platforms (LeadGen vs BrezCode).
 AI Learning Requirement: AI coding assistant must learn from actual conversation history across all projects and avoid repeating same errors and wrong logic.
+Dashboard Naming: Clear separation between frontend (personal) and backend (business) dashboards.
 
 ## System Architecture
 
@@ -34,7 +35,7 @@ AI Learning Requirement: AI coding assistant must learn from actual conversation
 - **Multi-Tenant Database**: PostgreSQL with separate tables for brands, brand configurations, and health assessment settings. Independent database schemas (e.g., leadgen-schema.ts and brezcode-schema.ts) for platform separation.
 - **Brand Middleware**: Automatic brand resolution from subdomain/domain.
 - **API Design**: RESTful endpoints for brands, configurations, and health assessments.
-- **Authentication**: Session-based with brand-specific user management, bcrypt password hashing, and SendGrid for email verification.
+- **Authentication**: Session-based with platform-specific login systems (LeadGen-login vs BrezCode-login), bcrypt password hashing, and SendGrid for email verification.
 - **Subscription Management**: Three-tier model with Stripe integration.
 - **Security**: Enterprise-level security with rate limiting, Helmet, input validation, SQL injection prevention, bcrypt, access control, and audit logging.
 
