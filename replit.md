@@ -14,12 +14,12 @@ Dashboard Naming: Clear separation between frontend (personal) and backend (busi
 
 ## System Architecture
 
-### Business Platform Architecture
-- **Ultimate Business App**: Comprehensive AI-powered business automation platform.
-- **Modular Tool System**: Reusable AI components for diverse applications.
-- **Multi-Tenant Infrastructure**: Complete business isolation with custom domains.
-- **AI Avatar Integration**: Claude-powered virtual assistants for customer service and sales.
-- **Multi-Channel Engagement**: Email, SMS, WhatsApp, LinkedIn automation.
+### Dual Platform Architecture
+- **BrezCode Health Platform**: Complete standalone breast health coaching platform with dedicated backend management system
+- **LeadGen.to Business Platform**: AI-powered business automation and lead generation platform
+- **Complete Platform Separation**: Independent databases, user systems, and feature sets
+- **Health-Focused Backend Tools**: AI training, user management, health analytics, and content management for BrezCode
+- **Business-Focused Tools**: Lead generation, CRM, and business automation for LeadGen.to
 
 ### Frontend Architecture
 - **Framework**: React 18 with TypeScript.
@@ -46,17 +46,30 @@ Dashboard Naming: Clear separation between frontend (personal) and backend (busi
 - **Security**: Enterprise-level security with platform isolation, rate limiting, Helmet, input validation, SQL injection prevention, bcrypt, access control, and audit logging.
 
 ### Key Features
-- **AI Avatar System**: Claude AI integration (with OpenAI fallback) for customer service, sales, lead qualification, and booking assistance, featuring advanced context retention and modular responses. Includes a personal avatar system separate from business avatars.
-- **Landing Page Builder**: AI-powered page creation with industry-specific templates.
-- **Lead Generation System**: Automated capture, qualification, and nurturing workflows.
-- **Sales CRM**: Complete pipeline management with automated follow-ups and payment processing.
-- **Booking Service**: Automated scheduling with calendar integration.
-- **AI Content Creation**: Daily content generation with image creation capabilities.
-- **Health & Wellness Suite (BrezCode)**: Assessment forms, dietary recommendations, food analysis, health coaching, activity planning. Includes a comprehensive health scheduling feature with calendar-based daily planning using React Big Calendar.
-- **AI Training System**: Comprehensive platform for training AI assistants with specialized avatar types and authentic customer scenarios, performance analytics, and Claude-powered analysis.
-- **Profile Management**: Detailed user profile and business dashboard system for centralized management and analytics.
-- **Business Consultant AI**: Claude-powered system for personalized business strategy generation.
-- **Internationalization**: Support for multiple languages, timezone awareness, and content localization.
+
+#### BrezCode Health Platform
+- **Dr. Sakura AI Coaching**: Advanced health coaching with Claude AI, specialized for breast health
+- **Health Assessment System**: Comprehensive risk assessment and personalized reporting
+- **AI Training Platform**: Complete training system for health coaching scenarios and performance optimization
+- **Health Analytics**: Advanced health outcomes tracking and population health metrics
+- **Content Management**: Evidence-based health education content with personalized recommendations
+- **User Management**: Complete health user lifecycle management with subscription tiers
+- **Notification System**: Health-focused reminders, alerts, and milestone celebrations
+- **Admin Dashboard**: Professional backend management interface for health platform
+
+#### LeadGen.to Business Platform  
+- **Business AI Avatars**: Claude AI integration for customer service, sales, and lead qualification
+- **Landing Page Builder**: AI-powered page creation with industry-specific templates
+- **Lead Generation System**: Automated capture, qualification, and nurturing workflows
+- **Sales CRM**: Complete pipeline management with automated follow-ups and payment processing
+- **Business Analytics**: Comprehensive business intelligence and performance tracking
+- **Brand Management**: Multi-brand support with custom configurations
+- **Business Consultant AI**: Claude-powered system for personalized business strategy generation
+
+#### Shared Technologies
+- **AI Training System**: Platform-specific training for both health and business scenarios
+- **Internationalization**: Support for multiple languages, timezone awareness, and content localization
+- **Calendar Integration**: React Big Calendar for scheduling and activity planning
 
 ## External Dependencies
 
