@@ -32,12 +32,18 @@ Dashboard Naming: Clear separation between frontend (personal) and backend (busi
 
 ### Backend Architecture
 - **Runtime**: Node.js with Express.js server.
-- **Multi-Tenant Database**: PostgreSQL with separate tables for brands, brand configurations, and health assessment settings. Independent database schemas (e.g., leadgen-schema.ts and brezcode-schema.ts) for platform separation.
-- **Brand Middleware**: Automatic brand resolution from subdomain/domain.
-- **API Design**: RESTful endpoints for brands, configurations, and health assessments.
-- **Authentication**: Session-based with platform-specific login systems (LeadGen-login vs BrezCode-login), bcrypt password hashing, and SendGrid for email verification.
-- **Subscription Management**: Three-tier model with Stripe integration.
-- **Security**: Enterprise-level security with rate limiting, Helmet, input validation, SQL injection prevention, bcrypt, access control, and audit logging.
+- **COMPLETELY SEPARATE DATABASES**: 
+  - **BrezCode Health Database**: Personal health data (brezcode_health_db) for breast health users
+  - **LeadGen Business Database**: Business analytics data (leadgen_business_db) for business users
+  - **Platform Isolation**: Zero data sharing between platforms for privacy and compliance
+- **Separate Schema Files**: 
+  - `shared/brezcode-schema.ts` for health platform tables
+  - `shared/leadgen-schema.ts` for business platform tables
+  - Complete table separation with no foreign key relationships between platforms
+- **Platform-Specific Authentication**: Completely separate login systems with no shared user tables
+- **API Design**: Platform-specific RESTful endpoints with separate routing
+- **Subscription Management**: Platform-specific billing and subscription management
+- **Security**: Enterprise-level security with platform isolation, rate limiting, Helmet, input validation, SQL injection prevention, bcrypt, access control, and audit logging.
 
 ### Key Features
 - **AI Avatar System**: Claude AI integration (with OpenAI fallback) for customer service, sales, lead qualification, and booking assistance, featuring advanced context retention and modular responses. Includes a personal avatar system separate from business avatars.
