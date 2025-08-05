@@ -1,0 +1,100 @@
+Database Analysis for User: leedennyps@gmail.com (ID: 14)
+
+=== USER DATA ===
+Table: users
+id,first_name,last_name,email,password,is_email_verified,quiz_answers,subscription_tier,stripe_customer_id,stripe_subscription_id,is_subscription_active,created_at,platform,street_address,city,state,postal_code,country,phone_number,profile_photo,phone,address,bio
+14,den,lee,leedennyps@gmail.com,$2b$10$czLP1La4f.513xPb20LJweVMZ/HvfBqWxBCT8es5zBKQDUCNzf7JC,t,,,,,f,2025-08-02 08:08:21.197229,leadgen,,,,,,,,,,
+
+Table: health_reports
+id,user_id,quiz_answers,risk_score,risk_category,user_profile,risk_factors,recommendations,daily_plan,report_data,created_at,updated_at
+(No records found for user_id 14)
+
+Table: brezcode_users
+id,first_name,last_name,email,password,is_email_verified,quiz_answers,health_profile,risk_level,subscription_tier,stripe_customer_id,stripe_subscription_id,is_subscription_active,created_at
+(No records found for leedennyps@gmail.com)
+
+=== DATABASE STRUCTURE ANALYSIS ===
+
+Current Issues Identified:
+1. DUAL USER SYSTEMS: Both 'users' and 'brezcode_users' tables exist, creating confusion
+2. MISSING HEALTH DATA: No health assessment or report data for the user despite login success
+3. INCONSISTENT FOREIGN KEYS: Different user ID systems across tables
+4. PLATFORM FRAGMENTATION: 'platform' field in users table shows 'leadgen' but user is accessing BrezCode
+
+=== RECOMMENDED DATABASE STRUCTURE ===
+
+UNIFIED USER SYSTEM:
+Table: unified_users
+- id (PRIMARY KEY)
+- first_name
+- last_name  
+- email (UNIQUE)
+- password_hash
+- is_email_verified
+- platform_access (JSON array: ['leadgen', 'brezcode'])
+- created_at
+- updated_at
+
+PLATFORM-SPECIFIC PROFILES:
+Table: user_platform_profiles
+- id (PRIMARY KEY)
+- user_id (FK to unified_users)
+- platform ('leadgen' | 'brezcode')
+- profile_data (JSON)
+- subscription_tier
+- stripe_customer_id
+- is_active
+- created_at
+- updated_at
+
+BREZCODE HEALTH DATA:
+Table: brezcode_health_assessments
+- id (PRIMARY KEY)
+- user_id (FK to unified_users)
+- quiz_answers (JSON)
+- risk_score
+- risk_category
+- user_profile
+- assessment_date
+- created_at
+
+Table: brezcode_health_reports
+- id (PRIMARY KEY)
+- user_id (FK to unified_users)
+- assessment_id (FK to brezcode_health_assessments)
+- report_data (JSON)
+- daily_plan (JSON)
+- recommendations (JSON)
+- created_at
+- updated_at
+
+SESSIONS & TRACKING:
+Table: user_sessions
+- id (PRIMARY KEY)
+- user_id (FK to unified_users)
+- platform
+- session_data (JSON)
+- last_activity
+- created_at
+
+=== MIGRATION STRATEGY ===
+
+1. Create new unified_users table
+2. Migrate data from both users and brezcode_users
+3. Update all foreign key references
+4. Add platform_access field to support multi-platform users
+5. Create platform-specific profile tables
+6. Establish proper health data relationships
+
+=== CURRENT DATA GAPS ===
+
+For User ID 14 (leedennyps@gmail.com):
+- ✓ Basic user record exists in 'users' table
+- ✓ Email verified
+- ✗ No BrezCode user record
+- ✗ No health assessment data
+- ✗ No health reports
+- ✗ Quiz answers field is empty
+- ✗ Platform shows 'leadgen' but accessing BrezCode features
+
+This explains why the user can login but has no health data or reports.
