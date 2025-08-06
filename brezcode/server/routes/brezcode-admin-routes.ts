@@ -193,7 +193,7 @@ router.post('/ai-training/start', async (req, res) => {
       return res.status(400).json({ error: 'Scenario ID required' })
     }
 
-    const session = await brezcodeAiTrainingService.startTrainingSession(userId, scenarioId)
+    const session = await brezcodeAiTrainingService.startTrainingSession(userId!, scenarioId)
     res.json(session)
   } catch (error) {
     console.error('Training session start error:', error)
@@ -253,7 +253,7 @@ router.post('/ai-training/sessions/:sessionId/complete', async (req, res) => {
 router.get('/ai-training/sessions', async (req, res) => {
   try {
     const userId = req.session.userId
-    const sessions = await brezcodeAiTrainingService.getUserTrainingSessions(userId)
+    const sessions = await brezcodeAiTrainingService.getUserTrainingSessions(userId!)
     res.json(sessions)
   } catch (error) {
     console.error('Training sessions fetch error:', error)

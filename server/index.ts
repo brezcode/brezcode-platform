@@ -3,6 +3,7 @@ import { createServer } from "http";
 import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerAvatarKnowledgeRoutes } from "./avatar-knowledge-routes";
+import brezcodeAdminRoutes from "../brezcode/server/routes/brezcode-admin-routes";
 
 const app = express();
 // Increase payload limit for image uploads
@@ -208,6 +209,11 @@ console.log('Starting server...');
 // Register main application routes
 registerRoutes(app);
 console.log('✅ Main routes registered successfully');
+
+// Register BrezCode admin routes
+console.log('🏥 Registering BrezCode admin routes...');
+app.use('/api/brezcode/admin', brezcodeAdminRoutes);
+console.log('✅ BrezCode admin routes registered successfully');
 
 // Register Avatar Knowledge Base routes
 console.log('📚 Registering Avatar Knowledge Base routes...');

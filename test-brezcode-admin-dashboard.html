@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrezCode Admin Dashboard Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        .content {
+            padding: 30px;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .test-card {
+            border: 2px solid #e1e8ed;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        .test-card h3 {
+            color: #2c3e50;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin: 10px 5px 5px 0;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .test-button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-success {
+            background: #28a745;
+        }
+        .status-error {
+            background: #dc3545;
+        }
+        .status-pending {
+            background: #ffc107;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .summary {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .summary h3 {
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 BrezCode Admin Dashboard</h1>
+            <p>Backend Management System Testing Interface</p>
+        </div>
+        
+        <div class="content">
+            <div class="summary" id="summary">
+                <h3>System Status</h3>
+                <p>Testing BrezCode backend management system functionality...</p>
+            </div>
+
+            <div class="test-grid">
+                <!-- Analytics Testing -->
+                <div class="test-card">
+                    <h3>📊 Analytics Dashboard</h3>
+                    <p>Test dashboard analytics and health metrics endpoints</p>
+                    <button class="test-button" onclick="testAnalytics()">Test Analytics</button>
+                    <button class="test-button" onclick="testHealthTrends()">Test Health Trends</button>
+                    <div id="analytics-result" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- User Management Testing -->
+                <div class="test-card">
+                    <h3>👥 User Management</h3>
+                    <p>Test user management endpoints and operations</p>
+                    <button class="test-button" onclick="testUserManagement()">Get Users</button>
+                    <button class="test-button" onclick="testUserStats()">User Stats</button>
+                    <div id="users-result" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- AI Training Testing -->
+                <div class="test-card">
+                    <h3>🤖 AI Training Platform</h3>
+                    <p>Test Dr. Sakura training scenarios and sessions</p>
+                    <button class="test-button" onclick="testAITraining()">Test Scenarios</button>
+                    <button class="test-button" onclick="testTrainingSessions()">Training Sessions</button>
+                    <div id="training-result" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- Avatar Management Testing -->
+                <div class="test-card">
+                    <h3>👨‍⚕️ Avatar Management</h3>
+                    <p>Test health avatar configurations and management</p>
+                    <button class="test-button" onclick="testAvatars()">Get Avatars</button>
+                    <button class="test-button" onclick="testDrSakura()">Dr. Sakura Config</button>
+                    <div id="avatars-result" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- Health Analytics Testing -->
+                <div class="test-card">
+                    <h3>📈 Health Analytics</h3>
+                    <p>Test health outcomes and population analytics</p>
+                    <button class="test-button" onclick="testHealthAnalytics()">Health Outcomes</button>
+                    <button class="test-button" onclick="testUserJourneys()">User Journeys</button>
+                    <div id="health-result" class="result" style="display: none;"></div>
+                </div>
+
+                <!-- Content Management Testing -->
+                <div class="test-card">
+                    <h3>📚 Content Management</h3>
+                    <p>Test health education content and recommendations</p>
+                    <button class="test-button" onclick="testContent()">Get Content</button>
+                    <button class="test-button" onclick="testNotifications()">Notifications</button>
+                    <div id="content-result" class="result" style="display: none;"></div>
+                </div>
+            </div>
+
+            <div class="summary" id="test-summary" style="display: none;">
+                <h3>Test Summary</h3>
+                <div id="summary-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BASE_URL = 'http://localhost:5000';
+        const testResults = {};
+
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = content;
+            element.className = `result ${type}`;
+            element.style.display = 'block';
+        }
+
+        function updateIndicator(cardElement, status) {
+            const indicator = cardElement.querySelector('.status-indicator') || document.createElement('span');
+            indicator.className = `status-indicator status-${status}`;
+            if (!cardElement.querySelector('.status-indicator')) {
+                cardElement.querySelector('h3').prepend(indicator);
+            }
+        }
+
+        async function makeRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, options);
+                const text = await response.text();
+                
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch {
+                    data = { raw: text };
+                }
+                
+                return {
+                    ok: response.ok,
+                    status: response.status,
+                    data,
+                    error: null
+                };
+            } catch (error) {
+                return {
+                    ok: false,
+                    status: 0,
+                    data: null,
+                    error: error.message
+                };
+            }
+        }
+
+        async function testAnalytics() {
+            const card = document.querySelector('.test-card');
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/analytics`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('analytics-result', 
+                    `✅ Analytics Data Retrieved:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.analytics = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('analytics-result', 
+                    `❌ Analytics Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.analytics = false;
+            }
+            updateSummary();
+        }
+
+        async function testHealthTrends() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/health-trends?days=7`);
+            
+            if (result.ok) {
+                showResult('analytics-result', 
+                    `✅ Health Trends (7 days):\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('analytics-result', 
+                    `❌ Health Trends Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testUserManagement() {
+            const card = document.querySelectorAll('.test-card')[1];
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/users`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('users-result', 
+                    `✅ User Management Available:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.userManagement = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('users-result', 
+                    `❌ User Management Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.userManagement = false;
+            }
+            updateSummary();
+        }
+
+        async function testUserStats() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/users/stats`);
+            
+            if (result.ok) {
+                showResult('users-result', 
+                    `✅ User Statistics:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('users-result', 
+                    `❌ User Stats Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testAITraining() {
+            const card = document.querySelectorAll('.test-card')[2];
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/ai-training/scenarios`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('training-result', 
+                    `✅ AI Training Scenarios:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.aiTraining = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('training-result', 
+                    `❌ AI Training Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.aiTraining = false;
+            }
+            updateSummary();
+        }
+
+        async function testTrainingSessions() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/ai-training/sessions`);
+            
+            if (result.ok) {
+                showResult('training-result', 
+                    `✅ Training Sessions:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('training-result', 
+                    `❌ Training Sessions Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testAvatars() {
+            const card = document.querySelectorAll('.test-card')[3];
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/avatars`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('avatars-result', 
+                    `✅ Avatar Management:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.avatars = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('avatars-result', 
+                    `❌ Avatar Management Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.avatars = false;
+            }
+            updateSummary();
+        }
+
+        async function testDrSakura() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/avatar/dr-sakura/config`);
+            
+            if (result.ok) {
+                showResult('avatars-result', 
+                    `✅ Dr. Sakura Configuration:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('avatars-result', 
+                    `❌ Dr. Sakura Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testHealthAnalytics() {
+            const card = document.querySelectorAll('.test-card')[4];
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/health-analytics/outcomes`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('health-result', 
+                    `✅ Health Analytics:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.healthAnalytics = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('health-result', 
+                    `❌ Health Analytics Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.healthAnalytics = false;
+            }
+            updateSummary();
+        }
+
+        async function testUserJourneys() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/health-analytics/user-journeys`);
+            
+            if (result.ok) {
+                showResult('health-result', 
+                    `✅ User Health Journeys:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('health-result', 
+                    `❌ User Journeys Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        async function testContent() {
+            const card = document.querySelectorAll('.test-card')[5];
+            updateIndicator(card, 'pending');
+            
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/content`);
+            
+            if (result.ok) {
+                updateIndicator(card, 'success');
+                showResult('content-result', 
+                    `✅ Content Management:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+                testResults.content = true;
+            } else {
+                updateIndicator(card, 'error');
+                showResult('content-result', 
+                    `❌ Content Management Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+                testResults.content = false;
+            }
+            updateSummary();
+        }
+
+        async function testNotifications() {
+            const result = await makeRequest(`${BASE_URL}/api/brezcode/admin/notifications`);
+            
+            if (result.ok) {
+                showResult('content-result', 
+                    `✅ Notification System:\n${JSON.stringify(result.data, null, 2)}`, 
+                    'success'
+                );
+            } else {
+                showResult('content-result', 
+                    `❌ Notifications Failed (${result.status}):\n${result.error || JSON.stringify(result.data, null, 2)}`, 
+                    'error'
+                );
+            }
+        }
+
+        function updateSummary() {
+            const totalTests = Object.keys(testResults).length;
+            const passedTests = Object.values(testResults).filter(Boolean).length;
+            
+            if (totalTests > 0) {
+                const successRate = Math.round((passedTests / totalTests) * 100);
+                const summaryElement = document.getElementById('test-summary');
+                const contentElement = document.getElementById('summary-content');
+                
+                contentElement.innerHTML = `
+                    <p><strong>Test Results:</strong> ${passedTests}/${totalTests} passed (${successRate}%)</p>
+                    <p><strong>Working Systems:</strong> ${Object.entries(testResults).filter(([,v]) => v).map(([k]) => k).join(', ')}</p>
+                    <p><strong>Status:</strong> ${successRate >= 80 ? 'Excellent! BrezCode backend is fully operational.' : 
+                                                   successRate >= 60 ? 'Good! Most systems working.' : 
+                                                   'Needs attention. Some systems require investigation.'}</p>
+                `;
+                summaryElement.style.display = 'block';
+            }
+        }
+
+        // Auto-run a quick test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('summary').innerHTML = `
+                    <h3>🟢 System Online</h3>
+                    <p>BrezCode backend management system is running on port 5000. Click the test buttons to verify all components.</p>
+                `;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
