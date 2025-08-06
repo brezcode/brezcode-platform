@@ -99,6 +99,17 @@ export class BrezcodeAvatarService {
       };
     }
     
+    // ENHANCED: Even if user exists but has no quiz data, provide helpful context
+    if (!userData.hasQuizData && !userData.quizResponses) {
+      console.log(`📋 User ${userId} found but no health assessment completed yet`);
+      return {
+        userData,
+        userProfile: `Hello ${userData.firstName}! I see you haven't completed your health assessment yet.`,
+        healthSummary: "To provide personalized guidance, I'd recommend taking our comprehensive breast health assessment first.",
+        riskContext: "Once you complete the assessment, I'll be able to provide specific recommendations based on your risk factors and profile."
+      };
+    }
+    
     console.log(`✅ User ${userId} found: ${userData.email}`);
     console.log(`📊 Quiz answers: ${userData.quizResponses ? 'FOUND' : 'NOT FOUND'}`);
     console.log(`📊 Health report: ${userData.healthReport ? 'FOUND' : 'NOT FOUND'}`);
@@ -852,19 +863,30 @@ ${profile.dailyPlan ? `
 • Evening: ${profile.dailyPlan.evening}` : '• No daily plan generated yet'}
 
 🔥 CRITICAL: Use this personalized information to provide specific, tailored coaching advice. Reference their risk factors, recommendations, and health details in your responses.`;
-    } else if (userHealthData?.user) {
+    } else if (userHealthData) {
+      // Handle case where user exists but has no health assessment data
+      const userName = userHealthData.firstName || 'there';
       personalizedInfo = `
 
-👤 PATIENT PROFILE - ${userHealthData.user.firstName} ${userHealthData.user.lastName}:
-• Email: ${userHealthData.user.email}
-• Assessment Status: ${userHealthData.quizCompleted ? '⚠️ Quiz completed but assessment pending' : '❌ No assessment completed'}
+👤 PATIENT PROFILE - ${userName}:
+• Name: ${userHealthData.firstName || ''} ${userHealthData.lastName || ''}
+• Email: ${userHealthData.email || 'not provided'}
+• Assessment Status: ❌ No health assessment completed yet
 
-🚨 IMPORTANT: This user has not completed their health assessment yet. Encourage them to:
-1. Complete the breast health risk assessment 
-2. Review their personalized recommendations
-3. Discuss their results with you for personalized coaching
+🚨 IMPORTANT: This user has not completed their health assessment yet. You can:
+1. Answer basic questions about their account (like their name, email)
+2. Provide general breast health education
+3. Encourage them to complete the breast health risk assessment
+4. Guide them to personalized coaching after assessment completion
 
-Without their assessment data, provide general breast health education while encouraging them to complete their evaluation.`;
+AVAILABLE USER INFORMATION:
+• First Name: ${userHealthData.firstName || 'Not provided'}
+• Last Name: ${userHealthData.lastName || 'Not provided'}  
+• Email: ${userHealthData.email || 'Not provided'}
+• User ID: ${userHealthData.id || 'Unknown'}
+• Platform: ${userHealthData.platform || 'Unknown'}
+
+🎯 If they ask about personal details (age, health info), explain that you need them to complete the health assessment first to provide personalized information.`;
     } else {
       personalizedInfo = `
 

@@ -521,14 +521,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (existingUser) {
         // Special handling for test email - allow re-registration
         if (userData.email === "leedennyps@gmail.com") {
-          console.log("Test email detected in legacy route - deleting existing user for re-registration");
+          console.log("Test email detected in legacy route - allowing re-registration");
+          // Simply update the existing user instead of deleting
           try {
-            const deleteResult = await storage.deleteUser(userData.email);
-            console.log("Legacy route delete result:", deleteResult);
-            // Continue to create new user after successful deletion
-          } catch (deleteError) {
-            console.error("Error deleting test user:", deleteError);
-            return res.status(500).json({ message: "Failed to reset test account" });
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            
+            // Convert username to firstName/lastName if needed
+            const createUserData: any = userData.username 
+              ? { firstName: userData.username, lastName: "User", email: userData.email, password: hashedPassword, quizAnswers: userData.quizAnswers }
+              : { firstName: userData.firstName, lastName: userData.lastName, email: userData.email, password: hashedPassword, quizAnswers: userData.quizAnswers };
+            
+            const { db } = await import("./db");
+            const { users } = await import("@shared/schema");
+            const { eq } = await import("drizzle-orm");
+            
+            const [updatedUser] = await db
+              .update(users)
+              .set({
+                firstName: createUserData.firstName,
+                lastName: createUserData.lastName,
+                password: hashedPassword,
+                quizAnswers: createUserData.quizAnswers,
+                isEmailVerified: true
+              })
+              .where(eq(users.email, userData.email))
+              .returning();
+            
+            req.session.userId = updatedUser.id;
+            req.session.isAuthenticated = true;
+
+            return res.json({ 
+              id: updatedUser.id, 
+              email: updatedUser.email,
+              subscriptionTier: updatedUser.subscriptionTier,
+              message: "Account updated successfully"
+            });
+            
+          } catch (updateError) {
+            console.error("Error updating test user in legacy route:", updateError);
+            return res.status(500).json({ message: "Failed to update test account" });
           }
         } else {
           return res.status(400).json({ 
@@ -1531,21 +1562,73 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // New signup route with verification
   app.post("/api/auth/signup", async (req, res) => {
     try {
+      console.log("🔍 Signup request body:", JSON.stringify(req.body, null, 2));
       const userData = signupSchema.parse(req.body);
+      console.log("✅ Parsed userData:", {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        hasQuizAnswers: !!userData.quizAnswers,
+        quizAnswersKeys: userData.quizAnswers ? Object.keys(userData.quizAnswers) : [],
+        sampleQuizData: userData.quizAnswers ? {
+          age: userData.quizAnswers.age,
+          country: userData.quizAnswers.country
+        } : null
+      });
 
       // Check if user already exists
       const existingUser = await storage.getUserByEmail(userData.email);
       if (existingUser) {
         // Special handling for test email - allow re-registration
         if (userData.email === "leedennyps@gmail.com") {
-          console.log("Test email detected - deleting existing user for re-registration");
+          console.log("Test email detected - allowing re-registration without deletion");
+          // Simply update the existing user with new data instead of deleting
           try {
-            const deleteResult = await storage.deleteUser(userData.email);
-            console.log("Delete result:", deleteResult);
-            // Continue to create new user after successful deletion
-          } catch (deleteError) {
-            console.error("Error deleting test user:", deleteError);
-            return res.status(500).json({ message: "Failed to reset test account" });
+            const hashedPassword = await bcrypt.hash(userData.password, 10);
+            
+            // Update existing user with new quiz data
+            const { db } = await import("./db");
+            const { users } = await import("@shared/schema");
+            const { eq } = await import("drizzle-orm");
+            
+            console.log("💾 Updating user with quiz data:", {
+              email: userData.email,
+              hasQuizAnswers: !!userData.quizAnswers,
+              quizSample: userData.quizAnswers ? { age: userData.quizAnswers.age } : null
+            });
+            
+            const [updatedUser] = await db
+              .update(users)
+              .set({
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                password: hashedPassword,
+                quizAnswers: userData.quizAnswers,
+                isEmailVerified: true // Keep verified status
+              })
+              .where(eq(users.email, userData.email))
+              .returning();
+            
+            console.log("✅ User updated successfully:", {
+              id: updatedUser.id,
+              email: updatedUser.email,
+              hasQuizAnswers: !!updatedUser.quizAnswers,
+              quizSample: updatedUser.quizAnswers ? { age: updatedUser.quizAnswers.age } : null
+            });
+            
+            req.session.userId = updatedUser.id;
+            req.session.isAuthenticated = true;
+
+            return res.json({ 
+              id: updatedUser.id, 
+              email: updatedUser.email,
+              subscriptionTier: updatedUser.subscriptionTier,
+              message: "Account updated successfully"
+            });
+            
+          } catch (updateError) {
+            console.error("Error updating test user:", updateError);
+            return res.status(500).json({ message: "Failed to update test account" });
           }
         } else {
           return res.status(400).json({ 

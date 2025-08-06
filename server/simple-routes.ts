@@ -22,6 +22,7 @@ import {
 } from './databaseSecurity';
 import { storage } from './storage';
 import { registerAiTrainingRoutes } from './ai-training-routes';
+import mediaResearchRoutes from './routes/mediaResearchRoutes';
 import OpenAI from "openai";
 
 // Create memory store for sessions
@@ -361,8 +362,115 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create email verification routes using the module
   const emailRoutes = createEmailVerificationRoutes(defaultEmailVerification);
   
-  // Use the modular email verification endpoints
-  app.post("/api/auth/signup", emailRoutes.signup);
+  // Custom signup route with quiz data support
+  app.post("/api/auth/signup", async (req, res) => {
+    try {
+      console.log("🔍 Signup request body (simple-routes):", JSON.stringify(req.body, null, 2));
+      
+      const { signupSchema } = await import("@shared/schema");
+      const userData = signupSchema.parse(req.body);
+      
+      console.log("✅ Parsed userData:", {
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        hasQuizAnswers: !!userData.quizAnswers,
+        quizAnswersKeys: userData.quizAnswers ? Object.keys(userData.quizAnswers) : [],
+        sampleQuizData: userData.quizAnswers ? {
+          age: userData.quizAnswers.age,
+          country: userData.quizAnswers.country
+        } : null
+      });
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(userData.email);
+      if (existingUser) {
+        // Special handling for test email - allow re-registration
+        if (userData.email === "leedennyps@gmail.com") {
+          console.log("Test email detected - allowing re-registration with quiz data");
+          try {
+            const bcrypt = await import("bcrypt");
+            const hashedPassword = await bcrypt.default.hash(userData.password, 10);
+            
+            // Update existing user with new quiz data
+            const { db } = await import("./db");
+            const { users } = await import("@shared/schema");
+            const { eq } = await import("drizzle-orm");
+            
+            console.log("💾 Updating user with quiz data:", {
+              email: userData.email,
+              hasQuizAnswers: !!userData.quizAnswers,
+              quizSample: userData.quizAnswers ? { age: userData.quizAnswers.age } : null
+            });
+            
+            const [updatedUser] = await db
+              .update(users)
+              .set({
+                firstName: userData.firstName,
+                lastName: userData.lastName,
+                password: hashedPassword,
+                quizAnswers: userData.quizAnswers,
+                isEmailVerified: true
+              })
+              .where(eq(users.email, userData.email))
+              .returning();
+            
+            console.log("✅ User updated successfully:", {
+              id: updatedUser.id,
+              email: updatedUser.email,
+              hasQuizAnswers: !!updatedUser.quizAnswers,
+              quizSample: updatedUser.quizAnswers ? { age: updatedUser.quizAnswers.age } : null
+            });
+            
+            (req as any).session.userId = updatedUser.id;
+            (req as any).session.isAuthenticated = true;
+
+            return res.json({ 
+              id: updatedUser.id, 
+              email: updatedUser.email,
+              subscriptionTier: updatedUser.subscriptionTier,
+              message: "Account updated successfully with quiz data"
+            });
+            
+          } catch (updateError) {
+            console.error("Error updating test user:", updateError);
+            return res.status(500).json({ message: "Failed to update test account" });
+          }
+        } else {
+          return res.status(400).json({ 
+            message: "This email address is already registered. Please use a different email address or try logging in instead.",
+            type: "EMAIL_EXISTS"
+          });
+        }
+      }
+
+      // For new users, create account with quiz data
+      const bcrypt = await import("bcrypt");
+      const hashedPassword = await bcrypt.default.hash(userData.password, 10);
+
+      const user = await storage.createUser({
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        email: userData.email,
+        password: hashedPassword,
+        quizAnswers: userData.quizAnswers,
+      });
+
+      (req as any).session.userId = user.id;
+      (req as any).session.isAuthenticated = true;
+
+      res.json({ 
+        id: user.id, 
+        email: user.email,
+        subscriptionTier: user.subscriptionTier,
+        message: "Account created successfully with quiz data"
+      });
+      
+    } catch (error: any) {
+      console.error("❌ Signup error:", error);
+      res.status(400).json({ message: error.message });
+    }
+  });
   app.post("/api/auth/verify-email", emailRoutes.verifyEmail);
   app.post("/api/auth/resend-verification", emailRoutes.resendVerification);
 
@@ -1350,6 +1458,9 @@ Format your response as JSON with the exact structure:
   
   // Register AI Training routes
   registerAiTrainingRoutes(app);
+  
+  // Register media research routes for BrezCode admin
+  app.use('/api', mediaResearchRoutes);
   
   // Register knowledge base routes for conversation storage
   const knowledgeBaseRoutes = await import('./routes/knowledgeBaseRoutes');

@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(lsof:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(curl:*)"
     ],
     "deny": []
   }

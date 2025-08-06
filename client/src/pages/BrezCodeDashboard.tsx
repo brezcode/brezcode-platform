@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Heart, Brain, Users, TrendingUp, MessageSquare, Calendar, BookOpen, Settings } from "lucide-react";
+import { Heart, Brain, Users, TrendingUp, MessageSquare, Calendar, BookOpen, Settings, Search } from "lucide-react";
 import { useLocation } from "wouter";
 import TopNavigation from "@/components/TopNavigation";
 
@@ -49,6 +49,20 @@ export default function BrezCodeDashboard() {
       icon: <MessageSquare className="h-6 w-6" />,
       action: () => setLocation('/customer-support'),
       color: "bg-orange-500"
+    },
+    {
+      title: "Media Research",
+      description: "AI-powered media research and content strategy",
+      icon: <Search className="h-6 w-6" />,
+      action: () => setLocation('/media-research'),
+      color: "bg-purple-500"
+    },
+    {
+      title: "Media Research Module",
+      description: "Modular research tool - ready for any application",
+      icon: <Search className="h-6 w-6" />,
+      action: () => setLocation('/media-research-module'),
+      color: "bg-indigo-500"
     }
   ];
 

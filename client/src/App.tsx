@@ -28,6 +28,8 @@ import { AiTrainingSession } from "@/pages/AiTrainingSession";
 import { AITrainingSetup } from "@/pages/AITrainingSetup";
 import AvatarTrainingSetup from "@/pages/AvatarTrainingSetup";
 import BusinessAvatarManager from "@/pages/BusinessAvatarManager";
+import MediaResearchPage from "@/pages/MediaResearchPage";
+import MediaResearchModulePage from "@/pages/MediaResearchModulePage";
 import PersonalAvatarManager from "@/pages/PersonalAvatarManager";
 import BusinessAvatarTraining from "@/pages/BusinessAvatarTraining";
 import BrezCodeAvatarTraining from "@/pages/BrezCodeAvatarTraining";
@@ -85,6 +87,8 @@ function App() {
           </Route>
           <Route path="/business/brezcode/dashboard" component={BrezCodeDashboard} />
           <Route path="/brezcode-backend-dashboard" component={BrezCodeDashboard} />
+          <Route path="/media-research" component={MediaResearchPage} />
+          <Route path="/media-research-module" component={MediaResearchModulePage} />
           <Route path="/business/brezcode/profile" component={BrezCodeBusinessProfile} />
           <Route path="/profile" component={ProfileEditor} />
           <Route path="/business-landing-creator" component={BusinessLandingCreator} />

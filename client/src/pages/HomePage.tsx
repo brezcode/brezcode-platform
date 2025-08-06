@@ -30,6 +30,13 @@ export default function HomePage() {
           >
             BrezCode Landing Page
           </Button>
+
+          <Button 
+            onClick={() => setLocation('/brezcode-backend-dashboard')}
+            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 text-lg font-semibold rounded-xl"
+          >
+            BrezCode Backend Platform
+          </Button>
         </div>
       </div>
     </div>
