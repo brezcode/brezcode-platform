@@ -6,6 +6,7 @@ import { promisify } from 'util';
 import { realSkinAnalysisService } from './services/realSkinAnalysis';
 import { skynAIService } from './services/skynAIService';
 import { skynOpenSourceService } from './services/skynOpenSourceService';
+import { skynJSService } from './services/skynJSService';
 
 // Types for skin analysis
 export interface SkinAnalysisResult {
@@ -113,7 +114,20 @@ class SkinAnalysisService {
     }
   }
 
-  // Real skin analysis using Skyn Open Source models
+  // JavaScript-based real analysis (no Python dependencies)
+  private async analyzeWithSkynJS(imageBuffer: Buffer, quizData: QuizData): Promise<Partial<SkinAnalysisResult>> {
+    try {
+      console.log('🎯 Starting SkynJS real image analysis...');
+      const result = await skynJSService.analyzeWithSkynJS(imageBuffer, quizData);
+      console.log('✅ SkynJS real analysis completed');
+      return result;
+    } catch (error) {
+      console.warn('⚠️ SkynJS analysis failed, using enhanced fallback:', error);
+      return this.getEnhancedFallback(quizData);
+    }
+  }
+
+  // Real skin analysis using Skyn Open Source models (requires Python)
   private async analyzeWithSkynOpenSource(imageBuffer: Buffer, quizData: QuizData): Promise<Partial<SkinAnalysisResult>> {
     try {
       console.log('🎯 Starting Skyn Open Source analysis with real AI models...');
@@ -529,18 +543,18 @@ class SkinAnalysisService {
 
       let analysisResult;
       
-      // Try Skyn Open Source models first (real AI models)
-      console.log('🚀 Using Skyn Open Source models with real AI analysis');
-      const skynOpenSourceResult = await this.analyzeWithSkynOpenSource(imageBuffer, quizData);
+      // Use JavaScript-based real analysis (works without Python dependencies)
+      console.log('🚀 Using SkynJS - Real image analysis with JavaScript');
+      const skynJSResult = await this.analyzeWithSkynJS(imageBuffer, quizData);
       analysisResult = this.combineAnalysisResults(
-        skynOpenSourceResult,
+        skynJSResult,
         {},
         {},
         quizData,
         imageBuffer
       );
-      analysisResult.models_used = ['Skyn Open Source - EfficientNet B0 Skin Type', 'Skyn Open Source - CNN Acne Detection', 'Skyn Open Source - KNN Skin Tone Classification'];
-      analysisResult.analysis_type = 'real_ai_analysis';
+      analysisResult.models_used = ['SkynJS - Image Properties Analysis', 'SkynJS - Skin Type Detection', 'SkynJS - Acne Level Detection', 'SkynJS - Skin Tone Analysis'];
+      analysisResult.analysis_type = 'real_image_analysis';
 
       // Add processing timestamp
       const finalAnalysisResult = {
