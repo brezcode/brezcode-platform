@@ -37,6 +37,20 @@ export default function HomePage() {
           >
             BrezCode Backend Platform
           </Button>
+
+          <Button 
+            onClick={() => setLocation('/skincoach')}
+            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 text-lg font-semibold rounded-xl"
+          >
+            SkinCoach AI Landing Page
+          </Button>
+
+          <Button 
+            onClick={() => setLocation('/skincoach/admin')}
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white py-6 text-lg font-semibold rounded-xl"
+          >
+            SkinCoach Backend Dashboard
+          </Button>
         </div>
       </div>
     </div>

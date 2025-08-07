@@ -61,6 +61,16 @@ import AuthenticatedBrezCodeRedirect from "@/components/AuthenticatedBrezCodeRed
 import BrezCodePersonalDashboard from "@/pages/BrezCodePersonalDashboard";
 import BrezCodeAdminDemo from "@/pages/BrezCodeAdminDemo";
 
+// SkinCoach App Pages
+import SkinCoachLanding from "@/pages/SkinCoachLanding";
+import SkinCoachQuiz from "@/pages/SkinCoachQuiz";
+import SkinCoachCameraSimple from "@/pages/SkinCoachCameraSimple";
+import SkinCoachCameraAdvanced from "@/pages/SkinCoachCameraAdvanced";
+import SkinCoachResults from "@/pages/SkinCoachResults";
+import SkinCoachResultsAdvanced from "@/pages/SkinCoachResultsAdvanced";
+import SkinCoachChat from "@/pages/SkinCoachChat";
+import SkinCoachAdminDashboard from "@/pages/SkinCoachAdminDashboard";
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -149,6 +159,16 @@ function App() {
           <Route path="/brezcode-login" component={BrezCodeLogin} />
           <Route path="/brezcode/admin" component={BrezCodeAdminDemo} />
           <Route path="/brezcode-admin-demo" component={BrezCodeAdminDemo} />
+          
+          {/* SkinCoach App Routes */}
+          <Route path="/skincoach" component={SkinCoachLanding} />
+          <Route path="/skincoach/quiz" component={SkinCoachQuiz} />
+          <Route path="/skincoach/camera" component={SkinCoachCameraAdvanced} />
+          <Route path="/skincoach/camera-simple" component={SkinCoachCameraSimple} />
+          <Route path="/skincoach/results" component={SkinCoachResultsAdvanced} />
+          <Route path="/skincoach/results-basic" component={SkinCoachResults} />
+          <Route path="/skincoach/chat" component={SkinCoachChat} />
+          <Route path="/skincoach/admin" component={SkinCoachAdminDashboard} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

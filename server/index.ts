@@ -4,6 +4,9 @@ import { registerRoutes } from "./simple-routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { registerAvatarKnowledgeRoutes } from "./avatar-knowledge-routes";
 import brezcodeAdminRoutes from "../brezcode/server/routes/brezcode-admin-routes";
+import skinAnalysisRoutes from "./routes/skinAnalysisRoutes";
+import skincoachAdminRoutes from "./routes/skincoachAdminRoutes";
+import skincoachChatRoutes from "./routes/skincoachChatRoutes";
 
 const app = express();
 // Increase payload limit for image uploads
@@ -214,6 +217,21 @@ console.log('✅ Main routes registered successfully');
 console.log('🏥 Registering BrezCode admin routes...');
 app.use('/api/brezcode/admin', brezcodeAdminRoutes);
 console.log('✅ BrezCode admin routes registered successfully');
+
+// Register SkinCoach analysis routes
+console.log('🔬 Registering SkinCoach analysis routes...');
+app.use('/api/skin-analysis', skinAnalysisRoutes);
+console.log('✅ SkinCoach analysis routes registered successfully');
+
+// Register SkinCoach admin routes
+console.log('💼 Registering SkinCoach admin routes...');
+app.use('/api/skincoach/admin', skincoachAdminRoutes);
+console.log('✅ SkinCoach admin routes registered successfully');
+
+// Register SkinCoach chat routes
+console.log('💬 Registering SkinCoach chat routes...');
+app.use('/api/skincoach', skincoachChatRoutes);
+console.log('✅ SkinCoach chat routes registered successfully');
 
 // Register Avatar Knowledge Base routes
 console.log('📚 Registering Avatar Knowledge Base routes...');
