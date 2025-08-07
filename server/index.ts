@@ -602,8 +602,9 @@ const server = createServer(app);
       serveStatic(app);
     }
 
-    server.listen(5000, "0.0.0.0", () => {
-      log(`serving on port 5000`);
+    const port = process.env.PORT || 3000;
+    server.listen(port, "0.0.0.0", () => {
+      log(`serving on port ${port}`);
     });
   } catch (error) {
     console.error('Failed to start server:', error);
