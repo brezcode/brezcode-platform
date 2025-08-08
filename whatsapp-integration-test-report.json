@@ -1,0 +1,172 @@
+{
+  "timestamp": "2025-08-07T23:39:13.964Z",
+  "testResults": [
+    {
+      "timestamp": "2025-08-07T23:39:12.997Z",
+      "type": "info",
+      "message": "🚀 Starting WhatsApp Integration Tests",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:12.999Z",
+      "type": "test",
+      "message": "Starting test: Server Health Check",
+      "test": "Server Health Check"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.034Z",
+      "type": "error",
+      "message": "❌ Test failed: Server Health Check - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Server Health Check"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.135Z",
+      "type": "test",
+      "message": "Starting test: Webhook Verification",
+      "test": "Webhook Verification"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.140Z",
+      "type": "error",
+      "message": "❌ Test failed: Webhook Verification - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Webhook Verification"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.240Z",
+      "type": "test",
+      "message": "Starting test: Webhook Message Processing",
+      "test": "Webhook Message Processing"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.243Z",
+      "type": "error",
+      "message": "❌ Test failed: Webhook Message Processing - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Webhook Message Processing"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.346Z",
+      "type": "test",
+      "message": "Starting test: Send Message Endpoint",
+      "test": "Send Message Endpoint"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.348Z",
+      "type": "error",
+      "message": "❌ Test failed: Send Message Endpoint - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Send Message Endpoint"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.448Z",
+      "type": "test",
+      "message": "Starting test: Welcome Message Endpoint",
+      "test": "Welcome Message Endpoint"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.450Z",
+      "type": "error",
+      "message": "❌ Test failed: Welcome Message Endpoint - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Welcome Message Endpoint"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.550Z",
+      "type": "test",
+      "message": "Starting test: Conversation History",
+      "test": "Conversation History"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.552Z",
+      "type": "error",
+      "message": "❌ Test failed: Conversation History - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Conversation History"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.653Z",
+      "type": "test",
+      "message": "Starting test: Business Profile",
+      "test": "Business Profile"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.656Z",
+      "type": "error",
+      "message": "❌ Test failed: Business Profile - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Business Profile"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.756Z",
+      "type": "test",
+      "message": "Starting test: Proactive Message",
+      "test": "Proactive Message"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.758Z",
+      "type": "error",
+      "message": "❌ Test failed: Proactive Message - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Proactive Message"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.858Z",
+      "type": "test",
+      "message": "Starting test: AI Assistant Responses",
+      "test": "AI Assistant Responses"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.860Z",
+      "type": "warn",
+      "message": "AI assistant test warning for coaching: connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "AI Assistant Responses"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.862Z",
+      "type": "warn",
+      "message": "AI assistant test warning for sales: connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "AI Assistant Responses"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.863Z",
+      "type": "warn",
+      "message": "AI assistant test warning for support: connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "AI Assistant Responses"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.863Z",
+      "type": "success",
+      "message": "✅ Test passed: AI Assistant Responses",
+      "test": "AI Assistant Responses"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.964Z",
+      "type": "info",
+      "message": "\n📊 Test Results Summary:",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.964Z",
+      "type": "success",
+      "message": "✅ Passed: 1",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.964Z",
+      "type": "error",
+      "message": "❌ Failed: 8",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.964Z",
+      "type": "info",
+      "message": "📈 Success Rate: 11.1%",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:39:13.964Z",
+      "type": "warn",
+      "message": "⚠️ 8 tests failed. Check configuration and credentials.",
+      "test": "unknown"
+    }
+  ],
+  "summary": {
+    "totalTests": 9,
+    "passed": 2,
+    "failed": 9
+  }
+}

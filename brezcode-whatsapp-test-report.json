@@ -1,0 +1,206 @@
+{
+  "timestamp": "2025-08-07T23:57:59.979Z",
+  "brezcodeBusinessNumber": "+85294740952",
+  "testTargetNumber": "+852 96099766",
+  "testResults": [
+    {
+      "timestamp": "2025-08-07T23:57:50.921Z",
+      "type": "info",
+      "message": "🚀 Starting Brezcode WhatsApp Integration Tests",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:50.922Z",
+      "type": "info",
+      "message": "📱 Business Number: +85294740952",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:50.922Z",
+      "type": "info",
+      "message": "📞 Test Target: +852 96099766",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:50.922Z",
+      "type": "test",
+      "message": "🧪 Starting test: Business Information Check",
+      "test": "Business Information Check"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:50.942Z",
+      "type": "error",
+      "message": "❌ Test failed: Business Information Check - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Business Information Check"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:51.944Z",
+      "type": "test",
+      "message": "🧪 Starting test: Welcome Message Test",
+      "test": "Welcome Message Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:51.947Z",
+      "type": "error",
+      "message": "❌ Test failed: Welcome Message Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Welcome Message Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:52.947Z",
+      "type": "test",
+      "message": "🧪 Starting test: Direct Message Test",
+      "test": "Direct Message Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:52.962Z",
+      "type": "error",
+      "message": "❌ Test failed: Direct Message Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Direct Message Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:53.962Z",
+      "type": "test",
+      "message": "🧪 Starting test: Dr. Sakura Coaching Test",
+      "test": "Dr. Sakura Coaching Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:53.964Z",
+      "type": "error",
+      "message": "❌ Test failed: Dr. Sakura Coaching Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Dr. Sakura Coaching Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:54.966Z",
+      "type": "test",
+      "message": "🧪 Starting test: Sales Assistant Test",
+      "test": "Sales Assistant Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:54.967Z",
+      "type": "error",
+      "message": "❌ Test failed: Sales Assistant Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Sales Assistant Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:55.968Z",
+      "type": "test",
+      "message": "🧪 Starting test: Customer Support Test",
+      "test": "Customer Support Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:55.970Z",
+      "type": "error",
+      "message": "❌ Test failed: Customer Support Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Customer Support Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:56.970Z",
+      "type": "test",
+      "message": "🧪 Starting test: Daily Health Tip Test",
+      "test": "Daily Health Tip Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:56.972Z",
+      "type": "error",
+      "message": "❌ Test failed: Daily Health Tip Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Daily Health Tip Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:57.972Z",
+      "type": "test",
+      "message": "🧪 Starting test: Webhook AI Processing Test",
+      "test": "Webhook AI Processing Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:57.974Z",
+      "type": "error",
+      "message": "❌ Test failed: Webhook AI Processing Test - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Webhook AI Processing Test"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:58.974Z",
+      "type": "test",
+      "message": "🧪 Starting test: Contact Link Generation",
+      "test": "Contact Link Generation"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:58.978Z",
+      "type": "error",
+      "message": "❌ Test failed: Contact Link Generation - connect ECONNREFUSED 127.0.0.1:3000",
+      "test": "Contact Link Generation"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.978Z",
+      "type": "info",
+      "message": "\n📊 Brezcode WhatsApp Test Results:",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "success",
+      "message": "✅ Passed: 0",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "error",
+      "message": "❌ Failed: 9",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "📈 Success Rate: 0.0%",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "\n📱 Next Steps:",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "1. Configure WhatsApp Business API with real credentials",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "2. Set webhook URL to your production domain",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "3. Test messaging between +85294740952 and +852 96099766",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "4. Verify AI responses work correctly",
+      "test": "unknown"
+    },
+    {
+      "timestamp": "2025-08-07T23:57:59.979Z",
+      "type": "info",
+      "message": "5. Enable automated health reminders",
+      "test": "unknown"
+    }
+  ],
+  "summary": {
+    "totalTests": 9,
+    "passed": 1,
+    "failed": 10,
+    "warnings": 0
+  },
+  "recommendations": [
+    "Set up WhatsApp Business API credentials in production",
+    "Configure webhook URL with your domain",
+    "Test real messaging between business and personal numbers",
+    "Monitor AI response quality and adjust as needed",
+    "Set up automated health reminder schedule"
+  ]
+}

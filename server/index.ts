@@ -7,6 +7,7 @@ import brezcodeAdminRoutes from "../brezcode/server/routes/brezcode-admin-routes
 import skinAnalysisRoutes from "./routes/skinAnalysisRoutes";
 import skincoachAdminRoutes from "./routes/skincoachAdminRoutes";
 import skincoachChatRoutes from "./routes/skincoachChatRoutes";
+import { keepAlive } from "../keep-alive";
 
 const app = express();
 // Increase payload limit for image uploads
@@ -209,6 +210,11 @@ app.post('/api/media-research/youtube-search', async (req, res) => {
 
 console.log('Starting server...');
 
+// Health check endpoint for keep-alive
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
 // Register main application routes
 registerRoutes(app);
 console.log('✅ Main routes registered successfully');
@@ -243,6 +249,18 @@ console.log('🔄 Registering Knowledge Transfer routes...');
 import knowledgeTransferRoutes from './routes/knowledge-transfer';
 app.use('/api/knowledge-transfer', knowledgeTransferRoutes);
 console.log('✅ Knowledge Transfer routes registered successfully');
+
+// Register WhatsApp Integration routes
+console.log('📱 Registering WhatsApp Integration routes...');
+import whatsappRoutes from './routes/whatsappRoutes';
+app.use('/api/whatsapp', whatsappRoutes);
+console.log('✅ WhatsApp Integration routes registered successfully');
+
+// Register WhatsApp Business Setup routes for Brezcode
+console.log('🏢 Registering Brezcode WhatsApp Business Setup routes...');
+import whatsappBusinessSetup from './routes/whatsappBusinessSetup';
+app.use('/api/whatsapp/business', whatsappBusinessSetup);
+console.log('✅ Brezcode WhatsApp Business Setup routes registered successfully');
 
 // Try to register additional routes if they exist
 // Register BrezCode avatar routes directly
@@ -605,6 +623,7 @@ const server = createServer(app);
     const port = process.env.PORT || 3000;
     server.listen(port, "0.0.0.0", () => {
       log(`serving on port ${port}`);
+      keepAlive();
     });
   } catch (error) {
     console.error('Failed to start server:', error);
