@@ -7,7 +7,6 @@ import brezcodeAdminRoutes from "../brezcode/server/routes/brezcode-admin-routes
 import skinAnalysisRoutes from "./routes/skinAnalysisRoutes";
 import skincoachAdminRoutes from "./routes/skincoachAdminRoutes";
 import skincoachChatRoutes from "./routes/skincoachChatRoutes";
-import { keepAlive } from "../keep-alive";
 
 const app = express();
 // Increase payload limit for image uploads
@@ -623,7 +622,6 @@ const server = createServer(app);
     const port = process.env.PORT || 3000;
     server.listen(port, "0.0.0.0", () => {
       log(`serving on port ${port}`);
-      keepAlive();
     });
   } catch (error) {
     console.error('Failed to start server:', error);
