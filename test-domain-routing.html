@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Routing Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background-color: #d4edda; color: #155724; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        code { background-color: #f8f9fa; padding: 2px 4px; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🌐 Domain Routing Test for BrezCode</h1>
+    
+    <div class="test-result info">
+        <h3>Current Configuration</h3>
+        <p><strong>Current Host:</strong> <code id="current-host"></code></p>
+        <p><strong>Current Path:</strong> <code id="current-path"></code></p>
+        <p><strong>Expected Behavior:</strong> www.brezcode.com should redirect to /brezcode landing page</p>
+    </div>
+
+    <div class="test-result success">
+        <h3>✅ Domain Routing Changes Applied</h3>
+        <ul>
+            <li>✅ Updated server/brandService.ts to handle www.brezcode.com</li>
+            <li>✅ Updated client/src/components/DomainRouter.tsx for client-side routing</li>
+            <li>✅ Updated server/securityMiddleware.ts CORS configuration</li>
+        </ul>
+    </div>
+
+    <div class="test-result info">
+        <h3>📋 Testing Instructions</h3>
+        <p>To test the domain routing:</p>
+        <ol>
+            <li>Deploy the application to production</li>
+            <li>Ensure DNS for www.brezcode.com points to your server</li>
+            <li>Visit <code>https://www.brezcode.com</code></li>
+            <li>Should automatically redirect to <code>https://www.brezcode.com/brezcode</code></li>
+            <li>Should show the BrezCode landing page instead of the homepage</li>
+        </ol>
+    </div>
+
+    <div class="test-result success">
+        <h3>🔧 Technical Details</h3>
+        <p><strong>Server-side changes:</strong></p>
+        <ul>
+            <li>BrandService.getBrandContext() now recognizes www.brezcode.com and brezcode.com</li>
+            <li>Returns 'brezcode' brand context for these domains</li>
+            <li>CORS configuration includes www.brezcode.com in allowed origins</li>
+        </ul>
+        
+        <p><strong>Client-side changes:</strong></p>
+        <ul>
+            <li>DomainRouter component detects www.brezcode.com domain</li>
+            <li>Automatically redirects root path (/) to /brezcode</li>
+            <li>Preserves existing paths by prepending /brezcode</li>
+            <li>getBrandBasePath() returns correct paths for brezcode.com domains</li>
+        </ul>
+    </div>
+
+    <script>
+        // Display current browser information
+        document.getElementById('current-host').textContent = window.location.host;
+        document.getElementById('current-path').textContent = window.location.pathname;
+        
+        console.log('Domain routing test page loaded');
+        console.log('Host:', window.location.host);
+        console.log('Path:', window.location.pathname);
+        console.log('Full URL:', window.location.href);
+    </script>
+</body>
+</html>

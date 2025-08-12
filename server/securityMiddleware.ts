@@ -97,7 +97,7 @@ export const sanitizeInput = (input: string): string => {
 // CORS configuration
 export const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://leadgen.to', 'https://brezcode.com']
+    ? ['https://leadgen.to', 'https://www.leadgen.to', 'https://brezcode.com', 'https://www.brezcode.com']
     : ['http://localhost:3000', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

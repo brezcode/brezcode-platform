@@ -10,6 +10,19 @@ export function DomainRouter() {
     const host = window.location.host;
     const path = window.location.pathname;
     
+    // Handle www.brezcode.com domain - redirect to BrezCode landing page
+    if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+      if (path === '/' || path === '') {
+        setLocation('/brezcode');
+        return;
+      }
+      // If already on a brezcode path, no need to redirect
+      if (!path.startsWith('/brezcode')) {
+        setLocation('/brezcode' + path);
+        return;
+      }
+    }
+    
     // Handle leadgen.to domain routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to') {
       // If visiting root domain, stay on LeadGen landing page
@@ -61,6 +74,11 @@ export function useBrandFromPath() {
 // Get the base path for a brand (for navigation)
 export function getBrandBasePath(brandName: string = 'brezcode') {
   const host = window.location.host;
+  
+  // For www.brezcode.com, use brezcode path-based routing
+  if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+    return `/${brandName}`;
+  }
   
   // For leadgen.to, use path-based routing
   if (host === 'leadgen.to' || host === 'www.leadgen.to' || host.includes('localhost')) {

@@ -9,6 +9,11 @@ export class BrandService {
     const host = req.get('host') || '';
     const path = req.path;
     
+    // Handle specific domain routing
+    if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+      return 'brezcode'; // Always return brezcode brand for brezcode.com domain
+    }
+    
     // Handle leadgen.to domain with path-based routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to' || host.includes('localhost')) {
       // Check if path starts with brand name: /brezcode, /health, etc.
