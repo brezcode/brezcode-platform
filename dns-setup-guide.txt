@@ -1,0 +1,13 @@
+# DNS Configuration Summary
+
+Current App URL: https://workspace.brezcode2024.replit.dev
+Current IP: 34.57.6.37
+
+DNS Records to add:
+1. CNAME: www -> workspace.brezcode2024.replit.dev  
+2. A Record: @ -> 34.57.6.37
+
+After DNS propagation (5-60 minutes):
+- www.skincoach.ai will point to your app
+- Then we'll update server code to redirect www.skincoach.ai visitors to /skincoach route
+
