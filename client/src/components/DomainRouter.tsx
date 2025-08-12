@@ -23,6 +23,19 @@ export function DomainRouter() {
       }
     }
     
+    // Handle www.skincoach.ai domain - redirect to SkinCoach landing page
+    if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
+      if (path === '/' || path === '') {
+        setLocation('/skincoach');
+        return;
+      }
+      // If already on a skincoach path, no need to redirect
+      if (!path.startsWith('/skincoach')) {
+        setLocation('/skincoach' + path);
+        return;
+      }
+    }
+    
     // Handle leadgen.to domain routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to') {
       // If visiting root domain, stay on LeadGen landing page
@@ -77,6 +90,11 @@ export function getBrandBasePath(brandName: string = 'brezcode') {
   
   // For www.brezcode.com, use brezcode path-based routing
   if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+    return `/${brandName}`;
+  }
+  
+  // For www.skincoach.ai, use skincoach path-based routing
+  if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
     return `/${brandName}`;
   }
   

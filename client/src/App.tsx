@@ -161,6 +161,10 @@ function App() {
           <Route path="/brezcode/admin" component={BrezCodeAdminDemo} />
           <Route path="/brezcode-admin-demo" component={BrezCodeAdminDemo} />
           
+          {/* SkinCoach Platform Routes */}
+          <Route path="/skincoach" component={SkinCoachLanding} />
+          <Route path="/skincoach-landing" component={SkinCoachLanding} />
+          
           {/* SkinCoach App Routes */}
           <Route path="/skincoach" component={SkinCoachLanding} />
           <Route path="/skincoach/quiz" component={SkinCoachQuiz} />

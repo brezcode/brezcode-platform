@@ -14,6 +14,10 @@ export class BrandService {
       return 'brezcode'; // Always return brezcode brand for brezcode.com domain
     }
     
+    if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
+      return 'skincoach'; // Always return skincoach brand for skincoach.ai domain
+    }
+    
     // Handle leadgen.to domain with path-based routing
     if (host === 'leadgen.to' || host === 'www.leadgen.to' || host.includes('localhost')) {
       // Check if path starts with brand name: /brezcode, /health, etc.
