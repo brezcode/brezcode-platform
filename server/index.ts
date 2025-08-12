@@ -110,7 +110,7 @@ app.post('/api/media-research/youtube-search', async (req, res) => {
     console.log('🔍 DIRECT YouTube search request:', { query, maxResults, verifyAccess });
     
     // Fallback function with known good YouTube videos for different categories
-    function getFallbackVideos(query: string): any[] {
+    const getFallbackVideos = (query: string): any[] => {
       const queryLower = query.toLowerCase();
       
       // Fitness/Exercise videos (known to be accessible)
@@ -214,18 +214,66 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Domain-specific logging middleware (no redirects)
+// Domain-specific routing with server-side handling
 app.use((req, res, next) => {
   const host = req.get('host');
   console.log(`🌐 Request from host: ${host} to path: ${req.path}`);
   
-  // Just log the domain - let client-side routing handle the domain-specific content
-  if (host === 'www.brezcode.com' || host === 'brezcode.com') {
-    console.log('🎯 BrezCode domain detected - letting client handle routing');
-  }
-  
-  if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
-    console.log('🎯 SkinCoach domain detected - letting client handle routing');
+  // Handle root path domain-specific routing with server response
+  if (req.path === '/') {
+    if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+      console.log('🎯 BrezCode domain: Serving BrezCode landing page');
+      return res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BrezCode - AI Health Coach</title>
+  <script>window.DOMAIN_CONFIG = { domain: 'brezcode', landingPage: 'BrezCode' };</script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Force BrezCode landing page
+    window.location.hash = '#/brezcode';
+    setTimeout(() => {
+      if (!document.querySelector('[data-brezcode-loaded]')) {
+        window.location.href = '/brezcode';
+      }
+    }, 1000);
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>`);
+    }
+    
+    if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
+      console.log('🎯 SkinCoach domain: Serving SkinCoach landing page');
+      return res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SkinCoach AI - Advanced Skin Analysis</title>
+  <script>window.DOMAIN_CONFIG = { domain: 'skincoach', landingPage: 'SkinCoach' };</script>
+</head>
+<body>
+  <div id="root"></div>
+  <script>
+    // Force SkinCoach landing page
+    window.location.hash = '#/skincoach';
+    setTimeout(() => {
+      if (!document.querySelector('[data-skincoach-loaded]')) {
+        window.location.href = '/skincoach';
+      }
+    }, 1000);
+  </script>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>`);
+    }
   }
   
   if (host === 'nudge-note-brezcode2024.replit.app' || host === 'workspace.brezcode2024.replit.dev') {
@@ -582,7 +630,7 @@ console.log('✅ BrezCode avatar routes registered successfully');
 (async () => {
   try {
     console.log('🚀 Registering avatar training routes...');
-    const { registerAvatarTrainingRoutes } = await import('./avatar-training-routes');
+    const { registerAvatarTrainingRoutes } = await import('./routes/avatarTrainingRoutes');
     registerAvatarTrainingRoutes(app);
     console.log('✅ Avatar training routes registered successfully');
   } catch (error) {
@@ -591,7 +639,7 @@ console.log('✅ BrezCode avatar routes registered successfully');
 
   try {
     console.log('🎯 Registering Avatar Performance routes...');
-    const { registerAvatarPerformanceRoutes } = await import('./routes/avatarPerformanceRoutes');
+    const { registerAvatarPerformanceRoutes } = await import('./avatar-performance-routes');
     registerAvatarPerformanceRoutes(app);
     console.log('✅ Avatar Performance routes registered successfully');
   } catch (error) {
@@ -652,7 +700,7 @@ const server = createServer(app);
       serveStatic(app);
     }
 
-    const port = process.env.PORT || 3000;
+    const port = Number(process.env.PORT) || 3000;
     server.listen(port, "0.0.0.0", () => {
       log(`serving on port ${port}`);
     });

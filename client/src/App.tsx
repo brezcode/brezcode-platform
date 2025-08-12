@@ -1,4 +1,5 @@
 import { Route, Switch } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
 import { LeadGenLanding } from "@/pages/LeadGenLanding";
 import LoginPage from "@/pages/LoginPage";
 import BrezCodeLogin from "@/pages/BrezCodeLogin";
@@ -72,6 +73,7 @@ import SkinCoachChat from "@/pages/SkinCoachChat";
 import SkinCoachAdminDashboard from "@/pages/SkinCoachAdminDashboard";
 import SkinLesionTest from "@/pages/SkinLesionTest";
 import { DomainRouter } from "@/components/DomainRouter";
+import { DomainHandler } from "@/components/DomainHandler";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -82,11 +84,23 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  // Check if we should use domain-specific handling for root path
+  const shouldUseDomainHandler = window.location.pathname === '/' || window.location.hash === '#/' || window.location.hash === '';
+  
+  if (shouldUseDomainHandler) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <DomainHandler />
+        <Toaster />
+      </QueryClientProvider>
+    );
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
         <DomainRouter />
-        <Switch>
+        <Switch location={useHashLocation}>
           {/* Home page with domain-specific routing */}
           <Route path="/" component={() => {
             const host = window.location.host;

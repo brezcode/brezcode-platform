@@ -13,7 +13,7 @@ export default function LandingPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" data-brezcode-loaded="true">
       <Navigation />
       <Hero />
       
