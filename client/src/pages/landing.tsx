@@ -395,9 +395,21 @@ export default function LandingPage() {
                 >
                   {t('signup.button', 'Start Your Health Assessment')}
                 </Button>
-                <p className="text-center text-sm text-gray-500">
+                <p className="text-center text-sm text-gray-500 mb-4">
                   {t('signup.description', 'Complete our 23-question assessment to get personalized insights')}
                 </p>
+                
+                <div className="border-t pt-4">
+                  <Button 
+                    onClick={() => setLocation('/skin-lesion-test')}
+                    className="w-full bg-orange-600 hover:bg-orange-700 text-white text-lg py-3"
+                  >
+                    🔍 Skin Lesion Test
+                  </Button>
+                  <p className="text-center text-sm text-gray-500 mt-2">
+                    Quick AI-powered skin lesion analysis using your camera
+                  </p>
+                </div>
               </div>
             </div>
           </div>

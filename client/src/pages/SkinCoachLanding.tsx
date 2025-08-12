@@ -36,6 +36,14 @@ export default function SkinCoachLanding() {
             </Button>
             
             <Button 
+              size="lg" 
+              className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-8 py-4 text-lg font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              onClick={() => setLocation('/skin-lesion-test')}
+            >
+              🔍 Skin Lesion Test
+            </Button>
+            
+            <Button 
               variant="outline" 
               size="lg"
               className="border-2 border-purple-300 text-purple-700 hover:bg-purple-50 px-8 py-4 text-lg font-semibold rounded-full"

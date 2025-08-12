@@ -70,6 +70,7 @@ import SkinCoachResults from "@/pages/SkinCoachResults";
 import SkinCoachResultsAdvanced from "@/pages/SkinCoachResultsAdvanced";
 import SkinCoachChat from "@/pages/SkinCoachChat";
 import SkinCoachAdminDashboard from "@/pages/SkinCoachAdminDashboard";
+import SkinLesionTest from "@/pages/SkinLesionTest";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -169,6 +170,9 @@ function App() {
           <Route path="/skincoach/results-basic" component={SkinCoachResults} />
           <Route path="/skincoach/chat" component={SkinCoachChat} />
           <Route path="/skincoach/admin" component={SkinCoachAdminDashboard} />
+          
+          {/* Skin Lesion Test Route */}
+          <Route path="/skin-lesion-test" component={SkinLesionTest} />
           
           {/* LeadGen platform page */}
           <Route path="/leadgen" component={LeadGenLanding} />

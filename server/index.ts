@@ -238,6 +238,12 @@ console.log('💬 Registering SkinCoach chat routes...');
 app.use('/api/skincoach', skincoachChatRoutes);
 console.log('✅ SkinCoach chat routes registered successfully');
 
+// Register Skin Lesion Analysis routes
+console.log('🔍 Registering Skin Lesion Analysis routes...');
+import skinLesionRoutes from './routes/skinLesionRoutes';
+app.use('/api/skin-lesion-analysis', skinLesionRoutes);
+console.log('✅ Skin Lesion Analysis routes registered successfully');
+
 // Register Avatar Knowledge Base routes
 console.log('📚 Registering Avatar Knowledge Base routes...');
 registerAvatarKnowledgeRoutes(app);

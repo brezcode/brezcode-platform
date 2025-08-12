@@ -40,12 +40,16 @@ router.post('/webhook', async (req, res) => {
     // Log webhook for debugging
     console.log('📨 WhatsApp webhook received:', JSON.stringify(webhookPayload, null, 2));
     
-    // Store webhook log
-    await db.insert(whatsappWebhookLogs).values({
-      webhookType: 'message',
-      payload: JSON.stringify(webhookPayload),
-      receivedAt: new Date()
-    });
+    // Store webhook log (handle gracefully if table doesn't exist)
+    try {
+      await db.insert(whatsappWebhookLogs).values({
+        webhookType: 'message',
+        payload: JSON.stringify(webhookPayload),
+        receivedAt: new Date()
+      });
+    } catch (dbError) {
+      console.log('📝 Note: Webhook logging skipped (table may not exist yet)');
+    }
 
     // Process webhook payload
     if (webhookPayload.entry && webhookPayload.entry.length > 0) {
@@ -67,13 +71,17 @@ router.post('/webhook', async (req, res) => {
     console.error('❌ Error processing WhatsApp webhook:', error);
     
     // Log error but still return 200 to prevent WhatsApp from retrying
-    await db.insert(whatsappWebhookLogs).values({
-      webhookType: 'message',
-      payload: JSON.stringify(req.body),
-      processed: false,
-      processingError: error instanceof Error ? error.message : 'Unknown error',
-      receivedAt: new Date()
-    });
+    try {
+      await db.insert(whatsappWebhookLogs).values({
+        webhookType: 'message',
+        payload: JSON.stringify(req.body),
+        processed: false,
+        processingError: error instanceof Error ? error.message : 'Unknown error',
+        receivedAt: new Date()
+      });
+    } catch (dbError) {
+      console.log('📝 Error logging skipped (table may not exist yet)');
+    }
     
     res.status(200).send('EVENT_RECEIVED');
   }
