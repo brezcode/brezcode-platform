@@ -19,6 +19,8 @@ export interface WhatsAppContact {
   profileUrl?: string;
   lastActive?: string;
   conversationContext: 'coaching' | 'sales' | 'support';
+  platform: 'brezcode' | 'skincoach' | 'leadgen';
+  businessId?: string; // For LeadGen SaaS clients
 }
 
 export class WhatsAppService {

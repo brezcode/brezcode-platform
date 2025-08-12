@@ -1,0 +1,17 @@
+# Live Testing Commands (once credentials are updated)
+
+# Test BrezCode with your real phone
+curl -X POST http://localhost:3001/api/whatsapp-multi/brezcode/send \
+  -H 'Content-Type: application/json' \
+  -d '{"phoneNumber": "+YOUR_PHONE_NUMBER", "message": "Hello from Dr. Sakura\! 🌸"}'
+
+# Test SkinCoach  
+curl -X POST http://localhost:3001/api/whatsapp-multi/skincoach/send \
+  -H 'Content-Type: application/json' \
+  -d '{"phoneNumber": "+YOUR_PHONE_NUMBER", "message": "Ready for skin analysis\! ✨"}'
+
+# Test LeadGen
+curl -X POST http://localhost:3001/api/whatsapp-multi/leadgen/send \
+  -H 'Content-Type: application/json' \
+  -d '{"phoneNumber": "+YOUR_PHONE_NUMBER", "message": "Let'\''s grow your business\! 🚀", "businessId": "test-client"}'
+

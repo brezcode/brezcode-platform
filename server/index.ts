@@ -214,6 +214,36 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Domain-specific routing middleware
+app.use((req, res, next) => {
+  const host = req.get('host');
+  console.log(`🌐 Request from host: ${host} to path: ${req.path}`);
+  
+  // Redirect www.brezcode.com to BrezCode landing page
+  if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+    if (req.path === '/') {
+      console.log('🔄 Redirecting brezcode.com root to /brezcode');
+      return res.redirect('/brezcode');
+    }
+  }
+  
+  // Redirect www.skincoach.ai to SkinCoach landing page
+  if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
+    if (req.path === '/') {
+      console.log('🔄 Redirecting skincoach.ai root to /skincoach');
+      return res.redirect('/skincoach');
+    }
+  }
+  
+  // Handle direct Replit domain access - default to homepage with platform selector
+  if (host === 'nudge-note-brezcode2024.replit.app' || host === 'workspace.brezcode2024.replit.dev') {
+    // Allow direct access to all routes - no redirect needed
+    // This shows the homepage with platform buttons by default
+  }
+  
+  next();
+});
+
 // Register main application routes
 registerRoutes(app);
 console.log('✅ Main routes registered successfully');
@@ -260,6 +290,12 @@ console.log('📱 Registering WhatsApp Integration routes...');
 import whatsappRoutes from './routes/whatsappRoutes';
 app.use('/api/whatsapp', whatsappRoutes);
 console.log('✅ WhatsApp Integration routes registered successfully');
+
+// Register Multi-Platform WhatsApp routes
+console.log('🌐 Registering Multi-Platform WhatsApp routes...');
+import multiPlatformWhatsAppRoutes from './routes/multiPlatformWhatsAppRoutes';
+app.use('/api/whatsapp-multi', multiPlatformWhatsAppRoutes);
+console.log('✅ Multi-Platform WhatsApp routes registered successfully');
 
 // Register WhatsApp Business Setup routes for Brezcode
 console.log('🏢 Registering Brezcode WhatsApp Business Setup routes...');

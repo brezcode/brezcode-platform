@@ -11,7 +11,8 @@
       "Bash(npm run build:*)",
       "Bash(npx tsc:*)",
       "Bash(curl:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(kill:*)"
     ],
     "deny": []
   }
