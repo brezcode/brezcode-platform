@@ -87,8 +87,22 @@ function App() {
       <div className="min-h-screen bg-background">
         <DomainRouter />
         <Switch>
-          {/* Home page with two buttons */}
-          <Route path="/" component={HomePage} />
+          {/* Home page with domain-specific routing */}
+          <Route path="/" component={() => {
+            const host = window.location.host;
+            console.log('🎯 App.tsx: Root route domain check -', host);
+            
+            if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+              console.log('✅ App.tsx: Showing BrezCode LandingPage for', host);
+              return <LandingPage />;
+            }
+            if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
+              console.log('✅ App.tsx: Showing SkinCoach LandingPage for', host);
+              return <SkinCoachLanding />;
+            }
+            console.log('✅ App.tsx: Showing HomePage for', host);
+            return <HomePage />;
+          }} />
           <Route path="/leadgen" component={LeadGenLanding} />
           <Route path="/dashboard" component={UserHomepage} />
           <Route path="/login" component={LoginPage} />

@@ -10,33 +10,18 @@ export function DomainRouter() {
     const host = window.location.host;
     const path = window.location.pathname;
     
-    console.log('🌐 DomainRouter: Checking domain routing for', { host, path });
+    console.log('🌐 DomainRouter: Domain detection for', { host, path });
     
-    // Handle www.brezcode.com domain - redirect to BrezCode landing page
+    // Handle www.brezcode.com domain - content handled by App.tsx routing
     if (host === 'www.brezcode.com' || host === 'brezcode.com') {
-      console.log('🔄 DomainRouter: Detected BrezCode domain, redirecting to /brezcode');
-      if (path === '/' || path === '') {
-        setLocation('/brezcode');
-        return;
-      }
-      // If already on a brezcode path, no need to redirect
-      if (!path.startsWith('/brezcode')) {
-        setLocation('/brezcode' + path);
-        return;
-      }
+      console.log('🎯 DomainRouter: BrezCode domain - App.tsx handles content');
+      return;
     }
     
-    // Handle www.skincoach.ai domain - redirect to SkinCoach landing page
+    // Handle www.skincoach.ai domain - content handled by App.tsx routing
     if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
-      if (path === '/' || path === '') {
-        setLocation('/skincoach');
-        return;
-      }
-      // If already on a skincoach path, no need to redirect
-      if (!path.startsWith('/skincoach')) {
-        setLocation('/skincoach' + path);
-        return;
-      }
+      console.log('🎯 DomainRouter: SkinCoach domain - App.tsx handles content');
+      return;
     }
     
     // Handle leadgen.to domain routing

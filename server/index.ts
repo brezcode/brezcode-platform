@@ -214,31 +214,22 @@ app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Domain-specific routing middleware
+// Domain-specific logging middleware (no redirects)
 app.use((req, res, next) => {
   const host = req.get('host');
   console.log(`🌐 Request from host: ${host} to path: ${req.path}`);
   
-  // Redirect www.brezcode.com to BrezCode landing page
+  // Just log the domain - let client-side routing handle the domain-specific content
   if (host === 'www.brezcode.com' || host === 'brezcode.com') {
-    if (req.path === '/') {
-      console.log('🔄 Redirecting brezcode.com root to /brezcode');
-      return res.redirect('/brezcode');
-    }
+    console.log('🎯 BrezCode domain detected - letting client handle routing');
   }
   
-  // Redirect www.skincoach.ai to SkinCoach landing page
   if (host === 'www.skincoach.ai' || host === 'skincoach.ai') {
-    if (req.path === '/') {
-      console.log('🔄 Redirecting skincoach.ai root to /skincoach');
-      return res.redirect('/skincoach');
-    }
+    console.log('🎯 SkinCoach domain detected - letting client handle routing');
   }
   
-  // Handle direct Replit domain access - default to homepage with platform selector
   if (host === 'nudge-note-brezcode2024.replit.app' || host === 'workspace.brezcode2024.replit.dev') {
-    // Allow direct access to all routes - no redirect needed
-    // This shows the homepage with platform buttons by default
+    console.log('🎯 Direct Replit domain - showing homepage with platform selector');
   }
   
   next();
