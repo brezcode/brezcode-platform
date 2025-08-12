@@ -10,8 +10,11 @@ export function DomainRouter() {
     const host = window.location.host;
     const path = window.location.pathname;
     
+    console.log('🌐 DomainRouter: Checking domain routing for', { host, path });
+    
     // Handle www.brezcode.com domain - redirect to BrezCode landing page
     if (host === 'www.brezcode.com' || host === 'brezcode.com') {
+      console.log('🔄 DomainRouter: Detected BrezCode domain, redirecting to /brezcode');
       if (path === '/' || path === '') {
         setLocation('/brezcode');
         return;
