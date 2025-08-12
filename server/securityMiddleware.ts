@@ -97,7 +97,7 @@ export const sanitizeInput = (input: string): string => {
 // CORS configuration
 export const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://leadgen.to', 'https://www.leadgen.to', 'https://brezcode.com', 'https://www.brezcode.com', 'https://skincoach.ai', 'https://www.skincoach.ai']
+    ? ['https://leadgen.to', 'https://www.leadgen.to', 'https://brezcode.com', 'https://www.brezcode.com', 'https://skincoach.ai', 'https://www.skincoach.ai', 'https://nudge-note-brezcode2024.replit.app']
     : ['http://localhost:3000', 'http://localhost:5000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

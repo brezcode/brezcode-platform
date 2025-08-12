@@ -71,6 +71,7 @@ import SkinCoachResultsAdvanced from "@/pages/SkinCoachResultsAdvanced";
 import SkinCoachChat from "@/pages/SkinCoachChat";
 import SkinCoachAdminDashboard from "@/pages/SkinCoachAdminDashboard";
 import SkinLesionTest from "@/pages/SkinLesionTest";
+import { DomainRouter } from "@/components/DomainRouter";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -84,6 +85,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <div className="min-h-screen bg-background">
+        <DomainRouter />
         <Switch>
           {/* Home page with two buttons */}
           <Route path="/" component={HomePage} />
