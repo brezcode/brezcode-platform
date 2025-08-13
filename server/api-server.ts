@@ -10,11 +10,19 @@ import skincoachChatRoutes from "./routes/skincoachChatRoutes";
 
 const app = express();
 
-// CORS configuration for frontend
+// CORS configuration for all three platforms
 const corsOptions = {
   origin: [
+    // BrezCode domains
     'https://www.brezcode.com',
-    'https://brezcode.com', 
+    'https://brezcode.com',
+    // LeadGen domains  
+    'https://www.leadgen.to',
+    'https://leadgen.to',
+    // SkinCoach domains
+    'https://www.skincoach.ai',
+    'https://skincoach.ai',
+    // Development
     'http://localhost:5173',
     'http://localhost:3000'
   ],
