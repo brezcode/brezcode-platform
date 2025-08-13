@@ -1,0 +1,104 @@
+You are a senior full-stack engineer and brand designer.
+
+❖ GOAL
+Build a small pay-walled web app for “Breast-Health Coach AI”.
+• Landing page inspired by Sunnyside.co’s vibe: bright blocks of color, huge hero, clean sans/serif pairing, generous whitespace, playful hover states.
+• Stripe subscription gate.
+• In-app chat that talks to OpenAI (our custom GPT prompt provided).
+• Runs inside a single Node.js (Express) Repl.
+
+❖ TECH STACK
+• Node.js + Express (index.js)
+• Static HTML/CSS/JS in /public
+• Tailwind 3 via CDN **with custom theme** (see colors below)
+• Stripe v12
+• OpenAI Chat Completions (gpt-4o)
+• No DB for MVP – store “paid” flag in express-session memory
+
+❖ DESIGN LANGUAGE  (match Sunnyside)
+• Color Palette  
+  --sun-yellow:  #FBD600;   /* primary accent */  
+  --sun-peach:   #FDF0DF;   /* soft BG */  
+  --sun-coral:   #FE7867;   /* CTA / hover */  
+  --sun-cyan:    #6EEAFF;   /* secondary accent */  
+  --sun-navy:    #23303E;   /* headings / footer text */
+
+• Typography  
+  Headings → Google Font **Fraunces** (700)  
+  Body → Google Font **Barlow** (400 / 600)
+
+• Layout cues  
+  – Full-width hero with huge H1 and offset CTA button  
+  – Alternating image/text blocks (50 / 50) that slide up on scroll  
+  – Feature grid with colored backgrounds (#sun-peach, #sun-cyan)  
+  – Big footer with dark navy background and social icons on hover
+
+❖ FOLDER STRUCTURE
+/
+├── index.js                 # Express server + Stripe + OpenAI routes
+├── public/
+│   ├── index.html           # Landing (Sunnyside-style)
+│   ├── app.html             # Chat UI (after payment)
+│   ├── css/tailwind.css     # Tailwind CDN preload + custom vars
+│   ├── js/chat.js           # front-end chat streaming
+│   └── img/                 # placeholder hero + section imagery
+├── .env.example             # OPENAI_API_KEY, STRIPE_SECRET_KEY, STRIPE_PRICE_ID
+└── README.md
+
+❖ LANDING  (public/index.html)
+1. **Hero**  
+   <nav> logo + inline links (hover = underline sun-coral)  
+   H1 “Breast-Health Coach AI” in white on sun-yellow background  
+   CTA “Know My Risk” (sun-coral → sun-cyan hover)
+
+2. **Services Section** – 3 cards, each card bg-peach, icon, short copy.
+
+3. **Split Blocks**  
+   a. Left text / right image: “Personal Risk Report”  
+   b. Right text / left image: “Daily Micro-Coaching”
+
+4. **Pricing** – center-aligned on sun-cyan:  
+   Premium $9.99/mo → button triggers `/create-checkout-session`.
+
+5. **FAQ + Disclaimer** – white bg, Fraunces headings, Barlow body.
+
+6. **Footer** – navy bg, white Fraunces logotype, sun-cyan social icons.
+
+❖ APP.HTML  (public/app.html)
+• Minimal chat window (tailwind flex-col), sticky top bar (logo + logout).
+• Message bubbles color: user = sun-coral, bot = sun-yellow.
+• On page load verify `session.paid`; otherwise redirect `/`.
+
+❖ SERVER  (index.js)
+• Middleware: express-session + body-parser + cors
+• GET `/` → index.html
+• GET `/app` → protect route
+• POST `/create-checkout-session`
+• POST `/api/chat` – forward to OpenAI with SYSTEM_PROMPT
+• Error + 404 handlers
+
+❖ SYSTEM_PROMPT  (read from /prompt.txt)
+Paste the *positive* + *negative* guardrails the founder supplied.
+
+❖ TAILWIND CUSTOMISATION
+In `<script>` tags before the Tailwind CDN call:
+```html
+<script>
+ tailwind.config = {
+   theme: {
+     fontFamily: {
+       heading: ['Fraunces', 'serif'],
+       body: ['Barlow', 'sans-serif'],
+     },
+     extend: {
+       colors: {
+         'sun-yellow': '#FBD600',
+         'sun-peach':  '#FDF0DF',
+         'sun-coral':  '#FE7867',
+         'sun-cyan':   '#6EEAFF',
+         'sun-navy':   '#23303E',
+       }
+     }
+   }
+ }
+</script>

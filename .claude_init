@@ -1,0 +1,19 @@
+#!/bin/bash
+# Claude Memory Initialization Script
+# Run this at the start of each session to brief Claude
+
+echo "=== CLAUDE MEMORY SYSTEM ==="
+echo "Reading project memory and context..."
+echo ""
+echo "📋 Current Project Status:"
+cat /home/runner/workspace/CLAUDE_MEMORY.md | grep -A 10 "Current Project Status"
+echo ""
+echo "🎯 Next Actions:"
+cat /home/runner/workspace/CLAUDE_MEMORY.md | grep -A 5 "Next Immediate Actions"
+echo ""
+echo "📊 Session History:"
+cat /home/runner/workspace/session_tracker.json | grep -A 3 "current_status"
+echo ""
+echo "=== MEMORY LOADED ==="
+echo ""
+echo "Claude: I've loaded our project memory. Ready to continue!"

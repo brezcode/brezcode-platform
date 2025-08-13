@@ -1,0 +1,9 @@
+Essential files to upload to GitHub:
+
+1. package.json
+2. server/index.ts
+3. client/index.html
+4. client/src/App.tsx
+5. vercel.json
+
+These 5 files are enough to get Railway working.
