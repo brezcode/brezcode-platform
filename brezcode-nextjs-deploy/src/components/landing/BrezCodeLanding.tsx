@@ -1,8 +1,12 @@
-import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 export default function BrezCodeLanding() {
   const [, setLocation] = useState(() => {});
+
+  const handleTakeQuiz = () => {
+    window.location.href = '/quiz';
+  };
 
   return (
     <div className="min-h-screen bg-white" data-brezcode-loaded="true">
@@ -25,30 +29,112 @@ export default function BrezCodeLanding() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-50 to-purple-50 py-20">
+      {/* Hero Section - ORIGINAL DESIGN */}
+      <section className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              Take Control of Your <span className="text-blue-600">Breast Health</span>
-            </h1>
-            <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              AI-powered personalized health insights, risk assessments, and 24/7 coaching to help you make informed decisions about your breast health.
+          <div className="text-center mb-16 pt-16">
+            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8">
+              <div className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
+              <span className="text-white text-sm font-medium">Evidence-based AI coaching available 24/7</span>
+            </div>
+
+            <p className="text-xl text-white/90 mb-6 max-w-4xl mx-auto leading-relaxed">
+              <strong>"1 in 8 women in US will develop breast cancer in their lifetime"... According to WHO</strong>
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
+              Good news! You can now <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">REVERSE</span> the development<br />
+              and lower the risk by <span className="text-yellow-400">100% in 15 days.</span>
+            </h1>
+
+            <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-4xl mx-auto leading-relaxed italic">
+              The #1 evidence-based AI breast health coaching platform to help you
+            </p>
+            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed italic">
+              regain control of your wellness.
+            </p>
+
+            <p className="text-lg text-white/90 mb-12 max-w-3xl mx-auto">
+              Don't wait until it is too late, your family depends on you.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
               <Button 
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg"
-                onClick={() => window.location.href = '/quiz'}
+                onClick={handleTakeQuiz}
+                className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105 hover:bg-yellow-300"
               >
-                Start Your Health Assessment
+                Take the quiz to start
               </Button>
               <Button 
+                onClick={() => window.location.href = '/login'}
                 variant="outline"
-                className="border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 text-lg"
-                onClick={() => window.location.href = '/skin-lesion-test'}
+                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-bold transition-all"
               >
-                🔍 Skin Lesion Test
+                Already have an account? Sign In
               </Button>
+            </div>
+
+            <p className="text-white/80 text-lg mb-16">
+              Start for free. Cancel any time.
+            </p>
+          </div>
+
+          {/* Hero Image Section */}
+          <div className="grid lg:grid-cols-2 gap-16 items-start pb-0">
+            <div className="relative flex justify-center items-end" style={{ height: '500px' }}>
+              {/* Yellow Circle Background */}
+              <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
+              {/* Woman Image Placeholder */}
+              <div 
+                className="relative z-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
+                style={{
+                  width: '24rem',
+                  height: '30rem',
+                  filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
+                }}
+              >
+                Happy Woman Image
+              </div>
+
+              {/* Chat Bubbles */}
+              <div className="absolute top-4 right-4 bg-white rounded-2xl p-3 shadow-lg max-w-48 z-20">
+                <p className="text-sm text-gray-700">Hey Sue, how'd it go yesterday?</p>
+              </div>
+
+              <div className="absolute top-20 right-8 bg-purple-500 rounded-2xl p-3 shadow-lg max-w-48 z-20">
+                <p className="text-sm text-white">I am following the plan, and feeling great today!</p>
+              </div>
+
+              <div className="absolute bottom-20 left-4 bg-green-500 rounded-2xl p-3 shadow-lg max-w-40 z-20">
+                <p className="text-sm text-white">Great work sticking to your plan!</p>
+              </div>
+            </div>
+
+            <div className="text-left">
+              <div className="text-6xl font-bold text-white mb-4">96%</div>
+              <div className="text-2xl font-bold text-white mb-4">
+                of members report<br />
+                reduced anxiety after 90 days
+              </div>
+              <p className="text-blue-100 mb-8">
+                In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button 
+                  onClick={handleTakeQuiz}
+                  className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all"
+                >
+                  Take the quiz to start
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = '/health-setup'}
+                  variant="outline"
+                  className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-8 py-3 rounded-full text-lg font-bold transition-all"
+                >
+                  🗓️ Create My Health Plan
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -204,48 +290,6 @@ export default function BrezCodeLanding() {
               <p className="text-gray-600 leading-relaxed">
                 "Having 24/7 access to evidence-based health guidance has been life-changing. BrezCode is like having a health expert in my pocket."
               </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Sign Up Section */}
-      <section className="py-20 bg-gradient-to-br from-blue-600 to-purple-600">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Start Your Journey Today
-            </h2>
-            <p className="text-xl text-white/90 max-w-2xl mx-auto">
-              Join thousands of women taking control of their breast health with personalized AI guidance and support.
-            </p>
-          </div>
-          
-          <div className="flex justify-center">
-            <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full">
-              <div className="space-y-4">
-                <Button 
-                  onClick={() => window.location.href = '/quiz'}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3"
-                >
-                  Start Your Health Assessment
-                </Button>
-                <p className="text-center text-sm text-gray-500 mb-4">
-                  Complete our 23-question assessment to get personalized insights
-                </p>
-                
-                <div className="border-t pt-4">
-                  <Button 
-                    onClick={() => window.location.href = '/skin-lesion-test'}
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white text-lg py-3"
-                  >
-                    🔍 Skin Lesion Test
-                  </Button>
-                  <p className="text-center text-sm text-gray-500 mt-2">
-                    Quick AI-powered skin lesion analysis using your camera
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
         </div>
