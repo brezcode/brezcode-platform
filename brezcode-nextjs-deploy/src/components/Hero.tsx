@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 export default function Hero() {
   const handleTakeQuiz = () => {
@@ -63,13 +64,13 @@ export default function Hero() {
             {/* Yellow Circle Background */}
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
             {/* Woman Image */}
-            <img 
+            <Image 
               src="/happy-woman-phone.png"
               alt="Happy woman using phone"
+              width={384}
+              height={480}
               className="relative z-10 object-contain object-bottom"
               style={{
-                width: '24rem',
-                height: '30rem',
                 filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
               }}
             />

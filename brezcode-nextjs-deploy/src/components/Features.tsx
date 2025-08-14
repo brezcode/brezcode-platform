@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import RiskReductionChart from "./RiskReductionChart";
 
 export default function Features() {
@@ -166,9 +167,11 @@ export default function Features() {
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
                 <div className="w-full h-96 rounded-2xl overflow-hidden">
-                  <img 
+                  <Image 
                     src="/yoga-woman.png" 
                     alt="Woman meditating in peaceful pose"
+                    width={400}
+                    height={384}
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 </div>
