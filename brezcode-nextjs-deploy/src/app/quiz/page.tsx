@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 export default function QuizPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [answers, setAnswers] = useState<{[key: string]: string}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const questions = [
     {
@@ -15,28 +16,173 @@ export default function QuizPage() {
       required: true
     },
     {
-      id: "country", 
-      question: "Which country are you residing in?",
-      type: "select",
-      options: ["United States", "Canada", "United Kingdom", "Australia", "Other"],
+      id: "family_history",
+      question: "Do you have a family history of breast or ovarian cancer?",
+      type: "radio",
+      options: ["Yes", "No", "Not sure"],
       required: true
     },
     {
-      id: "family_history",
-      question: "Do you have a family history of breast cancer?",
+      id: "weight",
+      question: "What is your current weight (in pounds)?",
+      type: "number",
+      required: true
+    },
+    {
+      id: "height",
+      question: "What is your height (in inches)?",
+      type: "number",
+      required: true
+    },
+    {
+      id: "exercise",
+      question: "How often do you exercise per week?",
       type: "radio",
-      options: ["Yes", "No", "Not sure"],
+      options: [
+        "No, little or no regular exercise",
+        "Yes, 1-2 times per week",
+        "Yes, 3-4 times per week", 
+        "Yes, 5+ times per week"
+      ],
+      required: true
+    },
+    {
+      id: "diet",
+      question: "How would you describe your typical diet?",
+      type: "radio",
+      options: [
+        "Mostly Western diet (processed foods, red meat, refined sugars)",
+        "Balanced diet with some processed foods",
+        "Mediterranean-style diet (fruits, vegetables, whole grains, fish)",
+        "Vegetarian or vegan diet"
+      ],
+      required: true
+    },
+    {
+      id: "alcohol",
+      question: "How often do you consume alcohol?",
+      type: "radio",
+      options: [
+        "Never",
+        "Rarely (special occasions only)",
+        "1-2 drinks per week",
+        "3-7 drinks per week",
+        "More than 7 drinks per week"
+      ],
+      required: true
+    },
+    {
+      id: "smoking",
+      question: "Do you smoke or have you smoked in the past?",
+      type: "radio",
+      options: ["Never smoked", "Former smoker (quit more than 10 years ago)", "Former smoker (quit within 10 years)", "Current smoker"],
+      required: true
+    },
+    {
+      id: "hormones",
+      question: "Have you ever used hormone replacement therapy (HRT) or birth control pills long-term?",
+      type: "radio",
+      options: ["Never used", "Used birth control pills only", "Used HRT only", "Used both", "Currently using HRT"],
+      required: true
+    },
+    {
+      id: "menstrual_history",
+      question: "At what age did you start menstruating?",
+      type: "radio",
+      options: ["Before age 12", "Age 12-13", "Age 14-15", "After age 15", "N/A"],
+      required: true
+    },
+    {
+      id: "pregnancy",
+      question: "How many full-term pregnancies have you had?",
+      type: "radio",
+      options: ["None", "1", "2", "3", "4 or more"],
+      required: true
+    },
+    {
+      id: "breastfeeding",
+      question: "If you have had children, did you breastfeed?",
+      type: "radio",
+      options: ["No children", "Did not breastfeed", "Breastfed less than 6 months total", "Breastfed 6-12 months total", "Breastfed more than 12 months total"],
+      required: true
+    },
+    {
+      id: "stress_level",
+      question: "How would you rate your typical stress level?",
+      type: "radio",
+      options: ["Very low stress", "Low stress", "Moderate stress", "High stress", "Very high stress"],
+      required: true
+    },
+    {
+      id: "sleep",
+      question: "How many hours of sleep do you typically get per night?",
+      type: "radio",
+      options: ["Less than 5 hours", "5-6 hours", "7-8 hours", "9+ hours"],
+      required: true
+    },
+    {
+      id: "health_goals",
+      question: "What are your primary health goals? (Select your top priority)",
+      type: "radio",
+      options: [
+        "Reduce breast cancer risk",
+        "Improve overall fitness",
+        "Maintain healthy weight",
+        "Manage stress and mental health",
+        "Improve energy levels"
+      ],
       required: true
     }
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < questions.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Quiz complete - redirect to results or dashboard
-      alert("Quiz completed! Redirecting to your personalized health plan...");
-      window.location.href = '/dashboard';
+      // Quiz complete - submit to backend API
+      await submitQuiz();
+    }
+  };
+
+  const submitQuiz = async () => {
+    setIsSubmitting(true);
+    try {
+      // Calculate BMI for backend
+      const weight = parseFloat(answers.weight);
+      const height = parseFloat(answers.height);
+      const bmi = weight / ((height * height) / 703); // BMI formula for pounds/inches
+      
+      const quizData = {
+        ...answers,
+        bmi: bmi.toFixed(1),
+        western_diet: answers.diet === "Mostly Western diet (processed foods, red meat, refined sugars)" ? "Yes" : "No"
+      };
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://brezcode-backend-production.up.railway.app';
+      
+      const response = await fetch(`${API_URL}/api/reports/generate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ quizAnswers: quizData })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate health report');
+      }
+
+      const result = await response.json();
+      
+      // Store results and redirect to results page
+      localStorage.setItem('healthReport', JSON.stringify(result.report));
+      window.location.href = '/results';
+      
+    } catch (error) {
+      console.error('Quiz submission error:', error);
+      alert('There was an error processing your assessment. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -140,10 +286,11 @@ export default function QuizPage() {
 
           <Button
             onClick={handleNext}
-            disabled={!answers[currentQuestion.id]}
+            disabled={!answers[currentQuestion.id] || isSubmitting}
             className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-2"
           >
-            {currentStep === questions.length - 1 ? 'Complete Assessment' : 'Next'}
+            {isSubmitting ? 'Generating Your Health Report...' : 
+             currentStep === questions.length - 1 ? 'Complete Assessment' : 'Next'}
           </Button>
         </div>
 
