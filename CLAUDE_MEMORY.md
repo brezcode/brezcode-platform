@@ -1,5 +1,33 @@
 # Claude Memory System - BrezCode Project
 
+## 🔥 CLAUDE PROTOCOL - READ THIS FIRST EVERY SESSION 🔥
+**MANDATORY STEPS AT START OF EVERY SESSION:**
+1. **READ CLAUDE_UNIVERSAL_PROTOCOL.md** - Universal working rules with Den
+2. **READ SESSION_MANAGEMENT_PROTOCOL.md** - Session restart handling
+3. **READ THIS ENTIRE MEMORY DOCUMENT** - Project-specific context
+4. **READ STRATEGIC_MASTER_PLAN.md** - Complete architecture & roadmap
+5. **Check "CRITICAL FAILURES" section** - Never retry failed approaches
+6. **Review "CURRENT STATUS"** - Continue from exact point where last session ended
+7. **Update memory after every major step** - Maintain continuity across restarts
+
+## 🔄 REPLIT SESSION MANAGEMENT
+**When credits run out and sessions restart:**
+- **Den types "r"** → I immediately read all memory documents
+- **I provide comprehensive summary:**
+  - Highest level strategy overview
+  - Current action plan and phase
+  - What was completed in last session
+  - What's pending and needs continuation
+  - All todo items and what's left out
+- **I act as smart consultant**: Propose ideas, guide strategically, think out of the box
+- **I continue auto-updating**: Memory docs and strategic thinking throughout session
+
+## ❌ CRITICAL FAILURES - NEVER RETRY THESE ❌
+- **Vite Deployment to Vercel**: FAILED MULTIPLE TIMES - DO NOT SUGGEST AGAIN
+- **CLI Vercel deployment**: Authentication issues - USE GITHUB IMPORT ONLY
+- **Old project recovery**: Creates conflicts - ALWAYS START FRESH
+- **Mixed framework configs**: Causes build errors - STICK TO ONE FRAMEWORK
+
 ## Session Information
 - **Project Start Date:** August 5, 2024 (User subscription date)
 - **Current Session:** August 13, 2025
@@ -42,12 +70,75 @@
 - Conflict-free vercel.json configuration
 
 ### 🔄 In Progress:
-- Final deployment configuration and GitHub upload
+- Deployment to Vercel after Vite failures
 
 ### ❌ Deployment Issues Encountered:
+- **Vite deployment FAILED multiple times on Vercel**
 - Persistent "functions property cannot be used in conjunction with builds property" error
 - Tried multiple framework presets (Vite, Create React App, Other, Node.js)
 - CLI deployment authentication issues
+- **CRITICAL DECISION: Abandoned Vite approach**
+
+### ✅ Recent Major Progress:
+- **Created Next.js version**: `/workspace/brezcode-nextjs-deploy/` 
+- **Successfully converted Vite to Next.js**: Build works perfectly
+- **Hybrid Architecture Decided**: 
+  - Frontend: Vercel (Next.js) 
+  - Backend: Railway (Express server)
+- **GitHub Upload**: brezcode-frontend repository uploaded to GitHub
+
+## 🎯 CURRENT STATUS - AUGUST 14, 2025
+- **Next.js build**: ✅ Working perfectly
+- **GitHub repo**: ✅ brezcode-frontend uploaded
+- **Old Vercel project**: ✅ Deleted successfully  
+- **User logged in**: ✅ brezcode2024@gmail.com
+- **CURRENT PHASE**: Phase 1 - Deployment & Domain Setup
+- **NEXT ACTION**: Deploy Next.js from GitHub to Vercel (NOT CLI, NOT Vite)
+- **SESSION MGMT**: ✅ "r" trigger protocol established
+- **RESTART TEST**: Ready to test - restart shell, type "r", get full summary
+- **CONSULTANT MODE**: ✅ Strategic guidance, out-of-box thinking, proactive proposals
+
+## 📋 CURRENT TODO LIST
+1. **Deploy Next.js from GitHub to Vercel** (Phase 1) - PENDING
+2. **Configure domain routing** for all 3 platforms - PENDING  
+3. **Set up Railway backend deployment** - PENDING
+4. **Test real environment deployment** - PENDING
+
+## 🏗️ COMPLETE PROJECT ARCHITECTURE
+**See STRATEGIC_MASTER_PLAN.md for full details**
+
+### Platforms
+- **BrezCode**: Main health & business platform
+- **SkinCoach**: Specialized skin analysis  
+- **LeadGen**: Business lead generation
+
+### Domains
+- brezcode.com → Main platform
+- skincoach.ai → Skin analysis
+- leadgen.to → Business tools
+
+### Architecture
+- **Frontend**: Vercel (Next.js) - FREE
+- **Backend**: Railway (Express.js + PostgreSQL) - $5/month
+- **AI**: Claude + OpenAI APIs
+- **Messaging**: WhatsApp Business API
+
+## 🚀 MASTER ACTION PLAN
+**Phase 1 (Current)**: Deploy & Domain Setup
+**Phase 2**: WhatsApp AI Coaching Integration  
+**Phase 3**: SEO & AI Agent Visibility
+**Phase 4**: Social Media AI & Lead Generation
+
+## 💰 CONSTRAINTS
+- **Solo developer** (Den working alone)
+- **Zero budget** (building/testing mode)
+- **Free-tier maximization** strategy
+- **MVP-first** approach for validation
+
+## 📋 PROVEN WORKING METHODS
+- **Framework**: Next.js (builds successfully)
+- **Deployment**: GitHub → Vercel import (NOT CLI)
+- **Architecture**: Frontend (Vercel) + Backend (Railway)
 
 ## Technical Architecture
 ```
