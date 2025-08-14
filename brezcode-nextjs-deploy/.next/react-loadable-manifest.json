@@ -8,7 +8,8 @@
   "app/page.tsx -> @/components/landing/BrezCodeLanding": {
     "id": 9915,
     "files": [
-      "static/chunks/915.99da696be356e51d.js"
+      "static/chunks/212-07f66728d47ac6f6.js",
+      "static/chunks/915.f0e2b1ea0fa267ae.js"
     ]
   },
   "app/page.tsx -> @/components/landing/LeadGenLanding": {
