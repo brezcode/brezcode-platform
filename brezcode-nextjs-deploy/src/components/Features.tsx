@@ -1,6 +1,7 @@
 'use client'
 
 import { Button } from "@/components/ui/button";
+import RiskReductionChart from "./RiskReductionChart";
 
 export default function Features() {
   const activities = [
@@ -82,6 +83,8 @@ export default function Features() {
           </p>
         </div>
 
+        <RiskReductionChart />
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {activities.map((activity, index) => (
             <div key={index} className="bg-yellow-50 border border-yellow-200 p-6 rounded-2xl hover:shadow-lg transition-all">
@@ -162,8 +165,12 @@ export default function Features() {
             {/* Right side - Image */}
             <div className="relative">
               <div className="bg-white rounded-3xl p-8 shadow-lg">
-                <div className="w-full h-96 rounded-2xl overflow-hidden flex items-center justify-center bg-gray-200">
-                  <span className="text-gray-500">Yoga/Meditation Image</span>
+                <div className="w-full h-96 rounded-2xl overflow-hidden">
+                  <img 
+                    src="/yoga-woman.png" 
+                    alt="Woman meditating in peaceful pose"
+                    className="w-full h-full object-cover rounded-2xl"
+                  />
                 </div>
               </div>
             </div>

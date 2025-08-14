@@ -62,17 +62,17 @@ export default function Hero() {
           <div className="relative flex justify-center items-end" style={{ height: '500px' }}>
             {/* Yellow Circle Background */}
             <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
-            {/* Woman Image Placeholder */}
-            <div 
-              className="relative z-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
+            {/* Woman Image */}
+            <img 
+              src="/happy-woman-phone.png"
+              alt="Happy woman using phone"
+              className="relative z-10 object-contain object-bottom"
               style={{
                 width: '24rem',
                 height: '30rem',
                 filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
               }}
-            >
-              Happy Woman Image
-            </div>
+            />
 
             {/* Chat Bubbles */}
             <div className="absolute top-4 right-4 bg-white rounded-2xl p-3 shadow-lg max-w-48 z-20">
