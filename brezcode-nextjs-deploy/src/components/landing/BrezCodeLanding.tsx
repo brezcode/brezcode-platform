@@ -1,144 +1,14 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import Navigation from "@/components/Navigation";
+import Hero from "@/components/Hero";
+import Features from "@/components/Features";
+import Pricing from "@/components/Pricing";
+import Reviews from "@/components/Reviews";
 
 export default function BrezCodeLanding() {
-  const [, setLocation] = useState(() => {});
-
-  const handleTakeQuiz = () => {
-    window.location.href = '/quiz';
-  };
-
   return (
     <div className="min-h-screen bg-white" data-brezcode-loaded="true">
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold">BC</span>
-              </div>
-              <span className="text-xl font-semibold text-gray-900">BrezCode</span>
-            </div>
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-600 hover:text-blue-600">Features</a>
-              <a href="#pricing" className="text-gray-600 hover:text-blue-600">Pricing</a>
-              <a href="#reviews" className="text-gray-600 hover:text-blue-600">Reviews</a>
-            </div>
-          </div>
-        </div>
-      </nav>
-
-      {/* Hero Section - ORIGINAL DESIGN */}
-      <section className="min-h-screen bg-gradient-to-br from-blue-400 via-blue-500 to-blue-600 relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16 pt-16">
-            <div className="inline-flex items-center bg-white/20 backdrop-blur-sm rounded-full px-6 py-3 mb-8">
-              <div className="w-3 h-3 bg-green-400 rounded-full mr-3 animate-pulse"></div>
-              <span className="text-white text-sm font-medium">Evidence-based AI coaching available 24/7</span>
-            </div>
-
-            <p className="text-xl text-white/90 mb-6 max-w-4xl mx-auto leading-relaxed">
-              <strong>"1 in 8 women in US will develop breast cancer in their lifetime"... According to WHO</strong>
-            </p>
-
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-8 leading-tight">
-              Good news! You can now <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">REVERSE</span> the development<br />
-              and lower the risk by <span className="text-yellow-400">100% in 15 days.</span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white/90 mb-4 max-w-4xl mx-auto leading-relaxed italic">
-              The #1 evidence-based AI breast health coaching platform to help you
-            </p>
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-4xl mx-auto leading-relaxed italic">
-              regain control of your wellness.
-            </p>
-
-            <p className="text-lg text-white/90 mb-12 max-w-3xl mx-auto">
-              Don't wait until it is too late, your family depends on you.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-8">
-              <Button 
-                onClick={handleTakeQuiz}
-                className="bg-yellow-400 text-black px-12 py-6 rounded-full text-xl font-bold hover:shadow-lg transition-all hover:scale-105 hover:bg-yellow-300"
-              >
-                Take the quiz to start
-              </Button>
-              <Button 
-                onClick={() => window.location.href = '/login'}
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-full text-lg font-bold transition-all"
-              >
-                Already have an account? Sign In
-              </Button>
-            </div>
-
-            <p className="text-white/80 text-lg mb-16">
-              Start for free. Cancel any time.
-            </p>
-          </div>
-
-          {/* Hero Image Section */}
-          <div className="grid lg:grid-cols-2 gap-16 items-start pb-0">
-            <div className="relative flex justify-center items-end" style={{ height: '500px' }}>
-              {/* Yellow Circle Background */}
-              <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
-              {/* Woman Image Placeholder */}
-              <div 
-                className="relative z-10 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500"
-                style={{
-                  width: '24rem',
-                  height: '30rem',
-                  filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
-                }}
-              >
-                Happy Woman Image
-              </div>
-
-              {/* Chat Bubbles */}
-              <div className="absolute top-4 right-4 bg-white rounded-2xl p-3 shadow-lg max-w-48 z-20">
-                <p className="text-sm text-gray-700">Hey Sue, how'd it go yesterday?</p>
-              </div>
-
-              <div className="absolute top-20 right-8 bg-purple-500 rounded-2xl p-3 shadow-lg max-w-48 z-20">
-                <p className="text-sm text-white">I am following the plan, and feeling great today!</p>
-              </div>
-
-              <div className="absolute bottom-20 left-4 bg-green-500 rounded-2xl p-3 shadow-lg max-w-40 z-20">
-                <p className="text-sm text-white">Great work sticking to your plan!</p>
-              </div>
-            </div>
-
-            <div className="text-left">
-              <div className="text-6xl font-bold text-white mb-4">96%</div>
-              <div className="text-2xl font-bold text-white mb-4">
-                of members report<br />
-                reduced anxiety after 90 days
-              </div>
-              <p className="text-blue-100 mb-8">
-                In addition, BrezCode members feel accomplished by an average of 80% after 90 days, as verified in a third-party study.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  onClick={handleTakeQuiz}
-                  className="bg-yellow-400 text-black px-8 py-3 rounded-full text-lg font-bold hover:bg-yellow-300 transition-all"
-                >
-                  Take the quiz to start
-                </Button>
-                <Button 
-                  onClick={() => window.location.href = '/health-setup'}
-                  variant="outline"
-                  className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-8 py-3 rounded-full text-lg font-bold transition-all"
-                >
-                  🗓️ Create My Health Plan
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Navigation />
+      <Hero />
       
       {/* How It Works Section */}
       <section id="how-it-works" className="py-20 bg-gray-50">
@@ -228,72 +98,9 @@ export default function BrezCodeLanding() {
         </div>
       </section>
 
-      {/* Reviews Section */}
-      <section id="reviews" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              What Our Users <span className="text-blue-600">Are Saying</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
-              Real stories from women who have transformed their health journey with BrezCode.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-white font-bold">S</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Sarah M.</h4>
-                  <div className="flex text-yellow-400">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-600 leading-relaxed">
-                "BrezCode helped me understand my risk factors and gave me a clear action plan. The AI coach is incredibly supportive and knowledgeable."
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-white font-bold">M</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Maria L.</h4>
-                  <div className="flex text-yellow-400">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-600 leading-relaxed">
-                "The personalized recommendations are amazing. I've made real changes to my lifestyle and feel more confident about my health."
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-lg border border-gray-100">
-              <div className="flex items-center mb-6">
-                <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
-                  <span className="text-white font-bold">J</span>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Jennifer K.</h4>
-                  <div className="flex text-yellow-400">
-                    ★★★★★
-                  </div>
-                </div>
-              </div>
-              <p className="text-gray-600 leading-relaxed">
-                "Having 24/7 access to evidence-based health guidance has been life-changing. BrezCode is like having a health expert in my pocket."
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <Features />
+      <Reviews />
+      <Pricing />
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-16">
