@@ -62,16 +62,17 @@ export default function Hero() {
         <div className="grid lg:grid-cols-2 gap-16 items-start pb-0">
           <div className="relative flex justify-center items-end" style={{ height: '500px' }}>
             {/* Yellow Circle Background */}
-            <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '120px' }}></div>
+            <div className="w-80 h-80 bg-yellow-400 rounded-full absolute" style={{ bottom: '50px' }}></div>
             {/* Woman Image */}
             <Image 
               src="/happy-woman-phone.png"
               alt="Happy woman using phone"
               width={384}
               height={480}
-              className="relative z-10 object-contain object-bottom"
+              className="relative z-10 object-contain"
               style={{
-                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))'
+                filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))',
+                bottom: '-50px'
               }}
             />
 
