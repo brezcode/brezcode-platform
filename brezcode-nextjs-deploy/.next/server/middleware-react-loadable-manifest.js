@@ -1,1 +1,1 @@
-self.__REACT_LOADABLE_MANIFEST='{"app/page.tsx -> @/components/HomePage":{"id":6900,"files":["static/chunks/900.e04652f3662d373f.js"]},"app/page.tsx -> @/components/landing/BrezCodeLanding":{"id":9915,"files":["static/chunks/212-07f66728d47ac6f6.js","static/chunks/915.f0e2b1ea0fa267ae.js"]},"app/page.tsx -> @/components/landing/LeadGenLanding":{"id":3593,"files":["static/chunks/355.7d4d2d7be33405a4.js"]},"app/page.tsx -> @/components/landing/SkinCoachLanding":{"id":7980,"files":["static/chunks/980.777458d7530d283d.js"]}}';
+self.__REACT_LOADABLE_MANIFEST="{}"
