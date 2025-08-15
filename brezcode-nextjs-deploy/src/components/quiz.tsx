@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -828,7 +830,7 @@ export default function Quiz({ onComplete, onClose }: QuizProps) {
             <Button
               onClick={handleNext}
               disabled={!isAnswerValid()}
-              className="px-8 py-3 bg-sky-blue hover:bg-blue-600 text-white"
+              className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white"
             >
               {isLastQuestion ? "Complete Assessment" : "Next"}
             </Button>

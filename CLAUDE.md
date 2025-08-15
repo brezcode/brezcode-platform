@@ -1,34 +1,46 @@
-# Claude Code Context for SkinCoach Project
+# 🔥 CLAUDE PROTOCOL - READ THIS FIRST EVERY SESSION 🔥
 
-## Current Project Status
-- This is a multi-platform application with SkinCoach, BrezCode, and LeadGen
-- Working on linking www.skincoach.ai domain to SkinCoach landing page
-- Current app runs at: https://workspace.brezcode2024.replit.dev
-- Current IP: 34.57.6.37
+## 📋 MANDATORY STEPS AT START OF EVERY SESSION:
 
-## Current Task
-Setting up www.skincoach.ai domain to point to /skincoach route
+**ALWAYS READ THESE 4 DOCUMENTS FIRST:**
 
-### DNS Configuration Needed
-```
-Type: CNAME
-Name: www
-Value: workspace.brezcode2024.replit.dev
-TTL: 300
-```
+1. **READ CLAUDE_UNIVERSAL_PROTOCOL.md** - Universal working rules with Den
+2. **READ CLAUDE_MEMORY.md** - Project-specific context and current status
+3. **READ SESSION_MANAGEMENT_PROTOCOL.md** - Session restart handling
+4. **READ STRATEGIC_MASTER_PLAN.md** - Complete architecture & roadmap
 
-### Server Update Required
-Need to add domain-specific routing in server/index.ts to redirect www.skincoach.ai visitors to /skincoach
+## 🚨 CRITICAL INSTRUCTIONS:
+- **CLAUDE_MEMORY.md is the master source of truth**
+- **Always verify current deployment status** (curl live sites)
+- **Never trust single documents** - cross-reference with reality
+- **Update CLAUDE_MEMORY.md after every major step**
 
-## Key Routes
-- `/skincoach` - SkinCoach landing page (already implemented)
-- SkinCoach routes are in client/src/App.tsx:165-172
-- Server runs on port 3000, exposed via Replit
+## 🔄 WHEN SESSIONS RESTART:
+1. Read all 4 documents above
+2. Check actual current state (pwd, git status, live sites)
+3. Reconcile any discrepancies
+4. **IMMEDIATELY PROVIDE COMPLETE STATUS SUMMARY TO DEN:**
+   - Current phase and exact status
+   - What's actually deployed and working
+   - Next critical action needed
+   - Any blockers or issues
+   - Proof I'm updated and not confused
+5. Continue from correct point
 
-## Important Files
-- server/index.ts - Main server file
-- client/src/pages/SkinCoachLanding.tsx - Landing page
-- client/src/App.tsx - Route configuration
+## ⚠️ FAILURE PREVENTION:
+- Don't let secondary docs override CLAUDE_MEMORY.md
+- Always check what's actually deployed/working
+- Update memory immediately when reality changes
+- **NO CONFUSING DEN** - Be clear and accurate
+- **NO MESSING UP** - Double-check before responding
+- **NO REPEAT PAST FAILURES** - Learn from documented mistakes
 
-## Previous Context
-User wants to link www.skincoach.ai domain to the existing SkinCoach landing page. The technical implementation is ready, just need DNS + server config.
+## ✅ SUCCESS CRITERIA:
+After reading these docs, I must demonstrate:
+- Accurate knowledge of current project status
+- Clear understanding of what's deployed and working
+- No confusion about domains, platforms, or next steps
+- Complete alignment with reality, not outdated documentation
+
+---
+**This protocol ensures continuity across session restarts and prevents memory confusion.**

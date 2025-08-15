@@ -1,21 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  eslint: {
-    ignoreDuringBuilds: true,
+  experimental: {
+    appDir: true,
   },
   typescript: {
     ignoreBuildErrors: true,
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@anthropic-ai/sdk', 'openai']
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ]
+  eslint: {
+    ignoreDuringBuilds: true,
   },
 }
 

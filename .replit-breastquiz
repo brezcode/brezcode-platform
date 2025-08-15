@@ -1,9 +1,0 @@
-run = "cd breastquiz && npm run dev"
-entrypoint = "breastquiz/server/index.ts"
-
-[deployment]
-run = ["sh", "-c", "cd breastquiz && npm run start"]
-build = ["sh", "-c", "cd breastquiz && npm run build"]
-
-[env]
-NODE_ENV = "development"
