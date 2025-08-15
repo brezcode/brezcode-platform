@@ -1,0 +1,89 @@
+/* Mobile-first responsive design improvements */
+
+/* Base styles for all devices */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Ensure all buttons stay within viewport */
+@media (max-width: 768px) {
+  
+  /* Responsive button sizing */
+  .btn, button {
+    min-height: 44px; /* Touch target size */
+    padding: 8px 16px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    max-width: calc(100vw - 32px); /* Stay within viewport */
+  }
+  
+  /* Form elements */
+  .form-container {
+    padding: 16px;
+    max-width: 100%;
+  }
+  
+  /* Cards and containers */
+  .card, .container {
+    margin: 8px;
+    max-width: calc(100vw - 16px);
+  }
+  
+  /* Navigation improvements */
+  .nav-button {
+    padding: 12px 16px;
+    margin: 4px;
+    width: auto;
+    max-width: calc(100vw - 32px);
+  }
+  
+  /* Prevent text overflow */
+  h1, h2, h3, h4, h5, h6, p, span, div {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
+  }
+  
+  /* Input fields */
+  input, textarea, select {
+    font-size: 16px; /* Prevent zoom */
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  
+  /* Modal and dialog improvements */
+  .modal, .dialog {
+    max-width: calc(100vw - 32px);
+    margin: 16px;
+  }
+  
+  /* Fixed positioning improvements */
+  .fixed {
+    max-width: calc(100vw - 8px);
+  }
+}
+
+/* Tablet adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    max-width: calc(100vw - 32px);
+    margin: 0 16px;
+  }
+}
+
+/* Touch improvements */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  button, .btn, a, input, select, textarea {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Remove hover states that don't work on touch */
+  *:hover {
+    transform: none !important;
+  }
+}

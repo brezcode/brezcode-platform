@@ -1,0 +1,900 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { useLocation } from 'wouter';
+import TopNavigation from "@/components/TopNavigation";
+import { 
+  MessageCircle, 
+  Send, 
+  Bot, 
+  User,
+  Calendar,
+  TrendingUp,
+  Target,
+  Heart,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  ChevronRight,
+  Play,
+  Pause,
+  RotateCcw,
+  Award,
+  Flame,
+  BarChart3,
+  Activity,
+  Smartphone,
+  Bell,
+  ArrowLeft,
+  Apple,
+  Brain,
+  Building2
+} from 'lucide-react';
+
+interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+}
+
+interface DashboardStats {
+  weeklyGoalProgress: number;
+  currentStreak: number;
+  totalActivities: number;
+  weeklyMinutes: number;
+  healthScore: number;
+}
+
+interface ScheduledActivity {
+  id: string;
+  title: string;
+  description: string;
+  scheduledDate: string;
+  duration: number;
+  category: string;
+  completed: boolean;
+  instructions?: string;
+}
+
+export default function UserHomepage() {
+  const [messages, setMessages] = useState<ChatMessage[]>([
+    {
+      role: 'assistant',
+      content: 'Hello! I\'m your personal health assistant. I can help you with wellness questions, provide guidance on breast health, and support your health journey. What can I help you with today?',
+      timestamp: new Date().toISOString(),
+    }
+  ]);
+  
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [inputMessage, setInputMessage] = useState('');
+  const [sessionId] = useState(`session-${Date.now()}`);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+
+  const queryClient = useQueryClient();
+  const [, setLocation] = useLocation();
+
+  // Fetch user information
+  const { data: currentUser } = useQuery({
+    queryKey: ['/api/me'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/me');
+      const data = await response.json();
+      return data.user;
+    }
+  });
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Fetch dashboard stats
+  const { data: dashboardStats, isLoading: statsLoading } = useQuery({
+    queryKey: ['/api/health/stats'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/health/stats');
+      const data = await response.json();
+      return data.stats as DashboardStats;
+    }
+  });
+
+  // Fetch today's activities
+  const { data: todayActivities, isLoading: activitiesLoading } = useQuery({
+    queryKey: ['/api/health/daily-plan', format(selectedDate, 'yyyy-MM-dd')],
+    queryFn: async () => {
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      const response = await apiRequest('GET', `/api/health/daily-plan?date=${dateStr}`);
+      const data = await response.json();
+      return data.activities as ScheduledActivity[];
+    }
+  });
+
+  // Fetch weekly schedule
+  const { data: weeklySchedule } = useQuery({
+    queryKey: ['/api/health/activities', format(startOfWeek(selectedDate), 'yyyy-MM-dd')],
+    queryFn: async () => {
+      const startDate = format(startOfWeek(selectedDate), 'yyyy-MM-dd');
+      const endDate = format(addDays(startOfWeek(selectedDate), 6), 'yyyy-MM-dd');
+      const response = await apiRequest('GET', `/api/health/activities?startDate=${startDate}&endDate=${endDate}`);
+      const data = await response.json();
+      return data.activities as ScheduledActivity[];
+    }
+  });
+
+  // Fetch Apple Watch health data
+  const { data: appleWatchData, isLoading: appleWatchLoading } = useQuery({
+    queryKey: ['/api/apple-health/metrics'],
+    queryFn: async () => {
+      const response = await apiRequest('GET', '/api/apple-health/metrics');
+      const data = await response.json();
+      return data.metrics;
+    },
+    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
+    retry: false, // Don't retry if no data
+  });
+
+  // Send message to AI
+  const sendMessageMutation = useMutation({
+    mutationFn: async (message: string) => {
+      const response = await apiRequest("POST", "/api/brand-ai/chat", {
+        brandId: 'brezcode',
+        sessionId,
+        message,
+        language: 'en',
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: data.response || data.message || 'I apologize, but I couldn\'t generate a response.',
+        timestamp: data.timestamp || new Date().toISOString(),
+      }]);
+    },
+    onError: (error: any) => {
+      console.error('Chat error:', error);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'I\'m having trouble connecting right now. Please try again in a moment.',
+        timestamp: new Date().toISOString(),
+      }]);
+    }
+  });
+
+  // Complete activity
+  const completeActivityMutation = useMutation({
+    mutationFn: async (activityId: string) => {
+      const response = await apiRequest('POST', `/api/health/activities/${activityId}/complete`);
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/health/daily-plan'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/health/stats'] });
+    }
+  });
+
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || sendMessageMutation.isPending) return;
+
+    const userMessage: ChatMessage = {
+      role: 'user',
+      content: inputMessage,
+      timestamp: new Date().toISOString(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputMessage('');
+
+    sendMessageMutation.mutate(inputMessage);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
+  const renderWeeklyCalendar = () => {
+    const weekStart = startOfWeek(selectedDate);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(weekStart, i));
+
+    return (
+      <div className="grid grid-cols-7 gap-2">
+        {days.map((day, index) => {
+          const dayActivities = weeklySchedule?.filter(activity => 
+            isSameDay(new Date(activity.scheduledDate), day)
+          ) || [];
+          const isToday = isSameDay(day, new Date());
+          const isSelected = isSameDay(day, selectedDate);
+
+          return (
+            <div
+              key={index}
+              className={`p-2 rounded-lg border cursor-pointer transition-colors ${
+                isSelected 
+                  ? 'bg-primary text-primary-foreground border-primary' 
+                  : isToday 
+                    ? 'bg-blue-50 border-blue-200 dark:bg-blue-900/20' 
+                    : 'hover:bg-muted'
+              }`}
+              onClick={() => setSelectedDate(day)}
+            >
+              <div className="text-center">
+                <div className="text-xs font-medium mb-1">
+                  {format(day, 'EEE')}
+                </div>
+                <div className="text-sm font-bold mb-1">
+                  {format(day, 'd')}
+                </div>
+                <div className="space-y-1">
+                  {dayActivities.slice(0, 2).map((activity, idx) => (
+                    <div 
+                      key={idx}
+                      className={`w-full h-1 rounded ${
+                        activity.completed ? 'bg-green-500' : 'bg-gray-300'
+                      }`}
+                    />
+                  ))}
+                  {dayActivities.length > 2 && (
+                    <div className="text-xs text-muted-foreground">
+                      +{dayActivities.length - 2}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      {/* Top Navigation */}
+      <TopNavigation />
+      
+      <div className="container mx-auto py-6 px-4">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+              Welcome Back{currentUser ? `, ${currentUser.firstName}!` : '!'}
+            </h1>
+            <p className="text-gray-600 dark:text-gray-300">
+              {currentUser?.email && (
+                <span className="text-sm text-blue-600 dark:text-blue-400 block">
+                  {currentUser.email}
+                </span>
+              )}
+              Your personalized dashboard
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className="bg-white">
+              {format(new Date(), 'EEEE, MMM d')}
+            </Badge>
+            <Avatar>
+              <AvatarFallback className="bg-primary text-primary-foreground">
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Panel - Dashboard Stats */}
+          <div className="lg:col-span-3 space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <BarChart3 className="h-5 w-5" />
+                  Your Progress
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {statsLoading ? (
+                  <div className="animate-pulse space-y-3">
+                    {Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-12 bg-gray-200 rounded"></div>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Weekly Goal</span>
+                        <span className="text-sm text-muted-foreground">
+                          {dashboardStats?.weeklyGoalProgress || 0}%
+                        </span>
+                      </div>
+                      <Progress value={dashboardStats?.weeklyGoalProgress || 0} className="h-2" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                          <span className="text-xs font-medium">Streak</span>
+                        </div>
+                        <div className="text-lg font-bold text-orange-600">
+                          {dashboardStats?.currentStreak || 0}
+                        </div>
+                      </div>
+
+                      <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Award className="h-4 w-4 text-green-500" />
+                          <span className="text-xs font-medium">Activities</span>
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          {dashboardStats?.totalActivities || 0}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-medium">Health Score</span>
+                        <span className="text-sm font-bold text-primary">
+                          {dashboardStats?.healthScore || 0}/100
+                        </span>
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        Based on your activities and consistency
+                      </div>
+                    </div>
+
+                    {/* Business Tools Section - LeadGen Focus */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Building2 className="h-4 w-4 text-blue-500" />
+                        <span className="text-sm font-medium">Business Tools</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div 
+                          className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg cursor-pointer hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+                          onClick={() => setLocation('/avatar-setup')}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Bot className="h-4 w-4 text-blue-500" />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">AI Assistant</div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">Sales & Lead Gen</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div 
+                          className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg cursor-pointer hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+                          onClick={() => setLocation('/business-landing-creator')}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Laptop className="h-4 w-4 text-purple-500" />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white">Landing Pages</div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">High-Converting Pages</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setLocation('/business-selector')}
+                        >
+                          View All Tools
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Separate Business Management */}
+                    <div className="mt-4 pt-4 border-t">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Heart className="h-4 w-4 text-pink-500" />
+                        <span className="text-sm font-medium">Your Businesses</span>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div 
+                          className="p-2 bg-pink-50 dark:bg-pink-900/20 rounded-lg cursor-pointer hover:bg-pink-100 dark:hover:bg-pink-900/30 transition-colors"
+                          onClick={() => setLocation('/business/brezcode/dashboard')}
+                        >
+                          <div className="flex items-center gap-2">
+                            <div className="w-6 h-6 bg-pink-500 rounded text-white text-xs font-bold flex items-center justify-center">
+                              B
+                            </div>
+                            <div>
+                              <div className="text-xs font-medium text-gray-900 dark:text-white">BrezCode</div>
+                              <div className="text-xs text-gray-600 dark:text-gray-400">Health Platform</div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="w-full text-xs"
+                          onClick={() => setLocation('/business-selector')}
+                        >
+                          + Add Business
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-sm">
+                  <Sparkles className="h-4 w-4 text-purple-500" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-xs"
+                  onClick={() => setLocation('/ai-trainer')}
+                >
+                  <Brain className="h-3 w-3 mr-2" />
+                  AI Training
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start text-xs"
+                  onClick={() => setLocation('/business-consultant')}
+                >
+                  <Target className="h-3 w-3 mr-2" />
+                  Business Strategy
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-9">
+            <Tabs defaultValue="chat" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="chat">AI Assistant</TabsTrigger>
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="chat" className="space-y-4">
+                <Card className="h-[600px]">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bot className="h-5 w-5 text-blue-500" />
+                      LeadGen AI Assistant
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="h-full flex flex-col p-0">
+                    <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                      {messages.map((message, index) => (
+                        <div
+                          key={index}
+                          className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                          <div className={`flex gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback>
+                                {message.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div
+                              className={`rounded-lg p-3 ${
+                                message.role === 'user'
+                                  ? 'bg-blue-500 text-white'
+                                  : 'bg-gray-100 text-gray-900'
+                              }`}
+                            >
+                              <p className="whitespace-pre-wrap">{message.content}</p>
+                              <p className="text-xs mt-1 opacity-70">
+                                {format(new Date(message.timestamp), 'HH:mm')}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                      {isSending && (
+                        <div className="flex gap-3 justify-start">
+                          <div className="flex gap-2 max-w-[80%]">
+                            <Avatar className="w-8 h-8">
+                              <AvatarFallback>
+                                <Bot className="h-4 w-4" />
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="bg-gray-100 text-gray-900 rounded-lg p-3">
+                              <div className="flex items-center gap-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div ref={messagesEndRef} />
+                    </div>
+
+                    <form onSubmit={handleSendMessage} className="p-4 border-t">
+                      <div className="flex gap-2">
+                        <Input
+                          value={currentMessage}
+                          onChange={(e) => setCurrentMessage(e.target.value)}
+                          placeholder="Ask me about business automation, lead generation, or AI strategies..."
+                          disabled={isSending}
+                        />
+                        <Button type="submit" disabled={isSending || !currentMessage.trim()}>
+                          <Send className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="overview" className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {quickActions.map((action, index) => (
+                    <Card key={index} className="cursor-pointer hover:shadow-lg transition-shadow" onClick={action.action}>
+                      <CardContent className="p-4">
+                        <div className={`w-12 h-12 ${action.color} rounded-lg flex items-center justify-center text-white mb-3`}>
+                          {action.icon}
+                        </div>
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          {action.title}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-3">
+                          {action.description}
+                        </p>
+                        <div className="flex items-center text-blue-500 text-sm font-medium">
+                          Get Started
+                          <ChevronRight className="h-4 w-4 ml-1" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+                              {appleWatchData.caloriesBurned}
+                            </div>
+                          </div>
+
+                          <div className="bg-purple-50 dark:bg-purple-900/20 p-2 rounded">
+                            <div className="flex items-center gap-1 mb-1">
+                              <Clock className="h-3 w-3 text-purple-500" />
+                              <span className="font-medium">Sleep</span>
+                            </div>
+                            <div className="text-sm font-bold text-purple-600">
+                              {appleWatchData.sleepHours ? `${appleWatchData.sleepHours.toFixed(1)}h` : '0h'}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="mt-2 text-xs text-muted-foreground text-center">
+                          Last sync: {appleWatchData.lastSync ? 
+                            format(new Date(appleWatchData.lastSync), 'MMM d, h:mm a') : 
+                            'Never'
+                          }
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Calendar className="h-5 w-5" />
+                  Week Overview
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {renderWeeklyCalendar()}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Center Panel - AI Chat Interface */}
+          <div className="lg:col-span-6">
+            <Card className="h-[600px] flex flex-col">
+              <CardHeader className="bg-gradient-to-r from-green-500 to-green-600 text-white rounded-t-lg">
+                <CardTitle className="flex items-center gap-3">
+                  <div className="bg-white/20 p-2 rounded-full">
+                    <Bot className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">AI Health Assistant</div>
+                    <div className="text-sm opacity-90">
+                      Ask me anything about your health journey
+                    </div>
+                  </div>
+                  <div className="ml-auto">
+                    <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+
+              <CardContent className="flex-1 flex flex-col p-0">
+                {/* Messages Area */}
+                <div 
+                  ref={messagesContainerRef}
+                  className="flex-1 overflow-y-auto p-4 space-y-4"
+                  style={{ maxHeight: '450px' }}
+                >
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`flex items-start gap-2 max-w-[80%] ${
+                        message.role === 'user' ? 'flex-row-reverse' : ''
+                      }`}>
+                        <Avatar className="w-8 h-8 mt-1">
+                          <AvatarFallback className={
+                            message.role === 'user' 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-green-100 text-green-600'
+                          }>
+                            {message.role === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className={`p-3 rounded-lg ${
+                          message.role === 'user'
+                            ? 'bg-primary text-primary-foreground rounded-br-sm'
+                            : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-sm'
+                        }`}>
+                          <div className="text-sm whitespace-pre-wrap">{message.content}</div>
+                          <div className={`text-xs mt-1 opacity-70`}>
+                            {format(new Date(message.timestamp), 'HH:mm')}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {sendMessageMutation.isPending && (
+                    <div className="flex justify-start">
+                      <div className="flex items-start gap-2">
+                        <Avatar className="w-8 h-8 mt-1">
+                          <AvatarFallback className="bg-green-100 text-green-600">
+                            <Bot className="h-4 w-4" />
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-lg rounded-bl-sm">
+                          <div className="flex items-center gap-2">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            </div>
+                            <span className="text-xs text-gray-500">Thinking...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Input Area */}
+                <div className="border-t p-4">
+                  <div className="flex gap-2">
+                    <Input
+                      value={inputMessage}
+                      onChange={(e) => setInputMessage(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      placeholder="Ask about your health, get wellness tips, or schedule activities..."
+                      className="flex-1"
+                      disabled={sendMessageMutation.isPending}
+                    />
+                    <Button 
+                      onClick={handleSendMessage}
+                      disabled={!inputMessage.trim() || sendMessageMutation.isPending}
+                      className="bg-green-500 hover:bg-green-600"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      AI-powered with brand knowledge
+                    </div>
+                    <div>Press Enter to send</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Panel - Today's Schedule */}
+          <div className="lg:col-span-3 space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Clock className="h-5 w-5" />
+                  Today's Plan
+                  <Badge variant="secondary" className="ml-auto">
+                    {format(selectedDate, 'MMM d')}
+                  </Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {activitiesLoading ? (
+                  <div className="animate-pulse space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-16 bg-gray-200 rounded"></div>
+                    ))}
+                  </div>
+                ) : todayActivities && todayActivities.length > 0 ? (
+                  <div className="space-y-3">
+                    {todayActivities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className={`p-3 rounded-lg border transition-all ${
+                          activity.completed 
+                            ? 'bg-green-50 border-green-200 dark:bg-green-900/20' 
+                            : 'bg-white dark:bg-gray-800 hover:shadow-md'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h4 className={`font-medium text-sm ${
+                              activity.completed ? 'text-green-700 dark:text-green-300' : ''
+                            }`}>
+                              {activity.title}
+                            </h4>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              {activity.duration}min • {activity.category}
+                            </p>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant={activity.completed ? "outline" : "default"}
+                            onClick={() => completeActivityMutation.mutate(activity.id)}
+                            disabled={activity.completed || completeActivityMutation.isPending}
+                            className="ml-2"
+                          >
+                            {activity.completed ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : (
+                              <Play className="h-4 w-4" />
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Calendar className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No activities scheduled for today</p>
+                    <Button variant="outline" size="sm" className="mt-2">
+                      <span>Plan Your Day</span>
+                      <ChevronRight className="h-3 w-3 ml-1" />
+                    </Button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-lg">
+                  <Target className="h-5 w-5" />
+                  Quick Actions
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/health-planner')}
+                >
+                  <Calendar className="h-4 w-4 mr-2" />
+                  AI Health Planner
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/notifications')}
+                >
+                  <Bell className="h-4 w-4 mr-2" />
+                  Smart Notifications
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/widget-guide')}
+                >
+                  <Smartphone className="h-4 w-4 mr-2" />
+                  Mobile Widgets
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/integrations')}
+                >
+                  <Activity className="h-4 w-4 mr-2" />
+                  Device Integrations
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/food-analyzer')}
+                >
+                  <Apple className="h-4 w-4 mr-2" />
+                  AI Food Analysis
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/leadgen/meal-planner')}
+                >
+                  <Brain className="h-4 w-4 mr-2" />
+                  AI Meal Planner
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/ai-trainer-dashboard')}
+                >
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  AI Training Analytics
+                </Button>
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start" 
+                  size="sm"
+                  onClick={() => setLocation('/roleplay-training')}
+                >
+                  <Bot className="h-4 w-4 mr-2" />
+                  Roleplay Training
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
