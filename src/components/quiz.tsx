@@ -25,7 +25,7 @@ interface QuizQuestion {
   };
 }
 
-// 6-Section BC Assessment Quiz based on updated CSV format
+// REAL COMPREHENSIVE 29-Question BC Assessment Quiz - CACHE BUST v2.0
 const quizSections = [
   {
     title: "Section 1: Demographic Factors",
