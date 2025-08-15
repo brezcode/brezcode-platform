@@ -1,34 +1,27 @@
-'use client'
+"use client";
 
-import { useState } from "react";
-import Quiz from "@/components/quiz";
-import QuizTransition from "@/components/quiz-transition";
-import CleanSignupFlow from "@/components/CleanSignupFlow";
-import { useRouter } from "next/navigation";
+import { useState } from 'react';
+import Quiz from '@/components/quiz';
+import CleanSignupFlow from '@/components/CleanSignupFlow';
+import { useRouter } from 'next/navigation';
 
 export default function QuizPage() {
   const [quizCompleted, setQuizCompleted] = useState(false);
-  const [showTransition, setShowTransition] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<Record<string, any>>({});
   const router = useRouter();
 
   const handleQuizComplete = (answers: Record<string, any>) => {
-    console.log("Quiz completed with answers:", answers);
+    console.log('Quiz completed with answers:', answers);
     setQuizAnswers(answers);
     // Store answers in localStorage for report generation
     localStorage.setItem('brezcode_quiz_answers', JSON.stringify(answers));
     
-    // Start the proper flow: quiz → signup → report
+    // Move to signup flow
     setQuizCompleted(true);
-    setShowTransition(true);
   };
 
   const handleQuizClose = () => {
     router.push('/');
-  };
-
-  const handleTransitionContinue = () => {
-    setShowTransition(false);
   };
 
   const handleSignupComplete = () => {
@@ -36,13 +29,8 @@ export default function QuizPage() {
     router.push('/dashboard');
   };
 
-  // Show transition page after quiz completion
-  if (quizCompleted && showTransition) {
-    return <QuizTransition onContinue={handleTransitionContinue} />;
-  }
-
-  // Show signup flow after transition
-  if (quizCompleted && !showTransition) {
+  // Show signup flow after quiz completion
+  if (quizCompleted) {
     return (
       <CleanSignupFlow 
         quizAnswers={quizAnswers} 

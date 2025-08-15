@@ -25,7 +25,7 @@ interface QuizQuestion {
   };
 }
 
-// COMPREHENSIVE 27-Question BC Assessment Quiz - REAL MEDICAL ASSESSMENT
+// 6-Section BC Assessment Quiz based on updated CSV format
 const quizSections = [
   {
     title: "Section 1: Demographic Factors",

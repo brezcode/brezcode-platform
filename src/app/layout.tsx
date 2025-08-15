@@ -6,7 +6,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'BrezCode - AI-Powered Breast Health Platform',
-  description: 'Complete health platform with AI coaching, skin analysis, and business tools',
+  description: 'Comprehensive breast health assessment with AI-powered risk analysis and personalized recommendations based on medical research.',
+  keywords: 'breast health, breast cancer risk, medical assessment, AI health, health screening',
 };
 
 export default function RootLayout({

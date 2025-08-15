@@ -5,6 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, Mail, Eye, EyeOff } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface CleanSignupFlowProps {
   quizAnswers: Record<string, any>;
@@ -22,34 +25,88 @@ export default function CleanSignupFlow({ quizAnswers, onComplete }: CleanSignup
     confirmPassword: "",
   });
   const [verificationCode, setVerificationCode] = useState("");
+  const { toast } = useToast();
 
-  const handleSignup = async (e: React.FormEvent) => {
+  // Signup mutation
+  const signupMutation = useMutation({
+    mutationFn: async (data: { firstName: string; lastName: string; email: string; password: string; quizAnswers: Record<string, any> }) => {
+      const response = await apiRequest("POST", "/api/auth/signup", data);
+      return response.json();
+    },
+    onSuccess: async () => {
+      try {
+        await apiRequest("POST", "/api/auth/send-email-verification", { email: formData.email });
+        toast({
+          title: "Account Created",
+          description: "Please check your email for verification code.",
+        });
+        setStep(2);
+      } catch (error: any) {
+        toast({
+          title: "Account Created",
+          description: "Please proceed to verification step.",
+        });
+        setStep(2);
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Registration Error",
+        description: error.message || "Failed to create account",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Email verification mutation
+  const verifyEmailMutation = useMutation({
+    mutationFn: async (data: { email: string; code: string }) => {
+      const response = await apiRequest("POST", "/api/auth/verify-email", data);
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Email Verified",
+        description: "Your account is now active!",
+      });
+      onComplete();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Verification Failed",
+        description: error.message || "Invalid verification code",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+      toast({
+        title: "Password Mismatch",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
       return;
     }
     
-    try {
-      // For now, skip actual API and move to verification step
-      console.log("Signup data:", { ...formData, quizAnswers });
-      setStep(2);
-    } catch (error) {
-      console.error("Signup error:", error);
-      alert("Failed to create account");
-    }
+    signupMutation.mutate({
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      quizAnswers,
+    });
   };
 
   const handleVerification = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo, accept any 6-digit code
-    if (verificationCode.length === 6) {
-      console.log("Email verified for:", formData.email);
-      onComplete();
-    } else {
-      alert("Please enter a 6-digit code");
-    }
+    verifyEmailMutation.mutate({
+      email: formData.email,
+      code: verificationCode,
+    });
   };
 
   if (step === 1) {
@@ -138,6 +195,7 @@ export default function CleanSignupFlow({ quizAnswers, onComplete }: CleanSignup
                 type="submit" 
                 className="w-full bg-blue-600 hover:bg-blue-700"
                 disabled={
+                  signupMutation.isPending || 
                   formData.password !== formData.confirmPassword ||
                   !formData.firstName ||
                   !formData.lastName ||
@@ -146,7 +204,7 @@ export default function CleanSignupFlow({ quizAnswers, onComplete }: CleanSignup
                   !formData.confirmPassword
                 }
               >
-                Create Account
+                {signupMutation.isPending ? "Creating Account..." : "Create Account"}
               </Button>
             </form>
           </CardContent>
@@ -174,7 +232,7 @@ export default function CleanSignupFlow({ quizAnswers, onComplete }: CleanSignup
                 type="text"
                 value={verificationCode}
                 onChange={(e) => setVerificationCode(e.target.value)}
-                placeholder="Enter 6-digit code (any 6 digits for demo)"
+                placeholder="Enter 6-digit code"
                 maxLength={6}
                 className="text-center text-lg tracking-widest"
                 required
@@ -184,9 +242,9 @@ export default function CleanSignupFlow({ quizAnswers, onComplete }: CleanSignup
             <Button 
               type="submit" 
               className="w-full bg-blue-600 hover:bg-blue-700"
-              disabled={verificationCode.length !== 6}
+              disabled={verifyEmailMutation.isPending || verificationCode.length !== 6}
             >
-              Verify Email
+              {verifyEmailMutation.isPending ? "Verifying..." : "Verify Email"}
             </Button>
           </form>
 
