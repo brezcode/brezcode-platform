@@ -5,8 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "NODE_ENV=development tsx server/railway-index.ts",
-    "build": "esbuild server/railway-index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/railway-index.js",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "vite build --outDir dist/public",
+    "build:server": "esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
+    "start": "node railway-start.js",
+    "railway:deploy": "npm run build && npm start",
     "db:push": "drizzle-kit push"
   },
   "dependencies": {
