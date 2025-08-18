@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { BrandService } from "./brandService";
 import { Brand, BrandConfig } from "@shared/brand-schema";
 

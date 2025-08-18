@@ -286,12 +286,6 @@ router.post('/dr-sakura/mark-proactive-read', async (req, res) => {
     console.error('Error marking proactive message as read:', error);
     res.status(500).json({ error: error.message });
   }
-    });
-    
-  } catch (error: any) {
-    console.error('Error fetching health context:', error);
-    res.status(500).json({ error: error.message });
-  }
 });
 
 // Training session endpoint for BrezCode

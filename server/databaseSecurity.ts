@@ -1,6 +1,6 @@
 import { db } from './db';
 import { eq, and, sql } from 'drizzle-orm';
-import { users, leadgenUsers, brezcodeUsers } from '@shared/schema';
+import { users, leadgenBusinessUsers, brezcodeUsers } from '@shared/schema';
 
 /**
  * Database Security Layer
@@ -55,7 +55,7 @@ export async function createSecureUser(userData: SecureUserData): Promise<any> {
 
       // Create platform-specific user record
       if (userData.platform === 'leadgen') {
-        await tx.insert(leadgenUsers).values({
+        await tx.insert(leadgenBusinessUsers).values({
           userId: user.id,
           businessName: null,
           industry: null,
@@ -259,8 +259,8 @@ export async function createDataBackup(userId: number): Promise<any> {
     let platformData = null;
     if (userData?.platform === 'leadgen') {
       const [leadgenData] = await db.select()
-        .from(leadgenUsers)
-        .where(eq(leadgenUsers.userId, userId))
+        .from(leadgenBusinessUsers)
+        .where(eq(leadgenBusinessUsers.userId, userId))
         .limit(1);
       platformData = leadgenData;
     } else if (userData?.platform === 'brezcode') {
@@ -299,8 +299,8 @@ export async function verifyDataIntegrity(): Promise<{ status: string; issues: s
   try {
     // Check for orphaned records
     const orphanedLeadgen = await db.select({ count: sql`count(*)` })
-      .from(leadgenUsers)
-      .leftJoin(users, eq(leadgenUsers.userId, users.id))
+      .from(leadgenBusinessUsers)
+      .leftJoin(users, eq(leadgenBusinessUsers.userId, users.id))
       .where(sql`${users.id} IS NULL`);
 
     const orphanedBrezcode = await db.select({ count: sql`count(*)` })

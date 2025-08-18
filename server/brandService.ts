@@ -1,4 +1,4 @@
-import { Request } from "express";
+import type { Request } from "express";
 import { db } from "./db";
 import { brands, brandConfigs, type Brand, type BrandConfig } from "@shared/brand-schema";
 import { eq, and } from "drizzle-orm";

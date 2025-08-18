@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import multer from 'multer';
 import { AvatarKnowledgeService } from './services/avatarKnowledgeService';
 import { TrainingImpactService } from './services/trainingImpactService';

@@ -1,6 +1,6 @@
 import { db } from './db';
 import { sql, eq, and, desc } from 'drizzle-orm';
-import { users, leadgenUsers, brezcodeUsers } from '@shared/schema';
+import { users, leadgenBusinessUsers, brezcodeUsers } from '@shared/schema';
 
 /**
  * Comprehensive Data Protection and Backup System
@@ -48,8 +48,8 @@ export async function createCompleteUserBackup(userId: number): Promise<any> {
     if (userData.platform === 'leadgen') {
       const [leadgenData] = await db
         .select()
-        .from(leadgenUsers)
-        .where(eq(leadgenUsers.userId, userId))
+        .from(leadgenBusinessUsers)
+        .where(eq(leadgenBusinessUsers.userId, userId))
         .limit(1);
       platformData = leadgenData;
     } else if (userData.platform === 'brezcode') {
@@ -130,8 +130,8 @@ export async function validateUserData(userId: number): Promise<DataValidationRe
     if (user.platform === 'leadgen') {
       const [leadgenData] = await db
         .select()
-        .from(leadgenUsers)
-        .where(eq(leadgenUsers.userId, userId))
+        .from(leadgenBusinessUsers)
+        .where(eq(leadgenBusinessUsers.userId, userId))
         .limit(1);
       
       if (!leadgenData) {
@@ -172,7 +172,7 @@ export async function validateUserData(userId: number): Promise<DataValidationRe
 export async function performSystemHealthCheck(): Promise<{
   database: boolean;
   users: number;
-  leadgenUsers: number;
+  leadgenBusinessUsers: number;
   brezcodeUsers: number;
   dataIntegrity: string;
   lastCheck: string;
@@ -183,14 +183,14 @@ export async function performSystemHealthCheck(): Promise<{
     
     // Count records
     const [userCount] = await db.select({ count: sql`count(*)` }).from(users);
-    const [leadgenCount] = await db.select({ count: sql`count(*)` }).from(leadgenUsers);
+    const [leadgenCount] = await db.select({ count: sql`count(*)` }).from(leadgenBusinessUsers);
     const [brezcodeCount] = await db.select({ count: sql`count(*)` }).from(brezcodeUsers);
 
     // Check for orphaned records
     const orphanedLeadgen = await db
       .select({ count: sql`count(*)` })
-      .from(leadgenUsers)
-      .leftJoin(users, eq(leadgenUsers.userId, users.id))
+      .from(leadgenBusinessUsers)
+      .leftJoin(users, eq(leadgenBusinessUsers.userId, users.id))
       .where(sql`${users.id} IS NULL`);
 
     const orphanedBrezcode = await db
@@ -204,7 +204,7 @@ export async function performSystemHealthCheck(): Promise<{
     return {
       database: true,
       users: Number(userCount.count),
-      leadgenUsers: Number(leadgenCount.count),
+      leadgenBusinessUsers: Number(leadgenCount.count),
       brezcodeUsers: Number(brezcodeCount.count),
       dataIntegrity: hasOrphans ? 'issues_detected' : 'healthy',
       lastCheck: new Date().toISOString()
@@ -214,7 +214,7 @@ export async function performSystemHealthCheck(): Promise<{
     return {
       database: false,
       users: 0,
-      leadgenUsers: 0,
+      leadgenBusinessUsers: 0,
       brezcodeUsers: 0,
       dataIntegrity: 'error',
       lastCheck: new Date().toISOString()
@@ -273,7 +273,7 @@ export async function saveSecureUserData(userData: any): Promise<{ success: bool
 
       // Create platform-specific record
       if ((userData.platform || 'leadgen') === 'leadgen') {
-        await tx.insert(leadgenUsers).values({
+        await tx.insert(leadgenBusinessUsers).values({
           userId: newUser.id,
           businessName: userData.businessName || null,
           industry: userData.industry || null,
@@ -342,8 +342,8 @@ export async function retrieveSecureUserData(userId: number, requestedBy: number
     if (userData.platform === 'leadgen') {
       const [leadgenData] = await db
         .select()
-        .from(leadgenUsers)
-        .where(eq(leadgenUsers.userId, userId))
+        .from(leadgenBusinessUsers)
+        .where(eq(leadgenBusinessUsers.userId, userId))
         .limit(1);
       platformData = leadgenData;
     } else if (userData.platform === 'brezcode') {
